@@ -1,11 +1,14 @@
-﻿namespace WinFormsApp1
+using System.Windows.Forms;
+
+namespace WinFormsApp1
 {
     partial class Form1
     {
         /// <summary>
         ///  Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private System.ComponentModel.IContainer? components = null;
+        private DataGridView dataGridViewCards;
 
         /// <summary>
         ///  Clean up any resources being used.
@@ -28,10 +31,30 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            this.dataGridViewCards = new System.Windows.Forms.DataGridView();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewCards)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // dataGridViewCards
+            // 
+            this.dataGridViewCards.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewCards.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridViewCards.Location = new System.Drawing.Point(0, 0);
+            this.dataGridViewCards.Name = "dataGridViewCards";
+            this.dataGridViewCards.RowTemplate.Height = 25;
+            this.dataGridViewCards.Size = new System.Drawing.Size(800, 450);
+            this.dataGridViewCards.TabIndex = 0;
+            // 
+            // Form1
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "Form1";
+            this.Controls.Add(this.dataGridViewCards);
+            this.Name = "Form1";
+            this.Text = "Card Browser";
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewCards)).EndInit();
+            this.ResumeLayout(false);
         }
 
         #endregion
