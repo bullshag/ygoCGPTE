@@ -9,7 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MySql.Data" Version="8.3.0" />
+    <Reference Include="MySql.Data">
+      <HintPath>..\..\..\..\..\AutobattlerMobile\Assets\MySql.Data.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

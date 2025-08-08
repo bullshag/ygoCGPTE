@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\derek\\OneDrive\\Desktop\\tcgAI\\ygoCGPTE\\WinFormsApp1\\WinFormsApp1.csproj": {}
+    "C:\\Users\\derek\\OneDrive\\Desktop\\tcgAI\\ygoCGPTE\\WinFormsApp2\\WinFormsApp2.csproj": {}
   },
   "projects": {
-    "C:\\Users\\derek\\OneDrive\\Desktop\\tcgAI\\ygoCGPTE\\WinFormsApp1\\WinFormsApp1.csproj": {
+    "C:\\Users\\derek\\OneDrive\\Desktop\\tcgAI\\ygoCGPTE\\WinFormsApp2\\WinFormsApp2.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\derek\\OneDrive\\Desktop\\tcgAI\\ygoCGPTE\\WinFormsApp1\\WinFormsApp1.csproj",
-        "projectName": "WinFormsApp1",
-        "projectPath": "C:\\Users\\derek\\OneDrive\\Desktop\\tcgAI\\ygoCGPTE\\WinFormsApp1\\WinFormsApp1.csproj",
+        "projectUniqueName": "C:\\Users\\derek\\OneDrive\\Desktop\\tcgAI\\ygoCGPTE\\WinFormsApp2\\WinFormsApp2.csproj",
+        "projectName": "WinFormsApp2",
+        "projectPath": "C:\\Users\\derek\\OneDrive\\Desktop\\tcgAI\\ygoCGPTE\\WinFormsApp2\\WinFormsApp2.csproj",
         "packagesPath": "C:\\Users\\derek\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\derek\\OneDrive\\Desktop\\tcgAI\\ygoCGPTE\\WinFormsApp1\\obj\\",
+        "outputPath": "C:\\Users\\derek\\OneDrive\\Desktop\\tcgAI\\ygoCGPTE\\WinFormsApp2\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
