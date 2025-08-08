@@ -1,4 +1,5 @@
-using System.Data.SqlClient;
+using MySql.Data.MySqlClient;
+using System;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
@@ -14,12 +15,12 @@ namespace WinFormsApp2
 
         private void btnLogin_Click(object? sender, EventArgs e)
         {
-            using SqlConnection conn = new SqlConnection(DatabaseConfig.ConnectionString);
+            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using SqlCommand cmd = new SqlCommand("SELECT COUNT(1) FROM Users WHERE Username=@u AND PasswordHash=@p", conn);
+            using MySqlCommand cmd = new MySqlCommand("SELECT COUNT(1) FROM Users WHERE Username=@u AND PasswordHash=@p", conn);
             cmd.Parameters.AddWithValue("@u", txtUsername.Text);
             cmd.Parameters.AddWithValue("@p", HashPassword(txtPassword.Text));
-            int count = (int)cmd.ExecuteScalar();
+            int count = Convert.ToInt32(cmd.ExecuteScalar());
             if (count == 1)
             {
                 MessageBox.Show("Login successful");
