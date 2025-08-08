@@ -3,23 +3,17 @@ using System.Windows.Forms;
 
 namespace WinFormsApp2
 {
-    partial class Form1
+    partial class RegisterForm
     {
-        /// <summary>
-        ///  Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer? components = null;
         private TextBox txtUsername = null!;
         private TextBox txtPassword = null!;
-        private Button btnLogin = null!;
-        private Button btnCreateAccount = null!;
+        private TextBox txtConfirmPassword = null!;
+        private Button btnRegister = null!;
         private Label lblUsername = null!;
         private Label lblPassword = null!;
+        private Label lblConfirm = null!;
 
-        /// <summary>
-        ///  Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -31,18 +25,15 @@ namespace WinFormsApp2
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        ///  Required method for Designer support - do not modify
-        ///  the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
             txtUsername = new TextBox();
             txtPassword = new TextBox();
-            btnLogin = new Button();
-            btnCreateAccount = new Button();
+            txtConfirmPassword = new TextBox();
+            btnRegister = new Button();
             lblUsername = new Label();
             lblPassword = new Label();
+            lblConfirm = new Label();
             SuspendLayout();
             // 
             // lblUsername
@@ -78,39 +69,47 @@ namespace WinFormsApp2
             txtPassword.TabIndex = 3;
             txtPassword.UseSystemPasswordChar = true;
             // 
-            // btnLogin
+            // lblConfirm
             // 
-            btnLogin.Location = new Point(30, 150);
-            btnLogin.Name = "btnLogin";
-            btnLogin.Size = new Size(75, 23);
-            btnLogin.TabIndex = 4;
-            btnLogin.Text = "Login";
-            btnLogin.UseVisualStyleBackColor = true;
-            btnLogin.Click += btnLogin_Click;
+            lblConfirm.AutoSize = true;
+            lblConfirm.Location = new Point(30, 150);
+            lblConfirm.Name = "lblConfirm";
+            lblConfirm.Size = new Size(106, 15);
+            lblConfirm.TabIndex = 4;
+            lblConfirm.Text = "Confirm Password";
             // 
-            // btnCreateAccount
+            // txtConfirmPassword
             // 
-            btnCreateAccount.Location = new Point(120, 150);
-            btnCreateAccount.Name = "btnCreateAccount";
-            btnCreateAccount.Size = new Size(110, 23);
-            btnCreateAccount.TabIndex = 5;
-            btnCreateAccount.Text = "Create Account";
-            btnCreateAccount.UseVisualStyleBackColor = true;
-            btnCreateAccount.Click += btnCreateAccount_Click;
+            txtConfirmPassword.Location = new Point(30, 168);
+            txtConfirmPassword.Name = "txtConfirmPassword";
+            txtConfirmPassword.Size = new Size(200, 23);
+            txtConfirmPassword.TabIndex = 5;
+            txtConfirmPassword.UseSystemPasswordChar = true;
             // 
-            // Form1
+            // btnRegister
+            // 
+            btnRegister.Location = new Point(30, 210);
+            btnRegister.Name = "btnRegister";
+            btnRegister.Size = new Size(100, 23);
+            btnRegister.TabIndex = 6;
+            btnRegister.Text = "Create";
+            btnRegister.UseVisualStyleBackColor = true;
+            btnRegister.Click += btnRegister_Click;
+            // 
+            // RegisterForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(264, 211);
-            Controls.Add(btnCreateAccount);
-            Controls.Add(btnLogin);
+            ClientSize = new Size(264, 261);
+            Controls.Add(btnRegister);
+            Controls.Add(txtConfirmPassword);
+            Controls.Add(lblConfirm);
             Controls.Add(txtPassword);
             Controls.Add(lblPassword);
             Controls.Add(txtUsername);
             Controls.Add(lblUsername);
-            Name = "Form1";
-            Text = "Login";
+            Name = "RegisterForm";
+            Text = "Create Account";
             ResumeLayout(false);
             PerformLayout();
         }
