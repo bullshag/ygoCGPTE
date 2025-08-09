@@ -8,8 +8,8 @@ namespace WinFormsApp2
     {
         private readonly Creature _player = new();
         private readonly Creature _npc = new();
-        private readonly Timer _playerTimer = new();
-        private readonly Timer _npcTimer = new();
+        private readonly System.Windows.Forms.Timer _playerTimer = new();
+        private readonly System.Windows.Forms.Timer _npcTimer = new();
         private readonly int _userId;
 
         public BattleForm(int userId)
