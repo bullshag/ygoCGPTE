@@ -159,7 +159,7 @@ namespace WinFormsApp2
                 cmd.Parameters.AddWithValue("@cid", _characterId);
                 cmd.ExecuteNonQuery();
             }
-            DialogResult = DialogResult.OK;
+            this.DialogResult = System.Windows.Forms.DialogResult.OK;
             Close();
         }
     }
