@@ -9,10 +9,12 @@ namespace WinFormsApp2
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer? components = null;
+        private GroupBox grpParty = null!;
         private ListBox lstParty = null!;
+        private Button btnHire = null!;
+        private GroupBox grpStatus = null!;
         private Label lblGold = null!;
         private Label lblPartyExp = null!;
-        private Button btnHire = null!;
 
         /// <summary>
         ///  Clean up any resources being used.
@@ -30,22 +32,33 @@ namespace WinFormsApp2
 
         private void InitializeComponent()
         {
+            grpParty = new GroupBox();
             lstParty = new ListBox();
+            btnHire = new Button();
+            grpStatus = new GroupBox();
             lblGold = new Label();
             lblPartyExp = new Label();
-            btnHire = new Button();
             SuspendLayout();
+            //
+            // grpParty
+            //
+            grpParty.Controls.Add(btnHire);
+            grpParty.Controls.Add(lstParty);
+            grpParty.Location = new Point(40, 40);
+            grpParty.Name = "grpParty";
+            grpParty.Size = new Size(300, 300);
+            grpParty.Text = "Party Members";
             //
             // lstParty
             //
-            lstParty.Location = new Point(70, 90);
-            lstParty.Size = new Size(220, 199);
+            lstParty.Location = new Point(10, 22);
+            lstParty.Size = new Size(280, 200);
             lstParty.Name = "lstParty";
             //
             // lblGold
             //
             lblGold.AutoSize = true;
-            lblGold.Location = new Point(70, 530);
+            lblGold.Location = new Point(10, 25);
             lblGold.Name = "lblGold";
             lblGold.Size = new Size(52, 15);
             lblGold.Text = "Gold: 0";
@@ -53,34 +66,39 @@ namespace WinFormsApp2
             // lblPartyExp
             //
             lblPartyExp.AutoSize = true;
-            lblPartyExp.Location = new Point(220, 530);
+            lblPartyExp.Location = new Point(10, 50);
             lblPartyExp.Name = "lblPartyExp";
             lblPartyExp.Size = new Size(86, 15);
             lblPartyExp.Text = "Party EXP: 0";
             //
             // btnHire
             //
-            btnHire.Location = new Point(70, 300);
+            btnHire.Location = new Point(10, 230);
             btnHire.Name = "btnHire";
-            btnHire.Size = new Size(120, 23);
+            btnHire.Size = new Size(150, 23);
             btnHire.Text = "Hire Party Member";
             btnHire.UseVisualStyleBackColor = true;
             btnHire.Click += btnHire_Click;
+            //
+            // grpStatus
+            //
+            grpStatus.Controls.Add(lblPartyExp);
+            grpStatus.Controls.Add(lblGold);
+            grpStatus.Location = new Point(40, 360);
+            grpStatus.Name = "grpStatus";
+            grpStatus.Size = new Size(300, 80);
+            grpStatus.Text = "Status";
             //
             // PartyForm
             //
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.DarkSlateGray;
             ClientSize = new Size(800, 600);
-            Controls.Add(btnHire);
-            Controls.Add(lblPartyExp);
-            Controls.Add(lblGold);
-            Controls.Add(lstParty);
+            Controls.Add(grpStatus);
+            Controls.Add(grpParty);
             Name = "PartyForm";
             Text = "Party";
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion

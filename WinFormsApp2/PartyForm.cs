@@ -1,5 +1,7 @@
 using MySql.Data.MySqlClient;
 using System;
+using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace WinFormsApp2
@@ -12,6 +14,8 @@ namespace WinFormsApp2
         {
             _userId = userId;
             InitializeComponent();
+            BackgroundImage = GenerateBackground(ClientSize.Width, ClientSize.Height);
+            BackgroundImageLayout = ImageLayout.Stretch;
             LoadPartyData();
         }
 
@@ -49,6 +53,21 @@ namespace WinFormsApp2
         private void btnHire_Click(object? sender, EventArgs e)
         {
             MessageBox.Show("Hire party member functionality coming soon.");
+        }
+
+        private static Image GenerateBackground(int width, int height)
+        {
+            Bitmap bmp = new Bitmap(width, height);
+            using Graphics g = Graphics.FromImage(bmp);
+            using LinearGradientBrush brush = new LinearGradientBrush(
+                new Rectangle(0, 0, width, height),
+                Color.DarkSlateGray,
+                Color.Black,
+                LinearGradientMode.Vertical);
+            g.FillRectangle(brush, 0, 0, width, height);
+            using Pen borderPen = new Pen(Color.Goldenrod, 4);
+            g.DrawRectangle(borderPen, 0, 0, width - 1, height - 1);
+            return bmp;
         }
     }
 }
