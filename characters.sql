@@ -17,5 +17,7 @@ CREATE TABLE IF NOT EXISTS characters (
     intelligence INT NOT NULL,
     melee_defense INT NOT NULL,
     magic_defense INT NOT NULL,
+    level INT NOT NULL DEFAULT 1,
+    skill_points INT NOT NULL DEFAULT 0,
     FOREIGN KEY (account_id) REFERENCES users(id)
 );

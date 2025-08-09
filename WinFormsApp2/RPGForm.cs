@@ -109,20 +109,15 @@ namespace WinFormsApp2
 
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using MySqlCommand cmd = new MySqlCommand("SELECT current_hp, max_hp, mana, strength, dex, intelligence, action_speed FROM characters WHERE account_id=@id AND name=@name", conn);
+            using MySqlCommand cmd = new MySqlCommand("SELECT id FROM characters WHERE account_id=@id AND name=@name", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             cmd.Parameters.AddWithValue("@name", name);
-            using MySqlDataReader reader = cmd.ExecuteReader();
-            if (reader.Read())
+            object? result = cmd.ExecuteScalar();
+            if (result != null)
             {
-                int hp = reader.GetInt32("current_hp");
-                int maxHp = reader.GetInt32("max_hp");
-                int mana = reader.GetInt32("mana");
-                int str = reader.GetInt32("strength");
-                int dex = reader.GetInt32("dex");
-                int intel = reader.GetInt32("intelligence");
-                int speed = reader.GetInt32("action_speed");
-                MessageBox.Show($"{name}\nHP: {hp}/{maxHp}\nMana: {mana}\nSTR: {str}\nDEX: {dex}\nINT: {intel}\nSpeed: {speed}", $"Inspect {name}");
+                int charId = Convert.ToInt32(result);
+                using var inspect = new HeroInspectForm(_userId, charId);
+                inspect.ShowDialog(this);
             }
         }
 
