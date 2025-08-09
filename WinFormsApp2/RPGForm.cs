@@ -27,24 +27,27 @@ namespace WinFormsApp2
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
 
-            using MySqlCommand cmd = new MySqlCommand("SELECT name, experience_points FROM characters WHERE account_id=@id", conn);
+            using MySqlCommand cmd = new MySqlCommand("SELECT name, experience_points, level FROM characters WHERE account_id=@id", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             using MySqlDataReader reader = cmd.ExecuteReader();
             lstParty.Items.Clear();
             int totalExp = 0;
+            int totalLevel = 0;
             while (reader.Read())
             {
                 string name = reader.GetString("name");
                 int exp = reader.GetInt32("experience_points");
-                lstParty.Items.Add($"{name} - EXP {exp}");
+                int level = reader.GetInt32("level");
+                int nextExp = ExperienceHelper.GetNextLevelRequirement(level);
+                lstParty.Items.Add($"{name} - LVL {level} EXP {exp}/{nextExp}");
                 totalExp += exp;
+                totalLevel += level;
             }
             reader.Close();
 
             lblTotalExp.Text = $"Party EXP: {totalExp}";
 
-            int level = totalExp / 100 + 1;
-            _searchCost = 100 + level * 10 + lstParty.Items.Count * 20;
+            _searchCost = 100 + totalLevel * 10 + lstParty.Items.Count * 20;
 
             using MySqlCommand goldCmd = new MySqlCommand("SELECT gold FROM users WHERE id=@id", conn);
             goldCmd.Parameters.AddWithValue("@id", _userId);

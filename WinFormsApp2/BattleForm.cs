@@ -40,12 +40,13 @@ namespace WinFormsApp2
                 }
             }
 
-            using var npcCmd = new MySqlCommand("SELECT name, current_hp, max_hp, strength, dex, action_speed, melee_defense FROM npcs ORDER BY RAND() LIMIT 1", conn);
+            using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, strength, dex, action_speed, melee_defense FROM npcs ORDER BY RAND() LIMIT 1", conn);
             using (var r2 = npcCmd.ExecuteReader())
             {
                 if (r2.Read())
                 {
                     _npc.Name = r2.GetString("name");
+                    _npc.Level = r2.GetInt32("level");
                     _npc.CurrentHp = r2.GetInt32("current_hp");
                     _npc.MaxHp = r2.GetInt32("max_hp");
                     _npc.Strength = r2.GetInt32("strength");
@@ -103,6 +104,10 @@ namespace WinFormsApp2
                 _npcTimer.Stop();
                 string winner = _player.CurrentHp > 0 ? _player.Name : _npc.Name;
                 lstLog.Items.Add($"{winner} wins!");
+                if (_player.CurrentHp > 0)
+                {
+                    AwardExperience();
+                }
             }
         }
 
@@ -115,6 +120,35 @@ namespace WinFormsApp2
             public int Dex { get; set; }
             public int ActionSpeed { get; set; }
             public int MeleeDefense { get; set; }
+            public int Level { get; set; }
+        }
+
+        private void AwardExperience()
+        {
+            using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+
+            int partySize;
+            using (var countCmd = new MySqlCommand("SELECT COUNT(*) FROM characters WHERE account_id=@id", conn))
+            {
+                countCmd.Parameters.AddWithValue("@id", _userId);
+                partySize = Convert.ToInt32(countCmd.ExecuteScalar());
+            }
+
+            if (partySize <= 0) return;
+
+            int totalEnemyLevels = _npc.Level;
+            int expGain = totalEnemyLevels * 20;
+            int expPer = expGain / partySize;
+
+            using (var updateCmd = new MySqlCommand("UPDATE characters SET experience_points = experience_points + @exp WHERE account_id=@id", conn))
+            {
+                updateCmd.Parameters.AddWithValue("@exp", expPer);
+                updateCmd.Parameters.AddWithValue("@id", _userId);
+                updateCmd.ExecuteNonQuery();
+            }
+
+            lstLog.Items.Add($"Each party member gains {expPer} EXP!");
         }
     }
 }
