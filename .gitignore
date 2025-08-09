@@ -1,0 +1,11 @@
+WinFormsApp2/bin/
+WinFormsApp2/obj/
+WinFormsApp2/.vs/
+WinFormsApp2/WinFormsApp2.csproj.user
+*.suo
+*.user
+*.cache
+*.png
+*.jpg
+*.jpeg
+*.gif

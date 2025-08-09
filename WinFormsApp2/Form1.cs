@@ -17,13 +17,17 @@ namespace WinFormsApp2
         {
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using MySqlCommand cmd = new MySqlCommand("SELECT COUNT(1) FROM Users WHERE Username=@u AND PasswordHash=@p", conn);
+            using MySqlCommand cmd = new MySqlCommand("SELECT id FROM Users WHERE Username=@u AND PasswordHash=@p", conn);
             cmd.Parameters.AddWithValue("@u", txtUsername.Text);
             cmd.Parameters.AddWithValue("@p", HashPassword(txtPassword.Text));
-            int count = Convert.ToInt32(cmd.ExecuteScalar());
-            if (count == 1)
+            object? result = cmd.ExecuteScalar();
+            if (result != null)
             {
-                MessageBox.Show("Login successful");
+                int userId = Convert.ToInt32(result);
+                using PartyForm party = new PartyForm(userId);
+                Hide();
+                party.ShowDialog();
+                Show();
             }
             else
             {
