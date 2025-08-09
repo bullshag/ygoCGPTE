@@ -1,0 +1,11 @@
+USE accounts;
+CALL GenerateNPC('Goblin Grunt',1);
+CALL GenerateNPC('Forest Wolf',2);
+CALL GenerateNPC('Bandit Scout',3);
+CALL GenerateNPC('Skeleton Warrior',4);
+CALL GenerateNPC('Orc Brute',5);
+CALL GenerateNPC('Dark Mage',6);
+CALL GenerateNPC('Troll Berserker',7);
+CALL GenerateNPC('Vampire Knight',8);
+CALL GenerateNPC('Dragon Whelp',9);
+CALL GenerateNPC('Ancient Dragon',10);
