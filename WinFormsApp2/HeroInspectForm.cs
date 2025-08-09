@@ -52,8 +52,9 @@ namespace WinFormsApp2
                 int intel = reader.GetInt32("intelligence");
                 int hp = reader.GetInt32("current_hp");
                 int maxHp = reader.GetInt32("max_hp");
-                lblStats.Text = $"{name}\nLevel: {level}\nEXP: {exp}/{level * 100}\nHP: {hp}/{maxHp}\nSTR: {str}\nDEX: {dex}\nINT: {intel}";
-                btnLevelUp.Enabled = exp >= level * 100;
+                int nextExp = ExperienceHelper.GetNextLevelRequirement(level);
+                lblStats.Text = $"{name}\nLevel: {level}\nEXP: {exp}/{nextExp}\nHP: {hp}/{maxHp}\nSTR: {str}\nDEX: {dex}\nINT: {intel}";
+                btnLevelUp.Enabled = exp >= nextExp;
             }
         }
 
