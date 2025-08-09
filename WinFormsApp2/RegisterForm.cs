@@ -31,7 +31,7 @@ namespace WinFormsApp2
                 return;
             }
 
-            using MySqlCommand insert = new MySqlCommand("INSERT INTO Users (Username, PasswordHash) VALUES (@u, @p)", conn);
+            using MySqlCommand insert = new MySqlCommand("INSERT INTO Users (Username, PasswordHash, Gold) VALUES (@u, @p, 300)", conn);
             insert.Parameters.AddWithValue("@u", txtUsername.Text);
             insert.Parameters.AddWithValue("@p", Form1.HashPassword(txtPassword.Text));
             insert.ExecuteNonQuery();

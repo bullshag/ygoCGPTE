@@ -65,7 +65,7 @@ namespace WinFormsApp2
             updateGold.Parameters.AddWithValue("@id", _userId);
             updateGold.ExecuteNonQuery();
 
-            using MySqlCommand insert = new MySqlCommand("INSERT INTO characters(account_id, name, current_hp, max_hp, mana, experience_points, action_speed, strength, dex, intelligence, melee_defense, magic_defense) VALUES(@acc,@name,@hp,@maxHp,@mana,0,@speed,@str,@dex,@int,0,0)", conn);
+            using MySqlCommand insert = new MySqlCommand("INSERT INTO characters(account_id, name, current_hp, max_hp, mana, experience_points, action_speed, strength, dex, intelligence, melee_defense, magic_defense, level, skill_points) VALUES(@acc,@name,@hp,@maxHp,@mana,0,@speed,@str,@dex,@int,0,0,1,0)", conn);
             insert.Parameters.AddWithValue("@acc", _userId);
             insert.Parameters.AddWithValue("@name", _candidate.Name);
             insert.Parameters.AddWithValue("@hp", hp);
