@@ -125,5 +125,11 @@ namespace WinFormsApp2
                 MessageBox.Show($"{name}\nHP: {hp}/{maxHp}\nMana: {mana}\nSTR: {str}\nDEX: {dex}\nINT: {intel}\nSpeed: {speed}", $"Inspect {name}");
             }
         }
+
+        private void btnBattle_Click(object? sender, EventArgs e)
+        {
+            using var battle = new BattleForm(_userId);
+            battle.ShowDialog(this);
+        }
     }
 }
