@@ -14,9 +14,10 @@ namespace WinFormsApp2
 
         public static RecruitCandidate Generate(Random rng, int index)
         {
+            string[] names = { "Arin", "Belor", "Ciri", "Doran", "Elaine", "Faris", "Garen", "Hilda", "Iris", "Jorin" };
             var candidate = new RecruitCandidate
             {
-                Name = $"Recruit {index + 1}",
+                Name = names[rng.Next(names.Length)],
                 Strength = 5,
                 Dexterity = 5,
                 Intelligence = 5

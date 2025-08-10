@@ -24,6 +24,7 @@ namespace WinFormsApp2
             if (result != null)
             {
                 int userId = Convert.ToInt32(result);
+                InventoryService.Load(userId);
                 RPGForm rpg = new RPGForm(userId);
                 rpg.FormClosed += (s, args) => this.Close();
                 rpg.Show();
