@@ -10,9 +10,7 @@ namespace WinFormsApp2
     {
         private readonly List<Creature> _players = new();
         private readonly List<Creature> _npcs = new();
- m98n5d-codex/add-targeting-settings-for-party-members
         private readonly Dictionary<Creature, System.Windows.Forms.Timer> _timers = new();
- main
         private readonly Random _rng = new();
         private readonly int _userId;
 
@@ -28,13 +26,13 @@ namespace WinFormsApp2
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
 
-            using var cmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, strength, dex, action_speed, melee_defense, role, targeting_style FROM characters WHERE account_id=@id", conn);
+            using var cmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, strength, dex, intelligence, action_speed, melee_defense, role, targeting_style FROM characters WHERE account_id=@id", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             using (var r = cmd.ExecuteReader())
             {
                 while (r.Read())
                 {
-                    _players.Add(new Creature
+                    var player = new Creature
                     {
                         Name = r.GetString("name"),
                         Level = r.GetInt32("level"),
@@ -42,11 +40,17 @@ namespace WinFormsApp2
                         MaxHp = r.GetInt32("max_hp"),
                         Strength = r.GetInt32("strength"),
                         Dex = r.GetInt32("dex"),
+                        Intelligence = r.GetInt32("intelligence"),
                         ActionSpeed = r.GetInt32("action_speed"),
                         MeleeDefense = r.GetInt32("melee_defense"),
                         Role = r.GetString("role"),
                         TargetingStyle = r.GetString("targeting_style")
-                    });
+                    };
+                    foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
+                    {
+                        player.Equipment[slot] = InventoryService.GetEquippedItem(player.Name, slot);
+                    }
+                    _players.Add(player);
                 }
             }
 
@@ -94,20 +98,22 @@ namespace WinFormsApp2
         {
             foreach (var p in _players)
             {
- m98n5d-codex/add-targeting-settings-for-party-members
                 var t = new System.Windows.Forms.Timer();
- main
-                t.Interval = (int)(3000 / (p.ActionSpeed + p.Dex / 25.0));
+                double speed = p.ActionSpeed + p.Dex / 25.0;
+                if (p.GetWeapon() is Weapon w && w.AttackSpeedMod != 0)
+                {
+                    speed *= (1 + w.AttackSpeedMod);
+                }
+                t.Interval = (int)(3000 / speed);
                 t.Tick += (s, e) => Act(p, _players, _npcs);
                 t.Start();
                 _timers[p] = t;
             }
             foreach (var n in _npcs)
             {
- m98n5d-codex/add-targeting-settings-for-party-members
                 var t = new System.Windows.Forms.Timer();
- main
-                t.Interval = (int)(3000 / (n.ActionSpeed + n.Dex / 25.0));
+                double speed = n.ActionSpeed + n.Dex / 25.0;
+                t.Interval = (int)(3000 / speed);
                 t.Tick += (s, e) => Act(n, _npcs, _players);
                 t.Start();
                 _timers[n] = t;
@@ -118,6 +124,26 @@ namespace WinFormsApp2
         {
             if (actor.CurrentHp <= 0) return;
             if (actor.HealCooldown > 0) actor.HealCooldown--;
+
+            if (actor.CurrentHp <= actor.MaxHp * 0.35)
+            {
+                if (actor.Equipment.TryGetValue(EquipmentSlot.LeftHand, out var lh) && lh is HealingPotion pot)
+                {
+                    actor.CurrentHp = Math.Min(actor.MaxHp, actor.CurrentHp + pot.HealAmount);
+                    lstLog.Items.Add($"{actor.Name} uses a healing potion!");
+                    InventoryService.ConsumeEquipped(actor.Name, EquipmentSlot.LeftHand);
+                    actor.Equipment[EquipmentSlot.LeftHand] = null;
+                    return;
+                }
+                if (actor.Equipment.TryGetValue(EquipmentSlot.RightHand, out var rh) && rh is HealingPotion pot2)
+                {
+                    actor.CurrentHp = Math.Min(actor.MaxHp, actor.CurrentHp + pot2.HealAmount);
+                    lstLog.Items.Add($"{actor.Name} uses a healing potion!");
+                    InventoryService.ConsumeEquipped(actor.Name, EquipmentSlot.RightHand);
+                    actor.Equipment[EquipmentSlot.RightHand] = null;
+                    return;
+                }
+            }
 
             Creature? target;
             if (actor.Role == "Healer" && actor.HealCooldown == 0)
@@ -138,7 +164,7 @@ namespace WinFormsApp2
             target = ChooseOpponent(actor, opponents, allies);
             if (target == null) return;
 
-            int dmg = Math.Max(1, actor.Strength - target.MeleeDefense);
+            int dmg = CalculateDamage(actor, target);
             target.CurrentHp -= dmg;
             lstLog.Items.Add($"{actor.Name} hits {target.Name} for {dmg} damage!");
             target.Threat[actor] = target.Threat.GetValueOrDefault(actor) + dmg;
@@ -218,7 +244,34 @@ namespace WinFormsApp2
                 {
                     AwardExperience(_npcs.Sum(n => n.Level));
                 }
+                BattleLogService.AddLog(string.Join("\n", lstLog.Items.Cast<string>()));
+                DialogResult = DialogResult.OK;
+                Close();
             }
+        }
+
+        private int CalculateDamage(Creature actor, Creature target)
+        {
+            var weapon = actor.GetWeapon();
+            double statTotal = actor.Strength;
+            double min = 0.8, max = 1.2;
+            double critChanceBonus = 0, critDamageBonus = 0;
+            if (weapon != null)
+            {
+                statTotal = actor.Strength * weapon.StrScaling + actor.Dex * weapon.DexScaling + actor.Intelligence * weapon.IntScaling;
+                min = weapon.MinMultiplier;
+                max = weapon.MaxMultiplier;
+                critChanceBonus = weapon.CritChanceBonus;
+                critDamageBonus = weapon.CritDamageBonus;
+            }
+            double mult = min + _rng.NextDouble() * (max - min);
+            int dmg = (int)Math.Max(1, statTotal * mult - target.MeleeDefense);
+            double critChance = 0.05 + actor.Dex / 5 * 0.01 + critChanceBonus;
+            if (_rng.NextDouble() < Math.Min(1.0, critChance))
+            {
+                dmg = (int)(dmg * (1.5 + critDamageBonus));
+            }
+            return dmg;
         }
 
         private void AwardExperience(int totalEnemyLevels)
@@ -243,6 +296,7 @@ namespace WinFormsApp2
             public int CurrentHp { get; set; }
             public int Strength { get; set; }
             public int Dex { get; set; }
+            public int Intelligence { get; set; }
             public int ActionSpeed { get; set; }
             public int MeleeDefense { get; set; }
             public int Level { get; set; }
@@ -252,6 +306,14 @@ namespace WinFormsApp2
             public Dictionary<Creature, int> Threat { get; } = new();
             public int LastHealedIndex { get; set; } = -1;
             public int HealCooldown { get; set; }
+            public Dictionary<EquipmentSlot, Item?> Equipment { get; } = new();
+
+            public Weapon? GetWeapon()
+            {
+                if (Equipment.TryGetValue(EquipmentSlot.LeftHand, out var lh) && lh is Weapon w) return w;
+                if (Equipment.TryGetValue(EquipmentSlot.RightHand, out var rh) && rh is Weapon w2) return w2;
+                return null;
+            }
         }
     }
 }
