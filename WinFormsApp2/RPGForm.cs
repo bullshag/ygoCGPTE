@@ -48,6 +48,10 @@ namespace WinFormsApp2
             lblTotalExp.Text = $"Party EXP: {totalExp}";
 
             _searchCost = 100 + totalLevel * 10 + lstParty.Items.Count * 20;
+            if (lstParty.Items.Count == 0)
+            {
+                _searchCost = 0;
+            }
 
             using MySqlCommand goldCmd = new MySqlCommand("SELECT gold FROM users WHERE id=@id", conn);
             goldCmd.Parameters.AddWithValue("@id", _userId);
@@ -55,10 +59,13 @@ namespace WinFormsApp2
             _playerGold = goldResult == null ? 0 : Convert.ToInt32(goldResult);
             lblGold.Text = $"Gold: {_playerGold}";
 
-            btnHire.Text = $"Search for new recruits ({_searchCost} gold)";
+            btnHire.Text = _searchCost > 0
+                ? $"Search for new recruits ({_searchCost} gold)"
+                : "Search for new recruits (free)";
             btnHire.Enabled = lstParty.Items.Count < 5 && _playerGold >= _searchCost;
             btnInspect.Enabled = false;
             btnInspect.Text = "Inspect";
+            btnBattle.Enabled = lstParty.Items.Count > 0;
         }
 
         private void btnHire_Click(object? sender, EventArgs e)
@@ -128,6 +135,18 @@ namespace WinFormsApp2
         {
             using var battle = new BattleForm(_userId);
             battle.ShowDialog(this);
+        }
+
+        private void btnLogs_Click(object? sender, EventArgs e)
+        {
+            using var logs = new BattleLogForm();
+            logs.ShowDialog(this);
+        }
+
+        private void btnInventory_Click(object? sender, EventArgs e)
+        {
+            using var inv = new InventoryForm();
+            inv.ShowDialog(this);
         }
     }
 }
