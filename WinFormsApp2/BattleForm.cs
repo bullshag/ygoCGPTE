@@ -212,12 +212,12 @@ namespace WinFormsApp2
                 {
                     actor.ManaBar.Value = Math.Max(0, actor.Mana);
                 }
-                lstLog.Items.Add($"{actor.Name} uses {ability.Name} on {target.Name}!");
+                lstLog.Items.Add(GenerateAbilityLog(actor, target, ability));
             }
 
             int dmg = CalculateDamage(actor, target);
             target.CurrentHp -= dmg;
-            lstLog.Items.Add($"{actor.Name} hits {target.Name} for {dmg} damage!");
+            lstLog.Items.Add(GenerateAttackLog(actor, target, dmg));
             actor.DamageDone += dmg;
             target.DamageTaken += dmg;
             target.HpBar.Value = Math.Max(0, target.CurrentHp);
@@ -226,6 +226,58 @@ namespace WinFormsApp2
             target.CurrentTarget = actor;
             actor.CurrentTarget = target;
             CheckEnd();
+        }
+
+        private string GenerateAbilityLog(Creature actor, Creature target, Ability ability)
+        {
+            string[] verbs = { "casts", "unleashes", "channels", "conjures", "invokes" };
+            string verb = verbs[_rng.Next(verbs.Length)];
+            return $"The {actor.Role.ToLower()} {actor.Name} {verb} {ability.Name} at {target.Name}!";
+        }
+
+        private string GenerateAttackLog(Creature actor, Creature target, int dmg)
+        {
+            bool isNpc = _npcs.Contains(actor);
+            var weapon = actor.GetWeapon();
+            string[] verbs;
+            if (weapon != null)
+            {
+                string name = weapon.Name.ToLower();
+                if (name.Contains("sword") || name.Contains("dagger") || name.Contains("scythe") || name.Contains("axe"))
+                {
+                    verbs = new[] { "slashes", "slices", "hacks", "cleaves", "carves into" };
+                }
+                else if (name.Contains("mace") || name.Contains("maul") || name.Contains("hammer"))
+                {
+                    verbs = new[] { "smashes", "crushes", "bashes", "pummels" };
+                }
+                else if (name.Contains("bow"))
+                {
+                    verbs = new[] { "fires an arrow at", "shoots", "looses a shot at", "pierces" };
+                }
+                else if (name.Contains("staff") || name.Contains("wand") || name.Contains("rod"))
+                {
+                    verbs = new[] { "zaps", "scorches", "blasts", "unleashes magic at" };
+                }
+                else
+                {
+                    verbs = new[] { "strikes", "hits", "attacks" };
+                }
+            }
+            else
+            {
+                if (isNpc)
+                {
+                    verbs = new[] { "claws at", "bites", "mauls", "rips into", "gnashes teeth at" };
+                }
+                else
+                {
+                    verbs = new[] { "punches", "kicks", "strikes" };
+                }
+            }
+
+            string verb = verbs[_rng.Next(verbs.Length)];
+            return $"The {actor.Role.ToLower()} {actor.Name} {verb} {target.Name} for {dmg} damage!";
         }
 
         private Creature? ChooseHealerTarget(Creature actor, List<Creature> allies)
