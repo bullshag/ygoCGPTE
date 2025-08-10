@@ -29,6 +29,8 @@ namespace WinFormsApp2
 
             using var cmd = new MySqlCommand("SELECT id, name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, role, targeting_style FROM characters WHERE account_id=@id", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
+
+            var playerIds = new Dictionary<Creature, int>();
             using (var r = cmd.ExecuteReader())
             {
                 while (r.Read())
@@ -54,15 +56,22 @@ namespace WinFormsApp2
                     {
                         player.Equipment[slot] = InventoryService.GetEquippedItem(player.Name, slot);
                     }
-                    foreach (var abil in AbilityService.GetEquippedAbilities(cid, conn))
-                    {
-                        player.Abilities.Add(abil);
-                    }
-                    if (!player.Abilities.Any())
-                    {
-                        player.Abilities.Add(new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0, Slot = 1 });
-                    }
+
                     _players.Add(player);
+                    playerIds[player] = cid;
+                }
+            }
+
+            // load abilities after closing the reader to avoid multiple active data readers on the same connection
+            foreach (var kv in playerIds)
+            {
+                foreach (var abil in AbilityService.GetEquippedAbilities(kv.Value, conn))
+                {
+                    kv.Key.Abilities.Add(abil);
+                }
+                if (!kv.Key.Abilities.Any())
+                {
+                    kv.Key.Abilities.Add(new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0, Slot = 1 });
                 }
             }
 
