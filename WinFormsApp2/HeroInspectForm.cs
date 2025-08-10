@@ -115,6 +115,7 @@ namespace WinFormsApp2
                 int maxHp = reader.GetInt32("max_hp");
                 int nextExp = ExperienceHelper.GetNextLevelRequirement(level);
                 lblStats.Text = $"{name}\nLevel: {level}\nEXP: {exp}/{nextExp}\nHP: {hp}/{maxHp}\nSTR: {str}\nDEX: {dex}\nINT: {intel}";
+                ShowPredictions(str, dex, intel);
                 btnLevelUp.Enabled = exp >= nextExp;
 
                 string role = reader.GetString("role");
@@ -124,6 +125,27 @@ namespace WinFormsApp2
                 cmbTarget.SelectedItem = targeting;
                 LoadEquipment();
             }
+        }
+
+        private void ShowPredictions(int str, int dex, int intel)
+        {
+            var weapon = InventoryService.GetEquippedItem(_characterName, EquipmentSlot.LeftHand) as Weapon
+                ?? InventoryService.GetEquippedItem(_characterName, EquipmentSlot.RightHand) as Weapon;
+            double statTotal = str;
+            double min = 0.8, max = 1.2, critBonus = 0, speed = 1 + dex / 25.0;
+            if (weapon != null)
+            {
+                statTotal = str * weapon.StrScaling + dex * weapon.DexScaling + intel * weapon.IntScaling;
+                min = weapon.MinMultiplier;
+                max = weapon.MaxMultiplier;
+                critBonus = weapon.CritChanceBonus;
+                speed *= (1 + weapon.AttackSpeedMod);
+            }
+            double minD = Math.Max(1, statTotal * min);
+            double maxD = Math.Max(1, statTotal * max);
+            double crit = Math.Min(1.0, 0.05 + dex / 5 * 0.01 + critBonus);
+            double atkRate = speed / 3.0;
+            lblStats.Text += $"\nDamage: {minD:F1}-{maxD:F1}\nCrit Chance: {crit:P0}\nAttack Rate: {atkRate:F2}/s";
         }
 
         private void BtnLevelUp_Click(object? sender, EventArgs e)

@@ -18,7 +18,7 @@ namespace WinFormsApp2
             _searchCost = searchCost;
             _hireCost = 10 + (int)Math.Ceiling(searchCost * 0.1);
             InitializeComponent();
-            lblName.Text = candidate.Name;
+            txtName.Text = candidate.Name;
             lblStr.Text = $"STR: {candidate.Strength}";
             lblDex.Text = $"DEX: {candidate.Dexterity}";
             lblInt.Text = $"INT: {candidate.Intelligence}";
@@ -67,7 +67,13 @@ namespace WinFormsApp2
 
             using MySqlCommand insert = new MySqlCommand("INSERT INTO characters(account_id, name, current_hp, max_hp, mana, experience_points, action_speed, strength, dex, intelligence, melee_defense, magic_defense, level, skill_points) VALUES(@acc,@name,@hp,@maxHp,@mana,0,@speed,@str,@dex,@int,0,0,1,0)", conn);
             insert.Parameters.AddWithValue("@acc", _userId);
-            insert.Parameters.AddWithValue("@name", _candidate.Name);
+            string name = txtName.Text.Trim();
+            if (name.Contains(' ') || name.Length < 3 || name.Length > 12)
+            {
+                MessageBox.Show("Name must be 3-12 characters with no spaces");
+                return;
+            }
+            insert.Parameters.AddWithValue("@name", name);
             insert.Parameters.AddWithValue("@hp", hp);
             insert.Parameters.AddWithValue("@maxHp", hp);
             insert.Parameters.AddWithValue("@mana", mana);

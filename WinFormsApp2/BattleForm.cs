@@ -13,6 +13,7 @@ namespace WinFormsApp2
         private readonly Dictionary<Creature, System.Windows.Forms.Timer> _timers = new();
         private readonly Random _rng = new();
         private readonly int _userId;
+        private readonly System.Windows.Forms.Timer _progressTimer = new System.Windows.Forms.Timer();
 
         public BattleForm(int userId)
         {
@@ -26,7 +27,7 @@ namespace WinFormsApp2
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
 
-            using var cmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, strength, dex, intelligence, action_speed, melee_defense, role, targeting_style FROM characters WHERE account_id=@id", conn);
+            using var cmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, role, targeting_style FROM characters WHERE account_id=@id", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             using (var r = cmd.ExecuteReader())
             {
@@ -38,6 +39,8 @@ namespace WinFormsApp2
                         Level = r.GetInt32("level"),
                         CurrentHp = r.GetInt32("current_hp"),
                         MaxHp = r.GetInt32("max_hp"),
+                        Mana = r.GetInt32("mana"),
+                        MaxMana = r.GetInt32("mana"),
                         Strength = r.GetInt32("strength"),
                         Dex = r.GetInt32("dex"),
                         Intelligence = r.GetInt32("intelligence"),
@@ -84,14 +87,8 @@ namespace WinFormsApp2
 
         private void BattleForm_Load(object? sender, EventArgs e)
         {
-            UpdateLabels();
+            BuildPanels();
             StartTimers();
-        }
-
-        private void UpdateLabels()
-        {
-            lblPlayer.Text = string.Join("\n", _players.Select(p => $"{p.Name}: {p.CurrentHp}/{p.MaxHp} HP"));
-            lblNpc.Text = string.Join("\n", _npcs.Select(n => $"{n.Name}: {n.CurrentHp}/{n.MaxHp} HP"));
         }
 
         private void StartTimers()
@@ -105,6 +102,9 @@ namespace WinFormsApp2
                     speed *= (1 + w.AttackSpeedMod);
                 }
                 t.Interval = (int)(3000 / speed);
+                p.AttackInterval = t.Interval;
+                p.AttackBar.Maximum = t.Interval;
+                p.AttackBar.Value = t.Interval;
                 t.Tick += (s, e) => Act(p, _players, _npcs);
                 t.Start();
                 _timers[p] = t;
@@ -114,10 +114,25 @@ namespace WinFormsApp2
                 var t = new System.Windows.Forms.Timer();
                 double speed = n.ActionSpeed + n.Dex / 25.0;
                 t.Interval = (int)(3000 / speed);
+                n.AttackInterval = t.Interval;
+                n.AttackBar.Maximum = t.Interval;
+                n.AttackBar.Value = t.Interval;
                 t.Tick += (s, e) => Act(n, _npcs, _players);
                 t.Start();
                 _timers[n] = t;
             }
+            _progressTimer.Interval = 100;
+            _progressTimer.Tick += (s, e) =>
+            {
+                foreach (var c in _players.Concat(_npcs))
+                {
+                    if (c.AttackBar.Value > 0)
+                    {
+                        c.AttackBar.Value = Math.Max(0, c.AttackBar.Value - 100);
+                    }
+                }
+            };
+            _progressTimer.Start();
         }
 
         private void Act(Creature actor, List<Creature> allies, List<Creature> opponents)
@@ -167,6 +182,10 @@ namespace WinFormsApp2
             int dmg = CalculateDamage(actor, target);
             target.CurrentHp -= dmg;
             lstLog.Items.Add($"{actor.Name} hits {target.Name} for {dmg} damage!");
+            actor.DamageDone += dmg;
+            target.DamageTaken += dmg;
+            target.HpBar.Value = Math.Max(0, target.CurrentHp);
+            actor.AttackBar.Value = actor.AttackInterval;
             target.Threat[actor] = target.Threat.GetValueOrDefault(actor) + dmg;
             target.CurrentTarget = actor;
             actor.CurrentTarget = target;
@@ -234,7 +253,8 @@ namespace WinFormsApp2
 
         private void CheckEnd()
         {
-            UpdateLabels();
+            foreach (var p in _players) p.HpBar.Value = Math.Max(0, p.CurrentHp);
+            foreach (var n in _npcs) n.HpBar.Value = Math.Max(0, n.CurrentHp);
             if (_players.All(p => p.CurrentHp <= 0) || _npcs.All(n => n.CurrentHp <= 0))
             {
                 foreach (var t in _timers.Values) t.Stop();
@@ -245,6 +265,9 @@ namespace WinFormsApp2
                     AwardExperience(_npcs.Sum(n => n.Level));
                 }
                 BattleLogService.AddLog(string.Join("\n", lstLog.Items.Cast<string>()));
+                SaveHp();
+                using var summary = new BattleSummaryForm(_players, _npcs);
+                summary.ShowDialog(this);
                 DialogResult = DialogResult.OK;
                 Close();
             }
@@ -294,6 +317,8 @@ namespace WinFormsApp2
             public string Name { get; set; } = string.Empty;
             public int MaxHp { get; set; }
             public int CurrentHp { get; set; }
+            public int Mana { get; set; }
+            public int MaxMana { get; set; }
             public int Strength { get; set; }
             public int Dex { get; set; }
             public int Intelligence { get; set; }
@@ -307,12 +332,67 @@ namespace WinFormsApp2
             public int LastHealedIndex { get; set; } = -1;
             public int HealCooldown { get; set; }
             public Dictionary<EquipmentSlot, Item?> Equipment { get; } = new();
+            public ProgressBar HpBar { get; set; } = new();
+            public ProgressBar ManaBar { get; set; } = new();
+            public ProgressBar AttackBar { get; set; } = new();
+            public int AttackInterval { get; set; }
+            public int DamageDone { get; set; }
+            public int DamageTaken { get; set; }
 
             public Weapon? GetWeapon()
             {
                 if (Equipment.TryGetValue(EquipmentSlot.LeftHand, out var lh) && lh is Weapon w) return w;
                 if (Equipment.TryGetValue(EquipmentSlot.RightHand, out var rh) && rh is Weapon w2) return w2;
                 return null;
+            }
+        }
+
+        private void BuildPanels()
+        {
+            pnlPlayers.Controls.Clear();
+            pnlEnemies.Controls.Clear();
+            foreach (var p in _players)
+            {
+                pnlPlayers.Controls.Add(CreatePanel(p));
+            }
+            foreach (var e in _npcs)
+            {
+                pnlEnemies.Controls.Add(CreatePanel(e));
+            }
+        }
+
+        private Control CreatePanel(Creature c)
+        {
+            var panel = new Panel { Width = 180, Height = 80 };
+            var lbl = new Label { Text = c.Name, AutoSize = true };
+            c.HpBar = new ProgressBar { Maximum = c.MaxHp, Value = c.CurrentHp, Width = 170, Location = new System.Drawing.Point(0, 15) };
+            panel.Controls.Add(lbl);
+            panel.Controls.Add(c.HpBar);
+            if (c.MaxMana > 0)
+            {
+                c.ManaBar = new ProgressBar { Maximum = c.MaxMana, Value = c.Mana, Width = 170, Location = new System.Drawing.Point(0, 35) };
+                panel.Controls.Add(c.ManaBar);
+                c.AttackBar = new ProgressBar { Maximum = 100, Value = 100, Width = 170, Location = new System.Drawing.Point(0, 55) };
+            }
+            else
+            {
+                c.AttackBar = new ProgressBar { Maximum = 100, Value = 100, Width = 170, Location = new System.Drawing.Point(0, 35) };
+            }
+            panel.Controls.Add(c.AttackBar);
+            return panel;
+        }
+
+        private void SaveHp()
+        {
+            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            foreach (var p in _players)
+            {
+                using MySqlCommand cmd = new MySqlCommand("UPDATE characters SET current_hp=@hp WHERE account_id=@uid AND name=@name", conn);
+                cmd.Parameters.AddWithValue("@hp", Math.Max(0, p.CurrentHp));
+                cmd.Parameters.AddWithValue("@uid", _userId);
+                cmd.Parameters.AddWithValue("@name", p.Name);
+                cmd.ExecuteNonQuery();
             }
         }
     }

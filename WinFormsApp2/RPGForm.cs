@@ -10,6 +10,7 @@ namespace WinFormsApp2
         private readonly int _userId;
         private int _searchCost;
         private int _playerGold;
+        private readonly Timer _regenTimer = new Timer();
 
         public RPGForm(int userId)
         {
@@ -20,6 +21,9 @@ namespace WinFormsApp2
         private void RPGForm_Load(object? sender, EventArgs e)
         {
             LoadPartyData();
+            _regenTimer.Interval = 10000;
+            _regenTimer.Tick += (s, e2) => Regenerate();
+            _regenTimer.Start();
         }
 
         private void LoadPartyData()
@@ -145,8 +149,18 @@ namespace WinFormsApp2
 
         private void btnInventory_Click(object? sender, EventArgs e)
         {
-            using var inv = new InventoryForm();
+            using var inv = new InventoryForm(_userId);
             inv.ShowDialog(this);
+        }
+
+        private void Regenerate()
+        {
+            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            using MySqlCommand cmd = new MySqlCommand("UPDATE characters SET current_hp = LEAST(max_hp, current_hp + CEILING(max_hp*0.05)) WHERE account_id=@id AND current_hp>0 AND current_hp<max_hp", conn);
+            cmd.Parameters.AddWithValue("@id", _userId);
+            cmd.ExecuteNonQuery();
+            LoadPartyData();
         }
     }
 }
