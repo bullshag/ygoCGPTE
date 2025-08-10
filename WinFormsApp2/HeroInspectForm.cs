@@ -6,20 +6,10 @@ using System.Collections.Generic;
 
 namespace WinFormsApp2
 {
-    public class HeroInspectForm : Form
+    public partial class HeroInspectForm : Form
     {
         private readonly int _userId;
         private readonly int _characterId;
-        private Label lblStats = new Label();
-        private Button btnLevelUp = new Button();
-        private ComboBox cmbRole = new ComboBox();
-        private ComboBox cmbTarget = new ComboBox();
-        private ComboBox cmbLeft = new ComboBox();
-        private ComboBox cmbRight = new ComboBox();
-        private ComboBox cmbBody = new ComboBox();
-        private ComboBox cmbLegs = new ComboBox();
-        private ComboBox cmbHead = new ComboBox();
-        private ComboBox cmbTrinket = new ComboBox();
         private ComboBox[] _abilityCombos = new ComboBox[3];
         private NumericUpDown[] _priorityNums = new NumericUpDown[3];
         private System.Collections.Generic.List<Ability> _knownAbilities = new();
@@ -31,92 +21,29 @@ namespace WinFormsApp2
         {
             _userId = userId;
             _characterId = characterId;
-            Text = "Hero Details";
-            Width = 300;
-            Height = 520;
-
-            lblStats.Left = 10;
-            lblStats.Top = 10;
-            lblStats.Width = 260;
-            lblStats.Height = 150;
-            Controls.Add(lblStats);
-
-            cmbRole.Left = 10;
-            cmbRole.Top = 170;
-            cmbRole.Width = 120;
+            InitializeComponent();
+            _abilityCombos = new[] { cmbAbility1, cmbAbility2, cmbAbility3 };
+            _priorityNums = new[] { numPriority1, numPriority2, numPriority3 };
             cmbRole.Items.AddRange(new[] { "Tank", "Healer", "DPS" });
             cmbRole.SelectedIndexChanged += CmbRole_SelectedIndexChanged;
-            Controls.Add(cmbRole);
-
-            cmbTarget.Left = 150;
-            cmbTarget.Top = 170;
-            cmbTarget.Width = 140;
             cmbTarget.SelectedIndexChanged += CmbTarget_SelectedIndexChanged;
-            Controls.Add(cmbTarget);
-
-            for (int i = 0; i < 3; i++)
+            cmbLeft.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.LeftHand, cmbLeft);
+            cmbRight.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.RightHand, cmbRight);
+            cmbBody.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.Body, cmbBody);
+            cmbLegs.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.Legs, cmbLegs);
+            cmbHead.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.Head, cmbHead);
+            cmbTrinket.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.Trinket, cmbTrinket);
+            foreach (var cmb in _abilityCombos)
             {
-                var cmb = new ComboBox();
-                var num = new NumericUpDown();
-                cmb.Left = 10;
-                cmb.Top = 200 + i * 30;
-                cmb.Width = 120;
                 cmb.SelectedIndexChanged += AbilityComboChanged;
-                Controls.Add(cmb);
-                _abilityCombos[i] = cmb;
-
-                num.Left = 150;
-                num.Top = 200 + i * 30;
-                num.Width = 40;
+            }
+            foreach (var num in _priorityNums)
+            {
                 num.Minimum = 1;
                 num.Maximum = 99;
                 num.ValueChanged += PriorityChanged;
-                Controls.Add(num);
-                _priorityNums[i] = num;
             }
-
-            cmbLeft.Left = 10;
-            cmbLeft.Top = 320;
-            cmbLeft.Width = 120;
-            cmbLeft.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.LeftHand, cmbLeft);
-            Controls.Add(cmbLeft);
-
-            cmbRight.Left = 150;
-            cmbRight.Top = 320;
-            cmbRight.Width = 120;
-            cmbRight.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.RightHand, cmbRight);
-            Controls.Add(cmbRight);
-
-            cmbBody.Left = 10;
-            cmbBody.Top = 350;
-            cmbBody.Width = 120;
-            cmbBody.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.Body, cmbBody);
-            Controls.Add(cmbBody);
-
-            cmbLegs.Left = 150;
-            cmbLegs.Top = 350;
-            cmbLegs.Width = 120;
-            cmbLegs.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.Legs, cmbLegs);
-            Controls.Add(cmbLegs);
-
-            cmbHead.Left = 10;
-            cmbHead.Top = 380;
-            cmbHead.Width = 120;
-            cmbHead.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.Head, cmbHead);
-            Controls.Add(cmbHead);
-
-            cmbTrinket.Left = 150;
-            cmbTrinket.Top = 380;
-            cmbTrinket.Width = 120;
-            cmbTrinket.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.Trinket, cmbTrinket);
-            Controls.Add(cmbTrinket);
-
-            btnLevelUp.Text = "Level Up";
-            btnLevelUp.Left = 10;
-            btnLevelUp.Top = 450;
             btnLevelUp.Click += BtnLevelUp_Click;
-            Controls.Add(btnLevelUp);
-
             Load += HeroInspectForm_Load;
         }
 
@@ -370,11 +297,6 @@ namespace WinFormsApp2
             var num = (NumericUpDown)sender!;
             int index = Array.IndexOf(_priorityNums, num);
             SaveAbility(index);
-        }
-
-        private void InitializeComponent()
-        {
-
         }
 
         private void SaveAbility(int index)

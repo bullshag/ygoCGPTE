@@ -7,7 +7,7 @@ using MySql.Data.MySqlClient;
 
 namespace WinFormsApp2
 {
-    public class ShopForm : Form
+    public partial class ShopForm : Form
     {
         private readonly int _userId;
         private int _playerGold;
@@ -21,41 +21,12 @@ namespace WinFormsApp2
             WeaponFactory.Create("wand")
         };
 
-        private ListBox _lstShop = new ListBox();
-        private ListBox _lstInventory = new ListBox();
-        private Button _btnBuy = new Button();
-        private Button _btnSell = new Button();
-        private Label _lblGold = new Label();
-
         public ShopForm(int userId)
         {
             _userId = userId;
-            Text = "Shop";
-            Width = 600;
-            Height = 400;
-
-            _lstShop.Location = new Point(10, 10);
-            _lstShop.Size = new Size(250, 300);
-            Controls.Add(_lstShop);
-
-            _lstInventory.Location = new Point(330, 10);
-            _lstInventory.Size = new Size(250, 300);
-            Controls.Add(_lstInventory);
-
-            _btnBuy.Text = "Buy";
-            _btnBuy.Location = new Point(10, 320);
+            InitializeComponent();
             _btnBuy.Click += BtnBuy_Click;
-            Controls.Add(_btnBuy);
-
-            _btnSell.Text = "Sell";
-            _btnSell.Location = new Point(330, 320);
             _btnSell.Click += BtnSell_Click;
-            Controls.Add(_btnSell);
-
-            _lblGold.Location = new Point(10, 350);
-            _lblGold.AutoSize = true;
-            Controls.Add(_lblGold);
-
             Load += ShopForm_Load;
         }
 
@@ -118,11 +89,6 @@ namespace WinFormsApp2
             if (item != null) InventoryService.AddItem(item);
             RefreshGold();
             RefreshInventory();
-        }
-
-        private void InitializeComponent()
-        {
-
         }
 
         private void BtnSell_Click(object? sender, EventArgs e)
