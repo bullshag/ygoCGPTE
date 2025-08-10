@@ -10,7 +10,9 @@ namespace WinFormsApp2
     {
         private readonly List<Creature> _players = new();
         private readonly List<Creature> _npcs = new();
-        private readonly Dictionary<Creature, Timer> _timers = new();
+ m98n5d-codex/add-targeting-settings-for-party-members
+        private readonly Dictionary<Creature, System.Windows.Forms.Timer> _timers = new();
+ main
         private readonly Random _rng = new();
         private readonly int _userId;
 
@@ -92,7 +94,9 @@ namespace WinFormsApp2
         {
             foreach (var p in _players)
             {
-                var t = new Timer();
+ m98n5d-codex/add-targeting-settings-for-party-members
+                var t = new System.Windows.Forms.Timer();
+ main
                 t.Interval = (int)(3000 / (p.ActionSpeed + p.Dex / 25.0));
                 t.Tick += (s, e) => Act(p, _players, _npcs);
                 t.Start();
@@ -100,7 +104,9 @@ namespace WinFormsApp2
             }
             foreach (var n in _npcs)
             {
-                var t = new Timer();
+ m98n5d-codex/add-targeting-settings-for-party-members
+                var t = new System.Windows.Forms.Timer();
+ main
                 t.Interval = (int)(3000 / (n.ActionSpeed + n.Dex / 25.0));
                 t.Tick += (s, e) => Act(n, _npcs, _players);
                 t.Start();

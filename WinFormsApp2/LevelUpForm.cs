@@ -150,7 +150,9 @@ namespace WinFormsApp2
             int remaining = _availablePoints - spent;
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using MySqlCommand cmd = new MySqlCommand("UPDATE characters SET strength=@s, dex=@d, intelligence=@i, skill_points=@sp WHERE id=@cid", conn)
+            using (MySqlCommand cmd = new MySqlCommand(
+                "UPDATE characters SET strength=@s, dex=@d, intelligence=@i, skill_points=@sp WHERE id=@cid",
+                conn))
             {
                 cmd.Parameters.AddWithValue("@s", newStr);
                 cmd.Parameters.AddWithValue("@d", newDex);
