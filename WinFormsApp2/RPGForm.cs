@@ -11,7 +11,6 @@ namespace WinFormsApp2
         private readonly string _nickname;
         private int _searchCost;
         private int _playerGold;
-        private readonly System.Windows.Forms.Timer _regenTimer = new System.Windows.Forms.Timer();
         private readonly System.Windows.Forms.Timer _chatTimer = new System.Windows.Forms.Timer();
         private DateTime _lastMessage = DateTime.MinValue;
 
@@ -25,9 +24,6 @@ namespace WinFormsApp2
         private void RPGForm_Load(object? sender, EventArgs e)
         {
             LoadPartyData();
-            _regenTimer.Interval = 10000;
-            _regenTimer.Tick += (s, e2) => Regenerate();
-            _regenTimer.Start();
             _chatTimer.Interval = 1000;
             _chatTimer.Tick += ChatTimer_Tick;
             _chatTimer.Start();
@@ -171,7 +167,7 @@ namespace WinFormsApp2
         {
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using MySqlCommand cmd = new MySqlCommand("UPDATE characters SET current_hp = LEAST(max_hp, current_hp + GREATEST(10, CEILING(max_hp*0.05))) WHERE account_id=@id AND current_hp>0 AND current_hp<max_hp", conn);
+            using MySqlCommand cmd = new MySqlCommand("UPDATE characters SET current_hp = LEAST(max_hp, current_hp + 1 + CEILING(max_hp*0.05)) WHERE account_id=@id AND current_hp>0 AND current_hp<max_hp", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             cmd.ExecuteNonQuery();
 
@@ -196,6 +192,7 @@ namespace WinFormsApp2
             lstOnline.DataSource = ChatService.GetOnlinePlayers();
             lstFriends.DataSource = FriendService.GetFriends(_userId);
             lstFriendRequests.DataSource = FriendService.GetFriendRequests(_userId);
+            Regenerate();
         }
 
         private void btnChatSend_Click(object? sender, EventArgs e)

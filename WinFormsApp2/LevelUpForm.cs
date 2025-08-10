@@ -5,19 +5,10 @@ using MySql.Data.MySqlClient;
 
 namespace WinFormsApp2
 {
-    public class LevelUpForm : Form
+    public partial class LevelUpForm : Form
     {
         private readonly int _userId;
         private readonly int _characterId;
-        private NumericUpDown numStr = new NumericUpDown();
-        private NumericUpDown numDex = new NumericUpDown();
-        private NumericUpDown numInt = new NumericUpDown();
-        private Label lblPoints = new Label();
-        private Label lblGold = new Label();
-        private ListBox lstAbilities = new ListBox();
-        private Button btnBuy = new Button();
-        private Button btnSave = new Button();
-
         private int _baseStr;
         private int _baseDex;
         private int _baseInt;
@@ -30,32 +21,12 @@ namespace WinFormsApp2
         {
             _userId = userId;
             _characterId = characterId;
-            Text = "Level Up";
-            Width = 400;
-            Height = 300;
-
-            var lblStr = new Label { Text = "STR", Left = 10, Top = 10, Width = 40 };
-            numStr.Left = 60; numStr.Top = 8; numStr.Width = 60;
-            numStr.Minimum = 0; numStr.Maximum = 999;
+            InitializeComponent();
             numStr.ValueChanged += StatsChanged;
-
-            var lblDex = new Label { Text = "DEX", Left = 10, Top = 40, Width = 40 };
-            numDex.Left = 60; numDex.Top = 38; numDex.Width = 60;
-            numDex.Minimum = 0; numDex.Maximum = 999;
             numDex.ValueChanged += StatsChanged;
-
-            var lblInt = new Label { Text = "INT", Left = 10, Top = 70, Width = 40 };
-            numInt.Left = 60; numInt.Top = 68; numInt.Width = 60;
-            numInt.Minimum = 0; numInt.Maximum = 999;
             numInt.ValueChanged += StatsChanged;
-
-            lblPoints.Left = 10; lblPoints.Top = 100; lblPoints.Width = 200;
-            lblGold.Left = 220; lblGold.Top = 10; lblGold.Width = 150;
-            lstAbilities.Left = 220; lstAbilities.Top = 40; lstAbilities.Width = 150; lstAbilities.Height = 120;
-            btnBuy.Text = "Buy"; btnBuy.Left = 220; btnBuy.Top = 170; btnBuy.Click += BtnBuy_Click;
-            btnSave.Text = "Save"; btnSave.Left = 10; btnSave.Top = 130; btnSave.Click += BtnSave_Click;
-
-            Controls.AddRange(new Control[] { lblStr, numStr, lblDex, numDex, lblInt, numInt, lblPoints, lblGold, lstAbilities, btnBuy, btnSave });
+            btnBuy.Click += BtnBuy_Click;
+            btnSave.Click += BtnSave_Click;
             Load += LevelUpForm_Load;
         }
 
@@ -133,11 +104,6 @@ namespace WinFormsApp2
             {
                 lstAbilities.Items.Add($"{a.Name} ({a.Cost})");
             }
-        }
-
-        private void InitializeComponent()
-        {
-
         }
 
         private void BtnSave_Click(object? sender, EventArgs e)
