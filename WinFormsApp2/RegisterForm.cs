@@ -14,15 +14,16 @@ namespace WinFormsApp2
         private void btnRegister_Click(object? sender, EventArgs e)
         {
             string user = txtUsername.Text;
+            string nick = txtNickname.Text;
             string pass = txtPassword.Text;
-            if (user.Contains(' ') || pass.Contains(' '))
+            if (user.Contains(' ') || pass.Contains(' ') || nick.Contains(' '))
             {
-                MessageBox.Show("No spaces allowed in username or password");
+                MessageBox.Show("No spaces allowed in username, nickname or password");
                 return;
             }
-            if (user.Length < 3 || user.Length > 12 || pass.Length < 3 || pass.Length > 12)
+            if (user.Length < 3 || user.Length > 12 || pass.Length < 3 || pass.Length > 12 || nick.Length < 3 || nick.Length > 12)
             {
-                MessageBox.Show("Username and password must be 3-12 characters");
+                MessageBox.Show("Username, nickname and password must be 3-12 characters");
                 return;
             }
             if (pass != txtConfirmPassword.Text)
@@ -34,17 +35,27 @@ namespace WinFormsApp2
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
 
-            using MySqlCommand check = new MySqlCommand("SELECT COUNT(1) FROM Users WHERE Username=@u", conn);
-            check.Parameters.AddWithValue("@u", user);
-            int exists = Convert.ToInt32(check.ExecuteScalar());
-            if (exists > 0)
+            using MySqlCommand checkUser = new MySqlCommand("SELECT COUNT(1) FROM Users WHERE Username=@u", conn);
+            checkUser.Parameters.AddWithValue("@u", user);
+            int existsUser = Convert.ToInt32(checkUser.ExecuteScalar());
+            if (existsUser > 0)
             {
                 MessageBox.Show("Username already exists");
                 return;
             }
 
-            using MySqlCommand insert = new MySqlCommand("INSERT INTO Users (Username, PasswordHash, Gold) VALUES (@u, @p, 300)", conn);
+            using MySqlCommand checkNick = new MySqlCommand("SELECT COUNT(1) FROM Users WHERE Nickname=@n", conn);
+            checkNick.Parameters.AddWithValue("@n", nick);
+            int existsNick = Convert.ToInt32(checkNick.ExecuteScalar());
+            if (existsNick > 0)
+            {
+                MessageBox.Show("Nickname already exists");
+                return;
+            }
+
+            using MySqlCommand insert = new MySqlCommand("INSERT INTO Users (Username, Nickname, PasswordHash, Gold, last_seen) VALUES (@u, @n, @p, 300, NOW())", conn);
             insert.Parameters.AddWithValue("@u", user);
+            insert.Parameters.AddWithValue("@n", nick);
             insert.Parameters.AddWithValue("@p", Form1.HashPassword(pass));
             insert.ExecuteNonQuery();
 
