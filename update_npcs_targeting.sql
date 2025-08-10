@@ -1,0 +1,3 @@
+USE accounts;
+ALTER TABLE npcs ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'DPS';
+ALTER TABLE npcs ADD COLUMN targeting_style VARCHAR(50) NOT NULL DEFAULT 'no priorities';
