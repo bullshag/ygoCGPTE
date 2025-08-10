@@ -6,8 +6,8 @@ namespace WinFormsApp2
     partial class BattleForm
     {
         private System.ComponentModel.IContainer? components = null;
-        private Label lblPlayer;
-        private Label lblNpc;
+        private FlowLayoutPanel pnlPlayers;
+        private FlowLayoutPanel pnlEnemies;
         private ListBox lstLog;
 
         protected override void Dispose(bool disposing)
@@ -21,40 +21,32 @@ namespace WinFormsApp2
 
         private void InitializeComponent()
         {
-            lblPlayer = new Label();
-            lblNpc = new Label();
+            pnlPlayers = new FlowLayoutPanel();
+            pnlEnemies = new FlowLayoutPanel();
             lstLog = new ListBox();
             SuspendLayout();
-            // lblPlayer
-            lblPlayer.AutoSize = true;
-            lblPlayer.Location = new Point(12, 9);
-            lblPlayer.Name = "lblPlayer";
-            lblPlayer.Size = new Size(38, 15);
-            lblPlayer.Text = "Player";
-            // lblNpc
-            lblNpc.AutoSize = true;
-            lblNpc.Location = new Point(12, 34);
-            lblNpc.Name = "lblNpc";
-            lblNpc.Size = new Size(31, 15);
-            lblNpc.Text = "NPC";
+            // pnlPlayers
+            pnlPlayers.Location = new Point(12, 12);
+            pnlPlayers.Size = new Size(200, 120);
+            // pnlEnemies
+            pnlEnemies.Location = new Point(276, 12);
+            pnlEnemies.Size = new Size(200, 120);
             // lstLog
             lstLog.FormattingEnabled = true;
             lstLog.ItemHeight = 15;
-            lstLog.Location = new Point(12, 60);
-            lstLog.Name = "lstLog";
-            lstLog.Size = new Size(260, 184);
+            lstLog.Location = new Point(12, 138);
+            lstLog.Size = new Size(464, 154);
             // BattleForm
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(284, 261);
+            ClientSize = new Size(488, 304);
             Controls.Add(lstLog);
-            Controls.Add(lblNpc);
-            Controls.Add(lblPlayer);
+            Controls.Add(pnlEnemies);
+            Controls.Add(pnlPlayers);
             Name = "BattleForm";
             Text = "Battle";
             Load += BattleForm_Load;
             ResumeLayout(false);
-            PerformLayout();
         }
     }
 }

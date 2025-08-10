@@ -9,6 +9,7 @@ namespace WinFormsApp2
         private ListBox lstItems;
         private Label lblDescription;
         private Button btnUse;
+        private ComboBox cmbTarget;
 
         protected override void Dispose(bool disposing)
         {
@@ -24,6 +25,7 @@ namespace WinFormsApp2
             lstItems = new ListBox();
             lblDescription = new Label();
             btnUse = new Button();
+            cmbTarget = new ComboBox();
             SuspendLayout();
             //
             // lstItems
@@ -40,18 +42,23 @@ namespace WinFormsApp2
             lblDescription.Size = new Size(200, 120);
             //
             // btnUse
-            //
-            btnUse.Location = new Point(168, 135);
+            btnUse.Location = new Point(168, 164);
             btnUse.Size = new Size(200, 23);
             btnUse.Text = "Use";
             btnUse.Enabled = false;
             btnUse.Click += btnUse_Click;
+
+            // cmbTarget
+            cmbTarget.Location = new Point(168, 135);
+            cmbTarget.Size = new Size(200, 23);
+            cmbTarget.SelectedIndexChanged += cmbTarget_SelectedIndexChanged;
             //
             // InventoryForm
             //
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(380, 223);
+            Controls.Add(cmbTarget);
             Controls.Add(btnUse);
             Controls.Add(lblDescription);
             Controls.Add(lstItems);

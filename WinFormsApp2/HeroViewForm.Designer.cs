@@ -7,6 +7,7 @@ namespace WinFormsApp2
     {
         private System.ComponentModel.IContainer? components = null;
         private Label lblName;
+        private TextBox txtName;
         private Label lblStr;
         private Label lblDex;
         private Label lblInt;
@@ -28,6 +29,7 @@ namespace WinFormsApp2
         private void InitializeComponent()
         {
             lblName = new Label();
+            txtName = new TextBox();
             lblStr = new Label();
             lblDex = new Label();
             lblInt = new Label();
@@ -42,12 +44,15 @@ namespace WinFormsApp2
             SuspendLayout();
             //
             // lblName
-            //
             lblName.AutoSize = true;
             lblName.Location = new Point(12, 9);
             lblName.Name = "lblName";
-            lblName.Size = new Size(38, 15);
-            lblName.Text = "Name";
+            lblName.Size = new Size(39, 15);
+            lblName.Text = "Name:";
+
+            // txtName
+            txtName.Location = new Point(70, 6);
+            txtName.Size = new Size(120, 23);
             //
             // lblStr
             //
@@ -127,6 +132,7 @@ namespace WinFormsApp2
             Controls.Add(lblInt);
             Controls.Add(lblDex);
             Controls.Add(lblStr);
+            Controls.Add(txtName);
             Controls.Add(lblName);
             Name = "HeroViewForm";
             Text = "Hero";
