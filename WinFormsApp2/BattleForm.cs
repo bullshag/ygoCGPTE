@@ -274,7 +274,9 @@ namespace WinFormsApp2
                 }
                 BattleLogService.AddLog(string.Join("\n", lstLog.Items.Cast<string>()));
                 SaveHp();
-                using var summary = new BattleSummaryForm(_players, _npcs);
+                var playerSummaries = _players.Select(p => new CombatantSummary(p.Name, p.DamageDone, p.DamageTaken));
+                var enemySummaries = _npcs.Select(n => new CombatantSummary(n.Name, n.DamageDone, n.DamageTaken));
+                using var summary = new BattleSummaryForm(playerSummaries, enemySummaries);
                 summary.ShowDialog(this);
                 DialogResult = DialogResult.OK;
                 Close();
