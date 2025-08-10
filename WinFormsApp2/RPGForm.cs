@@ -167,7 +167,13 @@ namespace WinFormsApp2
             using MySqlCommand cmd = new MySqlCommand("UPDATE characters SET current_hp = LEAST(max_hp, current_hp + GREATEST(10, CEILING(max_hp*0.05))) WHERE account_id=@id AND current_hp>0 AND current_hp<max_hp", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             cmd.ExecuteNonQuery();
+
+            int selectedIndex = lstParty.SelectedIndex;
             LoadPartyData();
+            if (selectedIndex >= 0 && selectedIndex < lstParty.Items.Count)
+            {
+                lstParty.SelectedIndex = selectedIndex;
+            }
         }
     }
 }

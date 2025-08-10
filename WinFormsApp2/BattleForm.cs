@@ -58,18 +58,24 @@ namespace WinFormsApp2
             }
 
             int totalLevel = _players.Sum(p => p.Level);
-            int targetLevel = (int)Math.Ceiling(totalLevel * 1.25);
+            int minLevel = (int)Math.Floor(totalLevel * 0.7);
+            int maxLevel = (int)Math.Ceiling(totalLevel * 1.2);
             int npcLevel = 0;
-            while (npcLevel < targetLevel)
+            while (npcLevel < minLevel)
             {
                 using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, strength, dex, action_speed, melee_defense, role, targeting_style FROM npcs ORDER BY RAND() LIMIT 1", conn);
                 using var r2 = npcCmd.ExecuteReader();
                 if (r2.Read())
                 {
+                    int level = r2.GetInt32("level");
+                    if (npcLevel + level > maxLevel)
+                    {
+                        continue;
+                    }
                     var npc = new Creature
                     {
                         Name = r2.GetString("name"),
-                        Level = r2.GetInt32("level"),
+                        Level = level,
                         CurrentHp = r2.GetInt32("current_hp"),
                         MaxHp = r2.GetInt32("max_hp"),
                         Strength = r2.GetInt32("strength"),
@@ -80,7 +86,7 @@ namespace WinFormsApp2
                         TargetingStyle = r2.GetString("targeting_style")
                     };
                     _npcs.Add(npc);
-                    npcLevel += npc.Level;
+                    npcLevel += level;
                 }
             }
         }
