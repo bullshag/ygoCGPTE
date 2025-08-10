@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using System.Linq;
 using MySql.Data.MySqlClient;
 
 namespace WinFormsApp2
@@ -12,6 +13,13 @@ namespace WinFormsApp2
         private Button btnLevelUp = new Button();
         private ComboBox cmbRole = new ComboBox();
         private ComboBox cmbTarget = new ComboBox();
+        private ComboBox cmbLeft = new ComboBox();
+        private ComboBox cmbRight = new ComboBox();
+        private ComboBox cmbBody = new ComboBox();
+        private ComboBox cmbLegs = new ComboBox();
+        private ComboBox cmbHead = new ComboBox();
+        private ComboBox cmbTrinket = new ComboBox();
+        private string _characterName = string.Empty;
 
         public HeroInspectForm(int userId, int characterId)
         {
@@ -19,7 +27,7 @@ namespace WinFormsApp2
             _characterId = characterId;
             Text = "Hero Details";
             Width = 300;
-            Height = 260;
+            Height = 430;
 
             lblStats.Left = 10;
             lblStats.Top = 10;
@@ -40,9 +48,45 @@ namespace WinFormsApp2
             cmbTarget.SelectedIndexChanged += CmbTarget_SelectedIndexChanged;
             Controls.Add(cmbTarget);
 
+            cmbLeft.Left = 10;
+            cmbLeft.Top = 230;
+            cmbLeft.Width = 120;
+            cmbLeft.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.LeftHand, cmbLeft);
+            Controls.Add(cmbLeft);
+
+            cmbRight.Left = 150;
+            cmbRight.Top = 230;
+            cmbRight.Width = 120;
+            cmbRight.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.RightHand, cmbRight);
+            Controls.Add(cmbRight);
+
+            cmbBody.Left = 10;
+            cmbBody.Top = 260;
+            cmbBody.Width = 120;
+            cmbBody.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.Body, cmbBody);
+            Controls.Add(cmbBody);
+
+            cmbLegs.Left = 150;
+            cmbLegs.Top = 260;
+            cmbLegs.Width = 120;
+            cmbLegs.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.Legs, cmbLegs);
+            Controls.Add(cmbLegs);
+
+            cmbHead.Left = 10;
+            cmbHead.Top = 290;
+            cmbHead.Width = 120;
+            cmbHead.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.Head, cmbHead);
+            Controls.Add(cmbHead);
+
+            cmbTrinket.Left = 150;
+            cmbTrinket.Top = 290;
+            cmbTrinket.Width = 120;
+            cmbTrinket.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.Trinket, cmbTrinket);
+            Controls.Add(cmbTrinket);
+
             btnLevelUp.Text = "Level Up";
             btnLevelUp.Left = 10;
-            btnLevelUp.Top = 200;
+            btnLevelUp.Top = 360;
             btnLevelUp.Click += BtnLevelUp_Click;
             Controls.Add(btnLevelUp);
 
@@ -60,6 +104,7 @@ namespace WinFormsApp2
             if (reader.Read())
             {
                 string name = reader.GetString("name");
+                _characterName = name;
                 int level = reader.GetInt32("level");
                 int exp = reader.GetInt32("experience_points");
                 int str = reader.GetInt32("strength");
@@ -76,6 +121,7 @@ namespace WinFormsApp2
                 cmbRole.SelectedItem = role;
                 LoadTargetOptions(role);
                 cmbTarget.SelectedItem = targeting;
+                LoadEquipment();
             }
         }
 
@@ -128,6 +174,71 @@ namespace WinFormsApp2
             {
                 cmbTarget.SelectedIndex = 0;
             }
+        }
+
+        private void LoadEquipment()
+        {
+            LoadSlot(cmbLeft, EquipmentSlot.LeftHand);
+            LoadSlot(cmbRight, EquipmentSlot.RightHand);
+            LoadSlot(cmbBody, EquipmentSlot.Body);
+            LoadSlot(cmbLegs, EquipmentSlot.Legs);
+            LoadSlot(cmbHead, EquipmentSlot.Head);
+            LoadSlot(cmbTrinket, EquipmentSlot.Trinket);
+        }
+
+        private void LoadSlot(ComboBox combo, EquipmentSlot slot)
+        {
+            combo.Items.Clear();
+            combo.Items.Add("-empty-");
+            var items = InventoryService.GetEquippableItems(slot, _characterName);
+            foreach (var i in items)
+            {
+                combo.Items.Add(i.Name);
+            }
+            var equipped = InventoryService.GetEquippedItem(_characterName, slot);
+            if (equipped != null && !combo.Items.Contains(equipped.Name))
+            {
+                combo.Items.Add(equipped.Name);
+            }
+            combo.SelectedItem = equipped?.Name ?? "-empty-";
+            if (equipped is Weapon w && w.TwoHanded)
+            {
+                if (slot == EquipmentSlot.LeftHand)
+                {
+                    cmbRight.Enabled = false;
+                }
+                else if (slot == EquipmentSlot.RightHand)
+                {
+                    cmbLeft.Enabled = false;
+                }
+            }
+            else
+            {
+                cmbLeft.Enabled = true;
+                cmbRight.Enabled = true;
+            }
+        }
+
+        private void EquipSlot(EquipmentSlot slot, ComboBox combo)
+        {
+            string selected = combo.SelectedItem?.ToString() ?? "-empty-";
+            if (selected == "-empty-")
+            {
+                var current = InventoryService.GetEquippedItem(_characterName, slot);
+                if (current != null)
+                {
+                    InventoryService.Equip(_characterName, slot, null);
+                }
+            }
+            else
+            {
+                var item = InventoryService.GetEquippableItems(slot, _characterName).FirstOrDefault(i => i.Name == selected);
+                if (item != null)
+                {
+                    InventoryService.Equip(_characterName, slot, item);
+                }
+            }
+            LoadEquipment();
         }
     }
 }
