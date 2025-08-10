@@ -2,6 +2,7 @@ using System;
 using System.Windows.Forms;
 using System.Linq;
 using MySql.Data.MySqlClient;
+using System.Collections.Generic;
 
 namespace WinFormsApp2
 {
@@ -19,6 +20,10 @@ namespace WinFormsApp2
         private ComboBox cmbLegs = new ComboBox();
         private ComboBox cmbHead = new ComboBox();
         private ComboBox cmbTrinket = new ComboBox();
+        private ComboBox[] _abilityCombos = new ComboBox[3];
+        private NumericUpDown[] _priorityNums = new NumericUpDown[3];
+        private System.Collections.Generic.List<Ability> _knownAbilities = new();
+        private bool _loadingAbilities;
         private string _characterName = string.Empty;
         private bool _loadingEquipment;
 
@@ -28,7 +33,7 @@ namespace WinFormsApp2
             _characterId = characterId;
             Text = "Hero Details";
             Width = 300;
-            Height = 430;
+            Height = 520;
 
             lblStats.Left = 10;
             lblStats.Top = 10;
@@ -49,45 +54,66 @@ namespace WinFormsApp2
             cmbTarget.SelectedIndexChanged += CmbTarget_SelectedIndexChanged;
             Controls.Add(cmbTarget);
 
+            for (int i = 0; i < 3; i++)
+            {
+                var cmb = new ComboBox();
+                var num = new NumericUpDown();
+                cmb.Left = 10;
+                cmb.Top = 200 + i * 30;
+                cmb.Width = 120;
+                cmb.SelectedIndexChanged += AbilityComboChanged;
+                Controls.Add(cmb);
+                _abilityCombos[i] = cmb;
+
+                num.Left = 150;
+                num.Top = 200 + i * 30;
+                num.Width = 40;
+                num.Minimum = 1;
+                num.Maximum = 99;
+                num.ValueChanged += PriorityChanged;
+                Controls.Add(num);
+                _priorityNums[i] = num;
+            }
+
             cmbLeft.Left = 10;
-            cmbLeft.Top = 230;
+            cmbLeft.Top = 320;
             cmbLeft.Width = 120;
             cmbLeft.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.LeftHand, cmbLeft);
             Controls.Add(cmbLeft);
 
             cmbRight.Left = 150;
-            cmbRight.Top = 230;
+            cmbRight.Top = 320;
             cmbRight.Width = 120;
             cmbRight.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.RightHand, cmbRight);
             Controls.Add(cmbRight);
 
             cmbBody.Left = 10;
-            cmbBody.Top = 260;
+            cmbBody.Top = 350;
             cmbBody.Width = 120;
             cmbBody.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.Body, cmbBody);
             Controls.Add(cmbBody);
 
             cmbLegs.Left = 150;
-            cmbLegs.Top = 260;
+            cmbLegs.Top = 350;
             cmbLegs.Width = 120;
             cmbLegs.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.Legs, cmbLegs);
             Controls.Add(cmbLegs);
 
             cmbHead.Left = 10;
-            cmbHead.Top = 290;
+            cmbHead.Top = 380;
             cmbHead.Width = 120;
             cmbHead.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.Head, cmbHead);
             Controls.Add(cmbHead);
 
             cmbTrinket.Left = 150;
-            cmbTrinket.Top = 290;
+            cmbTrinket.Top = 380;
             cmbTrinket.Width = 120;
             cmbTrinket.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.Trinket, cmbTrinket);
             Controls.Add(cmbTrinket);
 
             btnLevelUp.Text = "Level Up";
             btnLevelUp.Left = 10;
-            btnLevelUp.Top = 360;
+            btnLevelUp.Top = 450;
             btnLevelUp.Click += BtnLevelUp_Click;
             Controls.Add(btnLevelUp);
 
@@ -124,6 +150,7 @@ namespace WinFormsApp2
                 LoadTargetOptions(role);
                 cmbTarget.SelectedItem = targeting;
                 LoadEquipment();
+                LoadAbilities();
             }
         }
 
@@ -265,6 +292,94 @@ namespace WinFormsApp2
                 }
             }
             LoadEquipment();
+        }
+
+        private void LoadAbilities()
+        {
+            _loadingAbilities = true;
+            using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            _knownAbilities = AbilityService.GetCharacterAbilities(_characterId, conn);
+            var equipped = new Dictionary<int, Ability>();
+            foreach (var a in AbilityService.GetEquippedAbilities(_characterId, conn))
+            {
+                equipped[a.Slot] = a;
+            }
+            bool hasAbilities = _knownAbilities.Any();
+            for (int i = 0; i < 3; i++)
+            {
+                var combo = _abilityCombos[i];
+                combo.Items.Clear();
+                combo.Items.Add("-basic attack-");
+                foreach (var a in _knownAbilities)
+                {
+                    combo.Items.Add(a.Name);
+                }
+                if (equipped.TryGetValue(i + 1, out var abil))
+                {
+                    combo.SelectedItem = combo.Items.Contains(abil.Name) ? abil.Name : "-basic attack-";
+                    _priorityNums[i].Value = abil.Priority;
+                }
+                else
+                {
+                    combo.SelectedItem = "-basic attack-";
+                    _priorityNums[i].Value = 1;
+                }
+                combo.Enabled = hasAbilities;
+                _priorityNums[i].Enabled = hasAbilities;
+            }
+            _loadingAbilities = false;
+            UpdateAbilityOptions();
+        }
+
+        private void UpdateAbilityOptions()
+        {
+            if (_loadingAbilities) return;
+            _loadingAbilities = true;
+            var selected = new HashSet<string>(_abilityCombos.Select(c => c.SelectedItem?.ToString() ?? ""));
+            for (int i = 0; i < 3; i++)
+            {
+                var combo = _abilityCombos[i];
+                var current = combo.SelectedItem?.ToString() ?? "-basic attack-";
+                combo.Items.Clear();
+                combo.Items.Add("-basic attack-");
+                foreach (var a in _knownAbilities)
+                {
+                    if (!selected.Contains(a.Name) || a.Name == current)
+                    {
+                        combo.Items.Add(a.Name);
+                    }
+                }
+                combo.SelectedItem = current;
+            }
+            _loadingAbilities = false;
+        }
+
+        private void AbilityComboChanged(object? sender, EventArgs e)
+        {
+            if (_loadingAbilities) return;
+            UpdateAbilityOptions();
+            var combo = (ComboBox)sender!;
+            int index = Array.IndexOf(_abilityCombos, combo);
+            SaveAbility(index);
+        }
+
+        private void PriorityChanged(object? sender, EventArgs e)
+        {
+            if (_loadingAbilities) return;
+            var num = (NumericUpDown)sender!;
+            int index = Array.IndexOf(_priorityNums, num);
+            SaveAbility(index);
+        }
+
+        private void SaveAbility(int index)
+        {
+            using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            string name = _abilityCombos[index].SelectedItem?.ToString() ?? "-basic attack-";
+            int? abilityId = _knownAbilities.FirstOrDefault(a => a.Name == name)?.Id;
+            int priority = (int)_priorityNums[index].Value;
+            AbilityService.SetAbilitySlot(_characterId, index + 1, abilityId, priority, conn);
         }
     }
 }

@@ -24,6 +24,7 @@ namespace WinFormsApp2
         private int _availablePoints;
         private int _playerGold;
         private List<Ability> _abilities = new List<Ability>();
+        private int _maxMana;
 
         public LevelUpForm(int userId, int characterId)
         {
@@ -69,7 +70,7 @@ namespace WinFormsApp2
                 update.ExecuteNonQuery();
             }
 
-            using (MySqlCommand cmd = new MySqlCommand("SELECT strength, dex, intelligence, skill_points FROM characters WHERE id=@cid", conn))
+            using (MySqlCommand cmd = new MySqlCommand("SELECT strength, dex, intelligence, skill_points, mana FROM characters WHERE id=@cid", conn))
             {
                 cmd.Parameters.AddWithValue("@cid", _characterId);
                 using MySqlDataReader reader = cmd.ExecuteReader();
@@ -79,6 +80,7 @@ namespace WinFormsApp2
                     _baseDex = reader.GetInt32("dex");
                     _baseInt = reader.GetInt32("intelligence");
                     _availablePoints = reader.GetInt32("skill_points");
+                    _maxMana = reader.GetInt32("mana");
                     numStr.Value = _baseStr;
                     numDex.Value = _baseDex;
                     numInt.Value = _baseInt;
@@ -117,22 +119,14 @@ namespace WinFormsApp2
         {
             if (lstAbilities.SelectedIndex < 0) return;
             var ability = _abilities[lstAbilities.SelectedIndex];
-            if (_playerGold < ability.Cost)
+            if (_maxMana < ability.Cost)
             {
-                MessageBox.Show("Not enough gold.");
+                MessageBox.Show("Not enough mana.");
                 return;
             }
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using (MySqlCommand goldCmd = new MySqlCommand("UPDATE users SET gold=gold-@cost WHERE id=@id", conn))
-            {
-                goldCmd.Parameters.AddWithValue("@cost", ability.Cost);
-                goldCmd.Parameters.AddWithValue("@id", _userId);
-                goldCmd.ExecuteNonQuery();
-            }
             AbilityService.PurchaseAbility(_characterId, ability.Id, conn);
-            _playerGold -= ability.Cost;
-            lblGold.Text = $"Gold: {_playerGold}";
             _abilities = AbilityService.GetShopAbilities(_characterId, conn);
             lstAbilities.Items.Clear();
             foreach (var a in _abilities)
