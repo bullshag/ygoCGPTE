@@ -10,7 +10,7 @@ namespace WinFormsApp2
         private readonly int _userId;
         private int _searchCost;
         private int _playerGold;
-        private readonly Timer _regenTimer = new Timer();
+        private readonly System.Windows.Forms.Timer _regenTimer = new System.Windows.Forms.Timer();
 
         public RPGForm(int userId)
         {
