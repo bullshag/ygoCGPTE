@@ -17,15 +17,20 @@ namespace WinFormsApp2
         {
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using MySqlCommand cmd = new MySqlCommand("SELECT id FROM Users WHERE Username=@u AND PasswordHash=@p", conn);
+            using MySqlCommand cmd = new MySqlCommand("SELECT id, nickname FROM Users WHERE Username=@u AND PasswordHash=@p", conn);
             cmd.Parameters.AddWithValue("@u", txtUsername.Text);
             cmd.Parameters.AddWithValue("@p", HashPassword(txtPassword.Text));
-            object? result = cmd.ExecuteScalar();
-            if (result != null)
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
             {
-                int userId = Convert.ToInt32(result);
+                int userId = reader.GetInt32("id");
+                string nickname = reader.GetString("nickname");
+                reader.Close();
+                using MySqlCommand seen = new MySqlCommand("UPDATE users SET last_seen=NOW() WHERE id=@id", conn);
+                seen.Parameters.AddWithValue("@id", userId);
+                seen.ExecuteNonQuery();
                 InventoryService.Load(userId);
-                RPGForm rpg = new RPGForm(userId);
+                RPGForm rpg = new RPGForm(userId, nickname);
                 rpg.FormClosed += (s, args) => this.Close();
                 rpg.Show();
                 this.Hide();
