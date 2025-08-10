@@ -61,7 +61,7 @@ namespace WinFormsApp2
             }
         }
 
-        private static Item? CreateItem(string name)
+        public static Item? CreateItem(string name)
         {
             return name switch
             {

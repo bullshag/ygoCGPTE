@@ -147,6 +147,13 @@ namespace WinFormsApp2
             logs.ShowDialog(this);
         }
 
+        private void btnShop_Click(object? sender, EventArgs e)
+        {
+            using var shop = new ShopForm(_userId);
+            shop.ShowDialog(this);
+            LoadPartyData();
+        }
+
         private void btnInventory_Click(object? sender, EventArgs e)
         {
             using var inv = new InventoryForm(_userId);
