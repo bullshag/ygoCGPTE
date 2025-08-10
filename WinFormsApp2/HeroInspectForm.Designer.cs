@@ -34,7 +34,6 @@ namespace WinFormsApp2
 
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
             lblStats = new Label();
             cmbRole = new ComboBox();
             cmbTarget = new ComboBox();
@@ -58,90 +57,139 @@ namespace WinFormsApp2
             // 
             // lblStats
             // 
-            lblStats.Location = new Point(10, 10);
-            lblStats.Size = new Size(260, 150);
+            lblStats.Location = new Point(14, 17);
+            lblStats.Margin = new Padding(4, 0, 4, 0);
+            lblStats.Name = "lblStats";
+            lblStats.Size = new Size(371, 250);
+            lblStats.TabIndex = 15;
             // 
             // cmbRole
             // 
-            cmbRole.Location = new Point(10, 170);
-            cmbRole.Size = new Size(120, 23);
+            cmbRole.Location = new Point(14, 283);
+            cmbRole.Margin = new Padding(4, 5, 4, 5);
+            cmbRole.Name = "cmbRole";
+            cmbRole.Size = new Size(170, 33);
+            cmbRole.TabIndex = 14;
             // 
             // cmbTarget
             // 
-            cmbTarget.Location = new Point(150, 170);
-            cmbTarget.Size = new Size(140, 23);
+            cmbTarget.Location = new Point(214, 283);
+            cmbTarget.Margin = new Padding(4, 5, 4, 5);
+            cmbTarget.Name = "cmbTarget";
+            cmbTarget.Size = new Size(393, 33);
+            cmbTarget.TabIndex = 13;
             // 
             // cmbAbility1
             // 
-            cmbAbility1.Location = new Point(10, 200);
-            cmbAbility1.Size = new Size(120, 23);
+            cmbAbility1.Location = new Point(14, 333);
+            cmbAbility1.Margin = new Padding(4, 5, 4, 5);
+            cmbAbility1.Name = "cmbAbility1";
+            cmbAbility1.Size = new Size(170, 33);
+            cmbAbility1.TabIndex = 12;
             // 
             // cmbAbility2
             // 
-            cmbAbility2.Location = new Point(10, 230);
-            cmbAbility2.Size = new Size(120, 23);
+            cmbAbility2.Location = new Point(14, 383);
+            cmbAbility2.Margin = new Padding(4, 5, 4, 5);
+            cmbAbility2.Name = "cmbAbility2";
+            cmbAbility2.Size = new Size(170, 33);
+            cmbAbility2.TabIndex = 11;
             // 
             // cmbAbility3
             // 
-            cmbAbility3.Location = new Point(10, 260);
-            cmbAbility3.Size = new Size(120, 23);
+            cmbAbility3.Location = new Point(14, 433);
+            cmbAbility3.Margin = new Padding(4, 5, 4, 5);
+            cmbAbility3.Name = "cmbAbility3";
+            cmbAbility3.Size = new Size(170, 33);
+            cmbAbility3.TabIndex = 10;
             // 
             // numPriority1
             // 
-            numPriority1.Location = new Point(150, 200);
-            numPriority1.Size = new Size(40, 23);
+            numPriority1.Location = new Point(214, 333);
+            numPriority1.Margin = new Padding(4, 5, 4, 5);
+            numPriority1.Name = "numPriority1";
+            numPriority1.Size = new Size(57, 31);
+            numPriority1.TabIndex = 9;
             // 
             // numPriority2
             // 
-            numPriority2.Location = new Point(150, 230);
-            numPriority2.Size = new Size(40, 23);
+            numPriority2.Location = new Point(214, 383);
+            numPriority2.Margin = new Padding(4, 5, 4, 5);
+            numPriority2.Name = "numPriority2";
+            numPriority2.Size = new Size(57, 31);
+            numPriority2.TabIndex = 8;
             // 
             // numPriority3
             // 
-            numPriority3.Location = new Point(150, 260);
-            numPriority3.Size = new Size(40, 23);
+            numPriority3.Location = new Point(214, 433);
+            numPriority3.Margin = new Padding(4, 5, 4, 5);
+            numPriority3.Name = "numPriority3";
+            numPriority3.Size = new Size(57, 31);
+            numPriority3.TabIndex = 7;
             // 
             // cmbLeft
             // 
-            cmbLeft.Location = new Point(10, 320);
-            cmbLeft.Size = new Size(120, 23);
+            cmbLeft.Location = new Point(14, 533);
+            cmbLeft.Margin = new Padding(4, 5, 4, 5);
+            cmbLeft.Name = "cmbLeft";
+            cmbLeft.Size = new Size(267, 33);
+            cmbLeft.TabIndex = 6;
+            cmbLeft.SelectedIndexChanged += cmbLeft_SelectedIndexChanged;
             // 
             // cmbRight
             // 
-            cmbRight.Location = new Point(150, 320);
-            cmbRight.Size = new Size(120, 23);
+            cmbRight.Location = new Point(348, 533);
+            cmbRight.Margin = new Padding(4, 5, 4, 5);
+            cmbRight.Name = "cmbRight";
+            cmbRight.Size = new Size(259, 33);
+            cmbRight.TabIndex = 5;
             // 
             // cmbBody
             // 
-            cmbBody.Location = new Point(10, 350);
-            cmbBody.Size = new Size(120, 23);
+            cmbBody.Location = new Point(14, 583);
+            cmbBody.Margin = new Padding(4, 5, 4, 5);
+            cmbBody.Name = "cmbBody";
+            cmbBody.Size = new Size(267, 33);
+            cmbBody.TabIndex = 4;
             // 
             // cmbLegs
             // 
-            cmbLegs.Location = new Point(150, 350);
-            cmbLegs.Size = new Size(120, 23);
+            cmbLegs.Location = new Point(348, 583);
+            cmbLegs.Margin = new Padding(4, 5, 4, 5);
+            cmbLegs.Name = "cmbLegs";
+            cmbLegs.Size = new Size(259, 33);
+            cmbLegs.TabIndex = 3;
             // 
             // cmbHead
             // 
-            cmbHead.Location = new Point(10, 380);
-            cmbHead.Size = new Size(120, 23);
+            cmbHead.Location = new Point(14, 633);
+            cmbHead.Margin = new Padding(4, 5, 4, 5);
+            cmbHead.Name = "cmbHead";
+            cmbHead.Size = new Size(267, 33);
+            cmbHead.TabIndex = 2;
             // 
             // cmbTrinket
             // 
-            cmbTrinket.Location = new Point(150, 380);
-            cmbTrinket.Size = new Size(120, 23);
+            cmbTrinket.Location = new Point(348, 633);
+            cmbTrinket.Margin = new Padding(4, 5, 4, 5);
+            cmbTrinket.Name = "cmbTrinket";
+            cmbTrinket.Size = new Size(259, 33);
+            cmbTrinket.TabIndex = 1;
             // 
             // btnLevelUp
             // 
-            btnLevelUp.Location = new Point(10, 450);
-            btnLevelUp.Size = new Size(120, 23);
+            btnLevelUp.Location = new Point(14, 697);
+            btnLevelUp.Margin = new Padding(4, 5, 4, 5);
+            btnLevelUp.Name = "btnLevelUp";
+            btnLevelUp.Size = new Size(171, 38);
+            btnLevelUp.TabIndex = 0;
             btnLevelUp.Text = "Level Up";
             // 
             // HeroInspectForm
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(330, 520);
+            ClientSize = new Size(621, 781);
             Controls.Add(btnLevelUp);
             Controls.Add(cmbTrinket);
             Controls.Add(cmbHead);
@@ -158,6 +206,7 @@ namespace WinFormsApp2
             Controls.Add(cmbTarget);
             Controls.Add(cmbRole);
             Controls.Add(lblStats);
+            Margin = new Padding(4, 5, 4, 5);
             Name = "HeroInspectForm";
             Text = "Hero Details";
             ((System.ComponentModel.ISupportInitialize)numPriority1).EndInit();

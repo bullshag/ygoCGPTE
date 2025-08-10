@@ -91,17 +91,7 @@ namespace WinFormsApp2
             RefreshInventory();
         }
 
-        private void InitializeComponent()
-        {
-            SuspendLayout();
-            // 
-            // ShopForm
-            // 
-            ClientSize = new Size(490, 612);
-            Name = "ShopForm";
-            Load += ShopForm_Load_1;
-            ResumeLayout(false);
-        }
+  
 
         private void BtnSell_Click(object? sender, EventArgs e)
         {

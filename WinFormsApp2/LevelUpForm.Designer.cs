@@ -29,7 +29,6 @@ namespace WinFormsApp2
 
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
             lblPoints = new Label();
             lblGold = new Label();
             lstAbilities = new ListBox();
@@ -46,74 +45,108 @@ namespace WinFormsApp2
             ((System.ComponentModel.ISupportInitialize)numInt).BeginInit();
             SuspendLayout();
             // 
-            // labelStr
-            // 
-            labelStr.Text = "STR";
-            labelStr.Location = new Point(10, 10);
-            labelStr.Size = new Size(40, 15);
-            // 
-            // numStr
-            // 
-            numStr.Location = new Point(60, 8);
-            numStr.Maximum = 999;
-            numStr.Size = new Size(60, 23);
-            // 
-            // labelDex
-            // 
-            labelDex.Text = "DEX";
-            labelDex.Location = new Point(10, 40);
-            labelDex.Size = new Size(40, 15);
-            // 
-            // numDex
-            // 
-            numDex.Location = new Point(60, 38);
-            numDex.Maximum = 999;
-            numDex.Size = new Size(60, 23);
-            // 
-            // labelInt
-            // 
-            labelInt.Text = "INT";
-            labelInt.Location = new Point(10, 70);
-            labelInt.Size = new Size(40, 15);
-            // 
-            // numInt
-            // 
-            numInt.Location = new Point(60, 68);
-            numInt.Maximum = 999;
-            numInt.Size = new Size(60, 23);
-            // 
             // lblPoints
             // 
-            lblPoints.Location = new Point(10, 100);
-            lblPoints.Size = new Size(200, 15);
-            // 
-            // btnSave
-            // 
-            btnSave.Location = new Point(10, 130);
-            btnSave.Size = new Size(100, 23);
-            btnSave.Text = "Save";
+            lblPoints.Location = new Point(14, 167);
+            lblPoints.Margin = new Padding(4, 0, 4, 0);
+            lblPoints.Name = "lblPoints";
+            lblPoints.Size = new Size(286, 25);
+            lblPoints.TabIndex = 4;
             // 
             // lblGold
             // 
-            lblGold.Location = new Point(220, 10);
-            lblGold.Size = new Size(150, 15);
+            lblGold.Location = new Point(314, 17);
+            lblGold.Margin = new Padding(4, 0, 4, 0);
+            lblGold.Name = "lblGold";
+            lblGold.Size = new Size(214, 25);
+            lblGold.TabIndex = 2;
             // 
             // lstAbilities
             // 
-            lstAbilities.Location = new Point(220, 40);
-            lstAbilities.Size = new Size(150, 120);
+            lstAbilities.ItemHeight = 25;
+            lstAbilities.Location = new Point(180, 13);
+            lstAbilities.Margin = new Padding(4, 5, 4, 5);
+            lstAbilities.Name = "lstAbilities";
+            lstAbilities.Size = new Size(213, 179);
+            lstAbilities.TabIndex = 1;
             // 
             // btnBuy
             // 
-            btnBuy.Location = new Point(220, 170);
-            btnBuy.Size = new Size(150, 23);
+            btnBuy.Location = new Point(179, 197);
+            btnBuy.Margin = new Padding(4, 5, 4, 5);
+            btnBuy.Name = "btnBuy";
+            btnBuy.Size = new Size(214, 38);
+            btnBuy.TabIndex = 0;
             btnBuy.Text = "Buy";
+            // 
+            // btnSave
+            // 
+            btnSave.Location = new Point(29, 154);
+            btnSave.Margin = new Padding(4, 5, 4, 5);
+            btnSave.Name = "btnSave";
+            btnSave.Size = new Size(143, 38);
+            btnSave.TabIndex = 3;
+            btnSave.Text = "Save";
+            // 
+            // numStr
+            // 
+            numStr.Location = new Point(86, 13);
+            numStr.Margin = new Padding(4, 5, 4, 5);
+            numStr.Maximum = new decimal(new int[] { 999, 0, 0, 0 });
+            numStr.Name = "numStr";
+            numStr.Size = new Size(86, 31);
+            numStr.TabIndex = 9;
+            // 
+            // numDex
+            // 
+            numDex.Location = new Point(86, 63);
+            numDex.Margin = new Padding(4, 5, 4, 5);
+            numDex.Maximum = new decimal(new int[] { 999, 0, 0, 0 });
+            numDex.Name = "numDex";
+            numDex.Size = new Size(86, 31);
+            numDex.TabIndex = 7;
+            // 
+            // numInt
+            // 
+            numInt.Location = new Point(86, 113);
+            numInt.Margin = new Padding(4, 5, 4, 5);
+            numInt.Maximum = new decimal(new int[] { 999, 0, 0, 0 });
+            numInt.Name = "numInt";
+            numInt.Size = new Size(86, 31);
+            numInt.TabIndex = 5;
+            // 
+            // labelStr
+            // 
+            labelStr.Location = new Point(14, 17);
+            labelStr.Margin = new Padding(4, 0, 4, 0);
+            labelStr.Name = "labelStr";
+            labelStr.Size = new Size(57, 25);
+            labelStr.TabIndex = 10;
+            labelStr.Text = "STR";
+            // 
+            // labelDex
+            // 
+            labelDex.Location = new Point(14, 67);
+            labelDex.Margin = new Padding(4, 0, 4, 0);
+            labelDex.Name = "labelDex";
+            labelDex.Size = new Size(57, 25);
+            labelDex.TabIndex = 8;
+            labelDex.Text = "DEX";
+            // 
+            // labelInt
+            // 
+            labelInt.Location = new Point(14, 117);
+            labelInt.Margin = new Padding(4, 0, 4, 0);
+            labelInt.Name = "labelInt";
+            labelInt.Size = new Size(57, 25);
+            labelInt.TabIndex = 6;
+            labelInt.Text = "INT";
             // 
             // LevelUpForm
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(420, 240);
+            ClientSize = new Size(407, 250);
             Controls.Add(btnBuy);
             Controls.Add(lstAbilities);
             Controls.Add(lblGold);
@@ -125,13 +158,13 @@ namespace WinFormsApp2
             Controls.Add(labelDex);
             Controls.Add(numStr);
             Controls.Add(labelStr);
+            Margin = new Padding(4, 5, 4, 5);
             Name = "LevelUpForm";
             Text = "Level Up";
             ((System.ComponentModel.ISupportInitialize)numStr).EndInit();
             ((System.ComponentModel.ISupportInitialize)numDex).EndInit();
             ((System.ComponentModel.ISupportInitialize)numInt).EndInit();
             ResumeLayout(false);
-            PerformLayout();
         }
     }
 }

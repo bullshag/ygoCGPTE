@@ -308,5 +308,10 @@ namespace WinFormsApp2
             int priority = (int)_priorityNums[index].Value;
             AbilityService.SetAbilitySlot(_characterId, index + 1, abilityId, priority, conn);
         }
+
+        private void cmbLeft_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
