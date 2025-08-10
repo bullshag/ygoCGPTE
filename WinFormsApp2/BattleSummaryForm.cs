@@ -1,13 +1,13 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace WinFormsApp2
 {
     public class BattleSummaryForm : Form
     {
-        private readonly ListBox _list = new ListBox();
-        public BattleSummaryForm(IEnumerable<dynamic> players, IEnumerable<dynamic> enemies)
+        private readonly ListBox _list = new();
+
+        public BattleSummaryForm(IEnumerable<CombatantSummary> players, IEnumerable<CombatantSummary> enemies)
         {
             Text = "Battle Summary";
             Width = 400;

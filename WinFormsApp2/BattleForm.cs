@@ -263,10 +263,20 @@ namespace WinFormsApp2
                 if (playersWin)
                 {
                     AwardExperience(_npcs.Sum(n => n.Level));
+                    var loot = LootService.GenerateLoot(_npcs.Select(n => n.Name), _userId);
+                    if (loot.Count > 0)
+                    {
+                        var parts = new List<string>();
+                        if (loot.TryGetValue("gold", out int gold)) parts.Add($"{gold} gold");
+                        foreach (var kv in loot.Where(k => k.Key != "gold")) parts.Add($"{kv.Value} {kv.Key}");
+                        if (parts.Count > 0) lstLog.Items.Add("Loot: " + string.Join(", ", parts));
+                    }
                 }
                 BattleLogService.AddLog(string.Join("\n", lstLog.Items.Cast<string>()));
                 SaveHp();
-                using var summary = new BattleSummaryForm(_players, _npcs);
+                var playerSummaries = _players.Select(p => new CombatantSummary(p.Name, p.DamageDone, p.DamageTaken));
+                var enemySummaries = _npcs.Select(n => new CombatantSummary(n.Name, n.DamageDone, n.DamageTaken));
+                using var summary = new BattleSummaryForm(playerSummaries, enemySummaries);
                 summary.ShowDialog(this);
                 DialogResult = DialogResult.OK;
                 Close();

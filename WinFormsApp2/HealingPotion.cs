@@ -9,6 +9,7 @@ namespace WinFormsApp2
             Description = "Restores 50 HP";
             Stackable = true;
             Slot = EquipmentSlot.LeftHand;
+            Price = 30;
         }
     }
 }
