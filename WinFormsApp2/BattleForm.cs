@@ -76,20 +76,17 @@ namespace WinFormsApp2
             }
 
             int totalLevel = _players.Sum(p => p.Level);
-            int minLevel = (int)Math.Floor(totalLevel * 0.7);
-            int maxLevel = (int)Math.Ceiling(totalLevel * 1.2);
+            int minLevel = Math.Max(1, (int)Math.Ceiling(totalLevel * 1.0));
+            int maxLevel = Math.Max(minLevel, (int)Math.Ceiling(totalLevel * 1.4));
             int npcLevel = 0;
-            while (npcLevel < minLevel)
+            while (_npcs.Count == 0 || npcLevel < minLevel)
             {
-                using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, strength, dex, action_speed, melee_defense, role, targeting_style FROM npcs ORDER BY RAND() LIMIT 1", conn);
+                using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, strength, dex, action_speed, melee_defense, role, targeting_style FROM npcs WHERE level <= @maxLevel ORDER BY RAND() LIMIT 1", conn);
+                npcCmd.Parameters.AddWithValue("@maxLevel", Math.Max(1, maxLevel - npcLevel));
                 using var r2 = npcCmd.ExecuteReader();
                 if (r2.Read())
                 {
                     int level = r2.GetInt32("level");
-                    if (npcLevel + level > maxLevel)
-                    {
-                        continue;
-                    }
                     var npc = new Creature
                     {
                         Name = r2.GetString("name"),
@@ -106,6 +103,34 @@ namespace WinFormsApp2
                     npc.Abilities.Add(new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0, Slot = 1 });
                     _npcs.Add(npc);
                     npcLevel += level;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if (_npcs.Count == 0)
+            {
+                using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, strength, dex, action_speed, melee_defense, role, targeting_style FROM npcs ORDER BY level ASC LIMIT 1", conn);
+                using var r2 = npcCmd.ExecuteReader();
+                if (r2.Read())
+                {
+                    var npc = new Creature
+                    {
+                        Name = r2.GetString("name"),
+                        Level = r2.GetInt32("level"),
+                        CurrentHp = r2.GetInt32("current_hp"),
+                        MaxHp = r2.GetInt32("max_hp"),
+                        Strength = r2.GetInt32("strength"),
+                        Dex = r2.GetInt32("dex"),
+                        ActionSpeed = r2.GetInt32("action_speed"),
+                        MeleeDefense = r2.GetInt32("melee_defense"),
+                        Role = r2.GetString("role"),
+                        TargetingStyle = r2.GetString("targeting_style")
+                    };
+                    npc.Abilities.Add(new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0, Slot = 1 });
+                    _npcs.Add(npc);
                 }
             }
         }
