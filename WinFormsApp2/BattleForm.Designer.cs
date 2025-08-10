@@ -25,24 +25,42 @@ namespace WinFormsApp2
             pnlEnemies = new FlowLayoutPanel();
             lstLog = new ListBox();
             SuspendLayout();
+            // 
             // pnlPlayers
-            pnlPlayers.Location = new Point(12, 12);
-            pnlPlayers.Size = new Size(200, 120);
+            // 
+            pnlPlayers.Location = new Point(13, 14);
+            pnlPlayers.Margin = new Padding(4, 5, 4, 5);
+            pnlPlayers.Name = "pnlPlayers";
+            pnlPlayers.Size = new Size(384, 398);
+            pnlPlayers.TabIndex = 2;
+            // 
             // pnlEnemies
-            pnlEnemies.Location = new Point(276, 12);
-            pnlEnemies.Size = new Size(200, 120);
+            // 
+            pnlEnemies.Location = new Point(485, 14);
+            pnlEnemies.Margin = new Padding(4, 5, 4, 5);
+            pnlEnemies.Name = "pnlEnemies";
+            pnlEnemies.Size = new Size(366, 398);
+            pnlEnemies.TabIndex = 1;
+            // 
             // lstLog
+            // 
             lstLog.FormattingEnabled = true;
-            lstLog.ItemHeight = 15;
-            lstLog.Location = new Point(12, 138);
-            lstLog.Size = new Size(464, 154);
+            lstLog.ItemHeight = 25;
+            lstLog.Location = new Point(13, 422);
+            lstLog.Margin = new Padding(4, 5, 4, 5);
+            lstLog.Name = "lstLog";
+            lstLog.Size = new Size(838, 254);
+            lstLog.TabIndex = 0;
+            // 
             // BattleForm
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            // 
+            AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(488, 304);
+            ClientSize = new Size(864, 690);
             Controls.Add(lstLog);
             Controls.Add(pnlEnemies);
             Controls.Add(pnlPlayers);
+            Margin = new Padding(4, 5, 4, 5);
             Name = "BattleForm";
             Text = "Battle";
             Load += BattleForm_Load;

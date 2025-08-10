@@ -135,6 +135,11 @@ namespace WinFormsApp2
             }
         }
 
+        private void InitializeComponent()
+        {
+
+        }
+
         private void BtnSave_Click(object? sender, EventArgs e)
         {
             int newStr = (int)numStr.Value;

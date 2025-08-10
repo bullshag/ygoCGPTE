@@ -8,6 +8,11 @@ namespace WinFormsApp2
         private readonly ListBox _list = new();
         private readonly Button _btnContinue = new();
 
+        private void InitializeComponent()
+        {
+
+        }
+
         public BattleSummaryForm(IEnumerable<CombatantSummary> players, IEnumerable<CombatantSummary> enemies)
         {
             Text = "Battle Summary";

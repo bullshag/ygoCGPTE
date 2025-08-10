@@ -120,6 +120,11 @@ namespace WinFormsApp2
             RefreshInventory();
         }
 
+        private void InitializeComponent()
+        {
+
+        }
+
         private void BtnSell_Click(object? sender, EventArgs e)
         {
             int index = _lstInventory.SelectedIndex;

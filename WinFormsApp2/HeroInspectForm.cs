@@ -372,6 +372,11 @@ namespace WinFormsApp2
             SaveAbility(index);
         }
 
+        private void InitializeComponent()
+        {
+
+        }
+
         private void SaveAbility(int index)
         {
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);

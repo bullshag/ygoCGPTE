@@ -31,3 +31,11 @@ C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\WinFormsApp2\obj\Debug\net8.0-win
 C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\WinFormsApp2\obj\Debug\net8.0-windows\WinFormsApp2.genruntimeconfig.cache
 C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\WinFormsApp2\obj\Debug\net8.0-windows\ref\WinFormsApp2.dll
 C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\WinFormsApp2\obj\Debug\net8.0-windows\WinFormsApp2.RPGForm.resources
+C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\WinFormsApp2\obj\Debug\net8.0-windows\WinFormsApp2.BattleForm.resources
+C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\WinFormsApp2\obj\Debug\net8.0-windows\WinFormsApp2.BattleLogForm.resources
+C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\WinFormsApp2\obj\Debug\net8.0-windows\WinFormsApp2.BattleSummaryForm.resources
+C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\WinFormsApp2\obj\Debug\net8.0-windows\WinFormsApp2.HeroInspectForm.resources
+C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\WinFormsApp2\obj\Debug\net8.0-windows\WinFormsApp2.HeroViewForm.resources
+C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\WinFormsApp2\obj\Debug\net8.0-windows\WinFormsApp2.InventoryForm.resources
+C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\WinFormsApp2\obj\Debug\net8.0-windows\WinFormsApp2.LevelUpForm.resources
+C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\WinFormsApp2\obj\Debug\net8.0-windows\WinFormsApp2.ShopForm.resources
