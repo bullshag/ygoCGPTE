@@ -6,5 +6,6 @@ namespace WinFormsApp2
         public string Description { get; init; } = string.Empty;
         public bool Stackable { get; init; }
         public EquipmentSlot? Slot { get; init; }
+        public int Price { get; init; }
     }
 }

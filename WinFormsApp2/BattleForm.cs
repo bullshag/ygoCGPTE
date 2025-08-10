@@ -263,6 +263,14 @@ namespace WinFormsApp2
                 if (playersWin)
                 {
                     AwardExperience(_npcs.Sum(n => n.Level));
+                    var loot = LootService.GenerateLoot(_npcs.Select(n => n.Name), _userId);
+                    if (loot.Count > 0)
+                    {
+                        var parts = new List<string>();
+                        if (loot.TryGetValue("gold", out int gold)) parts.Add($"{gold} gold");
+                        foreach (var kv in loot.Where(k => k.Key != "gold")) parts.Add($"{kv.Value} {kv.Key}");
+                        if (parts.Count > 0) lstLog.Items.Add("Loot: " + string.Join(", ", parts));
+                    }
                 }
                 BattleLogService.AddLog(string.Join("\n", lstLog.Items.Cast<string>()));
                 SaveHp();
