@@ -27,12 +27,13 @@ namespace WinFormsApp2
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
 
-            using var cmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, role, targeting_style FROM characters WHERE account_id=@id", conn);
+            using var cmd = new MySqlCommand("SELECT id, name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, role, targeting_style FROM characters WHERE account_id=@id", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             using (var r = cmd.ExecuteReader())
             {
                 while (r.Read())
                 {
+                    int cid = r.GetInt32("id");
                     var player = new Creature
                     {
                         Name = r.GetString("name"),
@@ -52,6 +53,14 @@ namespace WinFormsApp2
                     foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
                     {
                         player.Equipment[slot] = InventoryService.GetEquippedItem(player.Name, slot);
+                    }
+                    foreach (var abil in AbilityService.GetEquippedAbilities(cid, conn))
+                    {
+                        player.Abilities.Add(abil);
+                    }
+                    if (!player.Abilities.Any())
+                    {
+                        player.Abilities.Add(new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0, Slot = 1 });
                     }
                     _players.Add(player);
                 }
@@ -85,6 +94,7 @@ namespace WinFormsApp2
                         Role = r2.GetString("role"),
                         TargetingStyle = r2.GetString("targeting_style")
                     };
+                    npc.Abilities.Add(new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0, Slot = 1 });
                     _npcs.Add(npc);
                     npcLevel += level;
                 }
@@ -185,6 +195,17 @@ namespace WinFormsApp2
             target = ChooseOpponent(actor, opponents, allies);
             if (target == null) return;
 
+            var ability = ChooseAbility(actor);
+            if (ability.Id != 0)
+            {
+                actor.Mana -= ability.Cost;
+                if (actor.ManaBar.Maximum > 0)
+                {
+                    actor.ManaBar.Value = Math.Max(0, actor.Mana);
+                }
+                lstLog.Items.Add($"{actor.Name} uses {ability.Name} on {target.Name}!");
+            }
+
             int dmg = CalculateDamage(actor, target);
             target.CurrentHp -= dmg;
             lstLog.Items.Add($"{actor.Name} hits {target.Name} for {dmg} damage!");
@@ -257,6 +278,47 @@ namespace WinFormsApp2
             }
         }
 
+        private Ability ChooseAbility(Creature actor)
+        {
+            var abilities = actor.Abilities;
+            var basic = abilities.FirstOrDefault(a => a.Id == 0) ?? new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0 };
+            Ability? chosen = null;
+            var usable = abilities.Where(a => a.Id == 0 || actor.Mana >= a.Cost).ToList();
+            var nonBasic = usable.Where(a => a.Id != 0).ToList();
+            if (nonBasic.Any())
+            {
+                int minPriority = nonBasic.Min(a => a.Priority);
+                int basicPriority = basic.Priority;
+                if (minPriority < basicPriority)
+                {
+                    var top = nonBasic.Where(a => a.Priority == minPriority).ToList();
+                    chosen = top[_rng.Next(top.Count)];
+                }
+            }
+            if (chosen == null)
+            {
+                var weighted = new List<(Ability ability, int weight)>();
+                foreach (var a in usable)
+                {
+                    int weight = Math.Max(1, 6 - a.Priority);
+                    weighted.Add((a, weight));
+                }
+                int total = weighted.Sum(w => w.weight);
+                int roll = _rng.Next(total);
+                int acc = 0;
+                foreach (var w in weighted)
+                {
+                    acc += w.weight;
+                    if (roll < acc)
+                    {
+                        chosen = w.ability;
+                        break;
+                    }
+                }
+            }
+            return chosen ?? basic;
+        }
+
         private void CheckEnd()
         {
             foreach (var p in _players) p.HpBar.Value = Math.Max(0, p.CurrentHp);
@@ -283,8 +345,8 @@ namespace WinFormsApp2
                 var playerSummaries = _players.Select(p => new CombatantSummary(p.Name, p.DamageDone, p.DamageTaken));
                 var enemySummaries = _npcs.Select(n => new CombatantSummary(n.Name, n.DamageDone, n.DamageTaken));
                 using var summary = new BattleSummaryForm(playerSummaries, enemySummaries);
-                summary.ShowDialog(this);
-                DialogResult = DialogResult.OK;
+                Hide();
+                summary.ShowDialog(this.Owner);
                 Close();
             }
         }
@@ -354,6 +416,7 @@ namespace WinFormsApp2
             public int AttackInterval { get; set; }
             public int DamageDone { get; set; }
             public int DamageTaken { get; set; }
+            public List<Ability> Abilities { get; } = new();
 
             public Weapon? GetWeapon()
             {

@@ -16,6 +16,16 @@ CREATE TABLE IF NOT EXISTS character_abilities (
     FOREIGN KEY (ability_id) REFERENCES abilities(id)
 );
 
+CREATE TABLE IF NOT EXISTS character_ability_slots (
+    character_id INT NOT NULL,
+    slot TINYINT NOT NULL,
+    ability_id INT NULL,
+    priority INT NOT NULL DEFAULT 1,
+    PRIMARY KEY(character_id, slot),
+    FOREIGN KEY (character_id) REFERENCES characters(id),
+    FOREIGN KEY (ability_id) REFERENCES abilities(id)
+);
+
 INSERT INTO abilities (name, description, cost) VALUES
 ('Fireball', 'Deal fire damage to a single enemy.', 50),
 ('Heal', 'Restore a small amount of HP to an ally.', 30);
