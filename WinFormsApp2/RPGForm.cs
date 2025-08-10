@@ -164,7 +164,7 @@ namespace WinFormsApp2
         {
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using MySqlCommand cmd = new MySqlCommand("UPDATE characters SET current_hp = LEAST(max_hp, current_hp + CEILING(max_hp*0.05)) WHERE account_id=@id AND current_hp>0 AND current_hp<max_hp", conn);
+            using MySqlCommand cmd = new MySqlCommand("UPDATE characters SET current_hp = LEAST(max_hp, current_hp + GREATEST(10, CEILING(max_hp*0.05))) WHERE account_id=@id AND current_hp>0 AND current_hp<max_hp", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             cmd.ExecuteNonQuery();
             LoadPartyData();
