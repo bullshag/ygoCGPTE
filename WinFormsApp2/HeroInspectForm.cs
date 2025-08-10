@@ -20,6 +20,7 @@ namespace WinFormsApp2
         private ComboBox cmbHead = new ComboBox();
         private ComboBox cmbTrinket = new ComboBox();
         private string _characterName = string.Empty;
+        private bool _loadingEquipment;
 
         public HeroInspectForm(int userId, int characterId)
         {
@@ -178,12 +179,14 @@ namespace WinFormsApp2
 
         private void LoadEquipment()
         {
+            _loadingEquipment = true;
             LoadSlot(cmbLeft, EquipmentSlot.LeftHand);
             LoadSlot(cmbRight, EquipmentSlot.RightHand);
             LoadSlot(cmbBody, EquipmentSlot.Body);
             LoadSlot(cmbLegs, EquipmentSlot.Legs);
             LoadSlot(cmbHead, EquipmentSlot.Head);
             LoadSlot(cmbTrinket, EquipmentSlot.Trinket);
+            _loadingEquipment = false;
         }
 
         private void LoadSlot(ComboBox combo, EquipmentSlot slot)
@@ -221,6 +224,7 @@ namespace WinFormsApp2
 
         private void EquipSlot(EquipmentSlot slot, ComboBox combo)
         {
+            if (_loadingEquipment) return;
             string selected = combo.SelectedItem?.ToString() ?? "-empty-";
             if (selected == "-empty-")
             {
