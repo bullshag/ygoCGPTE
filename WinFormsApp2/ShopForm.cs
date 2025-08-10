@@ -91,6 +91,18 @@ namespace WinFormsApp2
             RefreshInventory();
         }
 
+        private void InitializeComponent()
+        {
+            SuspendLayout();
+            // 
+            // ShopForm
+            // 
+            ClientSize = new Size(490, 612);
+            Name = "ShopForm";
+            Load += ShopForm_Load_1;
+            ResumeLayout(false);
+        }
+
         private void BtnSell_Click(object? sender, EventArgs e)
         {
             int index = _lstInventory.SelectedIndex;
@@ -106,6 +118,11 @@ namespace WinFormsApp2
             InventoryService.RemoveItem(inv.Item);
             RefreshGold();
             RefreshInventory();
+        }
+
+        private void ShopForm_Load_1(object sender, EventArgs e)
+        {
+
         }
     }
 }
