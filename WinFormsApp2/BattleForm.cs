@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using System.Drawing;
 using MySql.Data.MySqlClient;
 
 namespace WinFormsApp2
@@ -37,6 +38,7 @@ namespace WinFormsApp2
                 while (r.Read())
                 {
                     int cid = r.GetInt32("id");
+                    int intelligence = r.GetInt32("intelligence");
                     var player = new Creature
                     {
                         Name = r.GetString("name"),
@@ -44,10 +46,10 @@ namespace WinFormsApp2
                         CurrentHp = r.GetInt32("current_hp"),
                         MaxHp = r.GetInt32("max_hp"),
                         Mana = r.GetInt32("mana"),
-                        MaxMana = r.GetInt32("mana"),
+                        MaxMana = 10 + 5 * intelligence,
                         Strength = r.GetInt32("strength"),
                         Dex = r.GetInt32("dex"),
-                        Intelligence = r.GetInt32("intelligence"),
+                        Intelligence = intelligence,
                         ActionSpeed = r.GetInt32("action_speed"),
                         MeleeDefense = r.GetInt32("melee_defense"),
                         Role = r.GetString("role"),
@@ -435,7 +437,7 @@ namespace WinFormsApp2
                 }
                 BattleLogService.AddLog(string.Join("\n", lstLog.Items.Cast<string>()));
                 HandlePlayerDeaths();
-                SaveHp();
+                SaveState();
                 var playerSummaries = _players.Select(p => new CombatantSummary(p.Name, p.DamageDone, p.DamageTaken));
                 var enemySummaries = _npcs.Select(n => new CombatantSummary(n.Name, n.DamageDone, n.DamageTaken));
                 using var summary = new BattleSummaryForm(playerSummaries, enemySummaries);
@@ -538,31 +540,32 @@ namespace WinFormsApp2
         {
             var panel = new Panel { Width = 180, Height = 80 };
             var lbl = new Label { Text = c.Name, AutoSize = true };
-            c.HpBar = new ProgressBar { Maximum = c.MaxHp, Value = c.CurrentHp, Width = 170, Location = new System.Drawing.Point(0, 15) };
+            c.HpBar = new ProgressBar { Maximum = c.MaxHp, Value = c.CurrentHp, Width = 170, Location = new Point(0, 15), ForeColor = Color.Red, Style = ProgressBarStyle.Continuous };
             panel.Controls.Add(lbl);
             panel.Controls.Add(c.HpBar);
             if (c.MaxMana > 0)
             {
-                c.ManaBar = new ProgressBar { Maximum = c.MaxMana, Value = c.Mana, Width = 170, Location = new System.Drawing.Point(0, 35) };
+                c.ManaBar = new ProgressBar { Maximum = c.MaxMana, Value = c.Mana, Width = 170, Location = new Point(0, 35), ForeColor = Color.Blue, Style = ProgressBarStyle.Continuous };
                 panel.Controls.Add(c.ManaBar);
-                c.AttackBar = new ProgressBar { Maximum = 100, Value = 100, Width = 170, Location = new System.Drawing.Point(0, 55) };
+                c.AttackBar = new ProgressBar { Maximum = 100, Value = 100, Width = 170, Location = new Point(0, 55) };
             }
             else
             {
-                c.AttackBar = new ProgressBar { Maximum = 100, Value = 100, Width = 170, Location = new System.Drawing.Point(0, 35) };
+                c.AttackBar = new ProgressBar { Maximum = 100, Value = 100, Width = 170, Location = new Point(0, 35) };
             }
             panel.Controls.Add(c.AttackBar);
             return panel;
         }
 
-        private void SaveHp()
+        private void SaveState()
         {
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
             foreach (var p in _players)
             {
-                using MySqlCommand cmd = new MySqlCommand("UPDATE characters SET current_hp=@hp WHERE account_id=@uid AND name=@name", conn);
+                using MySqlCommand cmd = new MySqlCommand("UPDATE characters SET current_hp=@hp, mana=@mana WHERE account_id=@uid AND name=@name", conn);
                 cmd.Parameters.AddWithValue("@hp", Math.Max(0, p.CurrentHp));
+                cmd.Parameters.AddWithValue("@mana", Math.Max(0, p.Mana));
                 cmd.Parameters.AddWithValue("@uid", _userId);
                 cmd.Parameters.AddWithValue("@name", p.Name);
                 cmd.ExecuteNonQuery();
