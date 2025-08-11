@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Drawing;
 using MySql.Data.MySqlClient;
 
 namespace WinFormsApp2
@@ -12,6 +13,7 @@ namespace WinFormsApp2
         private int _searchCost;
         private int _playerGold;
         private readonly System.Windows.Forms.Timer _chatTimer = new System.Windows.Forms.Timer();
+        private readonly System.Windows.Forms.Timer _regenTimer = new System.Windows.Forms.Timer();
         private DateTime _lastMessage = DateTime.MinValue;
 
         public RPGForm(int userId, string nickname)
@@ -27,6 +29,9 @@ namespace WinFormsApp2
             _chatTimer.Interval = 1000;
             _chatTimer.Tick += ChatTimer_Tick;
             _chatTimer.Start();
+            _regenTimer.Interval = 3000;
+            _regenTimer.Tick += RegenTimer_Tick;
+            _regenTimer.Start();
         }
 
         private void LoadPartyData()
@@ -34,21 +39,45 @@ namespace WinFormsApp2
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
 
-            using MySqlCommand cmd = new MySqlCommand("SELECT name, experience_points, level FROM characters WHERE account_id=@id AND is_dead=0", conn);
+            using MySqlCommand cmd = new MySqlCommand("SELECT name, experience_points, level, current_hp, max_hp, mana, intelligence FROM characters WHERE account_id=@id AND is_dead=0", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             using MySqlDataReader reader = cmd.ExecuteReader();
             lstParty.Items.Clear();
+            pnlParty.Controls.Clear();
             int totalExp = 0;
             int totalLevel = 0;
+            int index = 0;
             while (reader.Read())
             {
                 string name = reader.GetString("name");
                 int exp = reader.GetInt32("experience_points");
                 int level = reader.GetInt32("level");
+                int hp = reader.GetInt32("current_hp");
+                int maxHp = reader.GetInt32("max_hp");
+                int mana = reader.GetInt32("mana");
+                int intel = reader.GetInt32("intelligence");
+                int maxMana = 10 + 5 * intel;
                 int nextExp = ExperienceHelper.GetNextLevelRequirement(level);
                 lstParty.Items.Add($"{name} - LVL {level} EXP {exp}/{nextExp}");
+
+                var panel = new Panel { Width = 180, Height = maxMana > 0 ? 60 : 40, Margin = new Padding(3) };
+                var lbl = new Label { Text = name, AutoSize = true };
+                var hpBar = new ProgressBar { Maximum = maxHp, Value = Math.Min(hp, maxHp), Width = 170, Location = new Point(0, 15), ForeColor = Color.Red, Style = ProgressBarStyle.Continuous };
+                panel.Controls.Add(lbl);
+                panel.Controls.Add(hpBar);
+                if (maxMana > 0)
+                {
+                    var manaBar = new ProgressBar { Maximum = maxMana, Value = Math.Min(mana, maxMana), Width = 170, Location = new Point(0, 35), ForeColor = Color.Blue, Style = ProgressBarStyle.Continuous };
+                    panel.Controls.Add(manaBar);
+                }
+                int current = index;
+                panel.Click += (s, e) => { lstParty.SelectedIndex = current; };
+                foreach (Control c in panel.Controls) c.Click += (s, e) => { lstParty.SelectedIndex = current; };
+                pnlParty.Controls.Add(panel);
+
                 totalExp += exp;
                 totalLevel += level;
+                index++;
             }
             reader.Close();
 
@@ -173,7 +202,12 @@ namespace WinFormsApp2
         {
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using MySqlCommand cmd = new MySqlCommand("UPDATE characters SET current_hp = LEAST(max_hp, current_hp + 1 + CEILING(max_hp*0.05)) WHERE account_id=@id AND current_hp>0 AND current_hp<max_hp AND is_dead=0", conn);
+            using MySqlCommand cmd = new MySqlCommand(
+                "UPDATE characters SET " +
+                "current_hp = LEAST(max_hp, current_hp + 5 + CEILING(max_hp*0.05)), " +
+                "mana = LEAST(10 + 5*intelligence, mana + 5 + CEILING((10 + 5*intelligence)*0.05)) " +
+                "WHERE account_id=@id AND is_dead=0 AND current_hp>0 AND (current_hp < max_hp OR mana < (10 + 5*intelligence))",
+                conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             cmd.ExecuteNonQuery();
 
@@ -183,6 +217,11 @@ namespace WinFormsApp2
             {
                 lstParty.SelectedIndex = selectedIndex;
             }
+        }
+
+        private void RegenTimer_Tick(object? sender, EventArgs e)
+        {
+            Regenerate();
         }
 
         private void ChatTimer_Tick(object? sender, EventArgs e)
@@ -198,7 +237,6 @@ namespace WinFormsApp2
             lstOnline.DataSource = ChatService.GetOnlinePlayers();
             lstFriends.DataSource = FriendService.GetFriends(_userId);
             lstFriendRequests.DataSource = FriendService.GetFriendRequests(_userId);
-            Regenerate();
         }
 
         private void btnChatSend_Click(object? sender, EventArgs e)

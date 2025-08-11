@@ -51,7 +51,7 @@ namespace WinFormsApp2
                     _baseDex = reader.GetInt32("dex");
                     _baseInt = reader.GetInt32("intelligence");
                     _availablePoints = reader.GetInt32("skill_points");
-                    _maxMana = reader.GetInt32("mana");
+                    _maxMana = 10 + 5 * _baseInt;
                     numStr.Value = _baseStr;
                     numDex.Value = _baseDex;
                     numInt.Value = _baseInt;
@@ -84,6 +84,7 @@ namespace WinFormsApp2
                 spent = _availablePoints;
             }
             lblPoints.Text = $"Points: {_availablePoints - spent}";
+            _maxMana = 10 + 5 * (int)numInt.Value;
         }
 
         private void BtnBuy_Click(object? sender, EventArgs e)

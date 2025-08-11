@@ -10,6 +10,7 @@ namespace WinFormsApp2
         /// </summary>
         private System.ComponentModel.IContainer? components = null;
         private ListBox lstParty;
+        private FlowLayoutPanel pnlParty;
         private Button btnHire;
         private Button btnInspect;
         private Button btnBattle;
@@ -50,6 +51,7 @@ namespace WinFormsApp2
         private void InitializeComponent()
         {
             lstParty = new ListBox();
+            pnlParty = new FlowLayoutPanel();
             btnHire = new Button();
             btnInspect = new Button();
             btnBattle = new Button();
@@ -77,13 +79,22 @@ namespace WinFormsApp2
             SuspendLayout();
             // 
             // lstParty
-            // 
+            //
             lstParty.FormattingEnabled = true;
             lstParty.ItemHeight = 15;
             lstParty.Location = new Point(12, 12);
             lstParty.Name = "lstParty";
             lstParty.Size = new Size(260, 154);
             lstParty.SelectedIndexChanged += lstParty_SelectedIndexChanged;
+            lstParty.Visible = false;
+            //
+            // pnlParty
+            //
+            pnlParty.Location = new Point(12, 12);
+            pnlParty.Name = "pnlParty";
+            pnlParty.Size = new Size(260, 154);
+            pnlParty.FlowDirection = FlowDirection.TopDown;
+            pnlParty.WrapContents = false;
             // 
             // btnHire
             // 
@@ -272,6 +283,7 @@ namespace WinFormsApp2
             Controls.Add(btnBattle);
             Controls.Add(btnInspect);
             Controls.Add(btnHire);
+            Controls.Add(pnlParty);
             Controls.Add(lstParty);
             Name = "RPGForm";
             Text = "Party";
