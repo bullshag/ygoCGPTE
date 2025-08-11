@@ -83,8 +83,9 @@ namespace WinFormsApp2
 
         private void ShowPredictions(int str, int dex, int intel)
         {
-            var weapon = InventoryService.GetEquippedItem(_characterName, EquipmentSlot.LeftHand) as Weapon
-                ?? InventoryService.GetEquippedItem(_characterName, EquipmentSlot.RightHand) as Weapon;
+            var left = InventoryService.GetEquippedItem(_characterName, EquipmentSlot.LeftHand) as Weapon;
+            var right = InventoryService.GetEquippedItem(_characterName, EquipmentSlot.RightHand) as Weapon;
+            var weapon = left ?? right;
             double statTotal = str;
             double min = 0.8, max = 1.2, critBonus = 0, speed = 1 + dex / 25.0;
             if (weapon != null)
@@ -93,8 +94,10 @@ namespace WinFormsApp2
                 min = weapon.MinMultiplier;
                 max = weapon.MaxMultiplier;
                 critBonus = weapon.CritChanceBonus;
-                speed *= (1 + weapon.AttackSpeedMod);
             }
+            if (left != null) speed *= (1 + left.AttackSpeedMod);
+            if (right != null) speed *= (1 + right.AttackSpeedMod);
+            if (left != null && right != null && left.Name != right.Name) speed *= 1.5;
             double minD = Math.Max(1, statTotal * min);
             double maxD = Math.Max(1, statTotal * max);
             double crit = Math.Min(1.0, 0.05 + dex / 5 * 0.01 + critBonus);

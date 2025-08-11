@@ -16,6 +16,7 @@ namespace WinFormsApp2
         private Button btnInventory;
         private Button btnLogs;
         private Button btnShop;
+        private Button btnGraveyard;
         private Label lblGold;
         private Label lblTotalExp;
         private TabControl tabSocial;
@@ -55,6 +56,7 @@ namespace WinFormsApp2
             btnInventory = new Button();
             btnLogs = new Button();
             btnShop = new Button();
+            btnGraveyard = new Button();
             lblGold = new Label();
             lblTotalExp = new Label();
             tabSocial = new TabControl();
@@ -138,10 +140,19 @@ namespace WinFormsApp2
             btnShop.UseVisualStyleBackColor = true;
             btnShop.Click += btnShop_Click;
             //
+            // btnGraveyard
+            //
+            btnGraveyard.Location = new Point(12, 346);
+            btnGraveyard.Name = "btnGraveyard";
+            btnGraveyard.Size = new Size(260, 23);
+            btnGraveyard.Text = "Graveyard";
+            btnGraveyard.UseVisualStyleBackColor = true;
+            btnGraveyard.Click += btnGraveyard_Click;
+            //
             // lblGold
             //
             lblGold.AutoSize = true;
-            lblGold.Location = new Point(12, 346);
+            lblGold.Location = new Point(12, 375);
             lblGold.Name = "lblGold";
             lblGold.Size = new Size(35, 15);
             lblGold.Text = "Gold:";
@@ -149,7 +160,7 @@ namespace WinFormsApp2
             // lblTotalExp
             //
             lblTotalExp.AutoSize = true;
-            lblTotalExp.Location = new Point(12, 371);
+            lblTotalExp.Location = new Point(12, 400);
             lblTotalExp.Name = "lblTotalExp";
             lblTotalExp.Size = new Size(69, 15);
             lblTotalExp.Text = "Party EXP:";
@@ -250,10 +261,11 @@ namespace WinFormsApp2
             //
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(684, 401);
+            ClientSize = new Size(684, 426);
             Controls.Add(tabSocial);
             Controls.Add(lblTotalExp);
             Controls.Add(lblGold);
+            Controls.Add(btnGraveyard);
             Controls.Add(btnShop);
             Controls.Add(btnLogs);
             Controls.Add(btnInventory);
