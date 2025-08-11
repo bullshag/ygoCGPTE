@@ -34,7 +34,7 @@ namespace WinFormsApp2
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
 
-            using MySqlCommand cmd = new MySqlCommand("SELECT name, experience_points, level FROM characters WHERE account_id=@id", conn);
+            using MySqlCommand cmd = new MySqlCommand("SELECT name, experience_points, level FROM characters WHERE account_id=@id AND is_dead=0", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             using MySqlDataReader reader = cmd.ExecuteReader();
             lstParty.Items.Clear();
@@ -157,6 +157,12 @@ namespace WinFormsApp2
             LoadPartyData();
         }
 
+        private void btnGraveyard_Click(object? sender, EventArgs e)
+        {
+            using var grave = new GraveyardForm(_userId, LoadPartyData);
+            grave.ShowDialog(this);
+        }
+
         private void btnInventory_Click(object? sender, EventArgs e)
         {
             using var inv = new InventoryForm(_userId);
@@ -167,7 +173,7 @@ namespace WinFormsApp2
         {
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using MySqlCommand cmd = new MySqlCommand("UPDATE characters SET current_hp = LEAST(max_hp, current_hp + 1 + CEILING(max_hp*0.05)) WHERE account_id=@id AND current_hp>0 AND current_hp<max_hp", conn);
+            using MySqlCommand cmd = new MySqlCommand("UPDATE characters SET current_hp = LEAST(max_hp, current_hp + 1 + CEILING(max_hp*0.05)) WHERE account_id=@id AND current_hp>0 AND current_hp<max_hp AND is_dead=0", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             cmd.ExecuteNonQuery();
 

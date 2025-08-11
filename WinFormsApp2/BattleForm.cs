@@ -14,6 +14,7 @@ namespace WinFormsApp2
         private readonly Random _rng = new();
         private readonly int _userId;
         private readonly System.Windows.Forms.Timer _progressTimer = new System.Windows.Forms.Timer();
+        private readonly Dictionary<string, string> _deathCauses = new();
 
         public BattleForm(int userId)
         {
@@ -27,7 +28,7 @@ namespace WinFormsApp2
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
 
-            using var cmd = new MySqlCommand("SELECT id, name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, role, targeting_style FROM characters WHERE account_id=@id", conn);
+            using var cmd = new MySqlCommand("SELECT id, name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, role, targeting_style FROM characters WHERE account_id=@id AND is_dead=0", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
 
             var playerIds = new Dictionary<Creature, int>();
@@ -147,10 +148,11 @@ namespace WinFormsApp2
             {
                 var t = new System.Windows.Forms.Timer();
                 double speed = p.ActionSpeed + p.Dex / 25.0;
-                if (p.GetWeapon() is Weapon w && w.AttackSpeedMod != 0)
-                {
-                    speed *= (1 + w.AttackSpeedMod);
-                }
+                Weapon? left = p.Equipment.GetValueOrDefault(EquipmentSlot.LeftHand) as Weapon;
+                Weapon? right = p.Equipment.GetValueOrDefault(EquipmentSlot.RightHand) as Weapon;
+                if (left != null) speed *= (1 + left.AttackSpeedMod);
+                if (right != null) speed *= (1 + right.AttackSpeedMod);
+                if (left != null && right != null && left.Name != right.Name) speed *= 1.5;
                 t.Interval = (int)(3000 / speed);
                 p.AttackInterval = t.Interval;
                 p.AttackBar.Maximum = t.Interval;
@@ -242,7 +244,12 @@ namespace WinFormsApp2
 
             int dmg = CalculateDamage(actor, target);
             target.CurrentHp -= dmg;
-            lstLog.Items.Add(GenerateAttackLog(actor, target, dmg));
+            string attackLog = GenerateAttackLog(actor, target, dmg);
+            if (target.CurrentHp <= 0 && _players.Contains(target) && !_deathCauses.ContainsKey(target.Name))
+            {
+                _deathCauses[target.Name] = attackLog;
+            }
+            lstLog.Items.Add(attackLog);
             actor.DamageDone += dmg;
             target.DamageTaken += dmg;
             target.HpBar.Value = Math.Max(0, target.CurrentHp);
@@ -427,6 +434,7 @@ namespace WinFormsApp2
                     }
                 }
                 BattleLogService.AddLog(string.Join("\n", lstLog.Items.Cast<string>()));
+                HandlePlayerDeaths();
                 SaveHp();
                 var playerSummaries = _players.Select(p => new CombatantSummary(p.Name, p.DamageDone, p.DamageTaken));
                 var enemySummaries = _npcs.Select(n => new CombatantSummary(n.Name, n.DamageDone, n.DamageTaken));
@@ -558,6 +566,48 @@ namespace WinFormsApp2
                 cmd.Parameters.AddWithValue("@uid", _userId);
                 cmd.Parameters.AddWithValue("@name", p.Name);
                 cmd.ExecuteNonQuery();
+            }
+        }
+
+        private void HandlePlayerDeaths()
+        {
+            using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            foreach (var p in _players.Where(pl => pl.CurrentHp <= 0))
+            {
+                foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
+                {
+                    InventoryService.Equip(p.Name, slot, null);
+                }
+                string cause = _deathCauses.GetValueOrDefault(p.Name, "Unknown");
+                DialogResult res = MessageBox.Show($"Send {p.Name}'s body to the nearest graveyard?", "Graveyard", MessageBoxButtons.YesNo);
+                using (var deadCmd = new MySqlCommand("UPDATE characters SET is_dead=1 WHERE account_id=@id AND name=@name", conn))
+                {
+                    deadCmd.Parameters.AddWithValue("@id", _userId);
+                    deadCmd.Parameters.AddWithValue("@name", p.Name);
+                    deadCmd.ExecuteNonQuery();
+                }
+                if (res == DialogResult.Yes)
+                {
+                    using var listCmd = new MySqlCommand("SELECT id FROM characters WHERE account_id=@id AND in_graveyard=1 ORDER BY death_time ASC", conn);
+                    listCmd.Parameters.AddWithValue("@id", _userId);
+                    var ids = new List<int>();
+                    using (var r = listCmd.ExecuteReader())
+                    {
+                        while (r.Read()) ids.Add(r.GetInt32("id"));
+                    }
+                    if (ids.Count >= 3)
+                    {
+                        using var rem = new MySqlCommand("UPDATE characters SET in_graveyard=0 WHERE id=@cid", conn);
+                        rem.Parameters.AddWithValue("@cid", ids[0]);
+                        rem.ExecuteNonQuery();
+                    }
+                    using var add = new MySqlCommand("UPDATE characters SET in_graveyard=1, cause_of_death=@cause, death_time=NOW() WHERE account_id=@id AND name=@name", conn);
+                    add.Parameters.AddWithValue("@cause", cause);
+                    add.Parameters.AddWithValue("@id", _userId);
+                    add.Parameters.AddWithValue("@name", p.Name);
+                    add.ExecuteNonQuery();
+                }
             }
         }
     }
