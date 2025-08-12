@@ -17,6 +17,16 @@ namespace WinFormsApp2
         private readonly System.Windows.Forms.Timer _progressTimer = new System.Windows.Forms.Timer();
         private readonly Dictionary<string, string> _deathCauses = new();
 
+        private void AppendLog(string text, bool isPlayerAction, bool isHeal = false)
+        {
+            Color color = isHeal ? Color.Green : (isPlayerAction ? Color.Blue : Color.Red);
+            rtbLog.SelectionStart = rtbLog.TextLength;
+            rtbLog.SelectionColor = color;
+            rtbLog.AppendText(text + Environment.NewLine);
+            rtbLog.SelectionColor = rtbLog.ForeColor;
+            rtbLog.ScrollToCaret();
+        }
+
         public BattleForm(int userId)
         {
             _userId = userId;
@@ -284,12 +294,12 @@ namespace WinFormsApp2
                             if (eff.Kind == EffectKind.HoT)
                             {
                                 c.CurrentHp = Math.Min(c.MaxHp, c.CurrentHp + eff.AmountPerTick);
-                                lstLog.Items.Add($"{c.Name} is healed for {eff.AmountPerTick}.");
+                                AppendLog($"{c.Name} is healed for {eff.AmountPerTick}.", eff.SourceIsPlayer, true);
                             }
                             else
                             {
                                 c.CurrentHp -= eff.AmountPerTick;
-                                lstLog.Items.Add($"{c.Name} takes {eff.AmountPerTick} {eff.Kind.ToString().ToLower()} damage.");
+                                AppendLog($"{c.Name} takes {eff.AmountPerTick} {eff.Kind.ToString().ToLower()} damage.", eff.SourceIsPlayer);
                                 if (c.CurrentHp <= 0 && _players.Contains(c) && !_deathCauses.ContainsKey(c.Name))
                                 {
                                     _deathCauses[c.Name] = $"{c.Name} succumbed to {eff.Kind}.";
@@ -314,7 +324,7 @@ namespace WinFormsApp2
                         if (c.VanishRemainingMs == 0)
                         {
                             c.IsVanished = false;
-                            lstLog.Items.Add($"{c.Name} reappears.");
+                            AppendLog($"{c.Name} reappears.", _players.Contains(c));
                         }
                     }
                 }
@@ -332,7 +342,7 @@ namespace WinFormsApp2
                 if (actor.Equipment.TryGetValue(EquipmentSlot.LeftHand, out var lh) && lh is HealingPotion pot)
                 {
                     actor.CurrentHp = Math.Min(actor.MaxHp, actor.CurrentHp + pot.HealAmount);
-                    lstLog.Items.Add($"{actor.Name} uses a healing potion!");
+                    AppendLog($"{actor.Name} uses a healing potion!", _players.Contains(actor), true);
                     InventoryService.ConsumeEquipped(actor.Name, EquipmentSlot.LeftHand);
                     actor.Equipment[EquipmentSlot.LeftHand] = null;
                     return;
@@ -340,7 +350,7 @@ namespace WinFormsApp2
                 if (actor.Equipment.TryGetValue(EquipmentSlot.RightHand, out var rh) && rh is HealingPotion pot2)
                 {
                     actor.CurrentHp = Math.Min(actor.MaxHp, actor.CurrentHp + pot2.HealAmount);
-                    lstLog.Items.Add($"{actor.Name} uses a healing potion!");
+                    AppendLog($"{actor.Name} uses a healing potion!", _players.Contains(actor), true);
                     InventoryService.ConsumeEquipped(actor.Name, EquipmentSlot.RightHand);
                     actor.Equipment[EquipmentSlot.RightHand] = null;
                     return;
@@ -355,7 +365,7 @@ namespace WinFormsApp2
                 {
                     int heal = Math.Max(1, actor.Strength);
                     target.CurrentHp = Math.Min(target.MaxHp, target.CurrentHp + heal);
-                    lstLog.Items.Add($"{actor.Name} heals {target.Name} for {heal}!");
+                    AppendLog($"{actor.Name} heals {target.Name} for {heal}!", _players.Contains(actor), true);
                     actor.CurrentTarget = target;
                     actor.HealCooldown = 3;
                     CheckEnd();
@@ -364,7 +374,7 @@ namespace WinFormsApp2
             }
 
             var ability = ChooseAbility(actor);
-            if (ability.Name == "Regenerate")
+            if (ability.Name == "Regenerate" || ability.Name == "Heal")
             {
                 target = ChooseHealerTarget(actor, allies);
                 if (target == null) return;
@@ -383,21 +393,51 @@ namespace WinFormsApp2
                     actor.ManaBar.Value = Math.Max(0, actor.Mana);
                 }
                 actor.Cooldowns[ability.Id] = ability.Cooldown * 1000;
-                lstLog.Items.Add(GenerateAbilityLog(actor, target, ability));
+                bool actorIsPlayer = _players.Contains(actor);
+                AppendLog(GenerateAbilityLog(actor, target, ability), actorIsPlayer, ability.Name == "Heal" || ability.Name == "Regenerate");
                 if (ability.Name == "Bleed") ApplyBleed(actor, target);
                 else if (ability.Name == "Poison") ApplyPoison(actor, target);
                 else if (ability.Name == "Regenerate") { ApplyHot(actor, target); CheckEnd(); return; }
+                else if (ability.Name == "Heal")
+                {
+                    int healAmt = (int)Math.Max(1, 5 + actor.Intelligence * 1.2);
+                    target.CurrentHp = Math.Min(target.MaxHp, target.CurrentHp + healAmt);
+                    target.HpBar.Value = Math.Min(target.MaxHp, target.CurrentHp);
+                    AppendLog($"{actor.Name} restores {healAmt} HP to {target.Name}!", _players.Contains(actor), true);
+                    actor.AttackBar.Value = actor.AttackInterval;
+                    CheckEnd();
+                    return;
+                }
                 else if (ability.Name == "Taunting Blows") ApplyTaunt(actor, opponents);
                 else if (ability.Name == "Vanish") { actor.IsVanished = true; actor.VanishRemainingMs = 5000; actor.AttackBar.Value = actor.AttackInterval; CheckEnd(); return; }
                 else if (ability.Name == "Fireball" || ability.Name == "Lightning Bolt")
                 {
                     int dmg = CalculateSpellDamage(actor, target, ability);
                     target.CurrentHp -= dmg;
-                    string spellLog = $"{actor.Name}'s {ability.Name} hits {target.Name} for {dmg} damage!";
+                    string spellLog = ability.Name switch
+                    {
+                        "Fireball" => $"{actor.Name}'s fireball engulfs {target.Name} for {dmg} damage!",
+                        "Lightning Bolt" => $"{actor.Name}'s lightning bolt smites {target.Name} for {dmg} damage!",
+                        "Ice Lance" => $"{actor.Name}'s ice lance impales {target.Name} for {dmg} damage!",
+                        "Arcane Blast" => $"{actor.Name}'s arcane blast rips through {target.Name} for {dmg} damage!",
+                        "Shield Bash" => $"{actor.Name} shield bashes {target.Name} for {dmg} damage!",
+                        "Drain Life" => $"{actor.Name} siphons {dmg} life from {target.Name}!",
+                        _ => $"{actor.Name}'s {ability.Name} hits {target.Name} for {dmg} damage!"
+                    };
+
+        
                     if (target.CurrentHp <= 0 && _players.Contains(target) && !_deathCauses.ContainsKey(target.Name))
                     {
                         _deathCauses[target.Name] = spellLog;
                     }
+                    AppendLog(spellLog, actorIsPlayer);
+                    if (ability.Name == "Drain Life")
+                    {
+                        actor.CurrentHp = Math.Min(actor.MaxHp, actor.CurrentHp + dmg);
+                        actor.HpBar.Value = Math.Max(0, actor.CurrentHp);
+                        AppendLog($"{actor.Name} absorbs {dmg} health!", actorIsPlayer, true);
+                    }
+
                     lstLog.Items.Add(spellLog);
                     actor.DamageDone += dmg;
                     target.DamageTaken += dmg;
@@ -416,7 +456,7 @@ namespace WinFormsApp2
                 int chance = (5 + target.Strength / 30 + target.Dex / 30) * parryLevel;
                 if (_rng.Next(100) < chance)
                 {
-                    lstLog.Items.Add($"{target.Name} parries {actor.Name}'s attack!");
+                    AppendLog($"{target.Name} parries {actor.Name}'s attack!", _players.Contains(target));
                     actor.AttackBar.Value = actor.AttackInterval;
                     return;
                 }
@@ -426,7 +466,7 @@ namespace WinFormsApp2
                 int chance = (target.Dex / 10) * nimbleLevel;
                 if (_rng.Next(100) < chance)
                 {
-                    lstLog.Items.Add($"{target.Name} dodges {actor.Name}'s attack!");
+                    AppendLog($"{target.Name} dodges {actor.Name}'s attack!", _players.Contains(target));
                     actor.AttackBar.Value = actor.AttackInterval;
                     return;
                 }
@@ -445,7 +485,7 @@ namespace WinFormsApp2
             {
                 _deathCauses[target.Name] = attackLog;
             }
-            lstLog.Items.Add(attackLog);
+            AppendLog(attackLog, _players.Contains(actor));
             actor.DamageDone += dmg;
             target.DamageTaken += dmg;
             target.HpBar.Value = Math.Max(0, target.CurrentHp);
@@ -460,8 +500,8 @@ namespace WinFormsApp2
                 if (_rng.Next(100) < chance)
                 {
                     int bleed = (int)Math.Max(1, dmg * dmgPct);
-                    target.Effects.Add(new StatusEffect { Kind = EffectKind.Bleed, RemainingMs = 6000, TickIntervalMs = 500, TimeUntilTickMs = 500, AmountPerTick = bleed });
-                    lstLog.Items.Add($"{target.Name} starts bleeding!");
+                    target.Effects.Add(new StatusEffect { Kind = EffectKind.Bleed, RemainingMs = 6000, TickIntervalMs = 500, TimeUntilTickMs = 500, AmountPerTick = bleed, SourceIsPlayer = _players.Contains(actor) });
+                    AppendLog($"{target.Name} starts bleeding!", _players.Contains(actor));
                 }
             }
             if (actor.Passives.ContainsKey("Battle Mage"))
@@ -476,27 +516,45 @@ namespace WinFormsApp2
 
         private string GenerateAbilityLog(Creature actor, Creature target, Ability ability)
         {
-            string[] verbs = { "casts", "unleashes", "channels", "conjures", "invokes" };
-            string verb = verbs[_rng.Next(verbs.Length)];
-            return $"{actor.Name} {verb} {ability.Name} at {target.Name}!";
+            return ability.Name switch
+            {
+                "Fireball" => $"{actor.Name} hurls a blazing fireball at {target.Name}!",
+                "Lightning Bolt" => $"{actor.Name} summons a crackling bolt of lightning toward {target.Name}!",
+                "Ice Lance" => $"{actor.Name} launches an icy lance at {target.Name}!",
+                "Arcane Blast" => $"{actor.Name} releases a wave of arcane force!",
+                "Bleed" => $"{actor.Name} rends {target.Name}, drawing rivers of blood!",
+                "Poison" => $"{actor.Name} envenoms {target.Name} with a vile toxin!",
+                "Regenerate" => $"{actor.Name} calls forth rejuvenating winds around {target.Name}!",
+                "Rejuvenate" => $"{actor.Name} bathes {target.Name} in rejuvenating energy!",
+                "Heal" => $"{actor.Name} channels soothing light into {target.Name}!",
+                "Stone Skin" => $"{actor.Name} hardens {target.Name}'s skin like stone!",
+                "Taunting Blows" => $"{actor.Name} bellows a challenge, daring foes to attack!",
+                "Shield Bash" => $"{actor.Name} slams their shield into {target.Name}!",
+                "Poison Arrow" => $"{actor.Name} fires a venom-tipped arrow at {target.Name}!",
+                "Cleanse" => $"{actor.Name} purges foul magic from {target.Name}!",
+                "Berserk" => $"{actor.Name} enters a berserk fury!",
+                "Drain Life" => $"{actor.Name} siphons vitality from {target.Name}!",
+                "Vanish" => $"{actor.Name} melts into the shadows!",
+                _ => $"{actor.Name} uses {ability.Name} on {target.Name}!"
+            };
         }
 
         private void ApplyBleed(Creature actor, Creature target)
         {
             int amt = (int)Math.Max(1, 1 + actor.Strength * 0.25);
-            target.Effects.Add(new StatusEffect { Kind = EffectKind.Bleed, RemainingMs = 6000, TickIntervalMs = 500, TimeUntilTickMs = 500, AmountPerTick = amt });
+            target.Effects.Add(new StatusEffect { Kind = EffectKind.Bleed, RemainingMs = 6000, TickIntervalMs = 500, TimeUntilTickMs = 500, AmountPerTick = amt, SourceIsPlayer = _players.Contains(actor) });
         }
 
         private void ApplyPoison(Creature actor, Creature target)
         {
             int amt = (int)Math.Max(1, 1 + actor.Dex * 0.50);
-            target.Effects.Add(new StatusEffect { Kind = EffectKind.Poison, RemainingMs = 6000, TickIntervalMs = 1000, TimeUntilTickMs = 1000, AmountPerTick = amt });
+            target.Effects.Add(new StatusEffect { Kind = EffectKind.Poison, RemainingMs = 6000, TickIntervalMs = 1000, TimeUntilTickMs = 1000, AmountPerTick = amt, SourceIsPlayer = _players.Contains(actor) });
         }
 
         private void ApplyHot(Creature actor, Creature target)
         {
             int amt = (int)Math.Max(1, 1 + target.Intelligence * 0.80);
-            target.Effects.Add(new StatusEffect { Kind = EffectKind.HoT, RemainingMs = 6000, TickIntervalMs = 3000, TimeUntilTickMs = 3000, AmountPerTick = amt });
+            target.Effects.Add(new StatusEffect { Kind = EffectKind.HoT, RemainingMs = 6000, TickIntervalMs = 3000, TimeUntilTickMs = 3000, AmountPerTick = amt, SourceIsPlayer = _players.Contains(actor) });
         }
 
         private void ApplyTaunt(Creature actor, List<Creature> opponents)
@@ -665,7 +723,7 @@ namespace WinFormsApp2
                 foreach (var t in _timers.Values) t.Stop();
                 bool playersWin = _players.Any(p => p.CurrentHp > 0);
                 string lootSummary = string.Empty;
-                lstLog.Items.Add(playersWin ? "Players win!" : "NPCs win!");
+                AppendLog(playersWin ? "Players win!" : "NPCs win!", playersWin);
                 if (playersWin)
                 {
                     AwardExperience(_npcs.Sum(n => n.Level));
@@ -676,10 +734,10 @@ namespace WinFormsApp2
                         if (loot.TryGetValue("gold", out int gold)) parts.Add($"{gold} gold");
                         foreach (var kv in loot.Where(k => k.Key != "gold")) parts.Add($"{kv.Value} {kv.Key}");
                         lootSummary = string.Join(", ", parts);
-                        if (parts.Count > 0) lstLog.Items.Add("Loot: " + lootSummary);
+                        if (parts.Count > 0) AppendLog("Loot: " + lootSummary, true);
                     }
                 }
-                BattleLogService.AddLog(string.Join("\n", lstLog.Items.Cast<string>()));
+                BattleLogService.AddLog(rtbLog.Text);
                 HandlePlayerDeaths();
                 SaveState();
                 var playerSummaries = _players.Select(p => new CombatantSummary(p.Name, p.DamageDone, p.DamageTaken));
@@ -733,6 +791,11 @@ namespace WinFormsApp2
             {
                 "Fireball" => 5 + actor.Intelligence * 1.0,
                 "Lightning Bolt" => 4 + actor.Intelligence * 1.2,
+                "Ice Lance" => 6 + actor.Intelligence * 1.1,
+                "Arcane Blast" => 8 + actor.Intelligence * 0.9,
+                "Shield Bash" => 2 + actor.Strength * 0.5,
+                "Drain Life" => 3 + actor.Intelligence * 0.7,
+
                 _ => 0
             };
             return (int)Math.Max(1, baseDamage - target.MagicDefense);
@@ -750,7 +813,7 @@ namespace WinFormsApp2
             updateCmd.Parameters.AddWithValue("@exp", expPer);
             updateCmd.Parameters.AddWithValue("@id", _userId);
             updateCmd.ExecuteNonQuery();
-            lstLog.Items.Add($"Each party member gains {expPer} EXP!");
+            AppendLog($"Each party member gains {expPer} EXP!", true);
         }
 
         private class Creature
@@ -806,6 +869,7 @@ namespace WinFormsApp2
             public int TickIntervalMs { get; set; }
             public int TimeUntilTickMs { get; set; }
             public int AmountPerTick { get; set; }
+            public bool SourceIsPlayer { get; set; }
         }
 
         private void BuildPanels()
