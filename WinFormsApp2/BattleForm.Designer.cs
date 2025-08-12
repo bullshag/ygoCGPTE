@@ -23,6 +23,7 @@ namespace WinFormsApp2
         {
             pnlPlayers = new FlowLayoutPanel();
             pnlEnemies = new FlowLayoutPanel();
+            rtbLog = new RichTextBox();
             SuspendLayout();
             // 
             // pnlPlayers
