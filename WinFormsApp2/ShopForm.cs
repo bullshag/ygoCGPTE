@@ -96,7 +96,7 @@ namespace WinFormsApp2
             RefreshInventory();
         }
 
-  
+
 
         private void BtnSell_Click(object? sender, EventArgs e)
         {
@@ -171,6 +171,11 @@ namespace WinFormsApp2
         }
 
         private void ShopForm_Load_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ShopForm_Load_2(object sender, EventArgs e)
         {
 
         }
