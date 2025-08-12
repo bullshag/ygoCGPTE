@@ -70,7 +70,7 @@ namespace WinFormsApp2
             lstAbilities.Items.Clear();
             foreach (var a in _abilities)
             {
-                lstAbilities.Items.Add($"{a.Name} ({a.Cost})");
+                lstAbilities.Items.Add($"{a.Name}: {a.Description} Cooldown: {a.Cooldown}s, Mana Cost: {a.Cost}");
             }
         }
 
@@ -103,7 +103,7 @@ namespace WinFormsApp2
             lstAbilities.Items.Clear();
             foreach (var a in _abilities)
             {
-                lstAbilities.Items.Add($"{a.Name} ({a.Cost})");
+                lstAbilities.Items.Add($"{a.Name}: {a.Description} Cooldown: {a.Cooldown}s, Mana Cost: {a.Cost}");
             }
         }
 

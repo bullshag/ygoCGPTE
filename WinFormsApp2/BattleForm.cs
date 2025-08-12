@@ -184,6 +184,45 @@ namespace WinFormsApp2
                     {
                         c.AttackBar.Value = Math.Max(0, c.AttackBar.Value - 100);
                     }
+
+                    var cdKeys = c.Cooldowns.Keys.ToList();
+                    foreach (var k in cdKeys)
+                    {
+                        if (c.Cooldowns[k] > 0)
+                        {
+                            c.Cooldowns[k] = Math.Max(0, c.Cooldowns[k] - 100);
+                        }
+                    }
+
+                    for (int i = c.Effects.Count - 1; i >= 0; i--)
+                    {
+                        var eff = c.Effects[i];
+                        eff.RemainingMs -= 100;
+                        eff.TimeUntilTickMs -= 100;
+                        if (eff.TimeUntilTickMs <= 0)
+                        {
+                            if (eff.Kind == EffectKind.HoT)
+                            {
+                                c.CurrentHp = Math.Min(c.MaxHp, c.CurrentHp + eff.AmountPerTick);
+                                lstLog.Items.Add($"{c.Name} is healed for {eff.AmountPerTick}.");
+                            }
+                            else
+                            {
+                                c.CurrentHp -= eff.AmountPerTick;
+                                lstLog.Items.Add($"{c.Name} takes {eff.AmountPerTick} {eff.Kind.ToString().ToLower()} damage.");
+                                if (c.CurrentHp <= 0 && _players.Contains(c) && !_deathCauses.ContainsKey(c.Name))
+                                {
+                                    _deathCauses[c.Name] = $"{c.Name} succumbed to {eff.Kind}.";
+                                }
+                            }
+                            c.HpBar.Value = Math.Max(0, c.CurrentHp);
+                            eff.TimeUntilTickMs += eff.TickIntervalMs;
+                        }
+                        if (eff.RemainingMs <= 0)
+                        {
+                            c.Effects.RemoveAt(i);
+                        }
+                    }
                 }
             };
             _progressTimer.Start();
@@ -230,10 +269,18 @@ namespace WinFormsApp2
                 }
             }
 
-            target = ChooseOpponent(actor, opponents, allies);
-            if (target == null) return;
-
             var ability = ChooseAbility(actor);
+            if (ability.Name == "Regenerate")
+            {
+                target = ChooseHealerTarget(actor, allies);
+                if (target == null) return;
+            }
+            else
+            {
+                target = ChooseOpponent(actor, opponents, allies);
+                if (target == null) return;
+            }
+
             if (ability.Id != 0)
             {
                 actor.Mana -= ability.Cost;
@@ -241,7 +288,11 @@ namespace WinFormsApp2
                 {
                     actor.ManaBar.Value = Math.Max(0, actor.Mana);
                 }
+                actor.Cooldowns[ability.Id] = ability.Cooldown * 1000;
                 lstLog.Items.Add(GenerateAbilityLog(actor, target, ability));
+                if (ability.Name == "Bleed") ApplyBleed(actor, target);
+                else if (ability.Name == "Poison") ApplyPoison(actor, target);
+                else if (ability.Name == "Regenerate") { ApplyHot(actor, target); CheckEnd(); return; }
             }
 
             int dmg = CalculateDamage(actor, target);
@@ -267,6 +318,24 @@ namespace WinFormsApp2
             string[] verbs = { "casts", "unleashes", "channels", "conjures", "invokes" };
             string verb = verbs[_rng.Next(verbs.Length)];
             return $"The {actor.Role.ToLower()} {actor.Name} {verb} {ability.Name} at {target.Name}!";
+        }
+
+        private void ApplyBleed(Creature actor, Creature target)
+        {
+            int amt = (int)Math.Max(1, 1 + actor.Strength * 0.25);
+            target.Effects.Add(new StatusEffect { Kind = EffectKind.Bleed, RemainingMs = 6000, TickIntervalMs = 500, TimeUntilTickMs = 500, AmountPerTick = amt });
+        }
+
+        private void ApplyPoison(Creature actor, Creature target)
+        {
+            int amt = (int)Math.Max(1, 1 + actor.Dex * 0.50);
+            target.Effects.Add(new StatusEffect { Kind = EffectKind.Poison, RemainingMs = 6000, TickIntervalMs = 1000, TimeUntilTickMs = 1000, AmountPerTick = amt });
+        }
+
+        private void ApplyHot(Creature actor, Creature target)
+        {
+            int amt = (int)Math.Max(1, 1 + target.Intelligence * 0.80);
+            target.Effects.Add(new StatusEffect { Kind = EffectKind.HoT, RemainingMs = 6000, TickIntervalMs = 3000, TimeUntilTickMs = 3000, AmountPerTick = amt });
         }
 
         private string GenerateAttackLog(Creature actor, Creature target, int dmg)
@@ -378,7 +447,7 @@ namespace WinFormsApp2
             var abilities = actor.Abilities;
             var basic = abilities.FirstOrDefault(a => a.Id == 0) ?? new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0 };
             Ability? chosen = null;
-            var usable = abilities.Where(a => a.Id == 0 || actor.Mana >= a.Cost).ToList();
+            var usable = abilities.Where(a => a.Id == 0 || (actor.Mana >= a.Cost && actor.Cooldowns.GetValueOrDefault(a.Id) <= 0)).ToList();
             var nonBasic = usable.Where(a => a.Id != 0).ToList();
             if (nonBasic.Any())
             {
@@ -450,7 +519,7 @@ namespace WinFormsApp2
         private int CalculateDamage(Creature actor, Creature target)
         {
             var weapon = actor.GetWeapon();
-            double statTotal = actor.Strength;
+            double statTotal = actor.Strength * 0.3 + actor.Dex * 0.3;
             double min = 0.8, max = 1.2;
             double critChanceBonus = 0, critDamageBonus = 0;
             if (weapon != null)
@@ -513,6 +582,8 @@ namespace WinFormsApp2
             public int DamageDone { get; set; }
             public int DamageTaken { get; set; }
             public List<Ability> Abilities { get; } = new();
+            public Dictionary<int, int> Cooldowns { get; } = new();
+            public List<StatusEffect> Effects { get; } = new();
 
             public Weapon? GetWeapon()
             {
@@ -520,6 +591,17 @@ namespace WinFormsApp2
                 if (Equipment.TryGetValue(EquipmentSlot.RightHand, out var rh) && rh is Weapon w2) return w2;
                 return null;
             }
+        }
+
+        private enum EffectKind { Bleed, Poison, HoT }
+
+        private class StatusEffect
+        {
+            public EffectKind Kind { get; set; }
+            public int RemainingMs { get; set; }
+            public int TickIntervalMs { get; set; }
+            public int TimeUntilTickMs { get; set; }
+            public int AmountPerTick { get; set; }
         }
 
         private void BuildPanels()

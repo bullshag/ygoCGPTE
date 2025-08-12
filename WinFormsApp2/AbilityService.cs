@@ -8,7 +8,7 @@ namespace WinFormsApp2
     {
         public static List<Ability> GetShopAbilities(int characterId, MySqlConnection conn)
         {
-            using var cmd = new MySqlCommand(@"SELECT a.id, a.name, a.description, a.cost
+            using var cmd = new MySqlCommand(@"SELECT a.id, a.name, a.description, a.cost, a.cooldown
                                                FROM abilities a
                                                WHERE a.id NOT IN (SELECT ability_id FROM character_abilities WHERE character_id=@cid)", conn);
             cmd.Parameters.AddWithValue("@cid", characterId);
@@ -21,7 +21,8 @@ namespace WinFormsApp2
                     Id = reader.GetInt32("id"),
                     Name = reader.GetString("name"),
                     Description = reader.GetString("description"),
-                    Cost = reader.GetInt32("cost")
+                    Cost = reader.GetInt32("cost"),
+                    Cooldown = reader.GetInt32("cooldown")
                 });
             }
             return list;
@@ -37,7 +38,7 @@ namespace WinFormsApp2
 
         public static List<Ability> GetCharacterAbilities(int characterId, MySqlConnection conn)
         {
-            using var cmd = new MySqlCommand(@"SELECT a.id, a.name, a.description, a.cost
+            using var cmd = new MySqlCommand(@"SELECT a.id, a.name, a.description, a.cost, a.cooldown
                                                FROM abilities a
                                                JOIN character_abilities ca ON ca.ability_id = a.id
                                                WHERE ca.character_id=@cid", conn);
@@ -51,7 +52,8 @@ namespace WinFormsApp2
                     Id = reader.GetInt32("id"),
                     Name = reader.GetString("name"),
                     Description = reader.GetString("description"),
-                    Cost = reader.GetInt32("cost")
+                    Cost = reader.GetInt32("cost"),
+                    Cooldown = reader.GetInt32("cooldown")
                 });
             }
             return list;
@@ -59,7 +61,7 @@ namespace WinFormsApp2
 
         public static List<Ability> GetEquippedAbilities(int characterId, MySqlConnection conn)
         {
-            using var cmd = new MySqlCommand(@"SELECT slot, priority, a.id, a.name, a.description, a.cost
+            using var cmd = new MySqlCommand(@"SELECT slot, priority, a.id, a.name, a.description, a.cost, a.cooldown
                                                FROM character_ability_slots s
                                                LEFT JOIN abilities a ON s.ability_id = a.id
                                                WHERE s.character_id=@cid", conn);
@@ -75,7 +77,8 @@ namespace WinFormsApp2
                     Id = reader.IsDBNull(reader.GetOrdinal("id")) ? 0 : reader.GetInt32("id"),
                     Name = reader.IsDBNull(reader.GetOrdinal("name")) ? "-basic attack-" : reader.GetString("name"),
                     Description = reader.IsDBNull(reader.GetOrdinal("description")) ? string.Empty : reader.GetString("description"),
-                    Cost = reader.IsDBNull(reader.GetOrdinal("cost")) ? 0 : reader.GetInt32("cost")
+                    Cost = reader.IsDBNull(reader.GetOrdinal("cost")) ? 0 : reader.GetInt32("cost"),
+                    Cooldown = reader.IsDBNull(reader.GetOrdinal("cooldown")) ? 0 : reader.GetInt32("cooldown")
                 };
                 list.Add(ability);
             }
