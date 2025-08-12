@@ -4,11 +4,12 @@
 -- `sys_exec` function can run shell commands, as well as the `jq` and `curl` utilities
 -- to be installed on the MySQL server host.
 
-DROP DATABASE IF EXISTS cardData;
-CREATE DATABASE cardData;
+-- Create the database if it doesn't already exist
+CREATE DATABASE IF NOT EXISTS cardData;
 USE cardData;
 
-CREATE TABLE cards (
+-- Ensure the cards table exists so we can upsert data
+CREATE TABLE IF NOT EXISTS cards (
     id INT PRIMARY KEY,
     name VARCHAR(255),
     type VARCHAR(100),
@@ -56,7 +57,12 @@ BEGIN
         -- Download each card image and insert the record
         CALL sys_exec(CONCAT('curl -L "', v_image_url, '" -o /tmp/', v_id, '.jpg'));
         INSERT INTO cards(id, name, type, description, image)
-            VALUES (v_id, v_name, v_type, v_desc, LOAD_FILE(CONCAT('/tmp/', v_id, '.jpg')));
+            VALUES (v_id, v_name, v_type, v_desc, LOAD_FILE(CONCAT('/tmp/', v_id, '.jpg')))
+            ON DUPLICATE KEY UPDATE
+                name = VALUES(name),
+                type = VALUES(type),
+                description = VALUES(description),
+                image = VALUES(image);
     END LOOP;
     CLOSE card_cursor;
 END$$
