@@ -412,20 +412,20 @@ namespace WinFormsApp2
                 else if (ability.Name == "Vanish") { actor.IsVanished = true; actor.VanishRemainingMs = 5000; actor.AttackBar.Value = actor.AttackInterval; CheckEnd(); return; }
                 else if (ability.Name == "Fireball" || ability.Name == "Lightning Bolt")
                 {
-                    int dmg = CalculateSpellDamage(actor, target, ability);
-                    target.CurrentHp -= dmg;
+                    int spellDamage = CalculateSpellDamage(actor, target, ability);
+                    target.CurrentHp -= spellDamage;
                     string spellLog = ability.Name switch
                     {
-                        "Fireball" => $"{actor.Name}'s fireball engulfs {target.Name} for {dmg} damage!",
-                        "Lightning Bolt" => $"{actor.Name}'s lightning bolt smites {target.Name} for {dmg} damage!",
-                        "Ice Lance" => $"{actor.Name}'s ice lance impales {target.Name} for {dmg} damage!",
-                        "Arcane Blast" => $"{actor.Name}'s arcane blast rips through {target.Name} for {dmg} damage!",
-                        "Shield Bash" => $"{actor.Name} shield bashes {target.Name} for {dmg} damage!",
-                        "Drain Life" => $"{actor.Name} siphons {dmg} life from {target.Name}!",
-                        _ => $"{actor.Name}'s {ability.Name} hits {target.Name} for {dmg} damage!"
+                        "Fireball" => $"{actor.Name}'s fireball engulfs {target.Name} for {spellDamage} damage!",
+                        "Lightning Bolt" => $"{actor.Name}'s lightning bolt smites {target.Name} for {spellDamage} damage!",
+                        "Ice Lance" => $"{actor.Name}'s ice lance impales {target.Name} for {spellDamage} damage!",
+                        "Arcane Blast" => $"{actor.Name}'s arcane blast rips through {target.Name} for {spellDamage} damage!",
+                        "Shield Bash" => $"{actor.Name} shield bashes {target.Name} for {spellDamage} damage!",
+                        "Drain Life" => $"{actor.Name} siphons {spellDamage} life from {target.Name}!",
+                        _ => $"{actor.Name}'s {ability.Name} hits {target.Name} for {spellDamage} damage!"
                     };
 
-        
+
                     if (target.CurrentHp <= 0 && _players.Contains(target) && !_deathCauses.ContainsKey(target.Name))
                     {
                         _deathCauses[target.Name] = spellLog;
@@ -433,17 +433,16 @@ namespace WinFormsApp2
                     AppendLog(spellLog, actorIsPlayer);
                     if (ability.Name == "Drain Life")
                     {
-                        actor.CurrentHp = Math.Min(actor.MaxHp, actor.CurrentHp + dmg);
+                        actor.CurrentHp = Math.Min(actor.MaxHp, actor.CurrentHp + spellDamage);
                         actor.HpBar.Value = Math.Max(0, actor.CurrentHp);
-                        AppendLog($"{actor.Name} absorbs {dmg} health!", actorIsPlayer, true);
+                        AppendLog($"{actor.Name} absorbs {spellDamage} health!", actorIsPlayer, true);
                     }
 
-                    lstLog.Items.Add(spellLog);
-                    actor.DamageDone += dmg;
-                    target.DamageTaken += dmg;
+                    actor.DamageDone += spellDamage;
+                    target.DamageTaken += spellDamage;
                     target.HpBar.Value = Math.Max(0, target.CurrentHp);
                     actor.AttackBar.Value = actor.AttackInterval;
-                    target.Threat[actor] = target.Threat.GetValueOrDefault(actor) + dmg;
+                    target.Threat[actor] = target.Threat.GetValueOrDefault(actor) + spellDamage;
                     target.CurrentTarget = actor;
                     actor.CurrentTarget = target;
                     CheckEnd();
