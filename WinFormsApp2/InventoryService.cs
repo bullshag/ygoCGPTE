@@ -63,11 +63,11 @@ namespace WinFormsApp2
 
         public static Item? CreateItem(string name)
         {
-            return name switch
-            {
-                "Healing Potion" => new HealingPotion(),
-                _ => WeaponFactory.Create(name.Replace(" ", "").ToLower())
-            };
+            if (name == "Healing Potion") return new HealingPotion();
+            string key = name.Replace(" ", "").ToLower();
+            if (WeaponFactory.TryCreate(key, out var weapon)) return weapon;
+            if (ArmorFactory.TryCreate(key, out var armor)) return armor;
+            return null;
         }
 
         public static void AddItem(Item item, int qty = 1)
