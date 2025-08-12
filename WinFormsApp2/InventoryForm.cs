@@ -64,7 +64,7 @@ namespace WinFormsApp2
             {
                 using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
                 conn.Open();
-                using MySqlCommand cmd = new MySqlCommand("UPDATE characters SET current_hp = LEAST(max_hp, current_hp + @heal) WHERE account_id=@uid AND name=@name", conn);
+                using MySqlCommand cmd = new MySqlCommand("UPDATE characters SET current_hp = LEAST(max_hp, current_hp + @heal) WHERE account_id=@uid AND name=@name AND is_dead=0", conn);
                 cmd.Parameters.AddWithValue("@heal", ((HealingPotion)item).HealAmount);
                 cmd.Parameters.AddWithValue("@uid", _userId);
                 cmd.Parameters.AddWithValue("@name", _selectedTarget);
@@ -79,7 +79,7 @@ namespace WinFormsApp2
             cmbTarget.Items.Clear();
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using MySqlCommand cmd = new MySqlCommand("SELECT name FROM characters WHERE account_id=@id", conn);
+            using MySqlCommand cmd = new MySqlCommand("SELECT name FROM characters WHERE account_id=@id AND is_dead=0", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             using var r = cmd.ExecuteReader();
             while (r.Read())
