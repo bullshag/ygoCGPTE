@@ -76,6 +76,10 @@ namespace WinFormsApp2
                 {
                     kv.Key.Abilities.Add(new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0, Slot = 1 });
                 }
+                foreach (var p in PassiveService.GetCharacterPassives(kv.Value, conn))
+                {
+                    kv.Key.Passives[p.Key] = p.Value;
+                }
             }
 
             int totalLevel = _players.Sum(p => p.Level);
@@ -223,6 +227,20 @@ namespace WinFormsApp2
                             c.Effects.RemoveAt(i);
                         }
                     }
+                    if (c.ForcedTargetMs > 0)
+                    {
+                        c.ForcedTargetMs = Math.Max(0, c.ForcedTargetMs - 100);
+                        if (c.ForcedTargetMs == 0) c.ForcedTarget = null;
+                    }
+                    if (c.IsVanished)
+                    {
+                        c.VanishRemainingMs = Math.Max(0, c.VanishRemainingMs - 100);
+                        if (c.VanishRemainingMs == 0)
+                        {
+                            c.IsVanished = false;
+                            lstLog.Items.Add($"{c.Name} reappears.");
+                        }
+                    }
                 }
             };
             _progressTimer.Start();
@@ -230,7 +248,7 @@ namespace WinFormsApp2
 
         private void Act(Creature actor, List<Creature> allies, List<Creature> opponents)
         {
-            if (actor.CurrentHp <= 0) return;
+            if (actor.CurrentHp <= 0 || actor.IsVanished) return;
             if (actor.HealCooldown > 0) actor.HealCooldown--;
 
             if (actor.CurrentHp <= actor.MaxHp * 0.35)
@@ -293,9 +311,38 @@ namespace WinFormsApp2
                 if (ability.Name == "Bleed") ApplyBleed(actor, target);
                 else if (ability.Name == "Poison") ApplyPoison(actor, target);
                 else if (ability.Name == "Regenerate") { ApplyHot(actor, target); CheckEnd(); return; }
+                else if (ability.Name == "Taunting Blows") ApplyTaunt(actor, opponents);
+                else if (ability.Name == "Vanish") { actor.IsVanished = true; actor.VanishRemainingMs = 5000; actor.AttackBar.Value = actor.AttackInterval; CheckEnd(); return; }
+            }
+
+            if (target.Passives.TryGetValue("Parry", out int parryLevel))
+            {
+                int chance = (5 + target.Strength / 30 + target.Dex / 30) * parryLevel;
+                if (_rng.Next(100) < chance)
+                {
+                    lstLog.Items.Add($"{target.Name} parries {actor.Name}'s attack!");
+                    actor.AttackBar.Value = actor.AttackInterval;
+                    return;
+                }
+            }
+            if (target.Passives.TryGetValue("Nimble", out int nimbleLevel))
+            {
+                int chance = (target.Dex / 10) * nimbleLevel;
+                if (_rng.Next(100) < chance)
+                {
+                    lstLog.Items.Add($"{target.Name} dodges {actor.Name}'s attack!");
+                    actor.AttackBar.Value = actor.AttackInterval;
+                    return;
+                }
             }
 
             int dmg = CalculateDamage(actor, target);
+            if (target.Passives.ContainsKey("Bloodlust"))
+            {
+                double missing = 1 - target.CurrentHp / (double)target.MaxHp;
+                double mult = 1.75 - missing;
+                dmg = (int)(dmg * mult);
+            }
             target.CurrentHp -= dmg;
             string attackLog = GenerateAttackLog(actor, target, dmg);
             if (target.CurrentHp <= 0 && _players.Contains(target) && !_deathCauses.ContainsKey(target.Name))
@@ -310,6 +357,24 @@ namespace WinFormsApp2
             target.Threat[actor] = target.Threat.GetValueOrDefault(actor) + dmg;
             target.CurrentTarget = actor;
             actor.CurrentTarget = target;
+            if (actor.Passives.ContainsKey("Flesh Rip"))
+            {
+                int chance = 5 + actor.Strength / 15;
+                double dmgPct = 0.10 + (actor.Strength / 15) * 0.01;
+                if (_rng.Next(100) < chance)
+                {
+                    int bleed = (int)Math.Max(1, dmg * dmgPct);
+                    target.Effects.Add(new StatusEffect { Kind = EffectKind.Bleed, RemainingMs = 6000, TickIntervalMs = 500, TimeUntilTickMs = 500, AmountPerTick = bleed });
+                    lstLog.Items.Add($"{target.Name} starts bleeding!");
+                }
+            }
+            if (actor.Passives.ContainsKey("Battle Mage"))
+            {
+                int mana = (int)(actor.Intelligence * 0.15);
+                actor.Mana = Math.Min(actor.MaxMana, actor.Mana + mana);
+                if (actor.ManaBar.Maximum > 0)
+                    actor.ManaBar.Value = actor.Mana;
+            }
             CheckEnd();
         }
 
@@ -317,7 +382,7 @@ namespace WinFormsApp2
         {
             string[] verbs = { "casts", "unleashes", "channels", "conjures", "invokes" };
             string verb = verbs[_rng.Next(verbs.Length)];
-            return $"The {actor.Role.ToLower()} {actor.Name} {verb} {ability.Name} at {target.Name}!";
+            return $"{actor.Name} {verb} {ability.Name} at {target.Name}!";
         }
 
         private void ApplyBleed(Creature actor, Creature target)
@@ -336,6 +401,16 @@ namespace WinFormsApp2
         {
             int amt = (int)Math.Max(1, 1 + target.Intelligence * 0.80);
             target.Effects.Add(new StatusEffect { Kind = EffectKind.HoT, RemainingMs = 6000, TickIntervalMs = 3000, TimeUntilTickMs = 3000, AmountPerTick = amt });
+        }
+
+        private void ApplyTaunt(Creature actor, List<Creature> opponents)
+        {
+            int duration = 2000 + (actor.Strength / 30) * 1000;
+            foreach (var o in opponents.Where(o => o.CurrentHp > 0))
+            {
+                o.ForcedTarget = actor;
+                o.ForcedTargetMs = duration;
+            }
         }
 
         private string GenerateAttackLog(Creature actor, Creature target, int dmg)
@@ -380,12 +455,12 @@ namespace WinFormsApp2
             }
 
             string verb = verbs[_rng.Next(verbs.Length)];
-            return $"The {actor.Role.ToLower()} {actor.Name} {verb} {target.Name} for {dmg} damage!";
+            return $"{actor.Name} {verb} {target.Name} for {dmg} damage!";
         }
 
         private Creature? ChooseHealerTarget(Creature actor, List<Creature> allies)
         {
-            var injured = allies.Where(a => a.CurrentHp < a.MaxHp).ToList();
+            var injured = allies.Where(a => a.CurrentHp < a.MaxHp && !a.IsVanished).ToList();
             if (!injured.Any()) return null;
             switch (actor.TargetingStyle)
             {
@@ -403,7 +478,9 @@ namespace WinFormsApp2
 
         private Creature? ChooseOpponent(Creature actor, List<Creature> opponents, List<Creature> allies)
         {
-            var alive = opponents.Where(o => o.CurrentHp > 0).ToList();
+            if (actor.ForcedTarget != null && actor.ForcedTargetMs > 0 && actor.ForcedTarget.CurrentHp > 0 && !actor.ForcedTarget.IsVanished)
+                return actor.ForcedTarget;
+            var alive = opponents.Where(o => o.CurrentHp > 0 && !o.IsVanished).ToList();
             if (!alive.Any()) return null;
             switch (actor.Role)
             {
@@ -491,6 +568,7 @@ namespace WinFormsApp2
             {
                 foreach (var t in _timers.Values) t.Stop();
                 bool playersWin = _players.Any(p => p.CurrentHp > 0);
+                string lootSummary = string.Empty;
                 lstLog.Items.Add(playersWin ? "Players win!" : "NPCs win!");
                 if (playersWin)
                 {
@@ -501,7 +579,8 @@ namespace WinFormsApp2
                         var parts = new List<string>();
                         if (loot.TryGetValue("gold", out int gold)) parts.Add($"{gold} gold");
                         foreach (var kv in loot.Where(k => k.Key != "gold")) parts.Add($"{kv.Value} {kv.Key}");
-                        if (parts.Count > 0) lstLog.Items.Add("Loot: " + string.Join(", ", parts));
+                        lootSummary = string.Join(", ", parts);
+                        if (parts.Count > 0) lstLog.Items.Add("Loot: " + lootSummary);
                     }
                 }
                 BattleLogService.AddLog(string.Join("\n", lstLog.Items.Cast<string>()));
@@ -509,7 +588,7 @@ namespace WinFormsApp2
                 SaveState();
                 var playerSummaries = _players.Select(p => new CombatantSummary(p.Name, p.DamageDone, p.DamageTaken));
                 var enemySummaries = _npcs.Select(n => new CombatantSummary(n.Name, n.DamageDone, n.DamageTaken));
-                using var summary = new BattleSummaryForm(playerSummaries, enemySummaries);
+                using var summary = new BattleSummaryForm(playerSummaries, enemySummaries, playersWin, lootSummary);
                 Hide();
                 summary.ShowDialog(this.Owner);
                 Close();
@@ -531,11 +610,23 @@ namespace WinFormsApp2
                 critDamageBonus = weapon.CritDamageBonus;
             }
             double mult = min + _rng.NextDouble() * (max - min);
-            int dmg = (int)Math.Max(1, statTotal * mult - target.MeleeDefense);
+            double weaponDamage = Math.Max(1, statTotal * mult);
+            int dmg = (int)Math.Max(1, weaponDamage - target.MeleeDefense);
             double critChance = 0.05 + actor.Dex / 5 * 0.01 + critChanceBonus;
+            if (actor.Passives.TryGetValue("Deadly Strikes", out int dsLvl))
+            {
+                critChance += dsLvl * (actor.Dex / 10 * 0.01);
+            }
             if (_rng.NextDouble() < Math.Min(1.0, critChance))
             {
                 dmg = (int)(dmg * (1.5 + critDamageBonus));
+                weaponDamage *= (1.5 + critDamageBonus);
+            }
+            if (actor.Passives.ContainsKey("Bloodlust"))
+            {
+                double missing = 1 - actor.CurrentHp / (double)actor.MaxHp;
+                double bonusPercent = 0.02 + missing * 2;
+                dmg += (int)(weaponDamage * bonusPercent);
             }
             return dmg;
         }
@@ -584,6 +675,11 @@ namespace WinFormsApp2
             public List<Ability> Abilities { get; } = new();
             public Dictionary<int, int> Cooldowns { get; } = new();
             public List<StatusEffect> Effects { get; } = new();
+            public Dictionary<string, int> Passives { get; } = new();
+            public Creature? ForcedTarget { get; set; }
+            public int ForcedTargetMs { get; set; }
+            public bool IsVanished { get; set; }
+            public int VanishRemainingMs { get; set; }
 
             public Weapon? GetWeapon()
             {

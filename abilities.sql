@@ -32,4 +32,6 @@ INSERT INTO abilities (name, description, cost, cooldown) VALUES
 ('Heal', 'Restore a small amount of HP to an ally.', 30, 0),
 ('Bleed', 'Bleed an enemy for 6s, dealing 1 + 25% of your STR every 0.5s. "Their blood writes your victory."', 20, 10),
 ('Poison', 'Poison an enemy for 6s, dealing 1 + 50% of your DEX each second. "Watch them wither away."', 20, 10),
-('Regenerate', 'Mend an ally for 6s, healing 1 + 80% of their INT every 3s. "Life blooms anew."', 25, 10);
+('Regenerate', 'Mend an ally for 6s, healing 1 + 80% of their INT every 3s. "Life blooms anew."', 25, 10),
+('Taunting Blows', 'Taunt all enemies to attack you for 2s +1s per 30 STR. Cooldown 5s.', 0, 5),
+('Vanish', 'Disappear for 5 seconds, avoiding all attacks but unable to act.', 0, 30);

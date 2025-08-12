@@ -50,7 +50,8 @@ namespace WinFormsApp2
                     Cause = r.IsDBNull(r.GetOrdinal("cause_of_death")) ? string.Empty : r.GetString("cause_of_death")
                 };
                 _dead.Add(d);
-                lstDead.Items.Add($"{d.Name} - LVL {d.Level}");
+                int cost = CalculateResCost(d.Level);
+                lstDead.Items.Add($"{d.Name} - LVL {d.Level} (Cost: {cost} gold)");
             }
         }
 
