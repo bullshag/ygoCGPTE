@@ -29,7 +29,7 @@ namespace WinFormsApp2
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
 
-            using var cmd = new MySqlCommand("SELECT id, name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, role, targeting_style FROM characters WHERE account_id=@id AND is_dead=0", conn);
+            using var cmd = new MySqlCommand("SELECT id, name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM characters WHERE account_id=@id AND is_dead=0", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
 
             var playerIds = new Dictionary<Creature, int>();
@@ -52,6 +52,7 @@ namespace WinFormsApp2
                         Intelligence = intelligence,
                         ActionSpeed = r.GetInt32("action_speed"),
                         MeleeDefense = r.GetInt32("melee_defense"),
+                        MagicDefense = r.GetInt32("magic_defense"),
                         Role = r.GetString("role"),
                         TargetingStyle = r.GetString("targeting_style")
                     };
@@ -88,7 +89,7 @@ namespace WinFormsApp2
             int npcLevel = 0;
             while (_npcs.Count == 0 || npcLevel < minLevel)
             {
-                using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, strength, dex, action_speed, melee_defense, role, targeting_style FROM npcs WHERE level <= @maxLevel ORDER BY RAND() LIMIT 1", conn);
+                using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM npcs WHERE level <= @maxLevel ORDER BY RAND() LIMIT 1", conn);
                 npcCmd.Parameters.AddWithValue("@maxLevel", Math.Max(1, maxLevel - npcLevel));
                 using var r2 = npcCmd.ExecuteReader();
                 if (r2.Read())
@@ -97,10 +98,13 @@ namespace WinFormsApp2
                     string name = r2.GetString("name");
                     int currentHp = r2.GetInt32("current_hp");
                     int maxHp = r2.GetInt32("max_hp");
+                    int mana = r2.GetInt32("mana");
                     int strength = r2.GetInt32("strength");
                     int dex = r2.GetInt32("dex");
+                    int intelligence = r2.GetInt32("intelligence");
                     int action = r2.GetInt32("action_speed");
                     int meleeDef = r2.GetInt32("melee_defense");
+                    int magicDef = r2.GetInt32("magic_defense");
                     string role = r2.GetString("role");
                     string style = r2.GetString("targeting_style");
                     r2.Close();
@@ -110,10 +114,14 @@ namespace WinFormsApp2
                         Level = level,
                         CurrentHp = currentHp,
                         MaxHp = maxHp,
+                        Mana = mana,
+                        MaxMana = 10 + 5 * intelligence,
                         Strength = strength,
                         Dex = dex,
+                        Intelligence = intelligence,
                         ActionSpeed = action,
                         MeleeDefense = meleeDef,
+                        MagicDefense = magicDef,
                         Role = role,
                         TargetingStyle = style
                     };
@@ -149,7 +157,7 @@ namespace WinFormsApp2
 
             if (_npcs.Count == 0)
             {
-                using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, strength, dex, action_speed, melee_defense, role, targeting_style FROM npcs ORDER BY level ASC LIMIT 1", conn);
+                using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM npcs ORDER BY level ASC LIMIT 1", conn);
                 using var r2 = npcCmd.ExecuteReader();
                 if (r2.Read())
                 {
@@ -157,10 +165,13 @@ namespace WinFormsApp2
                     int level = r2.GetInt32("level");
                     int currentHp = r2.GetInt32("current_hp");
                     int maxHp = r2.GetInt32("max_hp");
+                    int mana = r2.GetInt32("mana");
                     int strength = r2.GetInt32("strength");
                     int dex = r2.GetInt32("dex");
+                    int intelligence = r2.GetInt32("intelligence");
                     int action = r2.GetInt32("action_speed");
                     int meleeDef = r2.GetInt32("melee_defense");
+                    int magicDef = r2.GetInt32("magic_defense");
                     string role = r2.GetString("role");
                     string style = r2.GetString("targeting_style");
                     r2.Close();
@@ -170,10 +181,14 @@ namespace WinFormsApp2
                         Level = level,
                         CurrentHp = currentHp,
                         MaxHp = maxHp,
+                        Mana = mana,
+                        MaxMana = 10 + 5 * intelligence,
                         Strength = strength,
                         Dex = dex,
+                        Intelligence = intelligence,
                         ActionSpeed = action,
                         MeleeDefense = meleeDef,
+                        MagicDefense = magicDef,
                         Role = role,
                         TargetingStyle = style
                     };
@@ -374,6 +389,26 @@ namespace WinFormsApp2
                 else if (ability.Name == "Regenerate") { ApplyHot(actor, target); CheckEnd(); return; }
                 else if (ability.Name == "Taunting Blows") ApplyTaunt(actor, opponents);
                 else if (ability.Name == "Vanish") { actor.IsVanished = true; actor.VanishRemainingMs = 5000; actor.AttackBar.Value = actor.AttackInterval; CheckEnd(); return; }
+                else if (ability.Name == "Fireball" || ability.Name == "Lightning Bolt")
+                {
+                    int dmg = CalculateSpellDamage(actor, target, ability);
+                    target.CurrentHp -= dmg;
+                    string spellLog = $"{actor.Name}'s {ability.Name} hits {target.Name} for {dmg} damage!";
+                    if (target.CurrentHp <= 0 && _players.Contains(target) && !_deathCauses.ContainsKey(target.Name))
+                    {
+                        _deathCauses[target.Name] = spellLog;
+                    }
+                    lstLog.Items.Add(spellLog);
+                    actor.DamageDone += dmg;
+                    target.DamageTaken += dmg;
+                    target.HpBar.Value = Math.Max(0, target.CurrentHp);
+                    actor.AttackBar.Value = actor.AttackInterval;
+                    target.Threat[actor] = target.Threat.GetValueOrDefault(actor) + dmg;
+                    target.CurrentTarget = actor;
+                    actor.CurrentTarget = target;
+                    CheckEnd();
+                    return;
+                }
             }
 
             if (target.Passives.TryGetValue("Parry", out int parryLevel))
@@ -692,6 +727,17 @@ namespace WinFormsApp2
             return dmg;
         }
 
+        private int CalculateSpellDamage(Creature actor, Creature target, Ability ability)
+        {
+            double baseDamage = ability.Name switch
+            {
+                "Fireball" => 5 + actor.Intelligence * 1.0,
+                "Lightning Bolt" => 4 + actor.Intelligence * 1.2,
+                _ => 0
+            };
+            return (int)Math.Max(1, baseDamage - target.MagicDefense);
+        }
+
         private void AwardExperience(int totalEnemyLevels)
         {
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
@@ -719,6 +765,7 @@ namespace WinFormsApp2
             public int Intelligence { get; set; }
             public int ActionSpeed { get; set; }
             public int MeleeDefense { get; set; }
+            public int MagicDefense { get; set; }
             public int Level { get; set; }
             public string Role { get; set; } = "DPS";
             public string TargetingStyle { get; set; } = "no priorities";
