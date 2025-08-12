@@ -73,6 +73,17 @@ namespace WinFormsApp2
                 MessageBox.Show("Name must be 3-12 characters with no spaces");
                 return;
             }
+            using (MySqlCommand check = new MySqlCommand("SELECT COUNT(*) FROM characters WHERE account_id=@acc AND name=@name", conn))
+            {
+                check.Parameters.AddWithValue("@acc", _userId);
+                check.Parameters.AddWithValue("@name", name);
+                int exists = Convert.ToInt32(check.ExecuteScalar());
+                if (exists > 0)
+                {
+                    MessageBox.Show("A hero with that name already exists.");
+                    return;
+                }
+            }
             insert.Parameters.AddWithValue("@name", name);
             insert.Parameters.AddWithValue("@hp", hp);
             insert.Parameters.AddWithValue("@maxHp", hp);

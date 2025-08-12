@@ -155,7 +155,7 @@ namespace WinFormsApp2
 
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using MySqlCommand cmd = new MySqlCommand("SELECT id FROM characters WHERE account_id=@id AND name=@name", conn);
+            using MySqlCommand cmd = new MySqlCommand("SELECT id FROM characters WHERE account_id=@id AND name=@name AND is_dead=0", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             cmd.Parameters.AddWithValue("@name", name);
             object? result = cmd.ExecuteScalar();
