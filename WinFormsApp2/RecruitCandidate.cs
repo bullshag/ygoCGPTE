@@ -22,7 +22,7 @@ namespace WinFormsApp2
                 Dexterity = 5,
                 Intelligence = 5
             };
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 30; i++)
             {
                 int stat = rng.Next(3);
                 if (stat == 0) candidate.Strength++;
