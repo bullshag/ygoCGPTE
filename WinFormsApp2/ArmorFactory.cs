@@ -11,7 +11,8 @@ namespace WinFormsApp2
                 "leathercap" => new Armor { Name = "Leather Cap", Slot = EquipmentSlot.Head, Price = 25 },
                 "leatherboots" => new Armor { Name = "Leather Boots", Slot = EquipmentSlot.Legs, Price = 25 },
                 _ => null
-            }!;
+            };
+
             return armor != null;
         }
 
