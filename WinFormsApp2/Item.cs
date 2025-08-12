@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Drawing;
+
 namespace WinFormsApp2
 {
     public abstract class Item
@@ -7,5 +10,11 @@ namespace WinFormsApp2
         public bool Stackable { get; init; }
         public EquipmentSlot? Slot { get; init; }
         public int Price { get; init; }
+
+        public Dictionary<string, int> FlatBonuses { get; } = new();
+        public Dictionary<string, int> PercentBonuses { get; } = new();
+        public int TotalPoints { get; set; }
+        public Color NameColor { get; set; } = Color.White;
+        public List<Color>? RainbowColors { get; set; }
     }
 }

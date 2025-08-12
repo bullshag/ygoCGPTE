@@ -18,7 +18,11 @@ namespace WinFormsApp2
             WeaponFactory.Create("shortsword"),
             WeaponFactory.Create("bow"),
             WeaponFactory.Create("staff"),
-            WeaponFactory.Create("wand")
+            WeaponFactory.Create("wand"),
+            ArmorFactory.Create("leatherarmor"),
+            ArmorFactory.Create("leathercap"),
+            ArmorFactory.Create("leatherboots"),
+            ArmorFactory.Create("clothrobe")
         };
 
         public ShopForm(int userId)
@@ -28,6 +32,10 @@ namespace WinFormsApp2
             _btnBuy.Click += BtnBuy_Click;
             _btnSell.Click += BtnSell_Click;
             Load += ShopForm_Load;
+            _lstShop.DrawMode = DrawMode.OwnerDrawFixed;
+            _lstShop.DrawItem += LstShop_DrawItem;
+            _lstInventory.DrawMode = DrawMode.OwnerDrawFixed;
+            _lstInventory.DrawItem += LstInventory_DrawItem;
         }
 
         private void ShopForm_Load(object? sender, EventArgs e)
@@ -53,7 +61,7 @@ namespace WinFormsApp2
             _lstShop.Items.Clear();
             foreach (var item in _shopItems)
             {
-                _lstShop.Items.Add($"{item.Name} - {item.Price}g");
+                _lstShop.Items.Add(item);
             }
         }
 
@@ -62,10 +70,7 @@ namespace WinFormsApp2
             _lstInventory.Items.Clear();
             foreach (var inv in InventoryService.Items)
             {
-                int price = (int)(inv.Item.Price * 0.45);
-                string name = inv.Item.Name;
-                if (inv.Item.Stackable) name += $" x{inv.Quantity}";
-                _lstInventory.Items.Add($"{name} ({price}g)");
+                _lstInventory.Items.Add(inv);
             }
         }
 
@@ -108,6 +113,61 @@ namespace WinFormsApp2
             InventoryService.RemoveItem(inv.Item);
             RefreshGold();
             RefreshInventory();
+        }
+
+        private void LstShop_DrawItem(object? sender, DrawItemEventArgs e)
+        {
+            if (e.Index < 0) return;
+            var item = (Item)_lstShop.Items[e.Index];
+            e.DrawBackground();
+            if (item.RainbowColors != null)
+            {
+                int x = e.Bounds.Left;
+                var colors = item.RainbowColors;
+                for (int i = 0; i < item.Name.Length; i++)
+                {
+                    var brush = new SolidBrush(colors[i % colors.Count]);
+                    string ch = item.Name[i].ToString();
+                    e.Graphics.DrawString(ch, e.Font, brush, x, e.Bounds.Top);
+                    x += (int)e.Graphics.MeasureString(ch, e.Font).Width;
+                }
+                string price = $" - {item.Price}g";
+                e.Graphics.DrawString(price, e.Font, Brushes.Black, x, e.Bounds.Top);
+            }
+            else
+            {
+                using var brush = new SolidBrush(item.NameColor);
+                e.Graphics.DrawString($"{item.Name} - {item.Price}g", e.Font, brush, e.Bounds);
+            }
+            e.DrawFocusRectangle();
+        }
+
+        private void LstInventory_DrawItem(object? sender, DrawItemEventArgs e)
+        {
+            if (e.Index < 0) return;
+            var inv = (InventoryItem)_lstInventory.Items[e.Index];
+            var item = inv.Item;
+            e.DrawBackground();
+            string suffix = inv.Item.Stackable ? $" x{inv.Quantity}" : string.Empty;
+            if (item.RainbowColors != null)
+            {
+                int x = e.Bounds.Left;
+                var colors = item.RainbowColors;
+                for (int i = 0; i < item.Name.Length; i++)
+                {
+                    var brush = new SolidBrush(colors[i % colors.Count]);
+                    string ch = item.Name[i].ToString();
+                    e.Graphics.DrawString(ch, e.Font, brush, x, e.Bounds.Top);
+                    x += (int)e.Graphics.MeasureString(ch, e.Font).Width;
+                }
+                e.Graphics.DrawString(suffix, e.Font, Brushes.Black, x, e.Bounds.Top);
+            }
+            else
+            {
+                using var brush = new SolidBrush(item.NameColor);
+                e.Graphics.DrawString(item.Name + suffix, e.Font, brush, e.Bounds);
+            }
+            e.DrawFocusRectangle();
         }
 
         private void ShopForm_Load_1(object sender, EventArgs e)

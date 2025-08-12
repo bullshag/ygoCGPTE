@@ -2,9 +2,9 @@ namespace WinFormsApp2
 {
     public static class WeaponFactory
     {
-        public static Weapon Create(string type)
+        public static bool TryCreate(string type, out Weapon weapon)
         {
-            return type switch
+            weapon = type switch
             {
                 "shortsword" => new Weapon { Name = "Shortsword", Slot = EquipmentSlot.LeftHand, DexScaling = 0.75, StrScaling = 0.25, MinMultiplier = 0.8, MaxMultiplier = 1.3, Price = 50 },
                 "dagger" => new Weapon { Name = "Dagger", Slot = EquipmentSlot.LeftHand, DexScaling = 0.65, MinMultiplier = 0.9, MaxMultiplier = 1.1, CritDamageBonus = 0.5, Price = 20 },
@@ -18,8 +18,16 @@ namespace WinFormsApp2
                 "greatsword" => new Weapon { Name = "Greatsword", Slot = EquipmentSlot.LeftHand, DexScaling = 0.55, StrScaling = 0.55, MinMultiplier = 1.1, MaxMultiplier = 1.6, CritChanceBonus = 0.05, CritDamageBonus = 0.05, AttackSpeedMod = 0.05, TwoHanded = true, Price = 150 },
                 "mace" => new Weapon { Name = "Mace", Slot = EquipmentSlot.LeftHand, IntScaling = 0.15, DexScaling = 0.25, StrScaling = 0.35, MinMultiplier = 0.9, MaxMultiplier = 1.4, Price = 70 },
                 "greatmaul" => new Weapon { Name = "Greatmaul", Slot = EquipmentSlot.LeftHand, IntScaling = 0.25, StrScaling = 0.45, DexScaling = 0.45, MinMultiplier = 0.9, MaxMultiplier = 1.6, TwoHanded = true, Price = 130 },
-                _ => new Weapon { Name = "Fists", Slot = EquipmentSlot.LeftHand, StrScaling = 1.0, MinMultiplier = 0.8, MaxMultiplier = 1.2 }
-            };
+                _ => null
+            }!;
+            return weapon != null;
+        }
+
+        public static Weapon Create(string type)
+        {
+            return TryCreate(type, out var weapon)
+                ? weapon
+                : new Weapon { Name = "Fists", Slot = EquipmentSlot.LeftHand, StrScaling = 1.0, MinMultiplier = 0.8, MaxMultiplier = 1.2 };
         }
     }
 }
