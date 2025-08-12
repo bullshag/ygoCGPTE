@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS abilities (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT,
-    cost INT NOT NULL
+    cost INT NOT NULL,
+    cooldown INT NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS character_abilities (
@@ -26,6 +27,9 @@ CREATE TABLE IF NOT EXISTS character_ability_slots (
     FOREIGN KEY (ability_id) REFERENCES abilities(id)
 );
 
-INSERT INTO abilities (name, description, cost) VALUES
-('Fireball', 'Deal fire damage to a single enemy.', 50),
-('Heal', 'Restore a small amount of HP to an ally.', 30);
+INSERT INTO abilities (name, description, cost, cooldown) VALUES
+('Fireball', 'Deal fire damage to a single enemy.', 50, 0),
+('Heal', 'Restore a small amount of HP to an ally.', 30, 0),
+('Bleed', 'Bleed an enemy for 6s, dealing 1 + 25% of your STR every 0.5s. "Their blood writes your victory."', 20, 10),
+('Poison', 'Poison an enemy for 6s, dealing 1 + 50% of your DEX each second. "Watch them wither away."', 20, 10),
+('Regenerate', 'Mend an ally for 6s, healing 1 + 80% of their INT every 3s. "Life blooms anew."', 25, 10);
