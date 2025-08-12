@@ -424,6 +424,8 @@ namespace WinFormsApp2
                         "Drain Life" => $"{actor.Name} siphons {dmg} life from {target.Name}!",
                         _ => $"{actor.Name}'s {ability.Name} hits {target.Name} for {dmg} damage!"
                     };
+
+        
                     if (target.CurrentHp <= 0 && _players.Contains(target) && !_deathCauses.ContainsKey(target.Name))
                     {
                         _deathCauses[target.Name] = spellLog;
@@ -435,6 +437,8 @@ namespace WinFormsApp2
                         actor.HpBar.Value = Math.Max(0, actor.CurrentHp);
                         AppendLog($"{actor.Name} absorbs {dmg} health!", actorIsPlayer, true);
                     }
+
+                    lstLog.Items.Add(spellLog);
                     actor.DamageDone += dmg;
                     target.DamageTaken += dmg;
                     target.HpBar.Value = Math.Max(0, target.CurrentHp);
@@ -791,6 +795,7 @@ namespace WinFormsApp2
                 "Arcane Blast" => 8 + actor.Intelligence * 0.9,
                 "Shield Bash" => 2 + actor.Strength * 0.5,
                 "Drain Life" => 3 + actor.Intelligence * 0.7,
+
                 _ => 0
             };
             return (int)Math.Max(1, baseDamage - target.MagicDefense);
