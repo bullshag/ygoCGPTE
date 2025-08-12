@@ -15,6 +15,7 @@ namespace WinFormsApp2
         private int _availablePoints;
         private int _playerGold;
         private List<Ability> _abilities = new List<Ability>();
+        private List<Passive> _passives = new List<Passive>();
         private int _maxMana;
 
         public LevelUpForm(int userId, int characterId)
@@ -26,6 +27,7 @@ namespace WinFormsApp2
             numDex.ValueChanged += StatsChanged;
             numInt.ValueChanged += StatsChanged;
             btnBuy.Click += BtnBuy_Click;
+            btnBuyPassive.Click += BtnBuyPassive_Click;
             btnSave.Click += BtnSave_Click;
             Load += LevelUpForm_Load;
         }
@@ -72,6 +74,12 @@ namespace WinFormsApp2
             {
                 lstAbilities.Items.Add($"{a.Name}: {a.Description} Cooldown: {a.Cooldown}s, Mana Cost: {a.Cost}");
             }
+            _passives = PassiveService.GetPassives(_characterId, conn);
+            lstPassives.Items.Clear();
+            foreach (var p in _passives)
+            {
+                lstPassives.Items.Add($"{p.Name} (Lv {p.Level}) - Cost: {p.Level + 1}\n{p.Description}");
+            }
         }
 
         private void StatsChanged(object? sender, EventArgs e)
@@ -104,6 +112,29 @@ namespace WinFormsApp2
             foreach (var a in _abilities)
             {
                 lstAbilities.Items.Add($"{a.Name}: {a.Description} Cooldown: {a.Cooldown}s, Mana Cost: {a.Cost}");
+            }
+        }
+
+        private void BtnBuyPassive_Click(object? sender, EventArgs e)
+        {
+            if (lstPassives.SelectedIndex < 0) return;
+            var passive = _passives[lstPassives.SelectedIndex];
+            int cost = passive.Level + 1;
+            if (_availablePoints < cost)
+            {
+                MessageBox.Show("Not enough points.");
+                return;
+            }
+            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            PassiveService.PurchasePassive(_characterId, passive.Id, cost, conn);
+            _availablePoints -= cost;
+            lblPoints.Text = $"Points: {_availablePoints}";
+            _passives = PassiveService.GetPassives(_characterId, conn);
+            lstPassives.Items.Clear();
+            foreach (var p in _passives)
+            {
+                lstPassives.Items.Add($"{p.Name} (Lv {p.Level}) - Cost: {p.Level + 1}\n{p.Description}");
             }
         }
 

@@ -11,6 +11,8 @@ namespace WinFormsApp2
         private ListBox lstAbilities;
         private Button btnBuy;
         private Button btnSave;
+        private ListBox lstPassives;
+        private Button btnBuyPassive;
         private NumericUpDown numStr;
         private NumericUpDown numDex;
         private NumericUpDown numInt;
@@ -69,6 +71,16 @@ namespace WinFormsApp2
             lstAbilities.Name = "lstAbilities";
             lstAbilities.Size = new Size(213, 179);
             lstAbilities.TabIndex = 1;
+            //
+            // lstPassives
+            //
+            lstPassives = new ListBox();
+            lstPassives.ItemHeight = 25;
+            lstPassives.Location = new Point(403, 13);
+            lstPassives.Margin = new Padding(4, 5, 4, 5);
+            lstPassives.Name = "lstPassives";
+            lstPassives.Size = new Size(213, 179);
+            lstPassives.TabIndex = 11;
             // 
             // btnBuy
             // 
@@ -78,6 +90,16 @@ namespace WinFormsApp2
             btnBuy.Size = new Size(214, 38);
             btnBuy.TabIndex = 0;
             btnBuy.Text = "Buy";
+            //
+            // btnBuyPassive
+            //
+            btnBuyPassive = new Button();
+            btnBuyPassive.Location = new Point(402, 197);
+            btnBuyPassive.Margin = new Padding(4, 5, 4, 5);
+            btnBuyPassive.Name = "btnBuyPassive";
+            btnBuyPassive.Size = new Size(214, 38);
+            btnBuyPassive.TabIndex = 12;
+            btnBuyPassive.Text = "Buy Passive";
             // 
             // btnSave
             // 
@@ -146,7 +168,9 @@ namespace WinFormsApp2
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(407, 250);
+            ClientSize = new Size(630, 250);
+            Controls.Add(btnBuyPassive);
+            Controls.Add(lstPassives);
             Controls.Add(btnBuy);
             Controls.Add(lstAbilities);
             Controls.Add(lblGold);
