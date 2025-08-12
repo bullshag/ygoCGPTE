@@ -9,6 +9,7 @@ namespace WinFormsApp2
         private Label lblPoints;
         private Label lblGold;
         private ListBox lstAbilities;
+        private RichTextBox rtbAbility;
         private Button btnBuy;
         private Button btnSave;
         private ListBox lstPassives;
@@ -71,6 +72,17 @@ namespace WinFormsApp2
             lstAbilities.Name = "lstAbilities";
             lstAbilities.Size = new Size(213, 179);
             lstAbilities.TabIndex = 1;
+
+            // rtbAbility
+            //
+            rtbAbility = new RichTextBox();
+            rtbAbility.Location = new Point(180, 197);
+            rtbAbility.Margin = new Padding(4, 5, 4, 5);
+            rtbAbility.Name = "rtbAbility";
+            rtbAbility.ReadOnly = true;
+            rtbAbility.Size = new Size(213, 110);
+            rtbAbility.TabIndex = 13;
+            rtbAbility.Text = "";
             //
             // lstPassives
             //
@@ -84,7 +96,7 @@ namespace WinFormsApp2
             // 
             // btnBuy
             // 
-            btnBuy.Location = new Point(179, 197);
+            btnBuy.Location = new Point(179, 315);
             btnBuy.Margin = new Padding(4, 5, 4, 5);
             btnBuy.Name = "btnBuy";
             btnBuy.Size = new Size(214, 38);
@@ -168,10 +180,11 @@ namespace WinFormsApp2
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(630, 250);
+            ClientSize = new Size(630, 370);
             Controls.Add(btnBuyPassive);
             Controls.Add(lstPassives);
             Controls.Add(btnBuy);
+            Controls.Add(rtbAbility);
             Controls.Add(lstAbilities);
             Controls.Add(lblGold);
             Controls.Add(btnSave);

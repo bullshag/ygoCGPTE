@@ -2,6 +2,10 @@ namespace WinFormsApp2
 {
     public class Weapon : Item
     {
+        public Weapon()
+        {
+            Stackable = true;
+        }
         public double StrScaling { get; init; }
         public double DexScaling { get; init; }
         public double IntScaling { get; init; }
