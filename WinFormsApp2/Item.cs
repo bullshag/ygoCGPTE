@@ -14,7 +14,7 @@ namespace WinFormsApp2
         public Dictionary<string, int> FlatBonuses { get; } = new();
         public Dictionary<string, int> PercentBonuses { get; } = new();
         public int TotalPoints { get; set; }
-        public Color NameColor { get; set; } = Color.White;
+        public Color NameColor { get; set; } = Color.Black;
         public List<Color>? RainbowColors { get; set; }
     }
 }
