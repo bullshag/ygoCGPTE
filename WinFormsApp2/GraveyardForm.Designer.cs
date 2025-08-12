@@ -7,7 +7,6 @@ namespace WinFormsApp2
     {
         private System.ComponentModel.IContainer? components = null;
         private ListBox lstDead;
-        private Label lblInfo;
         private Button btnResurrect;
 
         protected override void Dispose(bool disposing)
@@ -22,44 +21,56 @@ namespace WinFormsApp2
         private void InitializeComponent()
         {
             lstDead = new ListBox();
-            lblInfo = new Label();
             btnResurrect = new Button();
+            lblInfo = new RichTextBox();
             SuspendLayout();
-            //
+            // 
             // lstDead
-            //
-            lstDead.Location = new Point(12, 12);
-            lstDead.Size = new Size(260, 199);
+            // 
+            lstDead.ItemHeight = 25;
+            lstDead.Location = new Point(17, 20);
+            lstDead.Margin = new Padding(4, 5, 4, 5);
+            lstDead.Name = "lstDead";
+            lstDead.Size = new Size(370, 329);
+            lstDead.TabIndex = 2;
             lstDead.SelectedIndexChanged += lstDead_SelectedIndexChanged;
-            //
-            // lblInfo
-            //
-            lblInfo.AutoSize = true;
-            lblInfo.Location = new Point(12, 214);
-            lblInfo.Size = new Size(0, 15);
-            //
+            // 
             // btnResurrect
-            //
+            // 
             btnResurrect.Enabled = false;
-            btnResurrect.Location = new Point(12, 240);
-            btnResurrect.Size = new Size(260, 23);
+            btnResurrect.Location = new Point(16, 424);
+            btnResurrect.Margin = new Padding(4, 5, 4, 5);
+            btnResurrect.Name = "btnResurrect";
+            btnResurrect.Size = new Size(371, 38);
+            btnResurrect.TabIndex = 0;
             btnResurrect.Text = "Resurrect";
             btnResurrect.UseVisualStyleBackColor = true;
             btnResurrect.Click += btnResurrect_Click;
-            //
+            // 
+            // lblInfo
+            // 
+            lblInfo.Location = new Point(17, 357);
+            lblInfo.Name = "lblInfo";
+            lblInfo.ReadOnly = true;
+            lblInfo.Size = new Size(370, 59);
+            lblInfo.TabIndex = 3;
+            lblInfo.Text = "";
+            // 
             // GraveyardForm
-            //
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            // 
+            AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(284, 275);
-            Controls.Add(btnResurrect);
+            ClientSize = new Size(408, 476);
             Controls.Add(lblInfo);
+            Controls.Add(btnResurrect);
             Controls.Add(lstDead);
+            Margin = new Padding(4, 5, 4, 5);
             Name = "GraveyardForm";
             Text = "Graveyard";
             Load += GraveyardForm_Load;
             ResumeLayout(false);
-            PerformLayout();
         }
+
+        private RichTextBox lblInfo;
     }
 }

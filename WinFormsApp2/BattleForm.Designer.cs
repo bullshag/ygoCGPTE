@@ -31,15 +31,15 @@ namespace WinFormsApp2
             pnlPlayers.Location = new Point(13, 14);
             pnlPlayers.Margin = new Padding(4, 5, 4, 5);
             pnlPlayers.Name = "pnlPlayers";
-            pnlPlayers.Size = new Size(384, 398);
+            pnlPlayers.Size = new Size(252, 398);
             pnlPlayers.TabIndex = 2;
             // 
             // pnlEnemies
             // 
-            pnlEnemies.Location = new Point(485, 14);
+            pnlEnemies.Location = new Point(587, 14);
             pnlEnemies.Margin = new Padding(4, 5, 4, 5);
             pnlEnemies.Name = "pnlEnemies";
-            pnlEnemies.Size = new Size(366, 398);
+            pnlEnemies.Size = new Size(264, 398);
             pnlEnemies.TabIndex = 1;
             // 
             // lstLog
