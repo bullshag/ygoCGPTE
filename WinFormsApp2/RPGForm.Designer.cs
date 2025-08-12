@@ -13,6 +13,7 @@ namespace WinFormsApp2
         private FlowLayoutPanel pnlParty;
         private Button btnHire;
         private Button btnInspect;
+        private Button btnFire;
         private Button btnBattle;
         private Button btnInventory;
         private Button btnLogs;
@@ -54,6 +55,7 @@ namespace WinFormsApp2
             pnlParty = new FlowLayoutPanel();
             btnHire = new Button();
             btnInspect = new Button();
+            btnFire = new Button();
             btnBattle = new Button();
             btnInventory = new Button();
             btnLogs = new Button();
@@ -115,9 +117,19 @@ namespace WinFormsApp2
             btnInspect.UseVisualStyleBackColor = true;
             btnInspect.Click += btnInspect_Click;
             //
+            // btnFire
+            //
+            btnFire.Enabled = false;
+            btnFire.Location = new Point(12, 230);
+            btnFire.Name = "btnFire";
+            btnFire.Size = new Size(260, 23);
+            btnFire.Text = "Fire";
+            btnFire.UseVisualStyleBackColor = true;
+            btnFire.Click += btnFire_Click;
+            //
             // btnBattle
             //
-            btnBattle.Location = new Point(12, 230);
+            btnBattle.Location = new Point(12, 259);
             btnBattle.Name = "btnBattle";
             btnBattle.Size = new Size(260, 23);
             btnBattle.Text = "Find Battle";
@@ -126,7 +138,7 @@ namespace WinFormsApp2
             //
             // btnInventory
             //
-            btnInventory.Location = new Point(12, 259);
+            btnInventory.Location = new Point(12, 288);
             btnInventory.Name = "btnInventory";
             btnInventory.Size = new Size(260, 23);
             btnInventory.Text = "Inventory";
@@ -135,7 +147,7 @@ namespace WinFormsApp2
             //
             // btnLogs
             //
-            btnLogs.Location = new Point(12, 288);
+            btnLogs.Location = new Point(12, 317);
             btnLogs.Name = "btnLogs";
             btnLogs.Size = new Size(260, 23);
             btnLogs.Text = "Battle Logs";
@@ -144,7 +156,7 @@ namespace WinFormsApp2
             //
             // btnShop
             //
-            btnShop.Location = new Point(12, 317);
+            btnShop.Location = new Point(12, 346);
             btnShop.Name = "btnShop";
             btnShop.Size = new Size(260, 23);
             btnShop.Text = "Shop";
@@ -153,7 +165,7 @@ namespace WinFormsApp2
             //
             // btnGraveyard
             //
-            btnGraveyard.Location = new Point(12, 346);
+            btnGraveyard.Location = new Point(12, 375);
             btnGraveyard.Name = "btnGraveyard";
             btnGraveyard.Size = new Size(260, 23);
             btnGraveyard.Text = "Graveyard";
@@ -281,6 +293,7 @@ namespace WinFormsApp2
             Controls.Add(btnLogs);
             Controls.Add(btnInventory);
             Controls.Add(btnBattle);
+            Controls.Add(btnFire);
             Controls.Add(btnInspect);
             Controls.Add(btnHire);
             Controls.Add(pnlParty);

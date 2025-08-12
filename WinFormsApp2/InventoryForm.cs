@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 
@@ -41,6 +42,28 @@ namespace WinFormsApp2
             return InventoryService.Items[index].Item;
         }
 
+        private string DescribeItem(Item item)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine(item.Description);
+            if (item is Weapon w)
+            {
+                sb.AppendLine($"Scaling - STR {w.StrScaling:P0}, DEX {w.DexScaling:P0}, INT {w.IntScaling:P0}");
+                sb.AppendLine($"Damage {w.MinMultiplier:0.##}x-{w.MaxMultiplier:0.##}x");
+                if (w.CritChanceBonus != 0) sb.AppendLine($"Crit Chance +{w.CritChanceBonus:P0}");
+                if (w.CritDamageBonus != 0) sb.AppendLine($"Crit Damage +{w.CritDamageBonus:P0}");
+            }
+            foreach (var kv in item.FlatBonuses)
+            {
+                sb.AppendLine($"+{kv.Value} {kv.Key}");
+            }
+            foreach (var kv in item.PercentBonuses)
+            {
+                sb.AppendLine($"+{kv.Value}% {kv.Key}");
+            }
+            return sb.ToString().Trim();
+        }
+
         private void lstItems_SelectedIndexChanged(object? sender, EventArgs e)
         {
             var item = SelectedItem();
@@ -51,7 +74,7 @@ namespace WinFormsApp2
             }
             else
             {
-                lblDescription.Text = item.Description;
+                lblDescription.Text = DescribeItem(item);
                 btnUse.Enabled = item is HealingPotion && _selectedTarget != null;
             }
         }

@@ -43,6 +43,7 @@ namespace WinFormsApp2
             // 
             // lblDescription
             // 
+            lblDescription.AutoSize = false;
             lblDescription.Location = new Point(240, 20);
             lblDescription.Margin = new Padding(4, 0, 4, 0);
             lblDescription.Name = "lblDescription";

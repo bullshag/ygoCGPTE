@@ -25,6 +25,7 @@ namespace WinFormsApp2
 
         private void RPGForm_Load(object? sender, EventArgs e)
         {
+            InventoryService.Load(_userId);
             LoadPartyData();
             _chatTimer.Interval = 1000;
             _chatTimer.Tick += ChatTimer_Tick;
@@ -137,6 +138,8 @@ namespace WinFormsApp2
             {
                 btnInspect.Enabled = false;
                 btnInspect.Text = "Inspect";
+                btnFire.Enabled = false;
+                btnFire.Text = "Fire";
             }
             else
             {
@@ -144,6 +147,8 @@ namespace WinFormsApp2
                 string name = item.Split(" - ")[0];
                 btnInspect.Enabled = true;
                 btnInspect.Text = $"Inspect {name}";
+                btnFire.Enabled = true;
+                btnFire.Text = $"Fire {name}";
             }
         }
 
@@ -165,6 +170,69 @@ namespace WinFormsApp2
                 using var inspect = new HeroInspectForm(_userId, charId);
                 inspect.ShowDialog(this);
             }
+        }
+
+        private void btnFire_Click(object? sender, EventArgs e)
+        {
+            if (lstParty.SelectedItem == null) return;
+            string item = lstParty.SelectedItem.ToString() ?? string.Empty;
+            string name = item.Split(" - ")[0];
+
+            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            using MySqlCommand cmd = new MySqlCommand("SELECT id, level FROM characters WHERE account_id=@id AND name=@name AND is_dead=0", conn);
+            cmd.Parameters.AddWithValue("@id", _userId);
+            cmd.Parameters.AddWithValue("@name", name);
+            using var reader = cmd.ExecuteReader();
+            if (!reader.Read()) return;
+            int charId = reader.GetInt32("id");
+            int level = reader.GetInt32("level");
+            reader.Close();
+
+            int hireCost = 10 + level * 10;
+            int refund = (int)(hireCost * 0.4);
+
+            InventoryService.Load(_userId);
+            foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
+            {
+                var eqItem = InventoryService.GetEquippedItem(name, slot);
+                if (eqItem != null)
+                {
+                    InventoryService.AddItem(eqItem);
+                    InventoryService.ConsumeEquipped(name, slot);
+                }
+            }
+
+            using (var delAb = new MySqlCommand("DELETE FROM character_abilities WHERE character_id=@cid", conn))
+            {
+                delAb.Parameters.AddWithValue("@cid", charId);
+                delAb.ExecuteNonQuery();
+            }
+            using (var delSlots = new MySqlCommand("DELETE FROM character_ability_slots WHERE character_id=@cid", conn))
+            {
+                delSlots.Parameters.AddWithValue("@cid", charId);
+                delSlots.ExecuteNonQuery();
+            }
+            using (var delPass = new MySqlCommand("DELETE FROM character_passives WHERE character_id=@cid", conn))
+            {
+                delPass.Parameters.AddWithValue("@cid", charId);
+                delPass.ExecuteNonQuery();
+            }
+            using (var delChar = new MySqlCommand("DELETE FROM characters WHERE id=@cid", conn))
+            {
+                delChar.Parameters.AddWithValue("@cid", charId);
+                delChar.ExecuteNonQuery();
+            }
+
+            using (var goldCmd = new MySqlCommand("UPDATE users SET gold = gold + @g WHERE id=@id", conn))
+            {
+                goldCmd.Parameters.AddWithValue("@g", refund);
+                goldCmd.Parameters.AddWithValue("@id", _userId);
+                goldCmd.ExecuteNonQuery();
+            }
+
+            MessageBox.Show($"{name} has been dismissed. You receive {refund} gold.");
+            LoadPartyData();
         }
 
         private void btnBattle_Click(object? sender, EventArgs e)
