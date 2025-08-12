@@ -29,6 +29,7 @@ namespace WinFormsApp2
             btnBuy.Click += BtnBuy_Click;
             btnBuyPassive.Click += BtnBuyPassive_Click;
             btnSave.Click += BtnSave_Click;
+            lstAbilities.SelectedIndexChanged += LstAbilities_SelectedIndexChanged;
             Load += LevelUpForm_Load;
         }
 
@@ -72,8 +73,9 @@ namespace WinFormsApp2
             lstAbilities.Items.Clear();
             foreach (var a in _abilities)
             {
-                lstAbilities.Items.Add($"{a.Name}: {a.Description} Cooldown: {a.Cooldown}s, Mana Cost: {a.Cost}");
+                lstAbilities.Items.Add(a.Name);
             }
+            rtbAbility.Clear();
             _passives = PassiveService.GetPassives(_characterId, conn);
             lstPassives.Items.Clear();
             foreach (var p in _passives)
@@ -111,8 +113,9 @@ namespace WinFormsApp2
             lstAbilities.Items.Clear();
             foreach (var a in _abilities)
             {
-                lstAbilities.Items.Add($"{a.Name}: {a.Description} Cooldown: {a.Cooldown}s, Mana Cost: {a.Cost}");
+                lstAbilities.Items.Add(a.Name);
             }
+            rtbAbility.Clear();
         }
 
         private void BtnBuyPassive_Click(object? sender, EventArgs e)
@@ -136,6 +139,17 @@ namespace WinFormsApp2
             {
                 lstPassives.Items.Add($"{p.Name} (Lv {p.Level}) - Cost: {p.Level + 1}\n{p.Description}");
             }
+        }
+
+        private void LstAbilities_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            if (lstAbilities.SelectedIndex < 0)
+            {
+                rtbAbility.Clear();
+                return;
+            }
+            var ability = _abilities[lstAbilities.SelectedIndex];
+            rtbAbility.Text = $"{ability.Description}\nCooldown: {ability.Cooldown}s\nMana Cost: {ability.Cost}";
         }
 
         private void BtnSave_Click(object? sender, EventArgs e)
