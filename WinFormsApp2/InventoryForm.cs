@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
@@ -14,6 +15,8 @@ namespace WinFormsApp2
         {
             _userId = userId;
             InitializeComponent();
+            lstItems.DrawMode = DrawMode.OwnerDrawFixed;
+            lstItems.DrawItem += LstItems_DrawItem;
         }
 
         private void InventoryForm_Load(object? sender, EventArgs e)
@@ -27,12 +30,7 @@ namespace WinFormsApp2
             lstItems.Items.Clear();
             foreach (var inv in InventoryService.Items)
             {
-                string name = inv.Item.Name;
-                if (inv.Item.Stackable)
-                {
-                    name += $" x{inv.Quantity}";
-                }
-                lstItems.Items.Add(name);
+                lstItems.Items.Add(inv);
             }
         }
 
@@ -95,6 +93,34 @@ namespace WinFormsApp2
             _selectedTarget = cmbTarget.SelectedItem?.ToString();
             var item = SelectedItem();
             btnUse.Enabled = item is HealingPotion && _selectedTarget != null;
+        }
+
+        private void LstItems_DrawItem(object? sender, DrawItemEventArgs e)
+        {
+            if (e.Index < 0) return;
+            var inv = (InventoryItem)lstItems.Items[e.Index];
+            var item = inv.Item;
+            e.DrawBackground();
+            string suffix = item.Stackable ? $" x{inv.Quantity}" : string.Empty;
+            if (item.RainbowColors != null)
+            {
+                int x = e.Bounds.Left;
+                var colors = item.RainbowColors;
+                for (int i = 0; i < item.Name.Length; i++)
+                {
+                    var brush = new SolidBrush(colors[i % colors.Count]);
+                    string ch = item.Name[i].ToString();
+                    e.Graphics.DrawString(ch, e.Font, brush, x, e.Bounds.Top);
+                    x += (int)e.Graphics.MeasureString(ch, e.Font).Width;
+                }
+                e.Graphics.DrawString(suffix, e.Font, Brushes.Black, x, e.Bounds.Top);
+            }
+            else
+            {
+                using var brush = new SolidBrush(item.NameColor);
+                e.Graphics.DrawString(item.Name + suffix, e.Font, brush, e.Bounds);
+            }
+            e.DrawFocusRectangle();
         }
     }
 }

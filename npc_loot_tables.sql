@@ -12,6 +12,7 @@ INSERT INTO npc_loot (npc_name, item_name, drop_chance, min_quantity, max_quanti
 ('Goblin Grunt', 'gold', 1.0, 5, 10),
 ('Goblin Grunt', 'Dagger', 0.2, 1, 1),
 ('Goblin Grunt', 'Shortsword', 0.1, 1, 1),
+('Goblin Grunt', 'Leather Cap', 0.1, 1, 1),
 ('Goblin Grunt', 'Healing Potion', 0.15, 1, 1),
 
 ('Forest Wolf', 'gold', 1.0, 8, 15),
@@ -21,11 +22,13 @@ INSERT INTO npc_loot (npc_name, item_name, drop_chance, min_quantity, max_quanti
 ('Bandit Scout', 'gold', 1.0, 10, 20),
 ('Bandit Scout', 'Shortsword', 0.15, 1, 1),
 ('Bandit Scout', 'Bow', 0.2, 1, 1),
+('Bandit Scout', 'Leather Armor', 0.15, 1, 1),
 ('Bandit Scout', 'Healing Potion', 0.15, 1, 1),
 
 ('Skeleton Warrior', 'gold', 1.0, 15, 25),
 ('Skeleton Warrior', 'Longsword', 0.15, 1, 1),
 ('Skeleton Warrior', 'Greataxe', 0.1, 1, 1),
+('Skeleton Warrior', 'Leather Boots', 0.15, 1, 1),
 ('Skeleton Warrior', 'Healing Potion', 0.2, 1, 1),
 
 ('Orc Brute', 'gold', 1.0, 20, 30),
@@ -36,6 +39,7 @@ INSERT INTO npc_loot (npc_name, item_name, drop_chance, min_quantity, max_quanti
 ('Dark Mage', 'gold', 1.0, 25, 40),
 ('Dark Mage', 'Staff', 0.2, 1, 1),
 ('Dark Mage', 'Wand', 0.2, 1, 1),
+('Dark Mage', 'Cloth Robe', 0.25, 1, 1),
 ('Dark Mage', 'Healing Potion', 0.3, 1, 1),
 
 ('Troll Berserker', 'gold', 1.0, 30, 50),
