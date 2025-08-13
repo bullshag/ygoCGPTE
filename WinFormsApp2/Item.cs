@@ -5,9 +5,9 @@ namespace WinFormsApp2
 {
     public abstract class Item
     {
-        public string Name { get; init; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
         public string Description { get; init; } = string.Empty;
-        public bool Stackable { get; init; }
+        public bool Stackable { get; set; }
         public EquipmentSlot? Slot { get; init; }
         public int Price { get; init; }
 
