@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace WinFormsApp2
@@ -30,7 +31,12 @@ namespace WinFormsApp2
             var logs = BattleLogService.GetLogs();
             if (idx >= 0 && idx < logs.Count)
             {
-                txtLog.Text = logs[idx];
+                lstLog.Items.Clear();
+                foreach (var line in logs[idx].Split(Environment.NewLine))
+                {
+                    lstLog.Items.Add(line);
+                }
+                if (lstLog.Items.Count > 0) lstLog.SelectedIndex = 0;
             }
         }
     }

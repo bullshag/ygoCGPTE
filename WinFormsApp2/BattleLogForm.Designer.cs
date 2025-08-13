@@ -7,7 +7,7 @@ namespace WinFormsApp2
     {
         private System.ComponentModel.IContainer? components = null;
         private ListBox lstBattles;
-        private TextBox txtLog;
+        private ListBox lstLog;
 
         protected override void Dispose(bool disposing)
         {
@@ -21,7 +21,7 @@ namespace WinFormsApp2
         private void InitializeComponent()
         {
             lstBattles = new ListBox();
-            txtLog = new TextBox();
+            lstLog = new ListBox();
             SuspendLayout();
             // 
             // lstBattles
@@ -35,23 +35,22 @@ namespace WinFormsApp2
             lstBattles.TabIndex = 1;
             lstBattles.SelectedIndexChanged += lstBattles_SelectedIndexChanged;
             // 
-            // txtLog
-            // 
-            txtLog.Location = new Point(197, 20);
-            txtLog.Margin = new Padding(4, 5, 4, 5);
-            txtLog.Multiline = true;
-            txtLog.Name = "txtLog";
-            txtLog.ReadOnly = true;
-            txtLog.ScrollBars = ScrollBars.Vertical;
-            txtLog.Size = new Size(355, 329);
-            txtLog.TabIndex = 0;
+            // lstLog
+            //
+            lstLog.FormattingEnabled = true;
+            lstLog.ItemHeight = 25;
+            lstLog.Location = new Point(197, 20);
+            lstLog.Margin = new Padding(4, 5, 4, 5);
+            lstLog.Name = "lstLog";
+            lstLog.Size = new Size(355, 329);
+            lstLog.TabIndex = 0;
             // 
             // BattleLogForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(570, 364);
-            Controls.Add(txtLog);
+            Controls.Add(lstLog);
             Controls.Add(lstBattles);
             Margin = new Padding(4, 5, 4, 5);
             Name = "BattleLogForm";

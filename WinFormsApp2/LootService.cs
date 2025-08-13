@@ -49,24 +49,57 @@ namespace WinFormsApp2
                     Item? item = InventoryService.CreateItem(kvp.Key);
                     if (item != null)
                     {
-                        if (!item.Stackable)
+                        if (item is Weapon || item is Armor)
                         {
-                            ApplyBonuses(item, avgLevel);
-                            InventoryService.AddItem(item);
+                            var rarity = RollRarity();
+                            if (rarity != Rarity.None)
+                            {
+                                string baseName = item.Name;
+                                item.Stackable = false;
+                                item.Name = MagicItemNameGenerator.Generate(baseName, rarity);
+                                ApplyBonuses(item, avgLevel, rarity);
+                            }
                         }
-                        else
-                        {
-                            InventoryService.AddItem(item);
-                        }
+                        InventoryService.AddItem(item);
                     }
                 }
             }
             return drops;
         }
 
-        private static void ApplyBonuses(Item item, int maxPoints)
+        private static Rarity RollRarity()
         {
-            int points = _rng.Next(1, maxPoints + 1);
+            if (_rng.NextDouble() > 0.25) return Rarity.None;
+            var rarity = Rarity.Green;
+            if (_rng.NextDouble() <= 0.25) rarity = Rarity.Blue; else return rarity;
+            if (_rng.NextDouble() <= 0.25) rarity = Rarity.Purple; else return rarity;
+            if (_rng.NextDouble() <= 0.25) rarity = Rarity.Red; else return rarity;
+            if (_rng.NextDouble() <= 0.10) rarity = Rarity.Rainbow;
+            return rarity;
+        }
+
+        private static void ApplyBonuses(Item item, int maxPoints, Rarity rarity)
+        {
+            int min = rarity switch
+            {
+                Rarity.Green => 1,
+                Rarity.Blue => 11,
+                Rarity.Purple => 21,
+                Rarity.Red => 31,
+                Rarity.Rainbow => 41,
+                _ => 1
+            };
+            int max = rarity switch
+            {
+                Rarity.Green => Math.Min(10, maxPoints),
+                Rarity.Blue => Math.Min(20, maxPoints),
+                Rarity.Purple => Math.Min(30, maxPoints),
+                Rarity.Red => Math.Min(40, maxPoints),
+                Rarity.Rainbow => maxPoints,
+                _ => maxPoints
+            };
+            if (max < min) max = min;
+            int points = _rng.Next(min, max + 1);
             item.TotalPoints = points;
             var flatOptions = new List<string> { "dex", "int", "str", "physical defense", "magical defense", "mana regen", "hp regen" };
             var percentOptions = new List<string> { "% increased max hp", "% increased max mana", "% increased dex", "% increased int", "% increased str" };
@@ -112,11 +145,24 @@ namespace WinFormsApp2
                 item.PercentBonuses[type] = item.PercentBonuses.GetValueOrDefault(type) + 1;
             }
 
-            if (points <= 10) item.NameColor = Color.Green;
-            else if (points <= 20) item.NameColor = Color.Blue;
-            else if (points <= 30) item.NameColor = Color.Purple;
-            else if (points <= 40) item.NameColor = Color.Red;
-            else item.RainbowColors = new List<Color> { Color.Green, Color.Blue, Color.Purple, Color.Red };
+            switch (rarity)
+            {
+                case Rarity.Green:
+                    item.NameColor = Color.Green;
+                    break;
+                case Rarity.Blue:
+                    item.NameColor = Color.Blue;
+                    break;
+                case Rarity.Purple:
+                    item.NameColor = Color.Purple;
+                    break;
+                case Rarity.Red:
+                    item.NameColor = Color.Red;
+                    break;
+                case Rarity.Rainbow:
+                    item.RainbowColors = new List<Color> { Color.Green, Color.Blue, Color.Purple, Color.Red };
+                    break;
+            }
         }
     }
 }
