@@ -67,11 +67,52 @@ namespace WinFormsApp2
             string key = name.Replace(" ", "").ToLower();
             if (WeaponFactory.TryCreate(key, out var weapon)) return weapon;
             if (ArmorFactory.TryCreate(key, out var armor)) return armor;
+
+            string lower = name.ToLower();
+            foreach (var type in new[] { "shortsword", "dagger", "bow", "longsword", "staff", "wand", "rod", "greataxe", "scythe", "greatsword", "mace", "greatmaul" })
+            {
+                if (lower.Contains(type))
+                {
+                    if (WeaponFactory.TryCreate(type, out weapon))
+                    {
+                        weapon.Stackable = false;
+                        weapon.Name = name;
+                        return weapon;
+                    }
+                }
+            }
+            foreach (var type in new[] { "clothrobe", "leatherarmor", "leathercap", "leatherboots" })
+            {
+                if (lower.Replace(" ", "").Contains(type))
+                {
+                    if (ArmorFactory.TryCreate(type, out armor))
+                    {
+                        armor.Name = name;
+                        return armor;
+                    }
+                }
+            }
             return null;
         }
 
         public static void AddItem(Item item, int qty = 1)
         {
+            if (!item.Stackable)
+            {
+                _items.Add(new InventoryItem { Item = item, Quantity = qty });
+                if (_loaded)
+                {
+                    using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+                    conn.Open();
+                    using MySqlCommand cmd = new MySqlCommand("INSERT INTO user_items(account_id,item_name,quantity) VALUES(@id,@name,@qty) ON DUPLICATE KEY UPDATE quantity=quantity+@qty", conn);
+                    cmd.Parameters.AddWithValue("@id", _userId);
+                    cmd.Parameters.AddWithValue("@name", item.Name);
+                    cmd.Parameters.AddWithValue("@qty", qty);
+                    cmd.ExecuteNonQuery();
+                }
+                return;
+            }
+
             var existing = _items.FirstOrDefault(i => i.Item.Name == item.Name);
             if (existing == null)
             {

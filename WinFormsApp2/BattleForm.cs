@@ -17,14 +17,23 @@ namespace WinFormsApp2
         private readonly System.Windows.Forms.Timer _progressTimer = new System.Windows.Forms.Timer();
         private readonly Dictionary<string, string> _deathCauses = new();
 
+        private class LogEntry
+        {
+            public string Text { get; }
+            public Color Color { get; }
+            public LogEntry(string text, Color color)
+            {
+                Text = text;
+                Color = color;
+            }
+            public override string ToString() => Text;
+        }
+
         private void AppendLog(string text, bool isPlayerAction, bool isHeal = false)
         {
             Color color = isHeal ? Color.Green : (isPlayerAction ? Color.Blue : Color.Red);
-            rtbLog.SelectionStart = rtbLog.TextLength;
-            rtbLog.SelectionColor = color;
-            rtbLog.AppendText(text + Environment.NewLine);
-            rtbLog.SelectionColor = rtbLog.ForeColor;
-            rtbLog.ScrollToCaret();
+            lstLog.Items.Add(new LogEntry(text, color));
+            lstLog.SelectedIndex = lstLog.Items.Count - 1;
         }
 
         public BattleForm(int userId)
@@ -736,7 +745,7 @@ namespace WinFormsApp2
                         if (parts.Count > 0) AppendLog("Loot: " + lootSummary, true);
                     }
                 }
-                BattleLogService.AddLog(rtbLog.Text);
+                BattleLogService.AddLog(string.Join(Environment.NewLine, lstLog.Items.Cast<LogEntry>().Select(l => l.Text)));
                 HandlePlayerDeaths();
                 SaveState();
                 var playerSummaries = _players.Select(p => new CombatantSummary(p.Name, p.DamageDone, p.DamageTaken));
@@ -889,21 +898,55 @@ namespace WinFormsApp2
         {
             var panel = new Panel { Width = 180, Height = 80 };
             var lbl = new Label { Text = c.Name, AutoSize = true };
-            c.HpBar = new ProgressBar { Maximum = c.MaxHp, Value = c.CurrentHp, Width = 170, Location = new Point(0, 15), ForeColor = Color.Red, Style = ProgressBarStyle.Continuous };
+            c.HpBar = CloneProgressBar(hpTemplate);
+            c.HpBar.Maximum = c.MaxHp;
+            c.HpBar.Value = c.CurrentHp;
+            c.HpBar.Location = new Point(0, 15);
             panel.Controls.Add(lbl);
             panel.Controls.Add(c.HpBar);
             if (c.MaxMana > 0)
             {
-                c.ManaBar = new ProgressBar { Maximum = c.MaxMana, Value = c.Mana, Width = 170, Location = new Point(0, 35), ForeColor = Color.Blue, Style = ProgressBarStyle.Continuous };
+                c.ManaBar = CloneProgressBar(manaTemplate);
+                c.ManaBar.Maximum = c.MaxMana;
+                c.ManaBar.Value = c.Mana;
+                c.ManaBar.Location = new Point(0, 35);
                 panel.Controls.Add(c.ManaBar);
-                c.AttackBar = new ProgressBar { Maximum = 100, Value = 100, Width = 170, Location = new Point(0, 55) };
+                c.AttackBar = CloneProgressBar(attackTemplate);
+                c.AttackBar.Maximum = 100;
+                c.AttackBar.Value = 100;
+                c.AttackBar.Location = new Point(0, 55);
             }
             else
             {
-                c.AttackBar = new ProgressBar { Maximum = 100, Value = 100, Width = 170, Location = new Point(0, 35) };
+                c.AttackBar = CloneProgressBar(attackTemplate);
+                c.AttackBar.Maximum = 100;
+                c.AttackBar.Value = 100;
+                c.AttackBar.Location = new Point(0, 35);
             }
             panel.Controls.Add(c.AttackBar);
             return panel;
+        }
+
+        private ProgressBar CloneProgressBar(ProgressBar template)
+        {
+            return new ProgressBar
+            {
+                Width = template.Width,
+                Height = template.Height,
+                ForeColor = template.ForeColor,
+                BackColor = template.BackColor,
+                Style = template.Style
+            };
+        }
+
+        private void lstLog_DrawItem(object? sender, DrawItemEventArgs e)
+        {
+            if (e.Index < 0) return;
+            var entry = (LogEntry)lstLog.Items[e.Index];
+            e.DrawBackground();
+            using var brush = new SolidBrush(entry.Color);
+            e.Graphics.DrawString(entry.Text, e.Font, brush, e.Bounds);
+            e.DrawFocusRectangle();
         }
 
         private void SaveState()
