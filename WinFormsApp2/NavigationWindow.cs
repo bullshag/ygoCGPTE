@@ -127,28 +127,6 @@ namespace WinFormsApp2
             HandleRecruit();
 
         }
-        private void LstActivities_DoubleClick(object? sender, EventArgs e)
-        {
-            if (lstActivities.SelectedItem == null) return;
-           
-            string act = lstActivities.SelectedItem.ToString() ?? string.Empty;
-            if (act.StartsWith("Shop"))
-            {
-                using var shop = new ShopForm(_accountId);
-                shop.ShowDialog(this);
-                _refresh();
-                UpdatePartySize();
-            }
-            else if (act.StartsWith("Graveyard"))
-            {
-                using var grave = new GraveyardForm(_accountId, () => { _refresh(); UpdatePartySize(); });
-                grave.ShowDialog(this);
-            }
-            else if (act.Contains("Tavern"))
-            {
-                HandleRecruit();
-            }
-        }
 
         private void HandleRecruit()
         {
