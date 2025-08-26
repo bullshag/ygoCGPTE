@@ -48,6 +48,7 @@
             btnGraveyard = new Button();
             btnTavern = new Button();
             lstConnections = new ListBox();
+            rtbNodeDescription = new RichTextBox();
             btnBeginTravel = new Button();
             travelProgressBar = new ProgressBar();
             lblTravelInfo = new Label();
@@ -220,6 +221,9 @@
             // 
             // tabPage1
             //
+            tabPage1.Controls.Add(btnTemple);
+            tabPage1.Controls.Add(btnArena);
+            tabPage1.Controls.Add(btnFindEnemies);
             tabPage1.Controls.Add(btnTavern);
             tabPage1.Controls.Add(btnGraveyard);
             tabPage1.Controls.Add(btnShop);
@@ -257,12 +261,40 @@
             btnTavern.TabIndex = 2;
             btnTavern.Text = "Tavern";
             btnTavern.UseVisualStyleBackColor = true;
+            //
+            // btnFindEnemies
+            //
+            btnFindEnemies.Location = new Point(6, 93);
+            btnFindEnemies.Name = "btnFindEnemies";
+            btnFindEnemies.Size = new Size(150, 23);
+            btnFindEnemies.TabIndex = 3;
+            btnFindEnemies.Text = "Find Enemies";
+            btnFindEnemies.UseVisualStyleBackColor = true;
+            //
+            // btnArena
+            //
+            btnArena.Location = new Point(6, 122);
+            btnArena.Name = "btnArena";
+            btnArena.Size = new Size(150, 23);
+            btnArena.TabIndex = 4;
+            btnArena.Text = "Battle Arena";
+            btnArena.UseVisualStyleBackColor = true;
+            //
+            // btnTemple
+            //
+            btnTemple.Location = new Point(6, 151);
+            btnTemple.Name = "btnTemple";
+            btnTemple.Size = new Size(150, 23);
+            btnTemple.TabIndex = 5;
+            btnTemple.Text = "Temple";
+            btnTemple.UseVisualStyleBackColor = true;
             // 
             // Travel
             //
             Travel.Controls.Add(lblTravelInfo);
             Travel.Controls.Add(travelProgressBar);
             Travel.Controls.Add(btnBeginTravel);
+            Travel.Controls.Add(rtbNodeDescription);
             Travel.Controls.Add(lstConnections);
             Travel.Location = new Point(4, 24);
             Travel.Name = "Travel";
@@ -283,28 +315,38 @@
             //
             // btnBeginTravel
             //
-            btnBeginTravel.Location = new Point(6, 211);
+            btnBeginTravel.Location = new Point(6, 297);
             btnBeginTravel.Name = "btnBeginTravel";
             btnBeginTravel.Size = new Size(150, 23);
-            btnBeginTravel.TabIndex = 1;
+            btnBeginTravel.TabIndex = 2;
             btnBeginTravel.Text = "Begin Travel";
             btnBeginTravel.UseVisualStyleBackColor = true;
             btnBeginTravel.Click += btnBeginTravel_Click;
             //
             // travelProgressBar
             //
-            travelProgressBar.Location = new Point(6, 240);
+            travelProgressBar.Location = new Point(6, 326);
             travelProgressBar.Name = "travelProgressBar";
             travelProgressBar.Size = new Size(417, 23);
-            travelProgressBar.TabIndex = 2;
+            travelProgressBar.TabIndex = 3;
             //
             // lblTravelInfo
             //
             lblTravelInfo.AutoSize = true;
-            lblTravelInfo.Location = new Point(6, 266);
+            lblTravelInfo.Location = new Point(6, 352);
             lblTravelInfo.Name = "lblTravelInfo";
             lblTravelInfo.Size = new Size(0, 15);
-            lblTravelInfo.TabIndex = 3;
+            lblTravelInfo.TabIndex = 4;
+
+            //
+            // rtbNodeDescription
+            //
+            rtbNodeDescription.Location = new Point(6, 211);
+            rtbNodeDescription.Name = "rtbNodeDescription";
+            rtbNodeDescription.ReadOnly = true;
+            rtbNodeDescription.Size = new Size(417, 80);
+            rtbNodeDescription.TabIndex = 1;
+            rtbNodeDescription.Text = "";
             // 
             // NavigationWindow
             // 
@@ -352,10 +394,14 @@
         private Button btnShop;
         private Button btnGraveyard;
         private Button btnTavern;
+        private Button btnFindEnemies;
+        private Button btnArena;
+        private Button btnTemple;
         private ListBox lstConnections;
         private Button btnBeginTravel;
         private ProgressBar travelProgressBar;
         private Label lblTravelInfo;
+        private RichTextBox rtbNodeDescription;
         private ToolTip toolTip1;
     }
 }

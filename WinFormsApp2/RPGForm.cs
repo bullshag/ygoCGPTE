@@ -237,7 +237,15 @@ namespace WinFormsApp2
 
         private void btnNavigate_Click(object? sender, EventArgs e)
         {
-            using var nav = new NavigationWindow(_userId, lstParty.Items.Count, false, LoadPartyData);
+            bool hasBlessing = false;
+            using (var conn = new MySqlConnection(DatabaseConfig.ConnectionString))
+            {
+                conn.Open();
+                using var cmd = new MySqlCommand("SELECT faster_travel FROM travel_state WHERE account_id=@a", conn);
+                cmd.Parameters.AddWithValue("@a", _userId);
+                hasBlessing = Convert.ToBoolean(cmd.ExecuteScalar() ?? 0);
+            }
+            using var nav = new NavigationWindow(_userId, lstParty.Items.Count, hasBlessing, LoadPartyData);
             nav.ShowDialog(this);
             LoadPartyData();
         }

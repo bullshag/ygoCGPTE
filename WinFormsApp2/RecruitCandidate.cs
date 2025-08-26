@@ -17,7 +17,22 @@ namespace WinFormsApp2
 
         public static RecruitCandidate Generate(Random rng, int index)
         {
-            string[] names = { "Arin", "Belor", "Ciri", "Doran", "Elaine", "Faris", "Garen", "Hilda", "Iris", "Jorin" };
+            string[] names =
+            {
+                "Arin", "Belor", "Ciri", "Doran", "Elaine", "Faris", "Garen", "Hilda", "Iris", "Jorin",
+                "Kara", "Luthor", "Mira", "Nolan", "Orin", "Perrin", "Quinn", "Rhea", "Sylas", "Taryn",
+                "Ulric", "Vera", "Wren", "Xander", "Yara", "Zane", "Alina", "Borin", "Cassia", "Dax",
+                "Alden", "Bria", "Cael", "Daria", "Eamon", "Faye", "Galen", "Helena", "Ivar", "Jasmin",
+                "Kestrel", "Lina", "Marek", "Nyx", "Orel", "Piper", "Quill", "Ronan", "Selene", "Theron",
+                "Ulma", "Vale", "Willa", "Xenia", "Ysolda", "Zeph", "Arlen", "Bryn", "Corin", "Delia",
+                "Edric", "Finna", "Garrick", "Hollis", "Isla", "Jaren", "Kira", "Leif", "Mirae", "Niall",
+                "Orla", "Pavel", "Quora", "Risa", "Soren", "Tess", "Uriah", "Veda", "Wynn", "Xara",
+                "Yorin", "Zara", "Astra", "Balen", "Cora", "Damon", "Elara", "Fintan", "Griff", "Hana",
+                "Ianto", "Jessa", "Kael", "Liora", "Maia", "Nico", "Orson", "Petra", "Quinlan", "Riven",
+                "Selwyn", "Thalia", "Ulf", "Varis", "Wystan", "Xavian", "Yvette", "Zorin", "Arian", "Briska",
+                "Caden", "Daelin", "Emrys", "Faelan", "Garran", "Halcy", "Idris", "Jax", "Kellen", "Lorin",
+                "Maelis", "Neris", "Odran", "Phaedra", "Quinley", "Rowan", "Seraph", "Torin", "Ume", "Vesper"
+            };
             var candidate = new RecruitCandidate
             {
                 Name = names[rng.Next(names.Length)],
