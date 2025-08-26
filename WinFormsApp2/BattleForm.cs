@@ -96,10 +96,8 @@ namespace WinFormsApp2
                 {
                     kv.Key.Abilities.Add(new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0, Slot = 1 });
                 }
-                foreach (var p in PassiveService.GetCharacterPassives(kv.Value, conn))
-                {
-                    kv.Key.Passives[p.Key] = p.Value;
-                }
+                foreach (var p in PassiveService.GetOwnedPassives(kv.Value, conn))
+                    kv.Key.Passives[p.Name] = p.Level;
             }
 
             int totalLevel = _players.Sum(p => p.Level);
