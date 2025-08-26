@@ -32,6 +32,7 @@ namespace WinFormsApp2
                 "Selwyn", "Thalia", "Ulf", "Varis", "Wystan", "Xavian", "Yvette", "Zorin", "Arian", "Briska",
                 "Caden", "Daelin", "Emrys", "Faelan", "Garran", "Halcy", "Idris", "Jax", "Kellen", "Lorin",
                 "Maelis", "Neris", "Odran", "Phaedra", "Quinley", "Rowan", "Seraph", "Torin", "Ume", "Vesper"
+                "Ulric", "Vera", "Wren", "Xander", "Yara", "Zane", "Alina", "Borin", "Cassia", "Dax"
             };
             var candidate = new RecruitCandidate
             {
