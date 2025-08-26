@@ -15,6 +15,7 @@ namespace WinFormsApp2
         private NumericUpDown numPriority1;
         private NumericUpDown numPriority2;
         private NumericUpDown numPriority3;
+        private ListBox lstPassives;
         private ComboBox cmbLeft;
         private ComboBox cmbRight;
         private ComboBox cmbBody;
@@ -50,6 +51,7 @@ namespace WinFormsApp2
             cmbHead = new ComboBox();
             cmbTrinket = new ComboBox();
             btnLevelUp = new Button();
+            lstPassives = new ListBox();
             ((System.ComponentModel.ISupportInitialize)numPriority1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numPriority2).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numPriority3).BeginInit();
@@ -102,9 +104,9 @@ namespace WinFormsApp2
             cmbAbility3.Name = "cmbAbility3";
             cmbAbility3.Size = new Size(170, 33);
             cmbAbility3.TabIndex = 10;
-            // 
+            //
             // numPriority1
-            // 
+            //
             numPriority1.Location = new Point(214, 333);
             numPriority1.Margin = new Padding(4, 5, 4, 5);
             numPriority1.Name = "numPriority1";
@@ -126,9 +128,18 @@ namespace WinFormsApp2
             numPriority3.Name = "numPriority3";
             numPriority3.Size = new Size(57, 31);
             numPriority3.TabIndex = 7;
-            // 
+            //
+            // lstPassives
+            //
+            lstPassives.ItemHeight = 25;
+            lstPassives.Location = new Point(348, 333);
+            lstPassives.Margin = new Padding(4, 5, 4, 5);
+            lstPassives.Name = "lstPassives";
+            lstPassives.Size = new Size(259, 129);
+            lstPassives.TabIndex = 16;
+            //
             // cmbLeft
-            // 
+            //
             cmbLeft.Location = new Point(14, 533);
             cmbLeft.Margin = new Padding(4, 5, 4, 5);
             cmbLeft.Name = "cmbLeft";
@@ -200,6 +211,7 @@ namespace WinFormsApp2
             Controls.Add(numPriority3);
             Controls.Add(numPriority2);
             Controls.Add(numPriority1);
+            Controls.Add(lstPassives);
             Controls.Add(cmbAbility3);
             Controls.Add(cmbAbility2);
             Controls.Add(cmbAbility1);

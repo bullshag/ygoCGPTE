@@ -11,6 +11,8 @@ namespace WinFormsApp2
         private Label lblStr;
         private Label lblDex;
         private Label lblInt;
+        private Label lblAbility;
+        private Label lblPassive;
         private NumericUpDown numStr;
         private NumericUpDown numDex;
         private NumericUpDown numInt;
@@ -33,6 +35,8 @@ namespace WinFormsApp2
             lblStr = new Label();
             lblDex = new Label();
             lblInt = new Label();
+            lblAbility = new Label();
+            lblPassive = new Label();
             numStr = new NumericUpDown();
             numDex = new NumericUpDown();
             numInt = new NumericUpDown();
@@ -90,6 +94,26 @@ namespace WinFormsApp2
             lblInt.Size = new Size(43, 25);
             lblInt.TabIndex = 5;
             lblInt.Text = "INT:";
+            //
+            // lblAbility
+            //
+            lblAbility.AutoSize = true;
+            lblAbility.Location = new Point(17, 206);
+            lblAbility.Margin = new Padding(4, 0, 4, 0);
+            lblAbility.Name = "lblAbility";
+            lblAbility.Size = new Size(74, 25);
+            lblAbility.TabIndex = 12;
+            lblAbility.Text = "Ability:";
+            //
+            // lblPassive
+            //
+            lblPassive.AutoSize = true;
+            lblPassive.Location = new Point(17, 246);
+            lblPassive.Margin = new Padding(4, 0, 4, 0);
+            lblPassive.Name = "lblPassive";
+            lblPassive.Size = new Size(73, 25);
+            lblPassive.TabIndex = 13;
+            lblPassive.Text = "Passive:";
             // 
             // numStr
             // 
@@ -147,6 +171,8 @@ namespace WinFormsApp2
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(315, 311);
+            Controls.Add(lblPassive);
+            Controls.Add(lblAbility);
             Controls.Add(btnHire);
             Controls.Add(lblPoints);
             Controls.Add(numInt);

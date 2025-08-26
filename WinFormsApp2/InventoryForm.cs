@@ -11,6 +11,7 @@ namespace WinFormsApp2
     {
         private readonly int _userId;
         private string? _selectedTarget;
+        private readonly ToolTip _tip = new();
 
         public InventoryForm(int userId)
         {
@@ -18,6 +19,7 @@ namespace WinFormsApp2
             InitializeComponent();
             lstItems.DrawMode = DrawMode.OwnerDrawFixed;
             lstItems.DrawItem += LstItems_DrawItem;
+            lstItems.MouseMove += LstItems_MouseMove;
         }
 
         private void InventoryForm_Load(object? sender, EventArgs e)
@@ -77,6 +79,15 @@ namespace WinFormsApp2
                 lblDescription.Text = DescribeItem(item);
                 btnUse.Enabled = item is HealingPotion && _selectedTarget != null;
             }
+        }
+
+        private void LstItems_MouseMove(object? sender, MouseEventArgs e)
+        {
+            int index = lstItems.IndexFromPoint(e.Location);
+            if (index >= 0 && index < InventoryService.Items.Count)
+                _tip.Show(DescribeItem(InventoryService.Items[index].Item), lstItems, e.Location + new Size(15, 15));
+            else
+                _tip.Hide(lstItems);
         }
 
         private void btnUse_Click(object? sender, EventArgs e)

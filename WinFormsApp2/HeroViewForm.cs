@@ -10,6 +10,7 @@ namespace WinFormsApp2
         private readonly int _userId;
         private readonly int _searchCost;
         private readonly int _hireCost;
+        private readonly ToolTip _tip = new();
 
         public HeroViewForm(int userId, RecruitCandidate candidate, int searchCost)
         {
@@ -22,6 +23,12 @@ namespace WinFormsApp2
             lblStr.Text = $"STR: {candidate.Strength}";
             lblDex.Text = $"DEX: {candidate.Dexterity}";
             lblInt.Text = $"INT: {candidate.Intelligence}";
+            lblAbility.Text = $"Ability: {candidate.StartingAbility?.Name ?? "None"}";
+            lblPassive.Text = $"Passive: {candidate.StartingPassive?.Name ?? "None"}";
+            if (candidate.StartingAbility != null)
+                _tip.SetToolTip(lblAbility, candidate.StartingAbility.Description);
+            if (candidate.StartingPassive != null)
+                _tip.SetToolTip(lblPassive, candidate.StartingPassive.Description);
             btnHire.Text = $"Hire Hero ({_hireCost} gold)";
         }
 
@@ -93,6 +100,21 @@ namespace WinFormsApp2
             insert.Parameters.AddWithValue("@dex", finalDex);
             insert.Parameters.AddWithValue("@int", finalInt);
             insert.ExecuteNonQuery();
+            int charId = (int)insert.LastInsertedId;
+            if (_candidate.StartingAbility != null)
+            {
+                using var abilCmd = new MySqlCommand("INSERT INTO character_abilities(character_id, ability_id) VALUES(@c,@a)", conn);
+                abilCmd.Parameters.AddWithValue("@c", charId);
+                abilCmd.Parameters.AddWithValue("@a", _candidate.StartingAbility.Id);
+                abilCmd.ExecuteNonQuery();
+            }
+            if (_candidate.StartingPassive != null)
+            {
+                using var pasCmd = new MySqlCommand("INSERT INTO character_passives(character_id, passive_id, level) VALUES(@c,@p,1)", conn);
+                pasCmd.Parameters.AddWithValue("@c", charId);
+                pasCmd.Parameters.AddWithValue("@p", _candidate.StartingPassive.Id);
+                pasCmd.ExecuteNonQuery();
+            }
 
             DialogResult = DialogResult.OK;
             Close();

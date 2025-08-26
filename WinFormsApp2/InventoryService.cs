@@ -81,7 +81,7 @@ namespace WinFormsApp2
                     }
                 }
             }
-            foreach (var type in new[] { "clothrobe", "leatherarmor", "leathercap", "leatherboots" })
+            foreach (var type in new[] { "clothrobe", "leatherarmor", "leathercap", "leatherboots", "platearmor" })
             {
                 if (lower.Replace(" ", "").Contains(type))
                 {
