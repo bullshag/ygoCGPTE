@@ -7,16 +7,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MySql.Data.MySqlClient;
 
 namespace WinFormsApp2
 {
     public partial class NavigationWindow : Form
     {
         private readonly int _accountId;
-        private readonly int _partySize;
+        private int _partySize;
         private bool _hasBlessing;
         private string _currentNode = "nodeMounttown";
         private readonly TravelManager _travelManager;
+        private readonly Action _refresh;
 
         private class ConnectionItem
         {
@@ -30,20 +32,33 @@ namespace WinFormsApp2
             public override string ToString() => _display;
         }
 
-        public NavigationWindow(int accountId, int partySize, bool hasBlessing)
+        public NavigationWindow(int accountId, int partySize, bool hasBlessing, Action refresh)
         {
             _accountId = accountId;
             _partySize = partySize;
             _hasBlessing = hasBlessing;
+            _refresh = refresh;
             InitializeComponent();
             _travelManager = new TravelManager(_accountId);
             _travelManager.ProgressChanged += TravelManager_ProgressChanged;
             _travelManager.TravelCompleted += TravelManager_TravelCompleted;
+            _currentNode = GetCurrentNode();
             LoadNode(_currentNode);
+            lstActivities.DoubleClick += LstActivities_DoubleClick;
             _travelManager.Resume();
         }
 
-        public NavigationWindow() : this(0, 0, false) { }
+        public NavigationWindow() : this(0, 0, false, () => { }) { }
+
+        private string GetCurrentNode()
+        {
+            using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            using var cmd = new MySqlCommand("SELECT current_node FROM travel_state WHERE account_id=@a", conn);
+            cmd.Parameters.AddWithValue("@a", _accountId);
+            object? result = cmd.ExecuteScalar();
+            return result?.ToString() ?? "nodeRiverVillage";
+        }
 
         private void LoadNode(string id)
         {
@@ -87,6 +102,84 @@ namespace WinFormsApp2
         {
             LoadNode(nodeId);
             lblTravelInfo.Text = "Arrived.";
+        }
+
+        private void LstActivities_DoubleClick(object? sender, EventArgs e)
+        {
+            if (lstActivities.SelectedItem == null) return;
+            string act = lstActivities.SelectedItem.ToString() ?? string.Empty;
+            if (act.StartsWith("Shop"))
+            {
+                using var shop = new ShopForm(_accountId);
+                shop.ShowDialog(this);
+                _refresh();
+                UpdatePartySize();
+            }
+            else if (act.StartsWith("Graveyard"))
+            {
+                using var grave = new GraveyardForm(_accountId, () => { _refresh(); UpdatePartySize(); });
+                grave.ShowDialog(this);
+            }
+            else if (act.Contains("Tavern"))
+            {
+                HandleRecruit();
+            }
+        }
+
+        private void HandleRecruit()
+        {
+            int partyCount = 0;
+            int totalLevel = 0;
+            int playerGold;
+            using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            using (var cmd = new MySqlCommand("SELECT level FROM characters WHERE account_id=@id AND is_dead=0", conn))
+            {
+                cmd.Parameters.AddWithValue("@id", _accountId);
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    partyCount++;
+                    totalLevel += reader.GetInt32("level");
+                }
+            }
+            using (var goldCmd = new MySqlCommand("SELECT gold FROM users WHERE id=@id", conn))
+            {
+                goldCmd.Parameters.AddWithValue("@id", _accountId);
+                playerGold = Convert.ToInt32(goldCmd.ExecuteScalar() ?? 0);
+            }
+
+            int searchCost = partyCount == 0 ? 0 : 100 + totalLevel * 10 + partyCount * 20;
+            if (playerGold < searchCost)
+            {
+                MessageBox.Show("Not enough gold to search for recruits.");
+                return;
+            }
+
+            using (var payCmd = new MySqlCommand("UPDATE users SET gold = gold - @cost WHERE id=@id", conn))
+            {
+                payCmd.Parameters.AddWithValue("@cost", searchCost);
+                payCmd.Parameters.AddWithValue("@id", _accountId);
+                payCmd.ExecuteNonQuery();
+            }
+
+            var rng = new Random();
+            var candidates = new List<RecruitCandidate>();
+            for (int i = 0; i < 3; i++)
+            {
+                candidates.Add(RecruitCandidate.Generate(rng, i));
+            }
+            using var recruitForm = new RecruitForm(_accountId, candidates, searchCost, () => { _refresh(); UpdatePartySize(); });
+            recruitForm.ShowDialog(this);
+        }
+
+        private void UpdatePartySize()
+        {
+            using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            using var cmd = new MySqlCommand("SELECT COUNT(*) FROM characters WHERE account_id=@id AND is_dead=0", conn);
+            cmd.Parameters.AddWithValue("@id", _accountId);
+            _partySize = Convert.ToInt32(cmd.ExecuteScalar());
         }
     }
 }
