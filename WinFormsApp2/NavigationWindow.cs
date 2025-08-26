@@ -128,9 +128,11 @@ namespace WinFormsApp2
         private void BtnTavern_Click(object? sender, EventArgs e)
         {
             HandleRecruit();
+        }
         private void LstActivities_DoubleClick(object? sender, EventArgs e)
         {
             if (lstActivities.SelectedItem == null) return;
+           
             string act = lstActivities.SelectedItem.ToString() ?? string.Empty;
             if (act.StartsWith("Shop"))
             {
