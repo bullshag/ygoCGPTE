@@ -16,6 +16,8 @@ namespace WinFormsApp2
         private bool _loadingAbilities;
         private string _characterName = string.Empty;
         private bool _loadingEquipment;
+        private System.Collections.Generic.List<Passive> _passives = new();
+        private readonly ToolTip _tip = new();
 
         public HeroInspectForm(int userId, int characterId)
         {
@@ -36,6 +38,7 @@ namespace WinFormsApp2
             foreach (var cmb in _abilityCombos)
             {
                 cmb.SelectedIndexChanged += AbilityComboChanged;
+                cmb.MouseMove += AbilityCombo_MouseMove;
             }
             foreach (var num in _priorityNums)
             {
@@ -78,6 +81,7 @@ namespace WinFormsApp2
                 cmbTarget.SelectedItem = targeting;
                 LoadEquipment();
                 LoadAbilities();
+                LoadPassives();
             }
         }
 
@@ -166,6 +170,38 @@ namespace WinFormsApp2
             LoadSlot(cmbHead, EquipmentSlot.Head);
             LoadSlot(cmbTrinket, EquipmentSlot.Trinket);
             _loadingEquipment = false;
+        }
+
+        private void LoadPassives()
+        {
+            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            _passives = PassiveService.GetOwnedPassives(_characterId, conn);
+            lstPassives.Items.Clear();
+            foreach (var p in _passives)
+            {
+                lstPassives.Items.Add($"{p.Name} (Lv {p.Level})");
+            }
+            lstPassives.MouseMove += LstPassives_MouseMove;
+        }
+
+        private void LstPassives_MouseMove(object? sender, MouseEventArgs e)
+        {
+            int index = lstPassives.IndexFromPoint(e.Location);
+            if (index >= 0 && index < _passives.Count)
+                _tip.Show(_passives[index].Description, lstPassives, e.Location + new Size(15, 15));
+            else
+                _tip.Hide(lstPassives);
+        }
+
+        private void AbilityCombo_MouseMove(object? sender, MouseEventArgs e)
+        {
+            var cmb = (ComboBox)sender!;
+            int index = cmb.SelectedIndex;
+            if (index > 0 && index - 1 < _knownAbilities.Count)
+                _tip.Show(_knownAbilities[index - 1].Description, cmb, e.Location + new Size(15, 15));
+            else
+                _tip.Hide(cmb);
         }
 
         private void LoadSlot(ComboBox combo, EquipmentSlot slot)

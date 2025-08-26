@@ -556,7 +556,7 @@ namespace WinFormsApp2
 
         private void ApplyPoison(Creature actor, Creature target)
         {
-            int amt = (int)Math.Max(1, 1 + actor.Dex * 0.50);
+            int amt = (int)Math.Max(1, 1 + actor.Dex * 0.35);
             target.Effects.Add(new StatusEffect { Kind = EffectKind.Poison, RemainingMs = 6000, TickIntervalMs = 1000, TimeUntilTickMs = 1000, AmountPerTick = amt, SourceIsPlayer = _players.Contains(actor) });
         }
 

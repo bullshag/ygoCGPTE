@@ -11,6 +11,7 @@ namespace WinFormsApp2
         private Button _btnBuy;
         private Button _btnSell;
         private Label _lblGold;
+        private Label _lblDescription;
 
         protected override void Dispose(bool disposing)
         {
@@ -28,6 +29,7 @@ namespace WinFormsApp2
             _btnBuy = new Button();
             _btnSell = new Button();
             _lblGold = new Label();
+            _lblDescription = new Label();
             SuspendLayout();
             // 
             // _lstShop
@@ -75,12 +77,22 @@ namespace WinFormsApp2
             _lblGold.Size = new Size(54, 25);
             _lblGold.TabIndex = 0;
             _lblGold.Text = "Gold:";
+            //
+            // _lblDescription
+            //
+            _lblDescription.AutoSize = false;
+            _lblDescription.Location = new Point(14, 621);
+            _lblDescription.Margin = new Padding(4, 0, 4, 0);
+            _lblDescription.Name = "_lblDescription";
+            _lblDescription.Size = new Size(812, 66);
+            _lblDescription.TabIndex = 5;
             // 
             // ShopForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(929, 700);
+            Controls.Add(_lblDescription);
             Controls.Add(_lblGold);
             Controls.Add(_btnSell);
             Controls.Add(_btnBuy);

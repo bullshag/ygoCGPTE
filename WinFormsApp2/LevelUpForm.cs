@@ -17,6 +17,7 @@ namespace WinFormsApp2
         private List<Ability> _abilities = new List<Ability>();
         private List<Passive> _passives = new List<Passive>();
         private int _maxMana;
+        private readonly ToolTip _tip = new();
 
         public LevelUpForm(int userId, int characterId)
         {
@@ -30,6 +31,8 @@ namespace WinFormsApp2
             btnBuyPassive.Click += BtnBuyPassive_Click;
             btnSave.Click += BtnSave_Click;
             lstAbilities.SelectedIndexChanged += LstAbilities_SelectedIndexChanged;
+            lstAbilities.MouseMove += LstAbilities_MouseMove;
+            lstPassives.MouseMove += LstPassives_MouseMove;
             Load += LevelUpForm_Load;
         }
 
@@ -76,11 +79,11 @@ namespace WinFormsApp2
                 lstAbilities.Items.Add(a.Name);
             }
             rtbAbility.Clear();
-            _passives = PassiveService.GetPassives(_characterId, conn);
+            _passives = PassiveService.GetAvailablePassives(_characterId, conn);
             lstPassives.Items.Clear();
             foreach (var p in _passives)
             {
-                lstPassives.Items.Add($"{p.Name} (Lv {p.Level}) - Cost: {p.Level + 1}\n{p.Description}");
+                lstPassives.Items.Add($"{p.Name} - Cost: 1\n{p.Description}");
             }
         }
 
@@ -122,7 +125,7 @@ namespace WinFormsApp2
         {
             if (lstPassives.SelectedIndex < 0) return;
             var passive = _passives[lstPassives.SelectedIndex];
-            int cost = passive.Level + 1;
+            int cost = 1;
             if (_availablePoints < cost)
             {
                 MessageBox.Show("Not enough points.");
@@ -133,11 +136,11 @@ namespace WinFormsApp2
             PassiveService.PurchasePassive(_characterId, passive.Id, cost, conn);
             _availablePoints -= cost;
             lblPoints.Text = $"Points: {_availablePoints}";
-            _passives = PassiveService.GetPassives(_characterId, conn);
+            _passives = PassiveService.GetAvailablePassives(_characterId, conn);
             lstPassives.Items.Clear();
             foreach (var p in _passives)
             {
-                lstPassives.Items.Add($"{p.Name} (Lv {p.Level}) - Cost: {p.Level + 1}\n{p.Description}");
+                lstPassives.Items.Add($"{p.Name} - Cost: 1\n{p.Description}");
             }
         }
 
@@ -150,6 +153,24 @@ namespace WinFormsApp2
             }
             var ability = _abilities[lstAbilities.SelectedIndex];
             rtbAbility.Text = $"{ability.Description}\nCooldown: {ability.Cooldown}s\nMana Cost: {ability.Cost}";
+        }
+
+        private void LstAbilities_MouseMove(object? sender, MouseEventArgs e)
+        {
+            int index = lstAbilities.IndexFromPoint(e.Location);
+            if (index >= 0 && index < _abilities.Count)
+                _tip.Show(_abilities[index].Description, lstAbilities, e.Location + new Size(15, 15));
+            else
+                _tip.Hide(lstAbilities);
+        }
+
+        private void LstPassives_MouseMove(object? sender, MouseEventArgs e)
+        {
+            int index = lstPassives.IndexFromPoint(e.Location);
+            if (index >= 0 && index < _passives.Count)
+                _tip.Show(_passives[index].Description, lstPassives, e.Location + new Size(15, 15));
+            else
+                _tip.Hide(lstPassives);
         }
 
         private void BtnSave_Click(object? sender, EventArgs e)
