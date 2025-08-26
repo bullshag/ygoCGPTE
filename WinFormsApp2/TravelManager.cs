@@ -1,5 +1,6 @@
 using System;
 using System.Timers;
+using System.Threading;
 using MySql.Data.MySqlClient;
 using Timer = System.Timers.Timer;
 
@@ -22,6 +23,7 @@ namespace WinFormsApp2
         private string? _toNode;
         private readonly Random _rng = new Random();
         private bool _fasterTravelApplied;
+        private readonly SynchronizationContext _syncContext;
 
         public event Action<int>? ProgressChanged;
         public event Action<string>? TravelCompleted;
@@ -30,6 +32,7 @@ namespace WinFormsApp2
         {
             _accountId = accountId;
             _timer.Elapsed += Timer_Elapsed;
+            _syncContext = SynchronizationContext.Current ?? new SynchronizationContext();
         }
 
         public void StartTravel(string fromNode, string toNode, int partySize, bool hasFasterTravel)
@@ -58,7 +61,8 @@ namespace WinFormsApp2
         private void Timer_Elapsed(object? sender, ElapsedEventArgs e)
         {
             _elapsedSeconds++;
-            ProgressChanged?.Invoke(_elapsedSeconds * 100 / Math.Max(1, _totalSeconds));
+            int percent = _elapsedSeconds * 100 / Math.Max(1, _totalSeconds);
+            _syncContext.Post(state => ProgressChanged?.Invoke((int)state!), percent);
             if (_elapsedSeconds % 30 == 0)
             {
                 if (_rng.NextDouble() < 0.15)
@@ -91,7 +95,8 @@ namespace WinFormsApp2
             }
             int finalDays = _totalSeconds / 60;
             TravelLogService.LogJourney(_accountId, _fromNode, _toNode, _originalDays, finalDays, _travelCost, _fasterTravelApplied);
-            TravelCompleted?.Invoke(_toNode);
+            string nodeId = _toNode;
+            _syncContext.Post(state => TravelCompleted?.Invoke((string)state!), nodeId);
         }
 
         public void SaveState()
