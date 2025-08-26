@@ -17,7 +17,12 @@ namespace WinFormsApp2
 
         public static RecruitCandidate Generate(Random rng, int index)
         {
-            string[] names = { "Arin", "Belor", "Ciri", "Doran", "Elaine", "Faris", "Garen", "Hilda", "Iris", "Jorin" };
+            string[] names =
+            {
+                "Arin", "Belor", "Ciri", "Doran", "Elaine", "Faris", "Garen", "Hilda", "Iris", "Jorin",
+                "Kara", "Luthor", "Mira", "Nolan", "Orin", "Perrin", "Quinn", "Rhea", "Sylas", "Taryn",
+                "Ulric", "Vera", "Wren", "Xander", "Yara", "Zane", "Alina", "Borin", "Cassia", "Dax"
+            };
             var candidate = new RecruitCandidate
             {
                 Name = names[rng.Next(names.Length)],
