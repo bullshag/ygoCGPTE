@@ -337,6 +337,7 @@ namespace WinFormsApp2
                         }
                     }
                 }
+                CheckEnd();
             };
             _progressTimer.Start();
         }
