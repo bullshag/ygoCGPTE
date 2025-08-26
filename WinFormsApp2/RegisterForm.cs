@@ -60,7 +60,7 @@ namespace WinFormsApp2
             insert.ExecuteNonQuery();
             long newId = insert.LastInsertedId;
 
-            // Ensure the starting node exists in the database before creating travel state
+
             using (MySqlCommand ensureNode = new MySqlCommand("INSERT IGNORE INTO nodes (id, name) VALUES (@node, @name)", conn))
             {
                 ensureNode.Parameters.AddWithValue("@node", "nodeRiverVillage");
@@ -68,7 +68,6 @@ namespace WinFormsApp2
                 ensureNode.ExecuteNonQuery();
             }
 
-            // Initialize the player's travel_state at the starting node
             using MySqlCommand initTravel = new MySqlCommand("REPLACE INTO travel_state(account_id,current_node,destination_node,start_time,arrival_time,progress_seconds,faster_travel,travel_cost) VALUES (@a,@node,@node,NULL,NULL,0,0,0)", conn);
             initTravel.Parameters.AddWithValue("@a", newId);
             initTravel.Parameters.AddWithValue("@node", "nodeRiverVillage");

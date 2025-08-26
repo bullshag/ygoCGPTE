@@ -50,6 +50,9 @@ namespace WinFormsApp2
             toolTip1.SetToolTip(btnShop, "Buy and sell items");
             toolTip1.SetToolTip(btnGraveyard, "View and resurrect fallen heroes");
             toolTip1.SetToolTip(btnTavern, "Recruit new party members");
+
+            lstActivities.DoubleClick += LstActivities_DoubleClick;
+
             _travelManager.Resume();
         }
 
@@ -125,6 +128,26 @@ namespace WinFormsApp2
         private void BtnTavern_Click(object? sender, EventArgs e)
         {
             HandleRecruit();
+        private void LstActivities_DoubleClick(object? sender, EventArgs e)
+        {
+            if (lstActivities.SelectedItem == null) return;
+            string act = lstActivities.SelectedItem.ToString() ?? string.Empty;
+            if (act.StartsWith("Shop"))
+            {
+                using var shop = new ShopForm(_accountId);
+                shop.ShowDialog(this);
+                _refresh();
+                UpdatePartySize();
+            }
+            else if (act.StartsWith("Graveyard"))
+            {
+                using var grave = new GraveyardForm(_accountId, () => { _refresh(); UpdatePartySize(); });
+                grave.ShowDialog(this);
+            }
+            else if (act.Contains("Tavern"))
+            {
+                HandleRecruit();
+            }
         }
 
         private void HandleRecruit()
