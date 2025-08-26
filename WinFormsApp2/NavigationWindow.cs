@@ -47,10 +47,21 @@ namespace WinFormsApp2
             btnShop.Click += BtnShop_Click;
             btnGraveyard.Click += BtnGraveyard_Click;
             btnTavern.Click += BtnTavern_Click;
+            btnFindEnemies.Click += BtnFindEnemies_Click;
+            btnArena.Click += BtnArena_Click;
+            btnTemple.Click += BtnTemple_Click;
             toolTip1.SetToolTip(btnShop, "Buy and sell items");
             toolTip1.SetToolTip(btnGraveyard, "View and resurrect fallen heroes");
-            toolTip1.SetToolTip(btnTavern, "Recruit new party members");
+            toolTip1.SetToolTip(btnTavern, "Visit the tavern");
+            toolTip1.SetToolTip(btnFindEnemies, "Search the area for trouble");
+            toolTip1.SetToolTip(btnArena, "Enter the battle arena");
+            toolTip1.SetToolTip(btnTemple, "Receive divine blessings");
             _travelManager.Resume();
+            btnBeginTravel.Enabled = !_travelManager.IsTraveling;
+            if (_travelManager.IsTraveling)
+            {
+                lblTravelInfo.Text = "Traveling...";
+            }
         }
 
         public NavigationWindow() : this(0, 0, false, () => { }) { }
@@ -77,6 +88,9 @@ namespace WinFormsApp2
             btnShop.Enabled = activities.Any(a => a.StartsWith("Shop"));
             btnGraveyard.Enabled = activities.Any(a => a.StartsWith("Graveyard"));
             btnTavern.Enabled = activities.Any(a => a.Contains("Tavern"));
+            btnFindEnemies.Enabled = activities.Any(a => a.StartsWith("Search"));
+            btnArena.Enabled = activities.Any(a => a.Contains("Battle Arena"));
+            btnTemple.Enabled = activities.Any(a => a.Contains("Temple"));
             lstConnections.Items.Clear();
             foreach (var (dest, days) in WorldMapService.GetConnections(id))
             {
@@ -91,7 +105,8 @@ namespace WinFormsApp2
             if (lstConnections.SelectedItem is ConnectionItem item)
             {
                 _travelManager.StartTravel(_currentNode, item.Id, _partySize, _hasBlessing);
-                lblTravelInfo.Text = $"Traveling to {item.ToString()}";
+                lblTravelInfo.Text = TravelLogService.GetDepartureFlavor(_currentNode, item.Id);
+                btnBeginTravel.Enabled = false;
             }
         }
 
@@ -105,7 +120,8 @@ namespace WinFormsApp2
         private void TravelManager_TravelCompleted(string nodeId)
         {
             LoadNode(nodeId);
-            lblTravelInfo.Text = "Arrived.";
+            lblTravelInfo.Text = TravelLogService.GetArrivalFlavor(nodeId);
+            btnBeginTravel.Enabled = true;
         }
 
         private void BtnShop_Click(object? sender, EventArgs e)
@@ -124,55 +140,37 @@ namespace WinFormsApp2
 
         private void BtnTavern_Click(object? sender, EventArgs e)
         {
-            HandleRecruit();
-
+            using var tavern = new TavernForm(_accountId, () => { _refresh(); UpdatePartySize(); });
+            tavern.ShowDialog(this);
         }
 
-        private void HandleRecruit()
+        private void BtnFindEnemies_Click(object? sender, EventArgs e)
         {
-            int partyCount = 0;
-            int totalLevel = 0;
-            int playerGold;
+            using var battle = new BattleForm(_accountId);
+            battle.ShowDialog(this);
+            _refresh();
+            UpdatePartySize();
+        }
+
+        private void BtnArena_Click(object? sender, EventArgs e)
+        {
+            using var arena = new ArenaForm();
+            arena.ShowDialog(this);
+        }
+
+        private void BtnTemple_Click(object? sender, EventArgs e)
+        {
+            using var temple = new TempleForm(_accountId, RefreshBlessing);
+            temple.ShowDialog(this);
+        }
+
+        private void RefreshBlessing()
+        {
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using (var cmd = new MySqlCommand("SELECT level FROM characters WHERE account_id=@id AND is_dead=0", conn))
-            {
-                cmd.Parameters.AddWithValue("@id", _accountId);
-                using var reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    partyCount++;
-                    totalLevel += reader.GetInt32("level");
-                }
-            }
-            using (var goldCmd = new MySqlCommand("SELECT gold FROM users WHERE id=@id", conn))
-            {
-                goldCmd.Parameters.AddWithValue("@id", _accountId);
-                playerGold = Convert.ToInt32(goldCmd.ExecuteScalar() ?? 0);
-            }
-
-            int searchCost = partyCount == 0 ? 0 : 100 + totalLevel * 10 + partyCount * 20;
-            if (playerGold < searchCost)
-            {
-                MessageBox.Show("Not enough gold to search for recruits.");
-                return;
-            }
-
-            using (var payCmd = new MySqlCommand("UPDATE users SET gold = gold - @cost WHERE id=@id", conn))
-            {
-                payCmd.Parameters.AddWithValue("@cost", searchCost);
-                payCmd.Parameters.AddWithValue("@id", _accountId);
-                payCmd.ExecuteNonQuery();
-            }
-
-            var rng = new Random();
-            var candidates = new List<RecruitCandidate>();
-            for (int i = 0; i < 3; i++)
-            {
-                candidates.Add(RecruitCandidate.Generate(rng, i));
-            }
-            using var recruitForm = new RecruitForm(_accountId, candidates, searchCost, () => { _refresh(); UpdatePartySize(); });
-            recruitForm.ShowDialog(this);
+            using var cmd = new MySqlCommand("SELECT faster_travel FROM travel_state WHERE account_id=@a", conn);
+            cmd.Parameters.AddWithValue("@a", _accountId);
+            _hasBlessing = Convert.ToBoolean(cmd.ExecuteScalar() ?? 0);
         }
 
         private void UpdatePartySize()

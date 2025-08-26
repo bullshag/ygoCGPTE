@@ -27,6 +27,7 @@ namespace WinFormsApp2
 
         public event Action<int>? ProgressChanged;
         public event Action<string>? TravelCompleted;
+        public bool IsTraveling => _timer.Enabled;
 
         public TravelManager(int accountId)
         {
