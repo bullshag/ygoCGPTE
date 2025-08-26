@@ -28,6 +28,9 @@
     <Compile Update="LevelUpForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="NavigationWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="RecruitForm.cs">
       <SubType>Form</SubType>
     </Compile>
