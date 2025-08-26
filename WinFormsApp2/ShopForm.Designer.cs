@@ -11,7 +11,6 @@ namespace WinFormsApp2
         private Button _btnBuy;
         private Button _btnSell;
         private Label _lblGold;
-        private Label _lblDescription;
 
         protected override void Dispose(bool disposing)
         {
@@ -29,7 +28,6 @@ namespace WinFormsApp2
             _btnBuy = new Button();
             _btnSell = new Button();
             _lblGold = new Label();
-            _lblDescription = new Label();
             label1 = new Label();
             label2 = new Label();
             shopDescBox = new RichTextBox();
@@ -75,16 +73,9 @@ namespace WinFormsApp2
             _lblGold.Size = new Size(35, 15);
             _lblGold.TabIndex = 0;
             _lblGold.Text = "Gold:";
-            // 
-            // _lblDescription
-            // 
-            _lblDescription.Location = new Point(10, 373);
-            _lblDescription.Name = "_lblDescription";
-            _lblDescription.Size = new Size(568, 40);
-            _lblDescription.TabIndex = 5;
-            // 
+            //
             // label1
-            // 
+            //
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label1.Location = new Point(73, 1);
@@ -107,6 +98,8 @@ namespace WinFormsApp2
             // 
             shopDescBox.Location = new Point(10, 170);
             shopDescBox.Name = "shopDescBox";
+            shopDescBox.ReadOnly = true;
+            shopDescBox.BackColor = SystemColors.Window;
             shopDescBox.Size = new Size(570, 48);
             shopDescBox.TabIndex = 8;
             shopDescBox.Text = "";
@@ -119,7 +112,6 @@ namespace WinFormsApp2
             Controls.Add(shopDescBox);
             Controls.Add(label2);
             Controls.Add(label1);
-            Controls.Add(_lblDescription);
             Controls.Add(_lblGold);
             Controls.Add(_btnSell);
             Controls.Add(_btnBuy);

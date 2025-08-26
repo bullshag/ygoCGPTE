@@ -85,18 +85,18 @@ namespace WinFormsApp2
         {
             int index = _lstShop.SelectedIndex;
             if (index >= 0 && index < _shopItems.Count)
-                _lblDescription.Text = DescribeItem(_shopItems[index]);
+                shopDescBox.Text = DescribeItem(_shopItems[index]);
             else
-                _lblDescription.Text = string.Empty;
+                shopDescBox.Text = string.Empty;
         }
 
         private void ShowInventoryDesc()
         {
             int index = _lstInventory.SelectedIndex;
             if (index >= 0 && index < InventoryService.Items.Count)
-                _lblDescription.Text = DescribeItem(InventoryService.Items[index].Item);
+                shopDescBox.Text = DescribeItem(InventoryService.Items[index].Item);
             else
-                _lblDescription.Text = string.Empty;
+                shopDescBox.Text = string.Empty;
         }
 
         private string DescribeItem(Item item)
