@@ -51,6 +51,11 @@ namespace WinFormsApp2
             toolTip1.SetToolTip(btnGraveyard, "View and resurrect fallen heroes");
             toolTip1.SetToolTip(btnTavern, "Recruit new party members");
             _travelManager.Resume();
+            btnBeginTravel.Enabled = !_travelManager.IsTraveling;
+            if (_travelManager.IsTraveling)
+            {
+                lblTravelInfo.Text = "Traveling...";
+            }
         }
 
         public NavigationWindow() : this(0, 0, false, () => { }) { }
@@ -91,7 +96,8 @@ namespace WinFormsApp2
             if (lstConnections.SelectedItem is ConnectionItem item)
             {
                 _travelManager.StartTravel(_currentNode, item.Id, _partySize, _hasBlessing);
-                lblTravelInfo.Text = $"Traveling to {item.ToString()}";
+                lblTravelInfo.Text = TravelLogService.GetDepartureFlavor(_currentNode, item.Id);
+                btnBeginTravel.Enabled = false;
             }
         }
 
@@ -105,7 +111,8 @@ namespace WinFormsApp2
         private void TravelManager_TravelCompleted(string nodeId)
         {
             LoadNode(nodeId);
-            lblTravelInfo.Text = "Arrived.";
+            lblTravelInfo.Text = TravelLogService.GetArrivalFlavor(nodeId);
+            btnBeginTravel.Enabled = true;
         }
 
         private void BtnShop_Click(object? sender, EventArgs e)

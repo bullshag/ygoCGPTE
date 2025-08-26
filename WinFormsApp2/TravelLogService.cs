@@ -8,6 +8,33 @@ namespace WinFormsApp2
     /// </summary>
     public static class TravelLogService
     {
+        private static readonly Random _rng = new Random();
+
+        public static string GetDepartureFlavor(string fromNode, string toNode)
+        {
+            var from = WorldMapService.GetNode(fromNode).Name;
+            var to = WorldMapService.GetNode(toNode).Name;
+            string[] templates =
+            {
+                "The party leaves {0} and heads toward {1}.",
+                "You depart {0}, bound for {1}.",
+                "Setting out from {0}, the road stretches toward {1}."
+            };
+            return string.Format(templates[_rng.Next(templates.Length)], from, to);
+        }
+
+        public static string GetArrivalFlavor(string nodeId)
+        {
+            var name = WorldMapService.GetNode(nodeId).Name;
+            string[] templates =
+            {
+                "You arrive at {0}, a welcome sight.",
+                "The town of {0} greets the weary travelers.",
+                "At last, {0} comes into view."
+            };
+            return string.Format(templates[_rng.Next(templates.Length)], name);
+        }
+
         public static void LogJourney(int accountId, string fromNode, string toNode, int originalDays, int finalDays, int cost, bool fasterTravel)
         {
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
