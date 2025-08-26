@@ -172,11 +172,38 @@ namespace WinFormsApp2
             }
         }
 
+        private bool ConfirmFire(string name)
+        {
+            using var confirm = new Form
+            {
+                Width = 300,
+                Height = 150,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                Text = "Confirm Fire",
+                StartPosition = FormStartPosition.CenterParent
+            };
+
+            var lbl = new Label { Left = 10, Top = 10, Width = 260, Text = $"Type '{name}' to confirm firing:" };
+            var txt = new TextBox { Left = 10, Top = 40, Width = 260 };
+            var btn = new Button { Text = "Confirm", Left = 10, Top = 70, Width = 100, DialogResult = DialogResult.OK, Enabled = false };
+            btn.Click += (s, e) => confirm.Close();
+            txt.TextChanged += (s, e) => btn.Enabled = txt.Text == name;
+
+            confirm.Controls.Add(lbl);
+            confirm.Controls.Add(txt);
+            confirm.Controls.Add(btn);
+            confirm.AcceptButton = btn;
+
+            return confirm.ShowDialog(this) == DialogResult.OK;
+        }
+
         private void btnFire_Click(object? sender, EventArgs e)
         {
             if (lstParty.SelectedItem == null) return;
             string item = lstParty.SelectedItem.ToString() ?? string.Empty;
             string name = item.Split(" - ")[0];
+
+            if (!ConfirmFire(name)) return;
 
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
