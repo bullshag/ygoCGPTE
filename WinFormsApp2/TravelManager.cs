@@ -123,14 +123,16 @@ namespace WinFormsApp2
                 _elapsedSeconds = reader.GetInt32("progress_seconds");
                 _fasterTravelApplied = reader.GetBoolean("faster_travel");
                 _travelCost = reader.GetInt32("travel_cost");
-                _originalDays = WorldMapService.GetNode(_fromNode).Connections[_toNode];
                 if (_fromNode == _toNode)
                 {
-                    // Not traveling
+                    // Not currently traveling; nothing to resume
+                    _originalDays = 0;
+                    _totalSeconds = 0;
                     _timer.Stop();
                 }
                 else
                 {
+                    _originalDays = WorldMapService.GetNode(_fromNode).Connections[_toNode];
                     int days = _originalDays;
                     if (_fasterTravelApplied && days > 1) days -= 1;
                     _totalSeconds = days * 60;
