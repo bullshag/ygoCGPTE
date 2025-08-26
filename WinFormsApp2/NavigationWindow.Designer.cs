@@ -220,6 +220,9 @@
             // 
             // tabPage1
             //
+            tabPage1.Controls.Add(btnTemple);
+            tabPage1.Controls.Add(btnArena);
+            tabPage1.Controls.Add(btnFindEnemies);
             tabPage1.Controls.Add(btnTavern);
             tabPage1.Controls.Add(btnGraveyard);
             tabPage1.Controls.Add(btnShop);
@@ -257,6 +260,33 @@
             btnTavern.TabIndex = 2;
             btnTavern.Text = "Tavern";
             btnTavern.UseVisualStyleBackColor = true;
+            //
+            // btnFindEnemies
+            //
+            btnFindEnemies.Location = new Point(6, 93);
+            btnFindEnemies.Name = "btnFindEnemies";
+            btnFindEnemies.Size = new Size(150, 23);
+            btnFindEnemies.TabIndex = 3;
+            btnFindEnemies.Text = "Find Enemies";
+            btnFindEnemies.UseVisualStyleBackColor = true;
+            //
+            // btnArena
+            //
+            btnArena.Location = new Point(6, 122);
+            btnArena.Name = "btnArena";
+            btnArena.Size = new Size(150, 23);
+            btnArena.TabIndex = 4;
+            btnArena.Text = "Battle Arena";
+            btnArena.UseVisualStyleBackColor = true;
+            //
+            // btnTemple
+            //
+            btnTemple.Location = new Point(6, 151);
+            btnTemple.Name = "btnTemple";
+            btnTemple.Size = new Size(150, 23);
+            btnTemple.TabIndex = 5;
+            btnTemple.Text = "Temple";
+            btnTemple.UseVisualStyleBackColor = true;
             // 
             // Travel
             //
@@ -352,6 +382,9 @@
         private Button btnShop;
         private Button btnGraveyard;
         private Button btnTavern;
+        private Button btnFindEnemies;
+        private Button btnArena;
+        private Button btnTemple;
         private ListBox lstConnections;
         private Button btnBeginTravel;
         private ProgressBar travelProgressBar;
