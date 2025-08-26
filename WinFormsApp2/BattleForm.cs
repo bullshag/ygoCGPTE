@@ -730,6 +730,7 @@ namespace WinFormsApp2
             if (_players.All(p => p.CurrentHp <= 0) || _npcs.All(n => n.CurrentHp <= 0))
             {
                 foreach (var t in _timers.Values) t.Stop();
+                _progressTimer.Stop();
                 bool playersWin = _players.Any(p => p.CurrentHp > 0);
                 string lootSummary = string.Empty;
                 AppendLog(playersWin ? "Players win!" : "NPCs win!", playersWin);
