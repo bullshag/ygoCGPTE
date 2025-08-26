@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             pictureBox1 = new PictureBox();
             nodeRiverVillage = new RadioButton();
             nodeMounttown = new RadioButton();
@@ -43,17 +44,20 @@
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
             Travel = new TabPage();
-            lstActivities = new ListBox();
+            btnShop = new Button();
+            btnGraveyard = new Button();
+            btnTavern = new Button();
             lstConnections = new ListBox();
             btnBeginTravel = new Button();
             travelProgressBar = new ProgressBar();
             lblTravelInfo = new Label();
+            toolTip1 = new ToolTip(components);
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             tabControl1.SuspendLayout();
             SuspendLayout();
-            // 
+            //
             // pictureBox1
-            // 
+            //
             pictureBox1.Image = Properties.Resources.mmmmmmmmmmmm;
             pictureBox1.Location = new Point(457, 8);
             pictureBox1.Name = "pictureBox1";
@@ -216,7 +220,9 @@
             // 
             // tabPage1
             //
-            tabPage1.Controls.Add(lstActivities);
+            tabPage1.Controls.Add(btnTavern);
+            tabPage1.Controls.Add(btnGraveyard);
+            tabPage1.Controls.Add(btnShop);
             tabPage1.Location = new Point(4, 24);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
@@ -225,15 +231,32 @@
             tabPage1.Text = "Activities";
             tabPage1.UseVisualStyleBackColor = true;
             //
-            // lstActivities
+            // btnShop
             //
-            lstActivities.Dock = DockStyle.Fill;
-            lstActivities.FormattingEnabled = true;
-            lstActivities.ItemHeight = 15;
-            lstActivities.Location = new Point(3, 3);
-            lstActivities.Name = "lstActivities";
-            lstActivities.Size = new Size(425, 583);
-            lstActivities.TabIndex = 0;
+            btnShop.Location = new Point(6, 6);
+            btnShop.Name = "btnShop";
+            btnShop.Size = new Size(150, 23);
+            btnShop.TabIndex = 0;
+            btnShop.Text = "Shop";
+            btnShop.UseVisualStyleBackColor = true;
+            //
+            // btnGraveyard
+            //
+            btnGraveyard.Location = new Point(6, 35);
+            btnGraveyard.Name = "btnGraveyard";
+            btnGraveyard.Size = new Size(150, 23);
+            btnGraveyard.TabIndex = 1;
+            btnGraveyard.Text = "Graveyard";
+            btnGraveyard.UseVisualStyleBackColor = true;
+            //
+            // btnTavern
+            //
+            btnTavern.Location = new Point(6, 64);
+            btnTavern.Name = "btnTavern";
+            btnTavern.Size = new Size(150, 23);
+            btnTavern.TabIndex = 2;
+            btnTavern.Text = "Tavern";
+            btnTavern.UseVisualStyleBackColor = true;
             // 
             // Travel
             //
@@ -326,10 +349,13 @@
         private TabControl tabControl1;
         private TabPage tabPage1;
         private TabPage Travel;
-        private ListBox lstActivities;
+        private Button btnShop;
+        private Button btnGraveyard;
+        private Button btnTavern;
         private ListBox lstConnections;
         private Button btnBeginTravel;
         private ProgressBar travelProgressBar;
         private Label lblTravelInfo;
+        private ToolTip toolTip1;
     }
 }

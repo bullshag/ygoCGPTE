@@ -11,14 +11,12 @@ namespace WinFormsApp2
         private System.ComponentModel.IContainer? components = null;
         private ListBox lstParty;
         private FlowLayoutPanel pnlParty;
-        private Button btnHire;
         private Button btnInspect;
         private Button btnFire;
         private Button btnBattle;
         private Button btnInventory;
         private Button btnLogs;
-        private Button btnShop;
-        private Button btnGraveyard;
+        private Button btnNavigate;
         private Label lblGold;
         private Label lblTotalExp;
         private TabControl tabSocial;
@@ -53,14 +51,12 @@ namespace WinFormsApp2
         {
             lstParty = new ListBox();
             pnlParty = new FlowLayoutPanel();
-            btnHire = new Button();
             btnInspect = new Button();
             btnFire = new Button();
             btnBattle = new Button();
             btnInventory = new Button();
             btnLogs = new Button();
-            btnShop = new Button();
-            btnGraveyard = new Button();
+            btnNavigate = new Button();
             lblGold = new Label();
             lblTotalExp = new Label();
             tabSocial = new TabControl();
@@ -98,19 +94,10 @@ namespace WinFormsApp2
             pnlParty.FlowDirection = FlowDirection.TopDown;
             pnlParty.WrapContents = false;
             // 
-            // btnHire
-            // 
-            btnHire.Location = new Point(12, 172);
-            btnHire.Name = "btnHire";
-            btnHire.Size = new Size(260, 23);
-            btnHire.Text = "Search for new recruits";
-            btnHire.UseVisualStyleBackColor = true;
-            btnHire.Click += btnHire_Click;
-            //
             // btnInspect
             //
             btnInspect.Enabled = false;
-            btnInspect.Location = new Point(12, 201);
+            btnInspect.Location = new Point(12, 172);
             btnInspect.Name = "btnInspect";
             btnInspect.Size = new Size(260, 23);
             btnInspect.Text = "Inspect";
@@ -120,7 +107,7 @@ namespace WinFormsApp2
             // btnFire
             //
             btnFire.Enabled = false;
-            btnFire.Location = new Point(12, 230);
+            btnFire.Location = new Point(12, 201);
             btnFire.Name = "btnFire";
             btnFire.Size = new Size(260, 23);
             btnFire.Text = "Fire";
@@ -129,7 +116,7 @@ namespace WinFormsApp2
             //
             // btnBattle
             //
-            btnBattle.Location = new Point(12, 259);
+            btnBattle.Location = new Point(12, 230);
             btnBattle.Name = "btnBattle";
             btnBattle.Size = new Size(260, 23);
             btnBattle.Text = "Find Battle";
@@ -138,7 +125,7 @@ namespace WinFormsApp2
             //
             // btnInventory
             //
-            btnInventory.Location = new Point(12, 288);
+            btnInventory.Location = new Point(12, 259);
             btnInventory.Name = "btnInventory";
             btnInventory.Size = new Size(260, 23);
             btnInventory.Text = "Inventory";
@@ -147,35 +134,26 @@ namespace WinFormsApp2
             //
             // btnLogs
             //
-            btnLogs.Location = new Point(12, 317);
+            btnLogs.Location = new Point(12, 288);
             btnLogs.Name = "btnLogs";
             btnLogs.Size = new Size(260, 23);
             btnLogs.Text = "Battle Logs";
             btnLogs.UseVisualStyleBackColor = true;
             btnLogs.Click += btnLogs_Click;
             //
-            // btnShop
+            // btnNavigate
             //
-            btnShop.Location = new Point(12, 346);
-            btnShop.Name = "btnShop";
-            btnShop.Size = new Size(260, 23);
-            btnShop.Text = "Shop";
-            btnShop.UseVisualStyleBackColor = true;
-            btnShop.Click += btnShop_Click;
-            //
-            // btnGraveyard
-            //
-            btnGraveyard.Location = new Point(12, 375);
-            btnGraveyard.Name = "btnGraveyard";
-            btnGraveyard.Size = new Size(260, 23);
-            btnGraveyard.Text = "Graveyard";
-            btnGraveyard.UseVisualStyleBackColor = true;
-            btnGraveyard.Click += btnGraveyard_Click;
+            btnNavigate.Location = new Point(12, 317);
+            btnNavigate.Name = "btnNavigate";
+            btnNavigate.Size = new Size(260, 23);
+            btnNavigate.Text = "World Map";
+            btnNavigate.UseVisualStyleBackColor = true;
+            btnNavigate.Click += btnNavigate_Click;
             //
             // lblGold
             //
             lblGold.AutoSize = true;
-            lblGold.Location = new Point(12, 375);
+            lblGold.Location = new Point(12, 346);
             lblGold.Name = "lblGold";
             lblGold.Size = new Size(35, 15);
             lblGold.Text = "Gold:";
@@ -183,7 +161,7 @@ namespace WinFormsApp2
             // lblTotalExp
             //
             lblTotalExp.AutoSize = true;
-            lblTotalExp.Location = new Point(12, 400);
+            lblTotalExp.Location = new Point(12, 371);
             lblTotalExp.Name = "lblTotalExp";
             lblTotalExp.Size = new Size(69, 15);
             lblTotalExp.Text = "Party EXP:";
@@ -288,14 +266,12 @@ namespace WinFormsApp2
             Controls.Add(tabSocial);
             Controls.Add(lblTotalExp);
             Controls.Add(lblGold);
-            Controls.Add(btnGraveyard);
-            Controls.Add(btnShop);
             Controls.Add(btnLogs);
             Controls.Add(btnInventory);
             Controls.Add(btnBattle);
             Controls.Add(btnFire);
             Controls.Add(btnInspect);
-            Controls.Add(btnHire);
+            Controls.Add(btnNavigate);
             Controls.Add(pnlParty);
             Controls.Add(lstParty);
             Name = "RPGForm";

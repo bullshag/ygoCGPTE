@@ -36,6 +36,8 @@ namespace WinFormsApp2
         {
             _fromNode = fromNode;
             _toNode = toNode;
+            EnsureNodeExists(fromNode);
+            EnsureNodeExists(toNode);
             _originalDays = WorldMapService.GetNode(fromNode).Connections[toNode];
             int days = _originalDays;
             _fasterTravelApplied = hasFasterTravel && days > 1;
@@ -123,20 +125,31 @@ namespace WinFormsApp2
                 _elapsedSeconds = reader.GetInt32("progress_seconds");
                 _fasterTravelApplied = reader.GetBoolean("faster_travel");
                 _travelCost = reader.GetInt32("travel_cost");
-                _originalDays = WorldMapService.GetNode(_fromNode).Connections[_toNode];
                 if (_fromNode == _toNode)
                 {
-                    // Not traveling
+                    // Not currently traveling; nothing to resume
+                    _originalDays = 0;
+                    _totalSeconds = 0;
                     _timer.Stop();
                 }
                 else
                 {
+                    _originalDays = WorldMapService.GetNode(_fromNode).Connections[_toNode];
                     int days = _originalDays;
                     if (_fasterTravelApplied && days > 1) days -= 1;
                     _totalSeconds = days * 60;
                     _timer.Start();
                 }
             }
+        }
+
+        private static void EnsureNodeExists(string nodeId)
+        {
+            using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            using var cmd = new MySqlCommand("INSERT IGNORE INTO nodes (id) VALUES (@id)", conn);
+            cmd.Parameters.AddWithValue("@id", nodeId);
+            cmd.ExecuteNonQuery();
         }
     }
 }
