@@ -16,13 +16,13 @@ namespace WinFormsApp2
         {
             Nodes = new Dictionary<string, WorldMapNode>();
 
-            var nodeMountain = new WorldMapNode("nodeMountain", "Mountain");
+            var nodeMountain = new WorldMapNode("nodeMountain", "Mountain", "Towering peaks home to dangerous beasts.");
             nodeMountain.Connections["nodeMounttown"] = 2;
             nodeMountain.Activities.Add("Search for enemies (Lv 10-15)");
             nodeMountain.Activities.Add("Search for powerful enemies (Lv 30+)");
             Nodes[nodeMountain.Id] = nodeMountain;
 
-            var nodeMounttown = new WorldMapNode("nodeMounttown", "Mounttown");
+            var nodeMounttown = new WorldMapNode("nodeMounttown", "Mounttown", "A bustling town carved into the mountainside.");
             nodeMounttown.Connections["nodeMountain"] = 2;
             nodeMounttown.Connections["nodeDarkSpire"] = 1;
             nodeMounttown.Connections["nodeRiverVillage"] = 3;
@@ -32,7 +32,7 @@ namespace WinFormsApp2
             nodeMounttown.Activities.Add("Tavern (recruit Lv5 adventurers w/2 random passives)");
             Nodes[nodeMounttown.Id] = nodeMounttown;
 
-            var nodeDarkSpire = new WorldMapNode("nodeDarkSpire", "Dark Spire");
+            var nodeDarkSpire = new WorldMapNode("nodeDarkSpire", "Dark Spire", "An ominous tower shrouded in eternal twilight.");
             nodeDarkSpire.Connections["nodeMounttown"] = 1;
             nodeDarkSpire.Connections["nodeRiverVillage"] = 3;
             nodeDarkSpire.Connections["nodeForestValley"] = 3;
@@ -40,21 +40,21 @@ namespace WinFormsApp2
             nodeDarkSpire.Activities.Add("Track floors cleared and reward bonus (15-20% for Lv15-20 floor)");
             Nodes[nodeDarkSpire.Id] = nodeDarkSpire;
 
-            var nodeNorthernIsland = new WorldMapNode("nodeNorthernIsland", "Northern Island");
+            var nodeNorthernIsland = new WorldMapNode("nodeNorthernIsland", "Northern Island", "A remote island swept by cold winds.");
             nodeNorthernIsland.Connections["nodeDarkSpire"] = 3;
             nodeNorthernIsland.Connections["nodeForestValley"] = 4;
             nodeNorthernIsland.Activities.Add("Ancient Stone of Regret (reset stats to 5 for 150% hire value cost)");
             nodeNorthernIsland.Activities.Add("Search for strong enemies (Lv50)");
             Nodes[nodeNorthernIsland.Id] = nodeNorthernIsland;
 
-            var nodeSouthernIsland = new WorldMapNode("nodeSouthernIsland", "Southern Island");
+            var nodeSouthernIsland = new WorldMapNode("nodeSouthernIsland", "Southern Island", "A tropical haven dotted with fishing huts.");
             nodeSouthernIsland.Connections["nodeSmallVillage"] = 10;
             nodeSouthernIsland.Activities.Add("Fisherman work: assign party member for N minutes → earns 5 gp/min");
             nodeSouthernIsland.Activities.Add("Tavern: hire hostile NPC mercenaries (no exp/level/equipment/resurrection)");
             nodeSouthernIsland.Activities.Add("Temple: blessing that reduces travel ≥2 days by 1 day");
             Nodes[nodeSouthernIsland.Id] = nodeSouthernIsland;
 
-            var nodeRiverVillage = new WorldMapNode("nodeRiverVillage", "River Village");
+            var nodeRiverVillage = new WorldMapNode("nodeRiverVillage", "River Village", "A prosperous settlement along winding rivers.");
             nodeRiverVillage.Connections["nodeSmallVillage"] = 1;
             nodeRiverVillage.Connections["nodeDarkSpire"] = 3;
             nodeRiverVillage.Connections["nodeMounttown"] = 3;
@@ -66,7 +66,7 @@ namespace WinFormsApp2
             nodeRiverVillage.Activities.Add("Wizard Tower: teleport to any node for cost");
             Nodes[nodeRiverVillage.Id] = nodeRiverVillage;
 
-            var nodeSmallVillage = new WorldMapNode("nodeSmallVillage", "Small Village");
+            var nodeSmallVillage = new WorldMapNode("nodeSmallVillage", "Small Village", "A quaint village surrounded by whispering woods.");
             nodeSmallVillage.Connections["nodeSouthernIsland"] = 10;
             nodeSmallVillage.Connections["nodeRiverVillage"] = 1;
             nodeSmallVillage.Activities.Add("Shop");
@@ -74,14 +74,14 @@ namespace WinFormsApp2
             nodeSmallVillage.Activities.Add("Search the woods (Lv1-10 enemies)");
             Nodes[nodeSmallVillage.Id] = nodeSmallVillage;
 
-            var nodeDesert = new WorldMapNode("nodeDesert", "Desert");
+            var nodeDesert = new WorldMapNode("nodeDesert", "Desert", "An endless expanse of scorching sands.");
             nodeDesert.Connections["nodeForestValley"] = 4;
             nodeDesert.Connections["nodeFarCliffs"] = 5;
             nodeDesert.Connections["nodeForestPlains"] = 5;
             nodeDesert.Activities.Add("Wander the desert: spend 1 day, chance to encounter Lv50 giant worm raid boss");
             Nodes[nodeDesert.Id] = nodeDesert;
 
-            var nodeForestValley = new WorldMapNode("nodeForestValley", "Forest Valley");
+            var nodeForestValley = new WorldMapNode("nodeForestValley", "Forest Valley", "A lush valley teeming with hidden wildlife.");
             nodeForestValley.Connections["nodeDarkSpire"] = 3;
             nodeForestValley.Connections["nodeRiverVillage"] = 4;
             nodeForestValley.Connections["nodeForestPlains"] = 3;
@@ -90,7 +90,7 @@ namespace WinFormsApp2
             nodeForestValley.Activities.Add("Search for powerful enemies (Lv30-40, 15% chance Lv50 raid boss)");
             Nodes[nodeForestValley.Id] = nodeForestValley;
 
-            var nodeForestPlains = new WorldMapNode("nodeForestPlains", "Forest Plains");
+            var nodeForestPlains = new WorldMapNode("nodeForestPlains", "Forest Plains", "Open plains where the forest meets the sky.");
             nodeForestPlains.Connections["nodeFarCliffs"] = 1;
             nodeForestPlains.Connections["nodeDesert"] = 5;
             nodeForestPlains.Connections["nodeForestValley"] = 3;
@@ -99,7 +99,7 @@ namespace WinFormsApp2
             nodeForestPlains.Activities.Add("Search for powerful enemies (Lv50 raid boss)");
             Nodes[nodeForestPlains.Id] = nodeForestPlains;
 
-            var nodeFarCliffs = new WorldMapNode("nodeFarCliffs", "Far Cliffs");
+            var nodeFarCliffs = new WorldMapNode("nodeFarCliffs", "Far Cliffs", "Sheer cliffs that overlook the restless sea.");
             nodeFarCliffs.Connections["nodeForestPlains"] = 1;
             nodeFarCliffs.Connections["nodeDesert"] = 5;
             nodeFarCliffs.Activities.Add("Ancient Altar: does nothing unless holding 'Orb of Unknowable Evil'");

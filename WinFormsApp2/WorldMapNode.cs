@@ -11,13 +11,15 @@ namespace WinFormsApp2
     {
         public string Id { get; }
         public string Name { get; }
+        public string Description { get; }
         public Dictionary<string, int> Connections { get; } = new();
         public List<string> Activities { get; } = new();
 
-        public WorldMapNode(string id, string name)
+        public WorldMapNode(string id, string name, string description = "")
         {
             Id = id;
             Name = name;
+            Description = description;
         }
     }
 }

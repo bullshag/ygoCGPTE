@@ -44,6 +44,7 @@ namespace WinFormsApp2
             _travelManager.TravelCompleted += TravelManager_TravelCompleted;
             _currentNode = GetCurrentNode();
             LoadNode(_currentNode);
+            lstConnections.SelectedIndexChanged += LstConnections_SelectedIndexChanged;
             btnShop.Click += BtnShop_Click;
             btnGraveyard.Click += BtnGraveyard_Click;
             btnTavern.Click += BtnTavern_Click;
@@ -98,6 +99,8 @@ namespace WinFormsApp2
             }
             travelProgressBar.Value = 0;
             lblTravelInfo.Text = string.Empty;
+            rtbNodeDescription.Text = node.Description;
+            btnBeginTravel.Text = "Begin Travel";
         }
 
         private void btnBeginTravel_Click(object? sender, EventArgs e)
@@ -122,6 +125,24 @@ namespace WinFormsApp2
             LoadNode(nodeId);
             lblTravelInfo.Text = TravelLogService.GetArrivalFlavor(nodeId);
             btnBeginTravel.Enabled = true;
+        }
+
+        private void LstConnections_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            if (lstConnections.SelectedItem is ConnectionItem item)
+            {
+                var dest = WorldMapService.GetNode(item.Id);
+                rtbNodeDescription.Text = dest.Description;
+                int days = WorldMapService.GetNode(_currentNode).Connections[item.Id];
+                if (_hasBlessing && days > 1) days -= 1;
+                int cost = days * _partySize * 5;
+                btnBeginTravel.Text = $"Travel ({cost}g)";
+            }
+            else
+            {
+                rtbNodeDescription.Text = WorldMapService.GetNode(_currentNode).Description;
+                btnBeginTravel.Text = "Begin Travel";
+            }
         }
 
         private void BtnShop_Click(object? sender, EventArgs e)

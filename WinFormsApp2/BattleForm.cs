@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Drawing;
 using MySql.Data.MySqlClient;
+using System.Text.RegularExpressions;
 
 namespace WinFormsApp2
 {
@@ -303,17 +304,19 @@ namespace WinFormsApp2
                                 c.CurrentHp = Math.Min(c.MaxHp, c.CurrentHp + eff.AmountPerTick);
                                 AppendLog($"{c.Name} is healed for {eff.AmountPerTick}.", eff.SourceIsPlayer, true);
                             }
-                            else
+                            else if (eff.Kind != EffectKind.Shield)
                             {
-                                c.CurrentHp -= eff.AmountPerTick;
-                                AppendLog($"{c.Name} takes {eff.AmountPerTick} {eff.Kind.ToString().ToLower()} damage.", eff.SourceIsPlayer);
+                                int tick = eff.AmountPerTick;
+                                ApplyShieldReduction(c, ref tick);
+                                c.CurrentHp -= tick;
+                                AppendLog($"{c.Name} takes {tick} {eff.Kind.ToString().ToLower()} damage.", eff.SourceIsPlayer);
                                 if (c.CurrentHp <= 0 && _players.Contains(c) && !_deathCauses.ContainsKey(c.Name))
                                 {
                                     _deathCauses[c.Name] = $"{c.Name} succumbed to {eff.Kind}.";
                                 }
+                                c.HpBar.Value = Math.Max(0, c.CurrentHp);
+                                eff.TimeUntilTickMs += eff.TickIntervalMs;
                             }
-                            c.HpBar.Value = Math.Max(0, c.CurrentHp);
-                            eff.TimeUntilTickMs += eff.TickIntervalMs;
                         }
                         if (eff.RemainingMs <= 0)
                         {
@@ -418,21 +421,15 @@ namespace WinFormsApp2
                 }
                 else if (ability.Name == "Taunting Blows") ApplyTaunt(actor, opponents);
                 else if (ability.Name == "Vanish") { actor.IsVanished = true; actor.VanishRemainingMs = 5000; actor.AttackBar.Value = actor.AttackInterval; CheckEnd(); return; }
-                else if (ability.Name == "Fireball" || ability.Name == "Lightning Bolt")
+                else if (ability.Name == "Arcane Shield") { ApplyShield(actor, target); actor.AttackBar.Value = actor.AttackInterval; CheckEnd(); return; }
+                else
                 {
                     int spellDamage = CalculateSpellDamage(actor, target, ability);
+                    ApplyShieldReduction(target, ref spellDamage);
                     target.CurrentHp -= spellDamage;
-                    string spellLog = ability.Name switch
-                    {
-                        "Fireball" => $"{actor.Name}'s fireball engulfs {target.Name} for {spellDamage} damage!",
-                        "Lightning Bolt" => $"{actor.Name}'s lightning bolt smites {target.Name} for {spellDamage} damage!",
-                        "Ice Lance" => $"{actor.Name}'s ice lance impales {target.Name} for {spellDamage} damage!",
-                        "Arcane Blast" => $"{actor.Name}'s arcane blast rips through {target.Name} for {spellDamage} damage!",
-                        "Shield Bash" => $"{actor.Name} shield bashes {target.Name} for {spellDamage} damage!",
-                        "Drain Life" => $"{actor.Name} siphons {spellDamage} life from {target.Name}!",
-                        _ => $"{actor.Name}'s {ability.Name} hits {target.Name} for {spellDamage} damage!"
-                    };
-
+                    string spellLog = ability.Name == "Drain Life"
+                        ? $"{actor.Name} siphons {spellDamage} life from {target.Name}!"
+                        : $"{actor.Name}'s {ability.Name} hits {target.Name} for {spellDamage} damage!";
 
                     if (target.CurrentHp <= 0 && _players.Contains(target) && !_deathCauses.ContainsKey(target.Name))
                     {
@@ -480,6 +477,7 @@ namespace WinFormsApp2
             }
 
             int dmg = CalculateDamage(actor, target);
+            ApplyShieldReduction(target, ref dmg);
             if (target.Passives.ContainsKey("Bloodlust"))
             {
                 double missing = 1 - target.CurrentHp / (double)target.MaxHp;
@@ -542,6 +540,7 @@ namespace WinFormsApp2
                 "Berserk" => $"{actor.Name} enters a berserk fury!",
                 "Drain Life" => $"{actor.Name} siphons vitality from {target.Name}!",
                 "Vanish" => $"{actor.Name} melts into the shadows!",
+                "Arcane Shield" => $"{actor.Name} conjures a shimmering shield around {target.Name}!",
                 _ => $"{actor.Name} uses {ability.Name} on {target.Name}!"
             };
         }
@@ -571,6 +570,36 @@ namespace WinFormsApp2
             {
                 o.ForcedTarget = actor;
                 o.ForcedTargetMs = duration;
+            }
+        }
+
+        private void ApplyShield(Creature actor, Creature target)
+        {
+            int shield = (int)Math.Max(1, 5 + actor.Intelligence * 1.5);
+            target.Effects.Add(new StatusEffect
+            {
+                Kind = EffectKind.Shield,
+                RemainingMs = 15000,
+                TickIntervalMs = int.MaxValue,
+                TimeUntilTickMs = int.MaxValue,
+                AmountPerTick = shield,
+                SourceIsPlayer = _players.Contains(actor)
+            });
+            AppendLog($"{target.Name} is protected by a magical shield ({shield}).", _players.Contains(actor), true);
+        }
+
+        private void ApplyShieldReduction(Creature target, ref int dmg)
+        {
+            var shield = target.Effects.FirstOrDefault(e => e.Kind == EffectKind.Shield);
+            if (shield != null && dmg > 0)
+            {
+                int absorb = Math.Min(dmg, shield.AmountPerTick);
+                dmg -= absorb;
+                shield.AmountPerTick -= absorb;
+                if (shield.AmountPerTick <= 0)
+                {
+                    target.Effects.Remove(shield);
+                }
             }
         }
 
@@ -795,18 +824,22 @@ namespace WinFormsApp2
 
         private int CalculateSpellDamage(Creature actor, Creature target, Ability ability)
         {
-            double baseDamage = ability.Name switch
+            var match = Regex.Match(ability.Description, "(\\d+) \\+ (\\d+)% of your (STR|DEX|INT)", RegexOptions.IgnoreCase);
+            if (match.Success)
             {
-                "Fireball" => 5 + actor.Intelligence * 1.0,
-                "Lightning Bolt" => 4 + actor.Intelligence * 1.2,
-                "Ice Lance" => 6 + actor.Intelligence * 1.1,
-                "Arcane Blast" => 8 + actor.Intelligence * 0.9,
-                "Shield Bash" => 2 + actor.Strength * 0.5,
-                "Drain Life" => 3 + actor.Intelligence * 0.7,
-
-                _ => 0
-            };
-            return (int)Math.Max(1, baseDamage - target.MagicDefense);
+                double baseVal = double.Parse(match.Groups[1].Value);
+                double percent = double.Parse(match.Groups[2].Value) / 100.0;
+                double stat = match.Groups[3].Value.ToUpper() switch
+                {
+                    "STR" => actor.Strength,
+                    "DEX" => actor.Dex,
+                    "INT" => actor.Intelligence,
+                    _ => 0
+                };
+                double dmg = baseVal + stat * percent;
+                return (int)Math.Max(1, dmg - target.MagicDefense);
+            }
+            return 0;
         }
 
         private void AwardExperience(int totalEnemyLevels)
@@ -868,7 +901,7 @@ namespace WinFormsApp2
             }
         }
 
-        private enum EffectKind { Bleed, Poison, HoT }
+        private enum EffectKind { Bleed, Poison, HoT, Shield }
 
         private class StatusEffect
         {
