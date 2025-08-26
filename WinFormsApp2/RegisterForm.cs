@@ -66,6 +66,7 @@ namespace WinFormsApp2
                 ensureNode.Parameters.AddWithValue("@name", "River Village");
                 ensureNode.ExecuteNonQuery();
             }
+
             using MySqlCommand initTravel = new MySqlCommand("REPLACE INTO travel_state(account_id,current_node,destination_node,start_time,arrival_time,progress_seconds,faster_travel,travel_cost) VALUES (@a,@node,@node,NULL,NULL,0,0,0)", conn);
             initTravel.Parameters.AddWithValue("@a", newId);
             initTravel.Parameters.AddWithValue("@node", "nodeRiverVillage");
