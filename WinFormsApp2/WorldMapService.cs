@@ -1,0 +1,121 @@
+using System.Collections.Generic;
+using System.Linq;
+
+namespace WinFormsApp2
+{
+    /// <summary>
+    /// Holds the static definition of all world map nodes and their
+    /// connections/activities. This allows the navigation UI and travel system
+    /// to query available destinations and actions.
+    /// </summary>
+    public static class WorldMapService
+    {
+        public static readonly Dictionary<string, WorldMapNode> Nodes;
+
+        static WorldMapService()
+        {
+            Nodes = new Dictionary<string, WorldMapNode>();
+
+            var nodeMountain = new WorldMapNode("nodeMountain", "Mountain");
+            nodeMountain.Connections["nodeMounttown"] = 2;
+            nodeMountain.Activities.Add("Search for enemies (Lv 10-15)");
+            nodeMountain.Activities.Add("Search for powerful enemies (Lv 30+)");
+            Nodes[nodeMountain.Id] = nodeMountain;
+
+            var nodeMounttown = new WorldMapNode("nodeMounttown", "Mounttown");
+            nodeMounttown.Connections["nodeMountain"] = 2;
+            nodeMounttown.Connections["nodeDarkSpire"] = 1;
+            nodeMounttown.Connections["nodeRiverVillage"] = 3;
+            nodeMounttown.Activities.Add("Shop");
+            nodeMounttown.Activities.Add("Temple (30 min +10% HP buff)");
+            nodeMounttown.Activities.Add("Graveyard (resurrect screen)");
+            nodeMounttown.Activities.Add("Tavern (recruit Lv5 adventurers w/2 random passives)");
+            Nodes[nodeMounttown.Id] = nodeMounttown;
+
+            var nodeDarkSpire = new WorldMapNode("nodeDarkSpire", "Dark Spire");
+            nodeDarkSpire.Connections["nodeMounttown"] = 1;
+            nodeDarkSpire.Connections["nodeRiverVillage"] = 3;
+            nodeDarkSpire.Connections["nodeForestValley"] = 3;
+            nodeDarkSpire.Activities.Add("Endless dungeon starting Lv1-5, +5 Lv per win");
+            nodeDarkSpire.Activities.Add("Track floors cleared and reward bonus (15-20% for Lv15-20 floor)");
+            Nodes[nodeDarkSpire.Id] = nodeDarkSpire;
+
+            var nodeNorthernIsland = new WorldMapNode("nodeNorthernIsland", "Northern Island");
+            nodeNorthernIsland.Connections["nodeDarkSpire"] = 3;
+            nodeNorthernIsland.Connections["nodeForestValley"] = 4;
+            nodeNorthernIsland.Activities.Add("Ancient Stone of Regret (reset stats to 5 for 150% hire value cost)");
+            nodeNorthernIsland.Activities.Add("Search for strong enemies (Lv50)");
+            Nodes[nodeNorthernIsland.Id] = nodeNorthernIsland;
+
+            var nodeSouthernIsland = new WorldMapNode("nodeSouthernIsland", "Southern Island");
+            nodeSouthernIsland.Connections["nodeSmallVillage"] = 10;
+            nodeSouthernIsland.Activities.Add("Fisherman work: assign party member for N minutes → earns 5 gp/min");
+            nodeSouthernIsland.Activities.Add("Tavern: hire hostile NPC mercenaries (no exp/level/equipment/resurrection)");
+            nodeSouthernIsland.Activities.Add("Temple: blessing that reduces travel ≥2 days by 1 day");
+            Nodes[nodeSouthernIsland.Id] = nodeSouthernIsland;
+
+            var nodeRiverVillage = new WorldMapNode("nodeRiverVillage", "River Village");
+            nodeRiverVillage.Connections["nodeSmallVillage"] = 1;
+            nodeRiverVillage.Connections["nodeDarkSpire"] = 3;
+            nodeRiverVillage.Connections["nodeMounttown"] = 3;
+            nodeRiverVillage.Connections["nodeDesert"] = 4;
+            nodeRiverVillage.Connections["nodeForestValley"] = 4;
+            nodeRiverVillage.Activities.Add("Battle Arena: leave party to fight other teams");
+            nodeRiverVillage.Activities.Add("Tavern: recruit magic specialists and take quests");
+            nodeRiverVillage.Activities.Add("Shop: strong/expensive items");
+            nodeRiverVillage.Activities.Add("Wizard Tower: teleport to any node for cost");
+            Nodes[nodeRiverVillage.Id] = nodeRiverVillage;
+
+            var nodeSmallVillage = new WorldMapNode("nodeSmallVillage", "Small Village");
+            nodeSmallVillage.Connections["nodeSouthernIsland"] = 10;
+            nodeSmallVillage.Connections["nodeRiverVillage"] = 1;
+            nodeSmallVillage.Activities.Add("Shop");
+            nodeSmallVillage.Activities.Add("Tavern (recruit DEX specialists)");
+            nodeSmallVillage.Activities.Add("Search the woods (Lv1-10 enemies)");
+            Nodes[nodeSmallVillage.Id] = nodeSmallVillage;
+
+            var nodeDesert = new WorldMapNode("nodeDesert", "Desert");
+            nodeDesert.Connections["nodeForestValley"] = 4;
+            nodeDesert.Connections["nodeFarCliffs"] = 5;
+            nodeDesert.Connections["nodeForestPlains"] = 5;
+            nodeDesert.Activities.Add("Wander the desert: spend 1 day, chance to encounter Lv50 giant worm raid boss");
+            Nodes[nodeDesert.Id] = nodeDesert;
+
+            var nodeForestValley = new WorldMapNode("nodeForestValley", "Forest Valley");
+            nodeForestValley.Connections["nodeDarkSpire"] = 3;
+            nodeForestValley.Connections["nodeRiverVillage"] = 4;
+            nodeForestValley.Connections["nodeForestPlains"] = 3;
+            nodeForestValley.Connections["nodeDesert"] = 4;
+            nodeForestValley.Activities.Add("Search for enemies (Lv10-20)");
+            nodeForestValley.Activities.Add("Search for powerful enemies (Lv30-40, 15% chance Lv50 raid boss)");
+            Nodes[nodeForestValley.Id] = nodeForestValley;
+
+            var nodeForestPlains = new WorldMapNode("nodeForestPlains", "Forest Plains");
+            nodeForestPlains.Connections["nodeFarCliffs"] = 1;
+            nodeForestPlains.Connections["nodeDesert"] = 5;
+            nodeForestPlains.Connections["nodeForestValley"] = 3;
+            nodeForestPlains.Activities.Add("Commune with nature (receive raid-boss quest)");
+            nodeForestPlains.Activities.Add("Search for enemies (Lv15-25)");
+            nodeForestPlains.Activities.Add("Search for powerful enemies (Lv50 raid boss)");
+            Nodes[nodeForestPlains.Id] = nodeForestPlains;
+
+            var nodeFarCliffs = new WorldMapNode("nodeFarCliffs", "Far Cliffs");
+            nodeFarCliffs.Connections["nodeForestPlains"] = 1;
+            nodeFarCliffs.Connections["nodeDesert"] = 5;
+            nodeFarCliffs.Activities.Add("Ancient Altar: does nothing unless holding 'Orb of Unknowable Evil'");
+            nodeFarCliffs.Activities.Add("Search for enemies (Lv5-15)");
+            Nodes[nodeFarCliffs.Id] = nodeFarCliffs;
+        }
+
+        public static WorldMapNode GetNode(string id) => Nodes[id];
+
+        public static IEnumerable<(WorldMapNode node, int days)> GetConnections(string id)
+        {
+            var source = GetNode(id);
+            foreach (var kv in source.Connections)
+            {
+                yield return (Nodes[kv.Key], kv.Value);
+            }
+        }
+    }
+}

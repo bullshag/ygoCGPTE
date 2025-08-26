@@ -43,6 +43,11 @@
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
             Travel = new TabPage();
+            lstActivities = new ListBox();
+            lstConnections = new ListBox();
+            btnBeginTravel = new Button();
+            travelProgressBar = new ProgressBar();
+            lblTravelInfo = new Label();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             tabControl1.SuspendLayout();
             SuspendLayout();
@@ -65,6 +70,8 @@
             nodeRiverVillage.Size = new Size(14, 13);
             nodeRiverVillage.TabIndex = 1;
             nodeRiverVillage.TabStop = true;
+            nodeRiverVillage.AutoCheck = false;
+            nodeRiverVillage.Enabled = false;
             nodeRiverVillage.UseVisualStyleBackColor = false;
             // 
             // nodeMounttown
@@ -76,6 +83,8 @@
             nodeMounttown.Size = new Size(14, 13);
             nodeMounttown.TabIndex = 2;
             nodeMounttown.TabStop = true;
+            nodeMounttown.AutoCheck = false;
+            nodeMounttown.Enabled = false;
             nodeMounttown.UseVisualStyleBackColor = false;
             // 
             // nodeDesert
@@ -87,6 +96,8 @@
             nodeDesert.Size = new Size(14, 13);
             nodeDesert.TabIndex = 3;
             nodeDesert.TabStop = true;
+            nodeDesert.AutoCheck = false;
+            nodeDesert.Enabled = false;
             nodeDesert.UseVisualStyleBackColor = false;
             // 
             // nodeDarkSpire
@@ -98,6 +109,8 @@
             nodeDarkSpire.Size = new Size(14, 13);
             nodeDarkSpire.TabIndex = 4;
             nodeDarkSpire.TabStop = true;
+            nodeDarkSpire.AutoCheck = false;
+            nodeDarkSpire.Enabled = false;
             nodeDarkSpire.UseVisualStyleBackColor = false;
             // 
             // nodeSouthernIsland
@@ -109,6 +122,8 @@
             nodeSouthernIsland.Size = new Size(14, 13);
             nodeSouthernIsland.TabIndex = 5;
             nodeSouthernIsland.TabStop = true;
+            nodeSouthernIsland.AutoCheck = false;
+            nodeSouthernIsland.Enabled = false;
             nodeSouthernIsland.UseVisualStyleBackColor = false;
             // 
             // nodeMountain
@@ -120,6 +135,8 @@
             nodeMountain.Size = new Size(14, 13);
             nodeMountain.TabIndex = 6;
             nodeMountain.TabStop = true;
+            nodeMountain.AutoCheck = false;
+            nodeMountain.Enabled = false;
             nodeMountain.UseVisualStyleBackColor = false;
             // 
             // nodeForestPlains
@@ -131,6 +148,8 @@
             nodeForestPlains.Size = new Size(14, 13);
             nodeForestPlains.TabIndex = 7;
             nodeForestPlains.TabStop = true;
+            nodeForestPlains.AutoCheck = false;
+            nodeForestPlains.Enabled = false;
             nodeForestPlains.UseVisualStyleBackColor = false;
             // 
             // nodeNorthernIsland
@@ -142,6 +161,8 @@
             nodeNorthernIsland.Size = new Size(14, 13);
             nodeNorthernIsland.TabIndex = 8;
             nodeNorthernIsland.TabStop = true;
+            nodeNorthernIsland.AutoCheck = false;
+            nodeNorthernIsland.Enabled = false;
             nodeNorthernIsland.UseVisualStyleBackColor = false;
             // 
             // nodeFarCliffs
@@ -153,6 +174,8 @@
             nodeFarCliffs.Size = new Size(14, 13);
             nodeFarCliffs.TabIndex = 9;
             nodeFarCliffs.TabStop = true;
+            nodeFarCliffs.AutoCheck = false;
+            nodeFarCliffs.Enabled = false;
             nodeFarCliffs.UseVisualStyleBackColor = false;
             // 
             // nodeSmallVillage
@@ -164,6 +187,8 @@
             nodeSmallVillage.Size = new Size(14, 13);
             nodeSmallVillage.TabIndex = 10;
             nodeSmallVillage.TabStop = true;
+            nodeSmallVillage.AutoCheck = false;
+            nodeSmallVillage.Enabled = false;
             nodeSmallVillage.UseVisualStyleBackColor = false;
             // 
             // nodeForestValley
@@ -175,6 +200,8 @@
             nodeForestValley.Size = new Size(14, 13);
             nodeForestValley.TabIndex = 11;
             nodeForestValley.TabStop = true;
+            nodeForestValley.AutoCheck = false;
+            nodeForestValley.Enabled = false;
             nodeForestValley.UseVisualStyleBackColor = false;
             // 
             // tabControl1
@@ -188,7 +215,8 @@
             tabControl1.TabIndex = 12;
             // 
             // tabPage1
-            // 
+            //
+            tabPage1.Controls.Add(lstActivities);
             tabPage1.Location = new Point(4, 24);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
@@ -196,9 +224,23 @@
             tabPage1.TabIndex = 0;
             tabPage1.Text = "Activities";
             tabPage1.UseVisualStyleBackColor = true;
+            //
+            // lstActivities
+            //
+            lstActivities.Dock = DockStyle.Fill;
+            lstActivities.FormattingEnabled = true;
+            lstActivities.ItemHeight = 15;
+            lstActivities.Location = new Point(3, 3);
+            lstActivities.Name = "lstActivities";
+            lstActivities.Size = new Size(425, 583);
+            lstActivities.TabIndex = 0;
             // 
             // Travel
-            // 
+            //
+            Travel.Controls.Add(lblTravelInfo);
+            Travel.Controls.Add(travelProgressBar);
+            Travel.Controls.Add(btnBeginTravel);
+            Travel.Controls.Add(lstConnections);
             Travel.Location = new Point(4, 24);
             Travel.Name = "Travel";
             Travel.Padding = new Padding(3);
@@ -206,6 +248,40 @@
             Travel.TabIndex = 1;
             Travel.Text = "Travel";
             Travel.UseVisualStyleBackColor = true;
+            //
+            // lstConnections
+            //
+            lstConnections.FormattingEnabled = true;
+            lstConnections.ItemHeight = 15;
+            lstConnections.Location = new Point(6, 6);
+            lstConnections.Name = "lstConnections";
+            lstConnections.Size = new Size(417, 199);
+            lstConnections.TabIndex = 0;
+            //
+            // btnBeginTravel
+            //
+            btnBeginTravel.Location = new Point(6, 211);
+            btnBeginTravel.Name = "btnBeginTravel";
+            btnBeginTravel.Size = new Size(150, 23);
+            btnBeginTravel.TabIndex = 1;
+            btnBeginTravel.Text = "Begin Travel";
+            btnBeginTravel.UseVisualStyleBackColor = true;
+            btnBeginTravel.Click += btnBeginTravel_Click;
+            //
+            // travelProgressBar
+            //
+            travelProgressBar.Location = new Point(6, 240);
+            travelProgressBar.Name = "travelProgressBar";
+            travelProgressBar.Size = new Size(417, 23);
+            travelProgressBar.TabIndex = 2;
+            //
+            // lblTravelInfo
+            //
+            lblTravelInfo.AutoSize = true;
+            lblTravelInfo.Location = new Point(6, 266);
+            lblTravelInfo.Name = "lblTravelInfo";
+            lblTravelInfo.Size = new Size(0, 15);
+            lblTravelInfo.TabIndex = 3;
             // 
             // NavigationWindow
             // 
@@ -250,5 +326,10 @@
         private TabControl tabControl1;
         private TabPage tabPage1;
         private TabPage Travel;
+        private ListBox lstActivities;
+        private ListBox lstConnections;
+        private Button btnBeginTravel;
+        private ProgressBar travelProgressBar;
+        private Label lblTravelInfo;
     }
 }
