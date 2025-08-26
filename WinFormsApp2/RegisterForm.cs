@@ -60,6 +60,7 @@ namespace WinFormsApp2
             insert.ExecuteNonQuery();
             long newId = insert.LastInsertedId;
 
+
             using (MySqlCommand ensureNode = new MySqlCommand("INSERT IGNORE INTO nodes (id, name) VALUES (@node, @name)", conn))
             {
                 ensureNode.Parameters.AddWithValue("@node", "nodeRiverVillage");

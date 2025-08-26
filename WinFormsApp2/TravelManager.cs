@@ -36,6 +36,8 @@ namespace WinFormsApp2
         {
             _fromNode = fromNode;
             _toNode = toNode;
+            EnsureNodeExists(fromNode);
+            EnsureNodeExists(toNode);
             _originalDays = WorldMapService.GetNode(fromNode).Connections[toNode];
             int days = _originalDays;
             _fasterTravelApplied = hasFasterTravel && days > 1;
@@ -139,6 +141,15 @@ namespace WinFormsApp2
                     _timer.Start();
                 }
             }
+        }
+
+        private static void EnsureNodeExists(string nodeId)
+        {
+            using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            using var cmd = new MySqlCommand("INSERT IGNORE INTO nodes (id) VALUES (@id)", conn);
+            cmd.Parameters.AddWithValue("@id", nodeId);
+            cmd.ExecuteNonQuery();
         }
     }
 }

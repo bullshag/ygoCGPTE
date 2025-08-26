@@ -44,7 +44,15 @@ namespace WinFormsApp2
             _travelManager.TravelCompleted += TravelManager_TravelCompleted;
             _currentNode = GetCurrentNode();
             LoadNode(_currentNode);
+            btnShop.Click += BtnShop_Click;
+            btnGraveyard.Click += BtnGraveyard_Click;
+            btnTavern.Click += BtnTavern_Click;
+            toolTip1.SetToolTip(btnShop, "Buy and sell items");
+            toolTip1.SetToolTip(btnGraveyard, "View and resurrect fallen heroes");
+            toolTip1.SetToolTip(btnTavern, "Recruit new party members");
+
             lstActivities.DoubleClick += LstActivities_DoubleClick;
+
             _travelManager.Resume();
         }
 
@@ -68,11 +76,10 @@ namespace WinFormsApp2
                 rb.Checked = rb.Name == id;
             }
             var node = WorldMapService.GetNode(id);
-            lstActivities.Items.Clear();
-            foreach (var act in node.Activities)
-            {
-                lstActivities.Items.Add(act);
-            }
+            var activities = node.Activities;
+            btnShop.Enabled = activities.Any(a => a.StartsWith("Shop"));
+            btnGraveyard.Enabled = activities.Any(a => a.StartsWith("Graveyard"));
+            btnTavern.Enabled = activities.Any(a => a.Contains("Tavern"));
             lstConnections.Items.Clear();
             foreach (var (dest, days) in WorldMapService.GetConnections(id))
             {
@@ -104,6 +111,23 @@ namespace WinFormsApp2
             lblTravelInfo.Text = "Arrived.";
         }
 
+        private void BtnShop_Click(object? sender, EventArgs e)
+        {
+            using var shop = new ShopForm(_accountId);
+            shop.ShowDialog(this);
+            _refresh();
+            UpdatePartySize();
+        }
+
+        private void BtnGraveyard_Click(object? sender, EventArgs e)
+        {
+            using var grave = new GraveyardForm(_accountId, () => { _refresh(); UpdatePartySize(); });
+            grave.ShowDialog(this);
+        }
+
+        private void BtnTavern_Click(object? sender, EventArgs e)
+        {
+            HandleRecruit();
         private void LstActivities_DoubleClick(object? sender, EventArgs e)
         {
             if (lstActivities.SelectedItem == null) return;
