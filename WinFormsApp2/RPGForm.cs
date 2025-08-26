@@ -10,7 +10,6 @@ namespace WinFormsApp2
     {
         private readonly int _userId;
         private readonly string _nickname;
-        private int _searchCost;
         private int _playerGold;
         private readonly System.Windows.Forms.Timer _chatTimer = new System.Windows.Forms.Timer();
         private readonly System.Windows.Forms.Timer _regenTimer = new System.Windows.Forms.Timer();
@@ -84,52 +83,14 @@ namespace WinFormsApp2
 
             lblTotalExp.Text = $"Party EXP: {totalExp}";
 
-            _searchCost = 100 + totalLevel * 10 + lstParty.Items.Count * 20;
-            if (lstParty.Items.Count == 0)
-            {
-                _searchCost = 0;
-            }
-
             using MySqlCommand goldCmd = new MySqlCommand("SELECT gold FROM users WHERE id=@id", conn);
             goldCmd.Parameters.AddWithValue("@id", _userId);
             object? goldResult = goldCmd.ExecuteScalar();
             _playerGold = goldResult == null ? 0 : Convert.ToInt32(goldResult);
             lblGold.Text = $"Gold: {_playerGold}";
-
-            btnHire.Text = _searchCost > 0
-                ? $"Search for new recruits ({_searchCost} gold)"
-                : "Search for new recruits (free)";
-            btnHire.Enabled = lstParty.Items.Count < 5 && _playerGold >= _searchCost;
             btnInspect.Enabled = false;
             btnInspect.Text = "Inspect";
             btnBattle.Enabled = lstParty.Items.Count > 0;
-        }
-
-        private void btnHire_Click(object? sender, EventArgs e)
-        {
-            if (_playerGold < _searchCost)
-            {
-                MessageBox.Show("Not enough gold to search for recruits.");
-                return;
-            }
-
-            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
-            conn.Open();
-            using MySqlCommand payCmd = new MySqlCommand("UPDATE users SET gold = gold - @cost WHERE id=@id", conn);
-            payCmd.Parameters.AddWithValue("@cost", _searchCost);
-            payCmd.Parameters.AddWithValue("@id", _userId);
-            payCmd.ExecuteNonQuery();
-
-            LoadPartyData();
-
-            var rng = new Random();
-            var candidates = new System.Collections.Generic.List<RecruitCandidate>();
-            for (int i = 0; i < 3; i++)
-            {
-                candidates.Add(RecruitCandidate.Generate(rng, i));
-            }
-            using var recruitForm = new RecruitForm(_userId, candidates, _searchCost, LoadPartyData);
-            recruitForm.ShowDialog(this);
         }
 
         private void lstParty_SelectedIndexChanged(object? sender, EventArgs e)
@@ -274,17 +235,11 @@ namespace WinFormsApp2
             logs.ShowDialog(this);
         }
 
-        private void btnShop_Click(object? sender, EventArgs e)
+        private void btnNavigate_Click(object? sender, EventArgs e)
         {
-            using var shop = new ShopForm(_userId);
-            shop.ShowDialog(this);
+            using var nav = new NavigationWindow(_userId, lstParty.Items.Count, false, LoadPartyData);
+            nav.ShowDialog(this);
             LoadPartyData();
-        }
-
-        private void btnGraveyard_Click(object? sender, EventArgs e)
-        {
-            using var grave = new GraveyardForm(_userId, LoadPartyData);
-            grave.ShowDialog(this);
         }
 
         private void btnInventory_Click(object? sender, EventArgs e)
