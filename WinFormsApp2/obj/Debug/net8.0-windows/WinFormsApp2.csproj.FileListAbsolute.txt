@@ -41,3 +41,5 @@ C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\WinFormsApp2\obj\Debug\net8.0-win
 C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\WinFormsApp2\obj\Debug\net8.0-windows\WinFormsApp2.ShopForm.resources
 C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\WinFormsApp2\obj\Debug\net8.0-windows\WinFormsApp2.GraveyardForm.resources
 C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\WinFormsApp2\obj\Debug\net8.0-windows\WinFormsApp2.RecruitForm.resources
+C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\WinFormsApp2\obj\Debug\net8.0-windows\WinFormsApp2.NavigationWindow.resources
+C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\WinFormsApp2\obj\Debug\net8.0-windows\WinFormsApp2.Properties.Resources.resources

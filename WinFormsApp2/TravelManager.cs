@@ -1,6 +1,7 @@
 using System;
 using System.Timers;
 using MySql.Data.MySqlClient;
+using Timer = System.Timers.Timer;
 
 namespace WinFormsApp2
 {
