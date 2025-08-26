@@ -23,30 +23,32 @@ namespace WinFormsApp2
             lstCandidates = new ListBox();
             btnView = new Button();
             SuspendLayout();
-            //
+            // 
             // lstCandidates
-            //
+            // 
             lstCandidates.FormattingEnabled = true;
             lstCandidates.ItemHeight = 15;
             lstCandidates.Location = new Point(12, 12);
             lstCandidates.Name = "lstCandidates";
             lstCandidates.Size = new Size(200, 94);
-            //
+            lstCandidates.TabIndex = 1;
+            // 
             // btnView
-            //
+            // 
             btnView.Enabled = false;
             btnView.Location = new Point(12, 112);
             btnView.Name = "btnView";
             btnView.Size = new Size(200, 23);
+            btnView.TabIndex = 0;
             btnView.Text = "View Hero";
             btnView.UseVisualStyleBackColor = true;
             btnView.Click += btnView_Click;
-            //
+            // 
             // RecruitForm
-            //
+            // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(224, 147);
+            ClientSize = new Size(224, 141);
             Controls.Add(btnView);
             Controls.Add(lstCandidates);
             Name = "RecruitForm";

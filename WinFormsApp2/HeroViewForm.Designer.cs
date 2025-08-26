@@ -50,117 +50,105 @@ namespace WinFormsApp2
             // lblName
             // 
             lblName.AutoSize = true;
-            lblName.Location = new Point(17, 15);
-            lblName.Margin = new Padding(4, 0, 4, 0);
+            lblName.Location = new Point(12, 9);
             lblName.Name = "lblName";
-            lblName.Size = new Size(63, 25);
+            lblName.Size = new Size(42, 15);
             lblName.TabIndex = 9;
             lblName.Text = "Name:";
             // 
             // txtName
             // 
-            txtName.Location = new Point(100, 10);
-            txtName.Margin = new Padding(4, 5, 4, 5);
+            txtName.Location = new Point(70, 6);
             txtName.Name = "txtName";
-            txtName.Size = new Size(170, 31);
+            txtName.Size = new Size(120, 23);
             txtName.TabIndex = 8;
             // 
             // lblStr
             // 
             lblStr.AutoSize = true;
-            lblStr.Location = new Point(17, 62);
-            lblStr.Margin = new Padding(4, 0, 4, 0);
+            lblStr.Location = new Point(12, 37);
             lblStr.Name = "lblStr";
-            lblStr.Size = new Size(46, 25);
+            lblStr.Size = new Size(29, 15);
             lblStr.TabIndex = 7;
             lblStr.Text = "STR:";
             // 
             // lblDex
             // 
             lblDex.AutoSize = true;
-            lblDex.Location = new Point(17, 110);
-            lblDex.Margin = new Padding(4, 0, 4, 0);
+            lblDex.Location = new Point(12, 66);
             lblDex.Name = "lblDex";
-            lblDex.Size = new Size(49, 25);
+            lblDex.Size = new Size(31, 15);
             lblDex.TabIndex = 6;
             lblDex.Text = "DEX:";
             // 
             // lblInt
             // 
             lblInt.AutoSize = true;
-            lblInt.Location = new Point(17, 158);
-            lblInt.Margin = new Padding(4, 0, 4, 0);
+            lblInt.Location = new Point(12, 95);
             lblInt.Name = "lblInt";
-            lblInt.Size = new Size(43, 25);
+            lblInt.Size = new Size(28, 15);
             lblInt.TabIndex = 5;
             lblInt.Text = "INT:";
-            //
+            // 
             // lblAbility
-            //
+            // 
             lblAbility.AutoSize = true;
-            lblAbility.Location = new Point(17, 206);
-            lblAbility.Margin = new Padding(4, 0, 4, 0);
+            lblAbility.Location = new Point(12, 124);
             lblAbility.Name = "lblAbility";
-            lblAbility.Size = new Size(74, 25);
+            lblAbility.Size = new Size(44, 15);
             lblAbility.TabIndex = 12;
             lblAbility.Text = "Ability:";
-            //
+            // 
             // lblPassive
-            //
+            // 
             lblPassive.AutoSize = true;
-            lblPassive.Location = new Point(17, 246);
-            lblPassive.Margin = new Padding(4, 0, 4, 0);
+            lblPassive.Location = new Point(12, 148);
             lblPassive.Name = "lblPassive";
-            lblPassive.Size = new Size(73, 25);
+            lblPassive.Size = new Size(48, 15);
             lblPassive.TabIndex = 13;
             lblPassive.Text = "Passive:";
             // 
             // numStr
             // 
-            numStr.Location = new Point(100, 58);
-            numStr.Margin = new Padding(4, 5, 4, 5);
+            numStr.Location = new Point(70, 35);
             numStr.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
             numStr.Name = "numStr";
-            numStr.Size = new Size(71, 31);
+            numStr.Size = new Size(50, 23);
             numStr.TabIndex = 4;
             numStr.ValueChanged += StatsChanged;
             // 
             // numDex
             // 
-            numDex.Location = new Point(100, 107);
-            numDex.Margin = new Padding(4, 5, 4, 5);
+            numDex.Location = new Point(70, 64);
             numDex.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
             numDex.Name = "numDex";
-            numDex.Size = new Size(71, 31);
+            numDex.Size = new Size(50, 23);
             numDex.TabIndex = 3;
             numDex.ValueChanged += StatsChanged;
             // 
             // numInt
             // 
-            numInt.Location = new Point(100, 155);
-            numInt.Margin = new Padding(4, 5, 4, 5);
+            numInt.Location = new Point(70, 93);
             numInt.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
             numInt.Name = "numInt";
-            numInt.Size = new Size(71, 31);
+            numInt.Size = new Size(50, 23);
             numInt.TabIndex = 2;
             numInt.ValueChanged += StatsChanged;
             // 
             // lblPoints
             // 
             lblPoints.AutoSize = true;
-            lblPoints.Location = new Point(17, 208);
-            lblPoints.Margin = new Padding(4, 0, 4, 0);
+            lblPoints.Location = new Point(70, 204);
             lblPoints.Name = "lblPoints";
-            lblPoints.Size = new Size(119, 25);
+            lblPoints.Size = new Size(78, 15);
             lblPoints.TabIndex = 1;
             lblPoints.Text = "Points left: 10";
             // 
             // btnHire
             // 
-            btnHire.Location = new Point(17, 255);
-            btnHire.Margin = new Padding(4, 5, 4, 5);
+            btnHire.Location = new Point(8, 222);
             btnHire.Name = "btnHire";
-            btnHire.Size = new Size(286, 38);
+            btnHire.Size = new Size(200, 23);
             btnHire.TabIndex = 0;
             btnHire.Text = "Hire Hero";
             btnHire.UseVisualStyleBackColor = true;
@@ -168,9 +156,9 @@ namespace WinFormsApp2
             // 
             // HeroViewForm
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(315, 311);
+            ClientSize = new Size(220, 257);
             Controls.Add(lblPassive);
             Controls.Add(lblAbility);
             Controls.Add(btnHire);
@@ -183,7 +171,6 @@ namespace WinFormsApp2
             Controls.Add(lblStr);
             Controls.Add(txtName);
             Controls.Add(lblName);
-            Margin = new Padding(4, 5, 4, 5);
             Name = "HeroViewForm";
             Text = "Hero";
             ((System.ComponentModel.ISupportInitialize)numStr).EndInit();
