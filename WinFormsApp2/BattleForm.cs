@@ -20,6 +20,8 @@ namespace WinFormsApp2
         private readonly bool _wildEncounter;
         private readonly bool _arenaBattle;
         private readonly int? _arenaOpponentId;
+        private readonly int? _areaMinLevel;
+        private readonly int? _areaMaxLevel;
         private int _opponentAccountId;
         private bool _cancelled;
         private bool _playersWin;
@@ -48,12 +50,14 @@ namespace WinFormsApp2
             lstLog.SelectedIndex = lstLog.Items.Count - 1;
         }
 
-        public BattleForm(int userId, bool wildEncounter = false, bool arenaBattle = false, int? arenaOpponentId = null)
+        public BattleForm(int userId, bool wildEncounter = false, bool arenaBattle = false, int? arenaOpponentId = null, int? areaMinLevel = null, int? areaMaxLevel = null)
         {
             _userId = userId;
             _wildEncounter = wildEncounter;
             _arenaBattle = arenaBattle;
             _arenaOpponentId = arenaOpponentId;
+            _areaMinLevel = areaMinLevel;
+            _areaMaxLevel = areaMaxLevel;
             InitializeComponent();
             LoadData();
         }
@@ -122,23 +126,23 @@ namespace WinFormsApp2
             }
 
             int totalLevel = _players.Sum(p => p.Level);
-            int minLevel;
-            int maxLevel;
-            if (_wildEncounter)
-            {
-                minLevel = Math.Max(1, (int)Math.Ceiling(totalLevel * 0.8));
-                maxLevel = Math.Max(minLevel, (int)Math.Ceiling(totalLevel * 1.0));
-            }
-            else
-            {
-                minLevel = Math.Max(1, (int)Math.Ceiling(totalLevel * 1.0));
-                maxLevel = Math.Max(minLevel, (int)Math.Ceiling(totalLevel * 1.4));
-            }
+            int avgLevel = _players.Count > 0 ? (int)Math.Ceiling(_players.Average(p => p.Level)) : 1;
+            int areaMin = _areaMinLevel ?? 1;
+            int areaMax = _areaMaxLevel ?? int.MaxValue;
+            int perNpcMin = Math.Max(areaMin, (int)Math.Ceiling(avgLevel * (_wildEncounter ? 0.8 : 1.0)));
+            int perNpcMax = Math.Min(areaMax, (int)Math.Ceiling(avgLevel * (_wildEncounter ? 1.0 : 1.4)));
+            if (perNpcMin > perNpcMax)
+                perNpcMin = perNpcMax = Math.Min(areaMax, perNpcMin);
+            int minTotal = _wildEncounter ? (int)Math.Ceiling(totalLevel * 0.8) : totalLevel;
+            int maxTotal = _wildEncounter ? (int)Math.Ceiling(totalLevel * 1.0) : (int)Math.Ceiling(totalLevel * 1.4);
             int npcLevel = 0;
-            while (_npcs.Count == 0 || npcLevel < minLevel)
+            while (_npcs.Count == 0 || npcLevel < minTotal)
             {
-                using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM npcs WHERE level <= @maxLevel ORDER BY RAND() LIMIT 1", conn);
-                npcCmd.Parameters.AddWithValue("@maxLevel", Math.Max(1, maxLevel - npcLevel));
+                int currentMax = Math.Min(perNpcMax, maxTotal - npcLevel);
+                if (currentMax < perNpcMin) break;
+                using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM npcs WHERE level BETWEEN @minLevel AND @maxLevel ORDER BY RAND() LIMIT 1", conn);
+                npcCmd.Parameters.AddWithValue("@minLevel", perNpcMin);
+                npcCmd.Parameters.AddWithValue("@maxLevel", currentMax);
                 using var r2 = npcCmd.ExecuteReader();
                 if (r2.Read())
                 {
@@ -205,7 +209,9 @@ namespace WinFormsApp2
 
             if (_npcs.Count == 0)
             {
-                using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM npcs ORDER BY level ASC LIMIT 1", conn);
+                using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM npcs WHERE level BETWEEN @minLevel AND @maxLevel ORDER BY level ASC LIMIT 1", conn);
+                npcCmd.Parameters.AddWithValue("@minLevel", perNpcMin);
+                npcCmd.Parameters.AddWithValue("@maxLevel", perNpcMax);
                 using var r2 = npcCmd.ExecuteReader();
                 if (r2.Read())
                 {
