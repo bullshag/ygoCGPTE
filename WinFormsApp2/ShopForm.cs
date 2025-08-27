@@ -11,26 +11,14 @@ namespace WinFormsApp2
     {
         private readonly int _userId;
         private int _playerGold;
-        private readonly List<Item> _shopItems = new()
-        {
-            new HealingPotion(),
-            WeaponFactory.Create("dagger"),
-            WeaponFactory.Create("shortsword"),
-            WeaponFactory.Create("bow"),
-            WeaponFactory.Create("staff"),
-            WeaponFactory.Create("wand"),
-            ArmorFactory.Create("leatherarmor"),
-            ArmorFactory.Create("leathercap"),
-            ArmorFactory.Create("leatherboots"),
-            ArmorFactory.Create("clothrobe"),
-            ArmorFactory.Create("platearmor")
-        };
+        private readonly List<Item> _shopItems;
 
         private readonly ToolTip _tip = new();
 
-        public ShopForm(int userId)
+        public ShopForm(int userId, string nodeId)
         {
             _userId = userId;
+            _shopItems = LootPool.GetShopStock(nodeId);
             InitializeComponent();
             _btnBuy.Click += BtnBuy_Click;
             _btnSell.Click += BtnSell_Click;
@@ -231,14 +219,5 @@ namespace WinFormsApp2
             e.DrawFocusRectangle();
         }
 
-        private void ShopForm_Load_1(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ShopForm_Load_2(object sender, EventArgs e)
-        {
-
-        }
     }
 }

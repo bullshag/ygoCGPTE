@@ -408,7 +408,7 @@ namespace WinFormsApp2
                                 {
                                     _deathCauses[c.Name] = $"{c.Name} succumbed to {eff.Kind}.";
                                 }
-                                c.HpBar.Value = Math.Max(0, c.CurrentHp);
+                                c.HpBar.Value = Math.Min(c.HpBar.Maximum, Math.Max(0, c.CurrentHp));
                                 eff.TimeUntilTickMs += eff.TickIntervalMs;
                             }
                         }
@@ -533,13 +533,13 @@ namespace WinFormsApp2
                     if (ability.Name == "Drain Life")
                     {
                         actor.CurrentHp = Math.Min(actor.MaxHp, actor.CurrentHp + spellDamage);
-                        actor.HpBar.Value = Math.Max(0, actor.CurrentHp);
+                        actor.HpBar.Value = Math.Min(actor.HpBar.Maximum, Math.Max(0, actor.CurrentHp));
                         AppendLog($"{actor.Name} absorbs {spellDamage} health!", actorIsPlayer, true);
                     }
 
                     actor.DamageDone += spellDamage;
                     target.DamageTaken += spellDamage;
-                    target.HpBar.Value = Math.Max(0, target.CurrentHp);
+                    target.HpBar.Value = Math.Min(target.HpBar.Maximum, Math.Max(0, target.CurrentHp));
                     actor.AttackBar.Value = actor.AttackInterval;
                     target.Threat[actor] = target.Threat.GetValueOrDefault(actor) + spellDamage;
                     target.CurrentTarget = actor;
@@ -587,7 +587,7 @@ namespace WinFormsApp2
             AppendLog(attackLog, _players.Contains(actor));
             actor.DamageDone += dmg;
             target.DamageTaken += dmg;
-            target.HpBar.Value = Math.Max(0, target.CurrentHp);
+            target.HpBar.Value = Math.Min(target.HpBar.Maximum, Math.Max(0, target.CurrentHp));
             actor.AttackBar.Value = actor.AttackInterval;
             target.Threat[actor] = target.Threat.GetValueOrDefault(actor) + dmg;
             target.CurrentTarget = actor;
@@ -846,8 +846,8 @@ namespace WinFormsApp2
 
         private void CheckEnd()
         {
-            foreach (var p in _players) p.HpBar.Value = Math.Max(0, p.CurrentHp);
-            foreach (var n in _npcs) n.HpBar.Value = Math.Max(0, n.CurrentHp);
+            foreach (var p in _players) p.HpBar.Value = Math.Min(p.HpBar.Maximum, Math.Max(0, p.CurrentHp));
+            foreach (var n in _npcs) n.HpBar.Value = Math.Min(n.HpBar.Maximum, Math.Max(0, n.CurrentHp));
             if (_players.All(p => p.CurrentHp <= 0) || _npcs.All(n => n.CurrentHp <= 0))
             {
                 foreach (var t in _timers.Values) t.Stop();
@@ -1027,16 +1027,16 @@ namespace WinFormsApp2
             var panel = new Panel { Width = 180, Height = 80 };
             var lbl = new Label { Text = c.Name, AutoSize = true };
             c.HpBar = CloneProgressBar(hpTemplate);
-            c.HpBar.Maximum = c.MaxHp;
-            c.HpBar.Value = c.CurrentHp;
+            c.HpBar.Maximum = Math.Max(1, c.MaxHp);
+            c.HpBar.Value = Math.Min(c.HpBar.Maximum, Math.Max(0, c.CurrentHp));
             c.HpBar.Location = new Point(0, 15);
             panel.Controls.Add(lbl);
             panel.Controls.Add(c.HpBar);
             if (c.MaxMana > 0)
             {
                 c.ManaBar = CloneProgressBar(manaTemplate);
-                c.ManaBar.Maximum = c.MaxMana;
-                c.ManaBar.Value = c.Mana;
+                c.ManaBar.Maximum = Math.Max(1, c.MaxMana);
+                c.ManaBar.Value = Math.Min(c.ManaBar.Maximum, Math.Max(0, c.Mana));
                 c.ManaBar.Location = new Point(0, 35);
                 panel.Controls.Add(c.ManaBar);
                 c.AttackBar = CloneProgressBar(attackTemplate);
