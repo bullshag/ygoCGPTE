@@ -86,6 +86,7 @@ namespace WinFormsApp2
                 rb.Checked = rb.Name == id;
             }
             var node = WorldMapService.GetNode(id);
+            locationLabel.Text = $"Current Location: {node.Name}";
             var activities = node.Activities;
             btnShop.Enabled = activities.Any(a => a.StartsWith("Shop"));
             btnGraveyard.Enabled = activities.Any(a => a.StartsWith("Graveyard"));
