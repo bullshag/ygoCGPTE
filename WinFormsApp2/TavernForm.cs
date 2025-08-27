@@ -67,7 +67,7 @@ namespace WinFormsApp2
                 return;
             }
 
-            using (var payCmd = new MySqlCommand("UPDATE users SET gold = gold - @cost WHERE id=@id", conn))
+            using (var payCmd = new MySqlCommand("UPDATE users SET gold = GREATEST(gold - @cost, 0) WHERE id=@id", conn))
             {
                 payCmd.Parameters.AddWithValue("@cost", _searchCost);
                 payCmd.Parameters.AddWithValue("@id", _accountId);
