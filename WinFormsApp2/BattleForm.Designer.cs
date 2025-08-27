@@ -39,6 +39,9 @@ namespace WinFormsApp2
             pnlPlayers.Name = "pnlPlayers";
             pnlPlayers.Size = new Size(252, 398);
             pnlPlayers.TabIndex = 2;
+            pnlPlayers.AutoScroll = true;
+            pnlPlayers.FlowDirection = FlowDirection.TopDown;
+            pnlPlayers.WrapContents = false;
             // 
             // pnlEnemies
             // 
@@ -47,6 +50,9 @@ namespace WinFormsApp2
             pnlEnemies.Name = "pnlEnemies";
             pnlEnemies.Size = new Size(264, 398);
             pnlEnemies.TabIndex = 1;
+            pnlEnemies.AutoScroll = true;
+            pnlEnemies.FlowDirection = FlowDirection.TopDown;
+            pnlEnemies.WrapContents = false;
             // 
             // lstLog
             //

@@ -13,7 +13,6 @@ namespace WinFormsApp2
         private FlowLayoutPanel pnlParty;
         private Button btnInspect;
         private Button btnFire;
-        private Button btnBattle;
         private Button btnInventory;
         private Button btnLogs;
         private Button btnNavigate;
@@ -53,7 +52,6 @@ namespace WinFormsApp2
             pnlParty = new FlowLayoutPanel();
             btnInspect = new Button();
             btnFire = new Button();
-            btnBattle = new Button();
             btnInventory = new Button();
             btnLogs = new Button();
             btnNavigate = new Button();
@@ -93,6 +91,7 @@ namespace WinFormsApp2
             pnlParty.Size = new Size(260, 154);
             pnlParty.FlowDirection = FlowDirection.TopDown;
             pnlParty.WrapContents = false;
+            pnlParty.AutoScroll = true;
             // 
             // btnInspect
             //
@@ -114,14 +113,6 @@ namespace WinFormsApp2
             btnFire.UseVisualStyleBackColor = true;
             btnFire.Click += btnFire_Click;
             //
-            // btnBattle
-            //
-            btnBattle.Location = new Point(12, 230);
-            btnBattle.Name = "btnBattle";
-            btnBattle.Size = new Size(260, 23);
-            btnBattle.Text = "Find Battle";
-            btnBattle.UseVisualStyleBackColor = true;
-            btnBattle.Click += btnBattle_Click;
             //
             // btnInventory
             //
@@ -268,7 +259,6 @@ namespace WinFormsApp2
             Controls.Add(lblGold);
             Controls.Add(btnLogs);
             Controls.Add(btnInventory);
-            Controls.Add(btnBattle);
             Controls.Add(btnFire);
             Controls.Add(btnInspect);
             Controls.Add(btnNavigate);

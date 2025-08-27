@@ -90,7 +90,6 @@ namespace WinFormsApp2
             lblGold.Text = $"Gold: {_playerGold}";
             btnInspect.Enabled = false;
             btnInspect.Text = "Inspect";
-            btnBattle.Enabled = lstParty.Items.Count > 0;
         }
 
         private void lstParty_SelectedIndexChanged(object? sender, EventArgs e)
@@ -221,12 +220,6 @@ namespace WinFormsApp2
 
             MessageBox.Show($"{name} has been dismissed. You receive {refund} gold.");
             LoadPartyData();
-        }
-
-        private void btnBattle_Click(object? sender, EventArgs e)
-        {
-            using var battle = new BattleForm(_userId);
-            battle.ShowDialog(this);
         }
 
         private void btnLogs_Click(object? sender, EventArgs e)

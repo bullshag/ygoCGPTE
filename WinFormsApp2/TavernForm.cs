@@ -9,7 +9,8 @@ namespace WinFormsApp2
     {
         private readonly int _accountId;
         private readonly Action _onUpdate;
-        private readonly int _searchCost;
+        private int _searchCost;
+        private Button _btnRecruit = null!;
 
         public TavernForm(int accountId, Action onUpdate)
         {
@@ -21,17 +22,15 @@ namespace WinFormsApp2
             FormBorderStyle = FormBorderStyle.FixedDialog;
             StartPosition = FormStartPosition.CenterParent;
 
-            _searchCost = CalculateSearchCost();
-
-            var btnRecruit = new Button
+            _btnRecruit = new Button
             {
-                Text = $"Find Recruits ({_searchCost}g)",
                 Left = 50,
                 Top = 20,
                 Width = 160
             };
-            btnRecruit.Click += BtnRecruit_Click;
-            Controls.Add(btnRecruit);
+            _btnRecruit.Click += BtnRecruit_Click;
+            Controls.Add(_btnRecruit);
+            RefreshSearchCost();
 
             var btnJoin = new Button { Text = "Join Another Party", Left = 50, Top = 60, Width = 160 };
             btnJoin.Click += (s, e) => MessageBox.Show("Joining parties not yet implemented.");
@@ -44,6 +43,14 @@ namespace WinFormsApp2
 
         private void BtnRecruit_Click(object? sender, EventArgs e)
         {
+            _searchCost = CalculateSearchCost(out int partyCount);
+            if (partyCount >= 5)
+            {
+                MessageBox.Show("Party is full. Release a member before recruiting.");
+                RefreshSearchCost();
+                return;
+            }
+
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
 
@@ -74,13 +81,34 @@ namespace WinFormsApp2
                 candidates.Add(RecruitCandidate.Generate(rng, i));
             }
 
-            using var recruitForm = new RecruitForm(_accountId, candidates, _searchCost, _onUpdate);
+            using var recruitForm = new RecruitForm(_accountId, candidates, () => _searchCost, OnHire);
             recruitForm.ShowDialog(this);
         }
 
-        private int CalculateSearchCost()
+        private void OnHire()
         {
-            int partyCount = 0;
+            _onUpdate();
+            RefreshSearchCost();
+        }
+
+        private void RefreshSearchCost()
+        {
+            _searchCost = CalculateSearchCost(out int partyCount);
+            if (partyCount >= 5)
+            {
+                _btnRecruit.Text = "Party Full";
+                _btnRecruit.Enabled = false;
+            }
+            else
+            {
+                _btnRecruit.Text = $"Find Recruits ({_searchCost}g)";
+                _btnRecruit.Enabled = true;
+            }
+        }
+
+        private int CalculateSearchCost(out int partyCount)
+        {
+            partyCount = 0;
             int totalLevel = 0;
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();

@@ -8,14 +8,14 @@ namespace WinFormsApp2
     {
         private readonly List<RecruitCandidate> _candidates;
         private readonly int _userId;
-        private readonly int _searchCost;
+        private readonly Func<int> _getSearchCost;
         private readonly Action _onHire;
 
-        public RecruitForm(int userId, List<RecruitCandidate> candidates, int searchCost, Action onHire)
+        public RecruitForm(int userId, List<RecruitCandidate> candidates, Func<int> getSearchCost, Action onHire)
         {
             _userId = userId;
             _candidates = candidates;
-            _searchCost = searchCost;
+            _getSearchCost = getSearchCost;
             _onHire = onHire;
             InitializeComponent();
             foreach (var c in _candidates)
@@ -32,7 +32,7 @@ namespace WinFormsApp2
         {
             if (lstCandidates.SelectedIndex < 0) return;
             var candidate = _candidates[lstCandidates.SelectedIndex];
-            using var view = new HeroViewForm(_userId, candidate, _searchCost);
+            using var view = new HeroViewForm(_userId, candidate, _getSearchCost());
             if (view.ShowDialog(this) == DialogResult.OK)
             {
                 int index = lstCandidates.SelectedIndex;
