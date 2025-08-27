@@ -15,6 +15,7 @@ namespace WinFormsApp2
         private Button btnCreateAccount = null!;
         private Label lblUsername = null!;
         private Label lblPassword = null!;
+        private CheckBox chkDebugMode = null!;
 
         /// <summary>
         ///  Clean up any resources being used.
@@ -43,6 +44,7 @@ namespace WinFormsApp2
             btnCreateAccount = new Button();
             lblUsername = new Label();
             lblPassword = new Label();
+            chkDebugMode = new CheckBox();
             SuspendLayout();
             // 
             // lblUsername
@@ -97,12 +99,23 @@ namespace WinFormsApp2
             btnCreateAccount.Text = "Create Account";
             btnCreateAccount.UseVisualStyleBackColor = true;
             btnCreateAccount.Click += btnCreateAccount_Click;
-            // 
+            //
+            // chkDebugMode
+            //
+            chkDebugMode.AutoSize = true;
+            chkDebugMode.Location = new Point(30, 179);
+            chkDebugMode.Name = "chkDebugMode";
+            chkDebugMode.Size = new Size(129, 19);
+            chkDebugMode.TabIndex = 6;
+            chkDebugMode.Text = "Enable debug mode";
+            chkDebugMode.UseVisualStyleBackColor = true;
+            //
             // Form1
-            // 
+            //
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(264, 211);
+            Controls.Add(chkDebugMode);
             Controls.Add(btnCreateAccount);
             Controls.Add(btnLogin);
             Controls.Add(txtPassword);

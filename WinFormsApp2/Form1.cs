@@ -15,6 +15,7 @@ namespace WinFormsApp2
 
         private void btnLogin_Click(object? sender, EventArgs e)
         {
+            DatabaseConfig.DebugMode = chkDebugMode.Checked;
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
             using MySqlCommand cmd = new MySqlCommand("SELECT id, nickname FROM Users WHERE Username=@u AND PasswordHash=@p", conn);
