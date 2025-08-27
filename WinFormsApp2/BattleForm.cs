@@ -17,6 +17,7 @@ namespace WinFormsApp2
         private readonly int _userId;
         private readonly System.Windows.Forms.Timer _progressTimer = new System.Windows.Forms.Timer();
         private readonly Dictionary<string, string> _deathCauses = new();
+        private readonly bool _wildEncounter;
 
         private class LogEntry
         {
@@ -37,9 +38,10 @@ namespace WinFormsApp2
             lstLog.SelectedIndex = lstLog.Items.Count - 1;
         }
 
-        public BattleForm(int userId)
+        public BattleForm(int userId, bool wildEncounter = false)
         {
             _userId = userId;
+            _wildEncounter = wildEncounter;
             InitializeComponent();
             LoadData();
         }
@@ -102,8 +104,18 @@ namespace WinFormsApp2
             }
 
             int totalLevel = _players.Sum(p => p.Level);
-            int minLevel = Math.Max(1, (int)Math.Ceiling(totalLevel * 1.0));
-            int maxLevel = Math.Max(minLevel, (int)Math.Ceiling(totalLevel * 1.4));
+            int minLevel;
+            int maxLevel;
+            if (_wildEncounter)
+            {
+                minLevel = Math.Max(1, (int)Math.Ceiling(totalLevel * 0.8));
+                maxLevel = Math.Max(minLevel, (int)Math.Ceiling(totalLevel * 1.0));
+            }
+            else
+            {
+                minLevel = Math.Max(1, (int)Math.Ceiling(totalLevel * 1.0));
+                maxLevel = Math.Max(minLevel, (int)Math.Ceiling(totalLevel * 1.4));
+            }
             int npcLevel = 0;
             while (_npcs.Count == 0 || npcLevel < minLevel)
             {

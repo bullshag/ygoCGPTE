@@ -9,6 +9,7 @@ namespace WinFormsApp2
     {
         private readonly int _accountId;
         private readonly Action _onUpdate;
+        private readonly int _searchCost;
 
         public TavernForm(int accountId, Action onUpdate)
         {
@@ -20,7 +21,15 @@ namespace WinFormsApp2
             FormBorderStyle = FormBorderStyle.FixedDialog;
             StartPosition = FormStartPosition.CenterParent;
 
-            var btnRecruit = new Button { Text = "Find Recruits", Left = 50, Top = 20, Width = 160 };
+            _searchCost = CalculateSearchCost();
+
+            var btnRecruit = new Button
+            {
+                Text = $"Find Recruits ({_searchCost}g)",
+                Left = 50,
+                Top = 20,
+                Width = 160
+            };
             btnRecruit.Click += BtnRecruit_Click;
             Controls.Add(btnRecruit);
 
@@ -35,29 +44,17 @@ namespace WinFormsApp2
 
         private void BtnRecruit_Click(object? sender, EventArgs e)
         {
-            int partyCount = 0;
-            int totalLevel = 0;
-            int playerGold;
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using (var cmd = new MySqlCommand("SELECT level FROM characters WHERE account_id=@id AND is_dead=0", conn))
-            {
-                cmd.Parameters.AddWithValue("@id", _accountId);
-                using var reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    partyCount++;
-                    totalLevel += reader.GetInt32("level");
-                }
-            }
+
+            int playerGold;
             using (var goldCmd = new MySqlCommand("SELECT gold FROM users WHERE id=@id", conn))
             {
                 goldCmd.Parameters.AddWithValue("@id", _accountId);
                 playerGold = Convert.ToInt32(goldCmd.ExecuteScalar() ?? 0);
             }
 
-            int searchCost = partyCount == 0 ? 0 : 100 + totalLevel * 10 + partyCount * 20;
-            if (playerGold < searchCost)
+            if (playerGold < _searchCost)
             {
                 MessageBox.Show("Not enough gold to search for recruits.");
                 return;
@@ -65,7 +62,7 @@ namespace WinFormsApp2
 
             using (var payCmd = new MySqlCommand("UPDATE users SET gold = gold - @cost WHERE id=@id", conn))
             {
-                payCmd.Parameters.AddWithValue("@cost", searchCost);
+                payCmd.Parameters.AddWithValue("@cost", _searchCost);
                 payCmd.Parameters.AddWithValue("@id", _accountId);
                 payCmd.ExecuteNonQuery();
             }
@@ -76,8 +73,26 @@ namespace WinFormsApp2
             {
                 candidates.Add(RecruitCandidate.Generate(rng, i));
             }
-            using var recruitForm = new RecruitForm(_accountId, candidates, searchCost, _onUpdate);
+
+            using var recruitForm = new RecruitForm(_accountId, candidates, _searchCost, _onUpdate);
             recruitForm.ShowDialog(this);
+        }
+
+        private int CalculateSearchCost()
+        {
+            int partyCount = 0;
+            int totalLevel = 0;
+            using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            using var cmd = new MySqlCommand("SELECT level FROM characters WHERE account_id=@id AND is_dead=0", conn);
+            cmd.Parameters.AddWithValue("@id", _accountId);
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                partyCount++;
+                totalLevel += reader.GetInt32("level");
+            }
+            return partyCount == 0 ? 0 : 100 + totalLevel * 10 + partyCount * 20;
         }
     }
 }

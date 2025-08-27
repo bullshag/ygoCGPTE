@@ -42,6 +42,7 @@ namespace WinFormsApp2
             _travelManager = new TravelManager(_accountId);
             _travelManager.ProgressChanged += TravelManager_ProgressChanged;
             _travelManager.TravelCompleted += TravelManager_TravelCompleted;
+            _travelManager.AmbushEncounter += TravelManager_AmbushEncounter;
             _currentNode = GetCurrentNode();
             LoadNode(_currentNode);
             lstConnections.SelectedIndexChanged += LstConnections_SelectedIndexChanged;
@@ -201,6 +202,16 @@ namespace WinFormsApp2
             using var cmd = new MySqlCommand("SELECT COUNT(*) FROM characters WHERE account_id=@id AND is_dead=0", conn);
             cmd.Parameters.AddWithValue("@id", _accountId);
             _partySize = Convert.ToInt32(cmd.ExecuteScalar());
+        }
+
+        private void TravelManager_AmbushEncounter()
+        {
+            lblTravelInfo.Text = "Ambushed by wild enemies!";
+            using var battle = new BattleForm(_accountId, true);
+            battle.ShowDialog(this);
+            _refresh();
+            UpdatePartySize();
+            _travelManager.ResumeAfterEncounter();
         }
     }
 }
