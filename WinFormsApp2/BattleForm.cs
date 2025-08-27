@@ -396,7 +396,10 @@ namespace WinFormsApp2
                             if (eff.Kind == EffectKind.HoT)
                             {
                                 c.CurrentHp = Math.Min(c.MaxHp, c.CurrentHp + eff.AmountPerTick);
-                                AppendLog($"{c.Name} is healed for {eff.AmountPerTick}.", eff.SourceIsPlayer, true);
+                                if (!string.IsNullOrEmpty(eff.SourceName))
+                                    AppendLog($"{eff.SourceName} heals {c.Name} for {eff.AmountPerTick}.", eff.SourceIsPlayer, true);
+                                else
+                                    AppendLog($"{c.Name} is healed for {eff.AmountPerTick}.", eff.SourceIsPlayer, true);
                             }
                             else if (eff.Kind != EffectKind.Shield)
                             {
@@ -481,8 +484,15 @@ namespace WinFormsApp2
             var ability = ChooseAbility(actor);
             if (ability.Name == "Regenerate" || ability.Name == "Heal")
             {
-                target = ChooseHealerTarget(actor, allies);
-                if (target == null) return;
+                if (actor.Role == "Healer")
+                {
+                    target = ChooseHealerTarget(actor, allies);
+                    if (target == null) return;
+                }
+                else
+                {
+                    target = actor;
+                }
             }
             else
             {
@@ -654,7 +664,7 @@ namespace WinFormsApp2
         private void ApplyHot(Creature actor, Creature target)
         {
             int amt = (int)Math.Max(1, 1 + target.Intelligence * 0.80);
-            target.Effects.Add(new StatusEffect { Kind = EffectKind.HoT, RemainingMs = 6000, TickIntervalMs = 3000, TimeUntilTickMs = 3000, AmountPerTick = amt, SourceIsPlayer = _players.Contains(actor) });
+            target.Effects.Add(new StatusEffect { Kind = EffectKind.HoT, RemainingMs = 6000, TickIntervalMs = 3000, TimeUntilTickMs = 3000, AmountPerTick = amt, SourceIsPlayer = _players.Contains(actor), SourceName = actor.Name });
         }
 
         private void ApplyTaunt(Creature actor, List<Creature> opponents)
@@ -1006,6 +1016,7 @@ namespace WinFormsApp2
             public int TimeUntilTickMs { get; set; }
             public int AmountPerTick { get; set; }
             public bool SourceIsPlayer { get; set; }
+            public string? SourceName { get; set; }
         }
 
         private void BuildPanels()
