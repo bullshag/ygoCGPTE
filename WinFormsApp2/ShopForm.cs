@@ -135,7 +135,7 @@ namespace WinFormsApp2
             }
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using MySqlCommand cmd = new MySqlCommand("UPDATE users SET gold = gold - @cost WHERE id=@id", conn);
+            using MySqlCommand cmd = new MySqlCommand("UPDATE users SET gold = GREATEST(gold - @cost, 0) WHERE id=@id", conn);
             cmd.Parameters.AddWithValue("@cost", proto.Price);
             cmd.Parameters.AddWithValue("@id", _userId);
             cmd.ExecuteNonQuery();
