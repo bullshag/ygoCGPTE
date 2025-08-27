@@ -522,19 +522,19 @@ namespace WinFormsApp2
                 {
                     foreach (var o in opponents.Where(o => o.CurrentHp > 0))
                     {
-                        int dmg = CalculateSpellDamage(actor, o, ability);
-                        ApplyShieldReduction(o, ref dmg);
-                        o.CurrentHp -= dmg;
-                        string spellLog = $"{actor.Name}'s {ability.Name} hits {o.Name} for {dmg} damage!";
+                        int damage = CalculateSpellDamage(actor, o, ability);
+                        ApplyShieldReduction(o, ref damage);
+                        o.CurrentHp -= damage;
+                        string spellLog = $"{actor.Name}'s {ability.Name} hits {o.Name} for {damage} damage!";
                         if (o.CurrentHp <= 0 && _players.Contains(o) && !_deathCauses.ContainsKey(o.Name))
                         {
                             _deathCauses[o.Name] = spellLog;
                         }
                         AppendLog(spellLog, actorIsPlayer);
-                        actor.DamageDone += dmg;
-                        o.DamageTaken += dmg;
+                        actor.DamageDone += damage;
+                        o.DamageTaken += damage;
                         o.HpBar.Value = Math.Min(o.HpBar.Maximum, Math.Max(0, o.CurrentHp));
-                        o.Threat[actor] = o.Threat.GetValueOrDefault(actor) + dmg;
+                        o.Threat[actor] = o.Threat.GetValueOrDefault(actor) + damage;
                         o.CurrentTarget = actor;
                     }
                     actor.AttackBar.Value = actor.AttackInterval;
