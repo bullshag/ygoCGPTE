@@ -150,6 +150,8 @@ namespace WinFormsApp2
                     string name = r2.GetString("name");
                     int currentHp = r2.GetInt32("current_hp");
                     int maxHp = r2.GetInt32("max_hp");
+                    currentHp *= 3;
+                    maxHp *= 3;
                     int mana = r2.GetInt32("mana");
                     int strength = r2.GetInt32("strength");
                     int dex = r2.GetInt32("dex");
@@ -219,6 +221,8 @@ namespace WinFormsApp2
                     int level = r2.GetInt32("level");
                     int currentHp = r2.GetInt32("current_hp");
                     int maxHp = r2.GetInt32("max_hp");
+                    currentHp *= 3;
+                    maxHp *= 3;
                     int mana = r2.GetInt32("mana");
                     int strength = r2.GetInt32("strength");
                     int dex = r2.GetInt32("dex");
@@ -306,8 +310,8 @@ namespace WinFormsApp2
                     {
                         Name = r.GetString("name"),
                         Level = r.GetInt32("level"),
-                        CurrentHp = r.GetInt32("current_hp"),
-                        MaxHp = r.GetInt32("max_hp"),
+                        CurrentHp = r.GetInt32("current_hp") * 3,
+                        MaxHp = r.GetInt32("max_hp") * 3,
                         Mana = r.GetInt32("mana"),
                         MaxMana = 10 + 5 * intel,
                         Strength = r.GetInt32("strength"),
