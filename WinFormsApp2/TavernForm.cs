@@ -112,7 +112,7 @@ namespace WinFormsApp2
             int totalLevel = 0;
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using var cmd = new MySqlCommand("SELECT level FROM characters WHERE account_id=@id AND is_dead=0", conn);
+            using var cmd = new MySqlCommand("SELECT level FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0", conn);
             cmd.Parameters.AddWithValue("@id", _accountId);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())

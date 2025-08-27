@@ -67,7 +67,10 @@ namespace WinFormsApp2
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
 
-            using var cmd = new MySqlCommand("SELECT id, name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM characters WHERE account_id=@id AND is_dead=0", conn);
+            string playerQuery = _arenaBattle
+                ? "SELECT id, name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=1"
+                : "SELECT id, name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0";
+            using var cmd = new MySqlCommand(playerQuery, conn);
             cmd.Parameters.AddWithValue("@id", _userId);
 
             var playerIds = new Dictionary<Creature, int>();
@@ -293,7 +296,7 @@ namespace WinFormsApp2
             }
             _opponentAccountId = oppId;
             InventoryService.Load(oppId);
-            using var cmd = new MySqlCommand("SELECT id, name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM characters WHERE account_id=@aid AND is_dead=0", conn);
+            using var cmd = new MySqlCommand("SELECT id, name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM characters WHERE account_id=@aid AND is_dead=0 AND in_arena=1", conn);
             cmd.Parameters.AddWithValue("@aid", oppId);
             var npcIds = new Dictionary<Creature, int>();
             using (var r = cmd.ExecuteReader())
@@ -1022,9 +1025,10 @@ namespace WinFormsApp2
             if (partySize <= 0) return;
             int expGain = totalEnemyLevels * 20;
             int expPer = expGain / partySize;
-            using var updateCmd = new MySqlCommand("UPDATE characters SET experience_points = experience_points + @exp WHERE account_id=@id", conn);
+            using var updateCmd = new MySqlCommand("UPDATE characters SET experience_points = experience_points + @exp WHERE account_id=@id AND is_dead=0 AND in_arena=@arena", conn);
             updateCmd.Parameters.AddWithValue("@exp", expPer);
             updateCmd.Parameters.AddWithValue("@id", _userId);
+            updateCmd.Parameters.AddWithValue("@arena", _arenaBattle ? 1 : 0);
             updateCmd.ExecuteNonQuery();
             AppendLog($"Each party member gains {expPer} EXP!", true);
         }
@@ -1182,7 +1186,7 @@ namespace WinFormsApp2
                 }
                 string cause = _deathCauses.GetValueOrDefault(p.Name, "Unknown");
                 DialogResult res = MessageBox.Show($"Send {p.Name}'s body to the nearest graveyard?", "Graveyard", MessageBoxButtons.YesNo);
-                using (var deadCmd = new MySqlCommand("UPDATE characters SET is_dead=1 WHERE account_id=@id AND name=@name", conn))
+                using (var deadCmd = new MySqlCommand("UPDATE characters SET is_dead=1, in_arena=0 WHERE account_id=@id AND name=@name", conn))
                 {
                     deadCmd.Parameters.AddWithValue("@id", _userId);
                     deadCmd.Parameters.AddWithValue("@name", p.Name);
