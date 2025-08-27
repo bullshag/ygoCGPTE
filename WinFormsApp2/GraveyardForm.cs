@@ -89,7 +89,7 @@ namespace WinFormsApp2
             pay.Parameters.AddWithValue("@c", cost);
             pay.Parameters.AddWithValue("@id", _userId);
             pay.ExecuteNonQuery();
-            using var res = new MySqlCommand("UPDATE characters SET is_dead=0, in_graveyard=0, current_hp=max_hp, cause_of_death=NULL, death_time=NULL WHERE id=@cid", conn);
+            using var res = new MySqlCommand("UPDATE characters SET is_dead=0, in_graveyard=0, in_arena=0, current_hp=max_hp, cause_of_death=NULL, death_time=NULL WHERE id=@cid", conn);
             res.Parameters.AddWithValue("@cid", d.Id);
             res.ExecuteNonQuery();
             MessageBox.Show($"{d.Name} has been resurrected!");
