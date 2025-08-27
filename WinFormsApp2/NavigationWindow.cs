@@ -32,6 +32,18 @@ namespace WinFormsApp2
             public override string ToString() => _display;
         }
 
+        private class EnemyListItem
+        {
+            public EnemyInfo Info { get; }
+            private readonly string _display;
+            public EnemyListItem(EnemyInfo info, int kills)
+            {
+                Info = info;
+                _display = kills >= 25 ? $"{info.Name} {Math.Min(kills,25)}/25" : $"?????? {Math.Min(kills,25)}/25";
+            }
+            public override string ToString() => _display;
+        }
+
         public NavigationWindow(int accountId, int partySize, bool hasBlessing, Action refresh)
         {
             _accountId = accountId;
@@ -46,6 +58,7 @@ namespace WinFormsApp2
             _currentNode = GetCurrentNode();
             LoadNode(_currentNode);
             lstConnections.SelectedIndexChanged += LstConnections_SelectedIndexChanged;
+            knownEnemyList.SelectedIndexChanged += KnownEnemyList_SelectedIndexChanged;
             btnShop.Click += BtnShop_Click;
             btnGraveyard.Click += BtnGraveyard_Click;
             btnTavern.Click += BtnTavern_Click;
@@ -103,6 +116,50 @@ namespace WinFormsApp2
             lblTravelInfo.Text = string.Empty;
             rtbNodeDescription.Text = node.Description;
             btnBeginTravel.Text = "Begin Travel";
+            PopulateKnownEnemies();
+        }
+
+        private void PopulateKnownEnemies()
+        {
+            knownEnemyList.Items.Clear();
+            enemyInfo.Clear();
+            var node = WorldMapService.GetNode(_currentNode);
+            if (!node.MinEnemyLevel.HasValue) return;
+            int min = node.MinEnemyLevel.Value;
+            int max = node.MaxEnemyLevel ?? int.MaxValue;
+            foreach (var info in EnemyKnowledgeService.GetEnemiesForArea(min, max))
+            {
+                int kills = EnemyKnowledgeService.GetKillCount(_accountId, info.Name);
+                knownEnemyList.Items.Add(new EnemyListItem(info, kills));
+            }
+        }
+
+        private void KnownEnemyList_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            if (knownEnemyList.SelectedItem is EnemyListItem item)
+            {
+                int kills = EnemyKnowledgeService.GetKillCount(_accountId, item.Info.Name);
+                if (kills >= 25)
+                {
+                    var sb = new StringBuilder();
+                    sb.AppendLine($"Name: {item.Info.Name}");
+                    sb.AppendLine($"Level: {item.Info.Level}");
+                    sb.AppendLine(item.Info.Description);
+                    if (item.Info.Skills.Count > 0)
+                    {
+                        sb.AppendLine("Skills:");
+                        foreach (var abil in item.Info.Skills)
+                        {
+                            sb.AppendLine($"- {abil.Name}: {abil.Description}");
+                        }
+                    }
+                    enemyInfo.Text = sb.ToString();
+                }
+                else
+                {
+                    enemyInfo.Text = "Unknown enemy.";
+                }
+            }
         }
 
         private void btnBeginTravel_Click(object? sender, EventArgs e)
@@ -174,6 +231,7 @@ namespace WinFormsApp2
             battle.ShowDialog(this);
             _refresh();
             UpdatePartySize();
+            LoadNode(_currentNode);
         }
 
         private void BtnArena_Click(object? sender, EventArgs e)
@@ -213,6 +271,7 @@ namespace WinFormsApp2
             battle.ShowDialog(this);
             _refresh();
             UpdatePartySize();
+            LoadNode(_currentNode);
             _travelManager.ResumeAfterEncounter();
         }
     }

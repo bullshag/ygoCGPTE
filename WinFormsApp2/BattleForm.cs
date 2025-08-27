@@ -939,6 +939,10 @@ namespace WinFormsApp2
                 if (playersWin)
                 {
                     AwardExperience(_npcs.Sum(n => n.Level));
+                    foreach (var npc in _npcs)
+                    {
+                        EnemyKnowledgeService.RecordKill(_userId, npc.Name);
+                    }
                     var loot = LootService.GenerateLoot(_npcs.Select(n => (n.Name, n.Level)), _userId);
                     if (loot.Count > 0)
                     {
