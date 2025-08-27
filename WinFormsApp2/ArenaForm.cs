@@ -79,12 +79,14 @@ namespace WinFormsApp2
             using var r = cmd.ExecuteReader();
             while (r.Read())
             {
-                _lstTeams.Items.Add(new ArenaTeam
+                var team = new ArenaTeam
                 {
                     AccountId = r.GetInt32("account_id"),
                     Wins = r.GetInt32("wins"),
                     Nickname = r.GetString("nickname")
-                });
+                };
+                team.Power = GetTeamPower(team.AccountId);
+                _lstTeams.Items.Add(team);
             }
             UpdateButtons();
         }
@@ -144,10 +146,32 @@ namespace WinFormsApp2
         {
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using var cmd = new MySqlCommand("SELECT SUM(level) FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=1", conn);
-            cmd.Parameters.AddWithValue("@id", accountId);
-            object? result = cmd.ExecuteScalar();
-            return result == null || result == DBNull.Value ? 0 : Convert.ToInt32(result);
+            int totalLevel;
+            using (var lvlCmd = new MySqlCommand("SELECT IFNULL(SUM(level),0) FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=1", conn))
+            {
+                lvlCmd.Parameters.AddWithValue("@id", accountId);
+                totalLevel = Convert.ToInt32(lvlCmd.ExecuteScalar());
+            }
+            int equipCost = 0;
+            using (var eqCmd = new MySqlCommand("SELECT item_name FROM character_equipment WHERE account_id=@id", conn))
+            {
+                eqCmd.Parameters.AddWithValue("@id", accountId);
+                using var er = eqCmd.ExecuteReader();
+                while (er.Read())
+                {
+                    string itemName = er.GetString("item_name");
+                    var item = InventoryService.CreateItem(itemName);
+                    if (item != null)
+                        equipCost += item.Price;
+                }
+            }
+            int skillCount;
+            using (var sCmd = new MySqlCommand("SELECT COUNT(*) FROM character_abilities ca JOIN characters c ON ca.character_id=c.id WHERE c.account_id=@id AND c.is_dead=0 AND in_arena=1", conn))
+            {
+                sCmd.Parameters.AddWithValue("@id", accountId);
+                skillCount = Convert.ToInt32(sCmd.ExecuteScalar() ?? 0);
+            }
+            return (int)Math.Ceiling((totalLevel + equipCost + 3 * skillCount) * 0.15);
         }
 
         private void LstTeams_MouseMove(object? sender, MouseEventArgs e)
@@ -155,8 +179,7 @@ namespace WinFormsApp2
             int index = _lstTeams.IndexFromPoint(e.Location);
             if (index >= 0 && _lstTeams.Items[index] is ArenaTeam team)
             {
-                int power = GetTeamPower(team.AccountId);
-                _tip.Show($"Power: {power}", _lstTeams, e.Location + new Size(15, 15));
+                _tip.Show($"Power: {team.Power}", _lstTeams, e.Location + new Size(15, 15));
             }
             else
             {
@@ -204,8 +227,9 @@ namespace WinFormsApp2
         {
             public int AccountId { get; set; }
             public int Wins { get; set; }
+            public int Power { get; set; }
             public string Nickname { get; set; } = string.Empty;
-            public override string ToString() => $"{Nickname}'s team ({Wins} wins)";
+            public override string ToString() => $"{Nickname}'s team (Power {Power}, {Wins} wins)";
         }
     }
 }

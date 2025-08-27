@@ -139,13 +139,12 @@ namespace WinFormsApp2
             int minTotal = _wildEncounter ? (int)Math.Ceiling(totalLevel * 0.8) : totalLevel;
             int maxTotal = _wildEncounter ? (int)Math.Ceiling(totalLevel * 1.0) : (int)Math.Ceiling(totalLevel * 1.4);
             int npcLevel = 0;
-            while (_npcs.Count == 0 || npcLevel < minTotal)
+
+            Creature? AddNpc(int minLevel, int maxLevel)
             {
-                int currentMax = Math.Min(perNpcMax, maxTotal - npcLevel);
-                if (currentMax < perNpcMin) break;
                 using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM npcs WHERE level BETWEEN @minLevel AND @maxLevel ORDER BY RAND() LIMIT 1", conn);
-                npcCmd.Parameters.AddWithValue("@minLevel", perNpcMin);
-                npcCmd.Parameters.AddWithValue("@maxLevel", currentMax);
+                npcCmd.Parameters.AddWithValue("@minLevel", minLevel);
+                npcCmd.Parameters.AddWithValue("@maxLevel", maxLevel);
                 using var r2 = npcCmd.ExecuteReader();
                 if (r2.Read())
                 {
@@ -203,75 +202,34 @@ namespace WinFormsApp2
                         npc.Abilities.Add(new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0, Slot = 1 });
                     _npcs.Add(npc);
                     npcLevel += level;
+                    return npc;
                 }
-                else
-                {
-                    break;
-                }
+                return null;
+            }
+
+            int strongMin = Math.Max(perNpcMin, (int)Math.Ceiling(avgLevel * 1.2));
+            int strongMax = Math.Min(perNpcMax, (int)Math.Ceiling(avgLevel * 1.5));
+            AddNpc(strongMin, strongMax);
+
+            int weakerCount = _rng.Next(1, 3);
+            for (int i = 0; i < weakerCount && npcLevel < maxTotal; i++)
+            {
+                int remaining = maxTotal - npcLevel;
+                int weakMax = Math.Min(avgLevel, remaining);
+                if (weakMax < perNpcMin) break;
+                AddNpc(perNpcMin, weakMax);
+            }
+
+            while (npcLevel < minTotal)
+            {
+                int remaining = maxTotal - npcLevel;
+                if (remaining < perNpcMin) break;
+                AddNpc(perNpcMin, Math.Min(avgLevel, remaining));
             }
 
             if (_npcs.Count == 0)
             {
-                using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM npcs WHERE level BETWEEN @minLevel AND @maxLevel ORDER BY level ASC LIMIT 1", conn);
-                npcCmd.Parameters.AddWithValue("@minLevel", perNpcMin);
-                npcCmd.Parameters.AddWithValue("@maxLevel", perNpcMax);
-                using var r2 = npcCmd.ExecuteReader();
-                if (r2.Read())
-                {
-                    string name = r2.GetString("name");
-                    int level = r2.GetInt32("level");
-                    int currentHp = r2.GetInt32("current_hp");
-                    int maxHp = r2.GetInt32("max_hp");
-                    int mana = r2.GetInt32("mana");
-                    int strength = r2.GetInt32("strength");
-                    int dex = r2.GetInt32("dex");
-                    int intelligence = r2.GetInt32("intelligence");
-                    int action = r2.GetInt32("action_speed");
-                    int meleeDef = r2.GetInt32("melee_defense");
-                    int magicDef = r2.GetInt32("magic_defense");
-                    string role = r2.GetString("role");
-                    string style = r2.GetString("targeting_style");
-                    r2.Close();
-                    var npc = new Creature
-                    {
-                        Name = name,
-                        Level = level,
-                        CurrentHp = currentHp,
-                        MaxHp = maxHp,
-                        Mana = mana,
-                        MaxMana = 10 + 5 * intelligence,
-                        Strength = strength,
-                        Dex = dex,
-                        Intelligence = intelligence,
-                        ActionSpeed = action,
-                        MeleeDefense = meleeDef,
-                        MagicDefense = magicDef,
-                        Role = role,
-                        TargetingStyle = style
-                    };
-                    using var abilCmd = new MySqlCommand(@"SELECT slot, priority, a.id, a.name, a.description, a.cost, a.cooldown
-                                                          FROM npc_abilities na
-                                                          JOIN abilities a ON na.ability_id = a.id
-                                                          WHERE na.npc_name=@n", conn);
-                    abilCmd.Parameters.AddWithValue("@n", name);
-                    using var abilR = abilCmd.ExecuteReader();
-                    while (abilR.Read())
-                    {
-                        npc.Abilities.Add(new Ability
-                        {
-                            Slot = abilR.GetInt32("slot"),
-                            Priority = abilR.GetInt32("priority"),
-                            Id = abilR.GetInt32("id"),
-                            Name = abilR.GetString("name"),
-                            Description = abilR.GetString("description"),
-                            Cost = abilR.GetInt32("cost"),
-                            Cooldown = abilR.GetInt32("cooldown")
-                        });
-                    }
-                    if (!npc.Abilities.Any())
-                        npc.Abilities.Add(new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0, Slot = 1 });
-                    _npcs.Add(npc);
-                }
+                AddNpc(perNpcMin, perNpcMax);
             }
         }
 

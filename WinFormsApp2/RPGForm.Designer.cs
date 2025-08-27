@@ -18,6 +18,7 @@ namespace WinFormsApp2
         private Button btnNavigate;
         private Label lblGold;
         private Label lblTotalExp;
+        private Label partyPowerLabel;
         private TabControl tabSocial;
         private TabPage tabChat;
         private TabPage tabFriends;
@@ -57,6 +58,7 @@ namespace WinFormsApp2
             btnNavigate = new Button();
             lblGold = new Label();
             lblTotalExp = new Label();
+            partyPowerLabel = new Label();
             tabSocial = new TabControl();
             tabChat = new TabPage();
             txtChatDisplay = new TextBox();
@@ -69,6 +71,7 @@ namespace WinFormsApp2
             txtFriendNick = new TextBox();
             btnAddFriend = new Button();
             btnAcceptFriend = new Button();
+            partyPowerLabel = new Label();
             tabSocial.SuspendLayout();
             tabChat.SuspendLayout();
             tabFriends.SuspendLayout();
@@ -157,13 +160,22 @@ namespace WinFormsApp2
             lblGold.Text = "Gold:";
             // 
             // lblTotalExp
-            // 
+            //
             lblTotalExp.AutoSize = true;
             lblTotalExp.Location = new Point(567, 45);
             lblTotalExp.Name = "lblTotalExp";
             lblTotalExp.Size = new Size(60, 15);
             lblTotalExp.TabIndex = 1;
             lblTotalExp.Text = "Party EXP:";
+            //
+            // partyPowerLabel
+            //
+            partyPowerLabel.AutoSize = true;
+            partyPowerLabel.Location = new Point(567, 74);
+            partyPowerLabel.Name = "partyPowerLabel";
+            partyPowerLabel.Size = new Size(82, 15);
+            partyPowerLabel.TabIndex = 10;
+            partyPowerLabel.Text = "Party Power:";
             // 
             // tabSocial
             // 
@@ -233,7 +245,7 @@ namespace WinFormsApp2
             tabFriends.Location = new Point(4, 24);
             tabFriends.Name = "tabFriends";
             tabFriends.Padding = new Padding(3);
-            tabFriends.Size = new Size(386, 349);
+            tabFriends.Size = new Size(386, 429);
             tabFriends.TabIndex = 1;
             tabFriends.Text = "Friends";
             tabFriends.UseVisualStyleBackColor = true;
@@ -281,13 +293,24 @@ namespace WinFormsApp2
             btnAcceptFriend.UseVisualStyleBackColor = true;
             btnAcceptFriend.Click += btnAcceptFriend_Click;
             // 
+            // partyPowerLabel
+            // 
+            partyPowerLabel.AutoSize = true;
+            partyPowerLabel.Location = new Point(571, 72);
+            partyPowerLabel.Name = "partyPowerLabel";
+            partyPowerLabel.Size = new Size(38, 15);
+            partyPowerLabel.TabIndex = 10;
+            partyPowerLabel.Text = "label1";
+            // 
             // RPGForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(684, 626);
+            Controls.Add(partyPowerLabel);
             Controls.Add(tabSocial);
             Controls.Add(lblTotalExp);
+            Controls.Add(partyPowerLabel);
             Controls.Add(lblGold);
             Controls.Add(btnLogs);
             Controls.Add(btnInventory);
@@ -309,5 +332,7 @@ namespace WinFormsApp2
         }
 
         #endregion
+
+        private Label partyPowerLabel;
     }
 }
