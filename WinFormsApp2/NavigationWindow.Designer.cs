@@ -47,6 +47,9 @@
             btnShop = new Button();
             btnGraveyard = new Button();
             btnTavern = new Button();
+            btnFindEnemies = new Button();
+            btnArena = new Button();
+            btnTemple = new Button();
             lstConnections = new ListBox();
             rtbNodeDescription = new RichTextBox();
             btnBeginTravel = new Button();
