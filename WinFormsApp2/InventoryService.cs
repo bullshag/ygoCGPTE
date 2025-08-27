@@ -196,12 +196,15 @@ namespace WinFormsApp2
             else
             {
                 _equipment[character][slot] = item;
-                var other = slot == EquipmentSlot.LeftHand ? EquipmentSlot.RightHand : EquipmentSlot.LeftHand;
-                if (_equipment[character].TryGetValue(other, out var otherItem) && otherItem is Weapon w2 && w2.TwoHanded)
+                if (slot == EquipmentSlot.LeftHand || slot == EquipmentSlot.RightHand)
                 {
-                    AddItem(otherItem);
-                    _equipment[character][other] = null;
-                    SaveEquipment(character, other, null);
+                    var other = slot == EquipmentSlot.LeftHand ? EquipmentSlot.RightHand : EquipmentSlot.LeftHand;
+                    if (_equipment[character].TryGetValue(other, out var otherItem) && otherItem is Weapon w2 && w2.TwoHanded)
+                    {
+                        AddItem(otherItem);
+                        _equipment[character][other] = null;
+                        SaveEquipment(character, other, null);
+                    }
                 }
                 SaveEquipment(character, slot, item);
             }
