@@ -2,8 +2,11 @@ namespace WinFormsApp2
 {
     internal static class DatabaseConfig
     {
-        // Replace with your actual MySQL connection string
-        // Example: "Server=localhost;Database=DATABASE_NAME;User ID=USERNAME;Password=PASSWORD;"
-        public const string ConnectionString = "Server=localhost;Database=accounts;User ID=root;Password=;";
+        private const string Host = "76.134.86.9";
+        private const string Username = "userclient";
+        private const string Password = "123321";
+        public static bool DebugMode { get; set; }
+        public static string ConnectionString =>
+            $"Server={(DebugMode ? "127.0.0.1" : Host)};Database=accounts;User ID={Username};Password={Password};";
     }
 }
