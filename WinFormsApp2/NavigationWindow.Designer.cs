@@ -287,7 +287,7 @@
             btnFindEnemies.Name = "btnFindEnemies";
             btnFindEnemies.Size = new Size(150, 23);
             btnFindEnemies.TabIndex = 3;
-            btnFindEnemies.Text = "Find Enemies";
+            btnFindEnemies.Text = "Search for Enemies";
             btnFindEnemies.UseVisualStyleBackColor = true;
             // 
             // btnTavern

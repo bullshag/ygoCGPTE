@@ -59,6 +59,18 @@ namespace WinFormsApp2
 
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
+
+            using (var countCmd = new MySqlCommand("SELECT COUNT(*) FROM characters WHERE account_id=@id AND is_dead=0", conn))
+            {
+                countCmd.Parameters.AddWithValue("@id", _userId);
+                int partyCount = Convert.ToInt32(countCmd.ExecuteScalar());
+                if (partyCount >= 5)
+                {
+                    MessageBox.Show("Party is full. Release a member before hiring.");
+                    return;
+                }
+            }
+
             using MySqlCommand goldCmd = new MySqlCommand("SELECT gold FROM users WHERE id=@id", conn);
             goldCmd.Parameters.AddWithValue("@id", _userId);
             int gold = Convert.ToInt32(goldCmd.ExecuteScalar());
