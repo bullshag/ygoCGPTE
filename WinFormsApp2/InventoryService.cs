@@ -63,6 +63,7 @@ namespace WinFormsApp2
 
         public static Item? CreateItem(string name)
         {
+            if (name == "Arena Coin") return new ArenaCoin();
             if (name == "Healing Potion") return new HealingPotion();
             string key = name.Replace(" ", "").ToLower();
             if (WeaponFactory.TryCreate(key, out var weapon)) return weapon;
