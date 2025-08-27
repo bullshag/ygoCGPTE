@@ -14,6 +14,14 @@ namespace WinFormsApp2
         public string Description { get; }
         public Dictionary<string, int> Connections { get; } = new();
         public List<string> Activities { get; } = new();
+        /// <summary>
+        /// Minimum level of enemies encountered at this node, if any.
+        /// </summary>
+        public int? MinEnemyLevel { get; set; }
+        /// <summary>
+        /// Maximum level of enemies encountered at this node, if any.
+        /// </summary>
+        public int? MaxEnemyLevel { get; set; }
 
         public WorldMapNode(string id, string name, string description = "")
         {

@@ -91,7 +91,7 @@ namespace WinFormsApp2
             btnShop.Enabled = activities.Any(a => a.StartsWith("Shop"));
             btnGraveyard.Enabled = activities.Any(a => a.StartsWith("Graveyard"));
             btnTavern.Enabled = activities.Any(a => a.Contains("Tavern"));
-            btnFindEnemies.Enabled = activities.Any(a => a.StartsWith("Search"));
+            btnFindEnemies.Enabled = node.MinEnemyLevel.HasValue;
             btnArena.Enabled = activities.Any(a => a.Contains("Battle Arena"));
             btnTemple.Enabled = activities.Any(a => a.Contains("Temple"));
             lstConnections.Items.Clear();
@@ -169,7 +169,8 @@ namespace WinFormsApp2
 
         private void BtnFindEnemies_Click(object? sender, EventArgs e)
         {
-            using var battle = new BattleForm(_accountId);
+            var node = WorldMapService.GetNode(_currentNode);
+            using var battle = new BattleForm(_accountId, areaMinLevel: node.MinEnemyLevel, areaMaxLevel: node.MaxEnemyLevel);
             battle.ShowDialog(this);
             _refresh();
             UpdatePartySize();
