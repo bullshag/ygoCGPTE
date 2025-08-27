@@ -46,6 +46,7 @@ namespace WinFormsApp2
             pnlParty.Controls.Clear();
             int totalExp = 0;
             int totalLevel = 0;
+            int totalEquipCost = 0;
             int index = 0;
             while (reader.Read())
             {
@@ -77,11 +78,26 @@ namespace WinFormsApp2
 
                 totalExp += exp;
                 totalLevel += level;
+                foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
+                {
+                    var eqItem = InventoryService.GetEquippedItem(name, slot);
+                    if (eqItem != null)
+                        totalEquipCost += eqItem.Price;
+                }
                 index++;
             }
             reader.Close();
 
             lblTotalExp.Text = $"Party EXP: {totalExp}";
+            int totalSkills = 0;
+            using (var skillCmd = new MySqlCommand("SELECT COUNT(*) FROM character_abilities ca JOIN characters c ON ca.character_id=c.id WHERE c.account_id=@id AND c.is_dead=0 AND in_arena=0", conn))
+            {
+                skillCmd.Parameters.AddWithValue("@id", _userId);
+                object? sres = skillCmd.ExecuteScalar();
+                totalSkills = sres == null || sres == DBNull.Value ? 0 : Convert.ToInt32(sres);
+            }
+            int partyPower = (int)Math.Ceiling((totalLevel + totalEquipCost + 3 * totalSkills) * 0.15);
+            partyPowerLabel.Text = $"Party Power: {partyPower}";
 
             using MySqlCommand goldCmd = new MySqlCommand("SELECT gold FROM users WHERE id=@id", conn);
             goldCmd.Parameters.AddWithValue("@id", _userId);
@@ -124,12 +140,13 @@ namespace WinFormsApp2
             cmd.Parameters.AddWithValue("@id", _userId);
             cmd.Parameters.AddWithValue("@name", name);
             object? result = cmd.ExecuteScalar();
-            if (result != null)
-            {
-                int charId = Convert.ToInt32(result);
-                using var inspect = new HeroInspectForm(_userId, charId);
-                inspect.ShowDialog(this);
-            }
+                if (result != null)
+                {
+                    int charId = Convert.ToInt32(result);
+                    using var inspect = new HeroInspectForm(_userId, charId);
+                    inspect.ShowDialog(this);
+                    LoadPartyData();
+                }
         }
 
         private bool ConfirmFire(string name)
@@ -247,6 +264,7 @@ namespace WinFormsApp2
         {
             using var inv = new InventoryForm(_userId);
             inv.ShowDialog(this);
+            LoadPartyData();
         }
 
         private void Regenerate()
