@@ -177,7 +177,7 @@ namespace WinFormsApp2
 
         private void BtnArena_Click(object? sender, EventArgs e)
         {
-            using var arena = new ArenaForm();
+            using var arena = new ArenaForm(_accountId);
             arena.ShowDialog(this);
         }
 

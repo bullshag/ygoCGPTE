@@ -18,6 +18,12 @@ namespace WinFormsApp2
         private readonly System.Windows.Forms.Timer _progressTimer = new System.Windows.Forms.Timer();
         private readonly Dictionary<string, string> _deathCauses = new();
         private readonly bool _wildEncounter;
+        private readonly bool _arenaBattle;
+        private bool _cancelled;
+        private bool _playersWin;
+
+        public bool PlayersWin => _playersWin;
+        public bool Cancelled => _cancelled;
 
         private class LogEntry
         {
@@ -38,10 +44,11 @@ namespace WinFormsApp2
             lstLog.SelectedIndex = lstLog.Items.Count - 1;
         }
 
-        public BattleForm(int userId, bool wildEncounter = false)
+        public BattleForm(int userId, bool wildEncounter = false, bool arenaBattle = false)
         {
             _userId = userId;
             _wildEncounter = wildEncounter;
+            _arenaBattle = arenaBattle;
             InitializeComponent();
             LoadData();
         }
@@ -101,6 +108,12 @@ namespace WinFormsApp2
                 }
                 foreach (var p in PassiveService.GetOwnedPassives(kv.Value, conn))
                     kv.Key.Passives[p.Name] = p.Level;
+            }
+
+            if (_arenaBattle)
+            {
+                LoadArenaOpponents(conn);
+                return;
             }
 
             int totalLevel = _players.Sum(p => p.Level);
@@ -248,8 +261,77 @@ namespace WinFormsApp2
             }
         }
 
+        private void LoadArenaOpponents(MySqlConnection conn)
+        {
+            using var oppCmd = new MySqlCommand(@"
+                SELECT id FROM accounts
+                WHERE id!=@id AND EXISTS (
+                    SELECT 1 FROM characters c
+                    WHERE c.account_id=accounts.id AND c.is_dead=0
+                )
+                ORDER BY RAND() LIMIT 1", conn);
+            oppCmd.Parameters.AddWithValue("@id", _userId);
+            object? opp = oppCmd.ExecuteScalar();
+            if (opp == null)
+            {
+                _cancelled = true;
+                return;
+            }
+            int oppId = Convert.ToInt32(opp);
+            InventoryService.Load(oppId);
+            using var cmd = new MySqlCommand("SELECT id, name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM characters WHERE account_id=@aid AND is_dead=0", conn);
+            cmd.Parameters.AddWithValue("@aid", oppId);
+            var npcIds = new Dictionary<Creature, int>();
+            using (var r = cmd.ExecuteReader())
+            {
+                while (r.Read())
+                {
+                    int cid = r.GetInt32("id");
+                    int intel = r.GetInt32("intelligence");
+                    var npc = new Creature
+                    {
+                        Name = r.GetString("name"),
+                        Level = r.GetInt32("level"),
+                        CurrentHp = r.GetInt32("current_hp"),
+                        MaxHp = r.GetInt32("max_hp"),
+                        Mana = r.GetInt32("mana"),
+                        MaxMana = 10 + 5 * intel,
+                        Strength = r.GetInt32("strength"),
+                        Dex = r.GetInt32("dex"),
+                        Intelligence = intel,
+                        ActionSpeed = r.GetInt32("action_speed"),
+                        MeleeDefense = r.GetInt32("melee_defense"),
+                        MagicDefense = r.GetInt32("magic_defense"),
+                        Role = r.GetString("role"),
+                        TargetingStyle = r.GetString("targeting_style")
+                    };
+                    foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
+                        npc.Equipment[slot] = InventoryService.GetEquippedItem(npc.Name, slot);
+                    _npcs.Add(npc);
+                    npcIds[npc] = cid;
+                }
+            }
+            foreach (var kv in npcIds)
+            {
+                foreach (var abil in AbilityService.GetEquippedAbilities(kv.Value, conn))
+                    kv.Key.Abilities.Add(abil);
+                if (!kv.Key.Abilities.Any())
+                    kv.Key.Abilities.Add(new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0, Slot = 1 });
+                foreach (var p in PassiveService.GetOwnedPassives(kv.Value, conn))
+                    kv.Key.Passives[p.Name] = p.Level;
+            }
+            InventoryService.Load(_userId);
+            if (_npcs.Count == 0)
+                _cancelled = true;
+        }
+
         private void BattleForm_Load(object? sender, EventArgs e)
         {
+            if (_cancelled)
+            {
+                Close();
+                return;
+            }
             BuildPanels();
             StartTimers();
         }
@@ -771,6 +853,7 @@ namespace WinFormsApp2
                 foreach (var t in _timers.Values) t.Stop();
                 _progressTimer.Stop();
                 bool playersWin = _players.Any(p => p.CurrentHp > 0);
+                _playersWin = playersWin;
                 string lootSummary = string.Empty;
                 AppendLog(playersWin ? "Players win!" : "NPCs win!", playersWin);
                 if (playersWin)
