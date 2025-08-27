@@ -496,12 +496,15 @@ namespace WinFormsApp2
             }
 
             var ability = ChooseAbility(actor);
-            if (ability.Name == "Regenerate" || ability.Name == "Heal")
+            if (ability.Name == "Regenerate" || ability.Name == "Heal" || ability.Name == "Rejuvenate" || ability.Name == "Healing Wave")
             {
                 if (actor.Role == "Healer")
                 {
                     target = ChooseHealerTarget(actor, allies);
-                    if (target == null) return;
+                    if (target == null)
+                    {
+                        if (ability.Name == "Healing Wave") target = actor; else return;
+                    }
                 }
                 else
                 {
@@ -523,10 +526,11 @@ namespace WinFormsApp2
                 }
                 actor.Cooldowns[ability.Id] = ability.Cooldown * 1000;
                 bool actorIsPlayer = _players.Contains(actor);
-                AppendLog(GenerateAbilityLog(actor, target, ability), actorIsPlayer, ability.Name == "Heal" || ability.Name == "Regenerate");
+                AppendLog(GenerateAbilityLog(actor, target, ability), actorIsPlayer, ability.Name == "Heal" || ability.Name == "Regenerate" || ability.Name == "Rejuvenate" || ability.Name == "Healing Wave");
                 if (ability.Name == "Bleed") ApplyBleed(actor, target);
                 else if (ability.Name == "Poison") ApplyPoison(actor, target);
                 else if (ability.Name == "Regenerate") { ApplyHot(actor, target); CheckEnd(); return; }
+                else if (ability.Name == "Rejuvenate") { ApplyRejuvenate(actor, target); CheckEnd(); return; }
                 else if (ability.Name == "Heal")
                 {
                     int healAmt = (int)Math.Max(1, 5 + actor.Intelligence * 1.2);
@@ -537,9 +541,46 @@ namespace WinFormsApp2
                     CheckEnd();
                     return;
                 }
+                else if (ability.Name == "Healing Wave")
+                {
+                    int healAmt = (int)Math.Max(1, 4 + actor.Intelligence * 1.0);
+                    foreach (var ally in allies.Where(a => a.CurrentHp > 0))
+                    {
+                        ally.CurrentHp = Math.Min(ally.MaxHp, ally.CurrentHp + healAmt);
+                        ally.HpBar.Value = Math.Min(ally.MaxHp, ally.CurrentHp);
+                    }
+                    AppendLog($"{actor.Name}'s healing wave restores {healAmt} HP to all allies!", _players.Contains(actor), true);
+                    actor.AttackBar.Value = actor.AttackInterval;
+                    CheckEnd();
+                    return;
+                }
                 else if (ability.Name == "Taunting Blows") ApplyTaunt(actor, opponents);
                 else if (ability.Name == "Vanish") { actor.IsVanished = true; actor.VanishRemainingMs = 5000; actor.AttackBar.Value = actor.AttackInterval; CheckEnd(); return; }
                 else if (ability.Name == "Arcane Shield") { ApplyShield(actor, target); actor.AttackBar.Value = actor.AttackInterval; CheckEnd(); return; }
+                else if (ability.Name == "Shockwave" || ability.Name == "Frost Nova" || ability.Name == "Earthquake" || ability.Name == "Meteor" || ability.Name == "Flame Strike" || ability.Name == "Arcane Blast")
+                {
+                    foreach (var o in opponents.Where(o => o.CurrentHp > 0))
+                    {
+                        int dmg = CalculateSpellDamage(actor, o, ability);
+                        ApplyShieldReduction(o, ref dmg);
+                        o.CurrentHp -= dmg;
+                        string spellLog = $"{actor.Name}'s {ability.Name} hits {o.Name} for {dmg} damage!";
+                        if (o.CurrentHp <= 0 && _players.Contains(o) && !_deathCauses.ContainsKey(o.Name))
+                        {
+                            _deathCauses[o.Name] = spellLog;
+                        }
+                        AppendLog(spellLog, actorIsPlayer);
+                        actor.DamageDone += dmg;
+                        o.DamageTaken += dmg;
+                        o.HpBar.Value = Math.Min(o.HpBar.Maximum, Math.Max(0, o.CurrentHp));
+                        o.Threat[actor] = o.Threat.GetValueOrDefault(actor) + dmg;
+                        o.CurrentTarget = actor;
+                    }
+                    actor.AttackBar.Value = actor.AttackInterval;
+                    actor.CurrentTarget = target;
+                    CheckEnd();
+                    return;
+                }
                 else
                 {
                     int spellDamage = CalculateSpellDamage(actor, target, ability);
@@ -645,6 +686,12 @@ namespace WinFormsApp2
                 "Lightning Bolt" => $"{actor.Name} summons a crackling bolt of lightning toward {target.Name}!",
                 "Ice Lance" => $"{actor.Name} launches an icy lance at {target.Name}!",
                 "Arcane Blast" => $"{actor.Name} releases a wave of arcane force!",
+                "Frost Nova" => $"{actor.Name} unleashes a frost nova!",
+                "Shockwave" => $"{actor.Name} releases a powerful shockwave!",
+                "Earthquake" => $"{actor.Name} causes the ground to quake violently!",
+                "Meteor" => $"{actor.Name} calls down a fiery meteor!",
+                "Flame Strike" => $"{actor.Name} smashes the ground with a flaming strike!",
+                "Healing Wave" => $"{actor.Name} releases a healing wave!",
                 "Bleed" => $"{actor.Name} rends {target.Name}, drawing rivers of blood!",
                 "Poison" => $"{actor.Name} envenoms {target.Name} with a vile toxin!",
                 "Regenerate" => $"{actor.Name} calls forth rejuvenating winds around {target.Name}!",
@@ -679,6 +726,12 @@ namespace WinFormsApp2
         {
             int amt = (int)Math.Max(1, 1 + target.Intelligence * 0.80);
             target.Effects.Add(new StatusEffect { Kind = EffectKind.HoT, RemainingMs = 6000, TickIntervalMs = 3000, TimeUntilTickMs = 3000, AmountPerTick = amt, SourceIsPlayer = _players.Contains(actor), SourceName = actor.Name });
+        }
+
+        private void ApplyRejuvenate(Creature actor, Creature target)
+        {
+            int amt = (int)Math.Max(1, 1 + actor.Intelligence * 0.60);
+            target.Effects.Add(new StatusEffect { Kind = EffectKind.HoT, RemainingMs = 6000, TickIntervalMs = 2000, TimeUntilTickMs = 2000, AmountPerTick = amt, SourceIsPlayer = _players.Contains(actor), SourceName = actor.Name });
         }
 
         private void ApplyTaunt(Creature actor, List<Creature> opponents)
