@@ -24,9 +24,12 @@ namespace WinFormsApp2
         private readonly Random _rng = new Random();
         private bool _fasterTravelApplied;
         private readonly SynchronizationContext _syncContext;
+        private int _partySize;
+        private bool _pausedForEncounter;
 
         public event Action<int>? ProgressChanged;
         public event Action<string>? TravelCompleted;
+        public event Action? AmbushEncounter;
         public bool IsTraveling => _timer.Enabled;
 
         public TravelManager(int accountId)
@@ -40,6 +43,7 @@ namespace WinFormsApp2
         {
             _fromNode = fromNode;
             _toNode = toNode;
+            _partySize = partySize;
             EnsureNodeExists(fromNode);
             EnsureNodeExists(toNode);
             _originalDays = WorldMapService.GetNode(fromNode).Connections[toNode];
@@ -64,11 +68,15 @@ namespace WinFormsApp2
             _elapsedSeconds++;
             int percent = _elapsedSeconds * 100 / Math.Max(1, _totalSeconds);
             _syncContext.Post(state => ProgressChanged?.Invoke((int)state!), percent);
-            if (_elapsedSeconds % 30 == 0)
+            if (_partySize > 0 && _elapsedSeconds % 30 == 0)
             {
                 if (_rng.NextDouble() < 0.15)
                 {
-                    // TODO: trigger ambush battle
+                    _timer.Stop();
+                    _pausedForEncounter = true;
+                    SaveState();
+                    _syncContext.Post(_ => AmbushEncounter?.Invoke(), null);
+                    return;
                 }
             }
             if (_elapsedSeconds >= _totalSeconds)
@@ -79,6 +87,15 @@ namespace WinFormsApp2
             else
             {
                 SaveState();
+            }
+        }
+
+        public void ResumeAfterEncounter()
+        {
+            if (_pausedForEncounter)
+            {
+                _pausedForEncounter = false;
+                _timer.Start();
             }
         }
 
