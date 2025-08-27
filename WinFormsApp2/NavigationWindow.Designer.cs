@@ -49,6 +49,8 @@
             btnTavern = new Button();
             btnGraveyard = new Button();
             btnShop = new Button();
+            knownEnemyList = new ListBox();
+            enemyInfo = new RichTextBox();
             Travel = new TabPage();
             lblTravelInfo = new Label();
             travelProgressBar = new ProgressBar();
@@ -252,7 +254,9 @@
             // 
             // tabPage1
             // 
+
             tabPage1.Controls.Add(label12);
+
             tabPage1.Controls.Add(enemyInfo);
             tabPage1.Controls.Add(knownEnemyList);
             tabPage1.Controls.Add(btnTemple);
@@ -322,9 +326,27 @@
             btnShop.TabIndex = 0;
             btnShop.Text = "Shop";
             btnShop.UseVisualStyleBackColor = true;
-            // 
+            //
+            // knownEnemyList
+            //
+            knownEnemyList.FormattingEnabled = true;
+            knownEnemyList.ItemHeight = 15;
+            knownEnemyList.Location = new Point(162, 6);
+            knownEnemyList.Name = "knownEnemyList";
+            knownEnemyList.Size = new Size(263, 154);
+            knownEnemyList.TabIndex = 6;
+            //
+            // enemyInfo
+            //
+            enemyInfo.Location = new Point(162, 166);
+            enemyInfo.Name = "enemyInfo";
+            enemyInfo.ReadOnly = true;
+            enemyInfo.Size = new Size(263, 394);
+            enemyInfo.TabIndex = 7;
+            enemyInfo.Text = "";
+            //
             // Travel
-            // 
+            //
             Travel.Controls.Add(lblTravelInfo);
             Travel.Controls.Add(travelProgressBar);
             Travel.Controls.Add(btnBeginTravel);
