@@ -56,7 +56,7 @@ namespace WinFormsApp2
             _travelCost = days * partySize * 5;
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using var cmd = new MySqlCommand("UPDATE users SET gold = gold - @c WHERE id=@id", conn);
+            using var cmd = new MySqlCommand("UPDATE users SET gold = GREATEST(gold - @c, 0) WHERE id=@id", conn);
             cmd.Parameters.AddWithValue("@c", _travelCost);
             cmd.Parameters.AddWithValue("@id", _accountId);
             cmd.ExecuteNonQuery();

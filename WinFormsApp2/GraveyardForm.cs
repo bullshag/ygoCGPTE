@@ -85,7 +85,7 @@ namespace WinFormsApp2
                 MessageBox.Show($"Need {cost} gold to resurrect.");
                 return;
             }
-            using var pay = new MySqlCommand("UPDATE users SET gold=gold-@c WHERE id=@id", conn);
+            using var pay = new MySqlCommand("UPDATE users SET gold=GREATEST(gold-@c,0) WHERE id=@id", conn);
             pay.Parameters.AddWithValue("@c", cost);
             pay.Parameters.AddWithValue("@id", _userId);
             pay.ExecuteNonQuery();

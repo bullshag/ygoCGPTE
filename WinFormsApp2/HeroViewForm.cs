@@ -79,7 +79,7 @@ namespace WinFormsApp2
                 MessageBox.Show("Not enough gold to hire this hero.");
                 return;
             }
-            using MySqlCommand updateGold = new MySqlCommand("UPDATE users SET gold=gold-@cost WHERE id=@id", conn);
+            using MySqlCommand updateGold = new MySqlCommand("UPDATE users SET gold=GREATEST(gold-@cost,0) WHERE id=@id", conn);
             updateGold.Parameters.AddWithValue("@cost", _hireCost);
             updateGold.Parameters.AddWithValue("@id", _userId);
             updateGold.ExecuteNonQuery();

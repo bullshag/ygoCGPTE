@@ -36,7 +36,7 @@ namespace WinFormsApp2
                 MessageBox.Show("Not enough gold.");
                 return;
             }
-            using (var pay = new MySqlCommand("UPDATE users SET gold = gold - 100 WHERE id=@id", conn))
+            using (var pay = new MySqlCommand("UPDATE users SET gold = GREATEST(gold - 100, 0) WHERE id=@id", conn))
             {
                 pay.Parameters.AddWithValue("@id", _accountId);
                 pay.ExecuteNonQuery();
