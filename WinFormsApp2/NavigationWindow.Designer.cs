@@ -68,6 +68,9 @@
             label9 = new Label();
             label10 = new Label();
             label11 = new Label();
+            knownEnemyList = new ListBox();
+            enemyInfo = new RichTextBox();
+            label12 = new Label();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
@@ -249,6 +252,9 @@
             // 
             // tabPage1
             // 
+            tabPage1.Controls.Add(label12);
+            tabPage1.Controls.Add(enemyInfo);
+            tabPage1.Controls.Add(knownEnemyList);
             tabPage1.Controls.Add(btnTemple);
             tabPage1.Controls.Add(btnArena);
             tabPage1.Controls.Add(btnFindEnemies);
@@ -506,6 +512,33 @@
             label11.TabIndex = 24;
             label11.Text = "Far Cliffs";
             // 
+            // knownEnemyList
+            // 
+            knownEnemyList.FormattingEnabled = true;
+            knownEnemyList.ItemHeight = 15;
+            knownEnemyList.Location = new Point(162, 37);
+            knownEnemyList.Name = "knownEnemyList";
+            knownEnemyList.Size = new Size(263, 139);
+            knownEnemyList.TabIndex = 6;
+            // 
+            // enemyInfo
+            // 
+            enemyInfo.Location = new Point(162, 182);
+            enemyInfo.Name = "enemyInfo";
+            enemyInfo.Size = new Size(263, 61);
+            enemyInfo.TabIndex = 7;
+            enemyInfo.Text = "";
+            // 
+            // label12
+            // 
+            label12.AutoSize = true;
+            label12.Font = new Font("Tahoma", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label12.Location = new Point(245, 21);
+            label12.Name = "label12";
+            label12.Size = new Size(97, 13);
+            label12.TabIndex = 14;
+            label12.Text = "Enemies in Area";
+            // 
             // NavigationWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -541,6 +574,7 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             tabControl1.ResumeLayout(false);
             tabPage1.ResumeLayout(false);
+            tabPage1.PerformLayout();
             Travel.ResumeLayout(false);
             Travel.PerformLayout();
             ResumeLayout(false);
@@ -588,5 +622,8 @@
         private Label label9;
         private Label label10;
         private Label label11;
+        private ListBox knownEnemyList;
+        private RichTextBox enemyInfo;
+        private Label label12;
     }
 }

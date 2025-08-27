@@ -69,6 +69,7 @@ namespace WinFormsApp2
             txtFriendNick = new TextBox();
             btnAddFriend = new Button();
             btnAcceptFriend = new Button();
+            partyPowerLabel = new Label();
             tabSocial.SuspendLayout();
             tabChat.SuspendLayout();
             tabFriends.SuspendLayout();
@@ -233,7 +234,7 @@ namespace WinFormsApp2
             tabFriends.Location = new Point(4, 24);
             tabFriends.Name = "tabFriends";
             tabFriends.Padding = new Padding(3);
-            tabFriends.Size = new Size(386, 349);
+            tabFriends.Size = new Size(386, 429);
             tabFriends.TabIndex = 1;
             tabFriends.Text = "Friends";
             tabFriends.UseVisualStyleBackColor = true;
@@ -281,11 +282,21 @@ namespace WinFormsApp2
             btnAcceptFriend.UseVisualStyleBackColor = true;
             btnAcceptFriend.Click += btnAcceptFriend_Click;
             // 
+            // partyPowerLabel
+            // 
+            partyPowerLabel.AutoSize = true;
+            partyPowerLabel.Location = new Point(571, 72);
+            partyPowerLabel.Name = "partyPowerLabel";
+            partyPowerLabel.Size = new Size(38, 15);
+            partyPowerLabel.TabIndex = 10;
+            partyPowerLabel.Text = "label1";
+            // 
             // RPGForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(684, 626);
+            Controls.Add(partyPowerLabel);
             Controls.Add(tabSocial);
             Controls.Add(lblTotalExp);
             Controls.Add(lblGold);
@@ -309,5 +320,7 @@ namespace WinFormsApp2
         }
 
         #endregion
+
+        private Label partyPowerLabel;
     }
 }
