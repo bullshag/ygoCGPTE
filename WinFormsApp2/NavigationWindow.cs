@@ -268,11 +268,33 @@ namespace WinFormsApp2
         {
             lblTravelInfo.Text = "Ambushed by wild enemies!";
             using var battle = new BattleForm(_accountId, true);
-            battle.ShowDialog(this);
+            // If the navigation window has already been disposed (for example
+            // when the user closes the form while travel continues), showing
+            // a dialog with this form as the owner will throw an
+            // ObjectDisposedException.  Guard against that by only using the
+            // form as the owner when it's still alive.
+            if (!IsDisposed && IsHandleCreated)
+            {
+                battle.ShowDialog(this);
+            }
+            else
+            {
+                battle.ShowDialog();
+            }
             _refresh();
             UpdatePartySize();
             LoadNode(_currentNode);
             _travelManager.ResumeAfterEncounter();
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            // Unsubscribe from travel manager events to avoid callbacks after
+            // the form has been disposed.
+            _travelManager.ProgressChanged -= TravelManager_ProgressChanged;
+            _travelManager.TravelCompleted -= TravelManager_TravelCompleted;
+            _travelManager.AmbushEncounter -= TravelManager_AmbushEncounter;
+            base.OnFormClosed(e);
         }
     }
 }
