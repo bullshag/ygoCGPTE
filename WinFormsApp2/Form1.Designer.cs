@@ -47,30 +47,12 @@ namespace WinFormsApp2
             chkDebugMode = new CheckBox();
             SuspendLayout();
             // 
-            // lblUsername
-            // 
-            lblUsername.AutoSize = true;
-            lblUsername.Location = new Point(30, 30);
-            lblUsername.Name = "lblUsername";
-            lblUsername.Size = new Size(63, 15);
-            lblUsername.TabIndex = 0;
-            lblUsername.Text = "Username";
-            // 
             // txtUsername
             // 
             txtUsername.Location = new Point(30, 48);
             txtUsername.Name = "txtUsername";
             txtUsername.Size = new Size(200, 23);
             txtUsername.TabIndex = 1;
-            // 
-            // lblPassword
-            // 
-            lblPassword.AutoSize = true;
-            lblPassword.Location = new Point(30, 90);
-            lblPassword.Name = "lblPassword";
-            lblPassword.Size = new Size(60, 15);
-            lblPassword.TabIndex = 2;
-            lblPassword.Text = "Password";
             // 
             // txtPassword
             // 
@@ -99,19 +81,38 @@ namespace WinFormsApp2
             btnCreateAccount.Text = "Create Account";
             btnCreateAccount.UseVisualStyleBackColor = true;
             btnCreateAccount.Click += btnCreateAccount_Click;
-            //
+            // 
+            // lblUsername
+            // 
+            lblUsername.AutoSize = true;
+            lblUsername.Location = new Point(30, 30);
+            lblUsername.Name = "lblUsername";
+            lblUsername.Size = new Size(60, 15);
+            lblUsername.TabIndex = 0;
+            lblUsername.Text = "Username";
+            // 
+            // lblPassword
+            // 
+            lblPassword.AutoSize = true;
+            lblPassword.Location = new Point(30, 90);
+            lblPassword.Name = "lblPassword";
+            lblPassword.Size = new Size(57, 15);
+            lblPassword.TabIndex = 2;
+            lblPassword.Text = "Password";
+            // 
             // chkDebugMode
-            //
+            // 
             chkDebugMode.AutoSize = true;
             chkDebugMode.Location = new Point(30, 179);
             chkDebugMode.Name = "chkDebugMode";
-            chkDebugMode.Size = new Size(129, 19);
+            chkDebugMode.Size = new Size(132, 19);
             chkDebugMode.TabIndex = 6;
             chkDebugMode.Text = "Enable debug mode";
             chkDebugMode.UseVisualStyleBackColor = true;
-            //
+            chkDebugMode.CheckedChanged += chkDebugMode_CheckedChanged;
+            // 
             // Form1
-            //
+            // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(264, 211);

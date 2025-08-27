@@ -31,7 +31,7 @@ namespace WinFormsApp2
                 MessageBox.Show("Passwords do not match");
                 return;
             }
-
+            DatabaseConfig.DebugMode = chkDebugMode2.Checked;
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
 

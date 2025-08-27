@@ -54,5 +54,10 @@ namespace WinFormsApp2
             var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
             return Convert.ToBase64String(bytes);
         }
+
+        private void chkDebugMode_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
