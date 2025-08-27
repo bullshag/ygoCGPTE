@@ -119,7 +119,7 @@ namespace WinFormsApp2
             Controls.Add(_lstShop);
             Name = "ShopForm";
             Text = "Shop";
-            Load += ShopForm_Load_2;
+            Load += ShopForm_Load;
             ResumeLayout(false);
             PerformLayout();
         }

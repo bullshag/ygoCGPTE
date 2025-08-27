@@ -42,6 +42,15 @@ namespace WinFormsApp2
                 goldCmd.ExecuteNonQuery();
             }
             conn.Close();
+
+            // chance to drop additional loot from global pool
+            Item? bonusLoot = LootPool.GetEnemyLoot(avgLevel);
+            if (bonusLoot != null)
+            {
+                drops[bonusLoot.Name] = drops.GetValueOrDefault(bonusLoot.Name) + 1;
+                InventoryService.AddItem(bonusLoot);
+            }
+
             foreach (var kvp in drops.Where(k => k.Key != "gold"))
             {
                 for (int i = 0; i < kvp.Value; i++)

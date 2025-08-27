@@ -149,7 +149,7 @@ namespace WinFormsApp2
 
         private void BtnShop_Click(object? sender, EventArgs e)
         {
-            using var shop = new ShopForm(_accountId);
+            using var shop = new ShopForm(_accountId, _currentNode);
             shop.ShowDialog(this);
             _refresh();
             UpdatePartySize();
