@@ -27,37 +27,33 @@ namespace WinFormsApp2
             // lstBattles
             // 
             lstBattles.FormattingEnabled = true;
-            lstBattles.ItemHeight = 25;
-            lstBattles.Location = new Point(17, 20);
-            lstBattles.Margin = new Padding(4, 5, 4, 5);
+            lstBattles.ItemHeight = 15;
+            lstBattles.Location = new Point(12, 12);
             lstBattles.Name = "lstBattles";
-            lstBattles.Size = new Size(170, 329);
+            lstBattles.Size = new Size(120, 199);
             lstBattles.TabIndex = 1;
             lstBattles.SelectedIndexChanged += lstBattles_SelectedIndexChanged;
             // 
             // lstLog
-            //
+            // 
             lstLog.FormattingEnabled = true;
-            lstLog.ItemHeight = 25;
-            lstLog.Location = new Point(197, 20);
-            lstLog.Margin = new Padding(4, 5, 4, 5);
+            lstLog.ItemHeight = 15;
+            lstLog.Location = new Point(138, 12);
             lstLog.Name = "lstLog";
-            lstLog.Size = new Size(355, 329);
+            lstLog.Size = new Size(691, 199);
             lstLog.TabIndex = 0;
             // 
             // BattleLogForm
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(570, 364);
+            ClientSize = new Size(841, 218);
             Controls.Add(lstLog);
             Controls.Add(lstBattles);
-            Margin = new Padding(4, 5, 4, 5);
             Name = "BattleLogForm";
             Text = "Battle Logs";
             Load += BattleLogForm_Load;
             ResumeLayout(false);
-            PerformLayout();
         }
     }
 }

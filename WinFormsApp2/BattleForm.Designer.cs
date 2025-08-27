@@ -34,71 +34,73 @@ namespace WinFormsApp2
             // 
             // pnlPlayers
             // 
-            pnlPlayers.Location = new Point(13, 14);
-            pnlPlayers.Margin = new Padding(4, 5, 4, 5);
-            pnlPlayers.Name = "pnlPlayers";
-            pnlPlayers.Size = new Size(252, 398);
-            pnlPlayers.TabIndex = 2;
             pnlPlayers.AutoScroll = true;
             pnlPlayers.FlowDirection = FlowDirection.TopDown;
+            pnlPlayers.Location = new Point(9, 8);
+            pnlPlayers.Name = "pnlPlayers";
+            pnlPlayers.Size = new Size(176, 457);
+            pnlPlayers.TabIndex = 2;
             pnlPlayers.WrapContents = false;
             // 
             // pnlEnemies
             // 
-            pnlEnemies.Location = new Point(587, 14);
-            pnlEnemies.Margin = new Padding(4, 5, 4, 5);
-            pnlEnemies.Name = "pnlEnemies";
-            pnlEnemies.Size = new Size(264, 398);
-            pnlEnemies.TabIndex = 1;
             pnlEnemies.AutoScroll = true;
             pnlEnemies.FlowDirection = FlowDirection.TopDown;
+            pnlEnemies.Location = new Point(734, 8);
+            pnlEnemies.Name = "pnlEnemies";
+            pnlEnemies.Size = new Size(185, 457);
+            pnlEnemies.TabIndex = 1;
             pnlEnemies.WrapContents = false;
             // 
             // lstLog
-            //
+            // 
             lstLog.DrawMode = DrawMode.OwnerDrawFixed;
-            lstLog.Location = new Point(13, 422);
-            lstLog.Margin = new Padding(4, 5, 4, 5);
+            lstLog.Location = new Point(8, 471);
             lstLog.Name = "lstLog";
-            lstLog.Size = new Size(838, 254);
+            lstLog.Size = new Size(911, 148);
             lstLog.TabIndex = 0;
             lstLog.DrawItem += lstLog_DrawItem;
-
+            // 
             // hpTemplate
-            //
-            hpTemplate.Location = new Point(300, 14);
+            // 
+            hpTemplate.Location = new Point(210, 8);
+            hpTemplate.Margin = new Padding(2, 2, 2, 2);
             hpTemplate.Name = "hpTemplate";
-            hpTemplate.Size = new Size(170, 20);
+            hpTemplate.Size = new Size(119, 12);
             hpTemplate.Style = ProgressBarStyle.Continuous;
+            hpTemplate.TabIndex = 2;
             hpTemplate.Visible = false;
-
+            // 
             // manaTemplate
-            //
-            manaTemplate.Location = new Point(300, 44);
+            // 
+            manaTemplate.Location = new Point(210, 26);
+            manaTemplate.Margin = new Padding(2, 2, 2, 2);
             manaTemplate.Name = "manaTemplate";
-            manaTemplate.Size = new Size(170, 20);
+            manaTemplate.Size = new Size(119, 12);
             manaTemplate.Style = ProgressBarStyle.Continuous;
+            manaTemplate.TabIndex = 1;
             manaTemplate.Visible = false;
-
+            // 
             // attackTemplate
-            //
-            attackTemplate.Location = new Point(300, 74);
+            // 
+            attackTemplate.Location = new Point(210, 44);
+            attackTemplate.Margin = new Padding(2, 2, 2, 2);
             attackTemplate.Name = "attackTemplate";
-            attackTemplate.Size = new Size(170, 20);
+            attackTemplate.Size = new Size(119, 12);
+            attackTemplate.TabIndex = 0;
             attackTemplate.Visible = false;
             // 
             // BattleForm
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(864, 690);
+            ClientSize = new Size(931, 631);
             Controls.Add(attackTemplate);
             Controls.Add(manaTemplate);
             Controls.Add(hpTemplate);
             Controls.Add(lstLog);
             Controls.Add(pnlEnemies);
             Controls.Add(pnlPlayers);
-            Margin = new Padding(4, 5, 4, 5);
             Name = "BattleForm";
             Text = "Battle";
             Load += BattleForm_Load;
