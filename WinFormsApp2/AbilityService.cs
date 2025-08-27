@@ -16,20 +16,26 @@ namespace WinFormsApp2
             var list = new List<Ability>();
             while (reader.Read())
             {
+                int manaCost = reader.GetInt32("cost");
                 list.Add(new Ability
                 {
                     Id = reader.GetInt32("id"),
                     Name = reader.GetString("name"),
                     Description = reader.GetString("description"),
-                    Cost = reader.GetInt32("cost"),
-                    Cooldown = reader.GetInt32("cooldown")
+                    Cost = manaCost,
+                    Cooldown = reader.GetInt32("cooldown"),
+                    PointCost = Math.Max(1, manaCost / 10)
                 });
             }
             return list;
         }
 
-        public static void PurchaseAbility(int characterId, int abilityId, MySqlConnection conn)
+        public static void PurchaseAbility(int characterId, int abilityId, int cost, MySqlConnection conn)
         {
+            using var spend = new MySqlCommand("UPDATE characters SET skill_points=skill_points-@c WHERE id=@cid", conn);
+            spend.Parameters.AddWithValue("@c", cost);
+            spend.Parameters.AddWithValue("@cid", characterId);
+            spend.ExecuteNonQuery();
             using var cmd = new MySqlCommand("INSERT INTO character_abilities(character_id, ability_id) VALUES(@c,@a)", conn);
             cmd.Parameters.AddWithValue("@c", characterId);
             cmd.Parameters.AddWithValue("@a", abilityId);
@@ -47,13 +53,15 @@ namespace WinFormsApp2
             var list = new List<Ability>();
             while (reader.Read())
             {
+                int manaCost = reader.GetInt32("cost");
                 list.Add(new Ability
                 {
                     Id = reader.GetInt32("id"),
                     Name = reader.GetString("name"),
                     Description = reader.GetString("description"),
-                    Cost = reader.GetInt32("cost"),
-                    Cooldown = reader.GetInt32("cooldown")
+                    Cost = manaCost,
+                    Cooldown = reader.GetInt32("cooldown"),
+                    PointCost = Math.Max(1, manaCost / 10)
                 });
             }
             return list;
@@ -70,6 +78,7 @@ namespace WinFormsApp2
             var list = new List<Ability>();
             while (reader.Read())
             {
+                int manaCost = reader.IsDBNull(reader.GetOrdinal("cost")) ? 0 : reader.GetInt32("cost");
                 var ability = new Ability
                 {
                     Slot = reader.GetInt32("slot"),
@@ -77,8 +86,9 @@ namespace WinFormsApp2
                     Id = reader.IsDBNull(reader.GetOrdinal("id")) ? 0 : reader.GetInt32("id"),
                     Name = reader.IsDBNull(reader.GetOrdinal("name")) ? "-basic attack-" : reader.GetString("name"),
                     Description = reader.IsDBNull(reader.GetOrdinal("description")) ? string.Empty : reader.GetString("description"),
-                    Cost = reader.IsDBNull(reader.GetOrdinal("cost")) ? 0 : reader.GetInt32("cost"),
-                    Cooldown = reader.IsDBNull(reader.GetOrdinal("cooldown")) ? 0 : reader.GetInt32("cooldown")
+                    Cost = manaCost,
+                    Cooldown = reader.IsDBNull(reader.GetOrdinal("cooldown")) ? 0 : reader.GetInt32("cooldown"),
+                    PointCost = Math.Max(1, manaCost / 10)
                 };
                 list.Add(ability);
             }

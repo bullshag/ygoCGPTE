@@ -79,6 +79,8 @@ namespace WinFormsApp2
                 lstAbilities.Items.Add(a.Name);
             }
             rtbAbility.Clear();
+            btnBuy.Text = "Buy";
+            btnBuy.Enabled = false;
             _passives = PassiveService.GetAvailablePassives(_characterId, conn);
             lstPassives.Items.Clear();
             foreach (var p in _passives)
@@ -109,9 +111,16 @@ namespace WinFormsApp2
                 MessageBox.Show("Not enough mana.");
                 return;
             }
+            if (_availablePoints < ability.PointCost)
+            {
+                MessageBox.Show("Not enough points.");
+                return;
+            }
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            AbilityService.PurchaseAbility(_characterId, ability.Id, conn);
+            AbilityService.PurchaseAbility(_characterId, ability.Id, ability.PointCost, conn);
+            _availablePoints -= ability.PointCost;
+            lblPoints.Text = $"Points: {_availablePoints}";
             _abilities = AbilityService.GetShopAbilities(_characterId, conn);
             lstAbilities.Items.Clear();
             foreach (var a in _abilities)
@@ -119,6 +128,8 @@ namespace WinFormsApp2
                 lstAbilities.Items.Add(a.Name);
             }
             rtbAbility.Clear();
+            btnBuy.Text = "Buy";
+            btnBuy.Enabled = false;
         }
 
         private void BtnBuyPassive_Click(object? sender, EventArgs e)
@@ -149,10 +160,14 @@ namespace WinFormsApp2
             if (lstAbilities.SelectedIndex < 0)
             {
                 rtbAbility.Clear();
+                btnBuy.Text = "Buy";
+                btnBuy.Enabled = false;
                 return;
             }
             var ability = _abilities[lstAbilities.SelectedIndex];
-            rtbAbility.Text = $"{ability.Description}\nCooldown: {ability.Cooldown}s\nMana Cost: {ability.Cost}";
+            rtbAbility.Text = $"{ability.Description}\nCooldown: {ability.Cooldown}s\nMana Cost: {ability.Cost}\nPoint Cost: {ability.PointCost}";
+            btnBuy.Text = $"Buy ({ability.PointCost} pt{(ability.PointCost > 1 ? "s" : string.Empty)})";
+            btnBuy.Enabled = ability.PointCost <= _availablePoints;
         }
 
         private void LstAbilities_MouseMove(object? sender, MouseEventArgs e)
