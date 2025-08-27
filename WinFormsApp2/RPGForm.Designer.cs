@@ -333,6 +333,5 @@ namespace WinFormsApp2
 
         #endregion
 
-        private Label partyPowerLabel;
     }
 }
