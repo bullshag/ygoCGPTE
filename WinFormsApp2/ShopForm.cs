@@ -152,7 +152,7 @@ namespace WinFormsApp2
             int index = _lstInventory.SelectedIndex;
             if (index < 0 || index >= InventoryService.Items.Count) return;
             var inv = InventoryService.Items[index];
-            int value = (int)(inv.Item.Price * 0.45);
+            int value = inv.Item is ArenaCoin ? 200 : (int)(inv.Item.Price * 0.45);
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
             using MySqlCommand cmd = new MySqlCommand("UPDATE users SET gold = gold + @amt WHERE id=@id", conn);

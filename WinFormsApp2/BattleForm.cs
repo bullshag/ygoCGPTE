@@ -19,11 +19,15 @@ namespace WinFormsApp2
         private readonly Dictionary<string, string> _deathCauses = new();
         private readonly bool _wildEncounter;
         private readonly bool _arenaBattle;
+        private readonly int? _arenaOpponentId;
+        private int _opponentAccountId;
         private bool _cancelled;
         private bool _playersWin;
 
         public bool PlayersWin => _playersWin;
         public bool Cancelled => _cancelled;
+        public int OpponentAccountId => _opponentAccountId;
+        public IReadOnlyList<string> LogLines => lstLog.Items.Cast<LogEntry>().Select(l => l.Text).ToList();
 
         private class LogEntry
         {
@@ -44,11 +48,12 @@ namespace WinFormsApp2
             lstLog.SelectedIndex = lstLog.Items.Count - 1;
         }
 
-        public BattleForm(int userId, bool wildEncounter = false, bool arenaBattle = false)
+        public BattleForm(int userId, bool wildEncounter = false, bool arenaBattle = false, int? arenaOpponentId = null)
         {
             _userId = userId;
             _wildEncounter = wildEncounter;
             _arenaBattle = arenaBattle;
+            _arenaOpponentId = arenaOpponentId;
             InitializeComponent();
             LoadData();
         }
@@ -112,7 +117,7 @@ namespace WinFormsApp2
 
             if (_arenaBattle)
             {
-                LoadArenaOpponents(conn);
+                LoadArenaOpponents(conn, _arenaOpponentId);
                 return;
             }
 
@@ -261,23 +266,26 @@ namespace WinFormsApp2
             }
         }
 
-        private void LoadArenaOpponents(MySqlConnection conn)
+        private void LoadArenaOpponents(MySqlConnection conn, int? specificOpponent)
         {
-            using var oppCmd = new MySqlCommand(@"
-                SELECT id FROM accounts
-                WHERE id!=@id AND EXISTS (
-                    SELECT 1 FROM characters c
-                    WHERE c.account_id=accounts.id AND c.is_dead=0
-                )
-                ORDER BY RAND() LIMIT 1", conn);
-            oppCmd.Parameters.AddWithValue("@id", _userId);
-            object? opp = oppCmd.ExecuteScalar();
-            if (opp == null)
+            int oppId;
+            if (specificOpponent.HasValue)
             {
-                _cancelled = true;
-                return;
+                oppId = specificOpponent.Value;
             }
-            int oppId = Convert.ToInt32(opp);
+            else
+            {
+                using var oppCmd = new MySqlCommand("SELECT account_id FROM arena_teams WHERE account_id!=@id ORDER BY RAND() LIMIT 1", conn);
+                oppCmd.Parameters.AddWithValue("@id", _userId);
+                object? opp = oppCmd.ExecuteScalar();
+                if (opp == null)
+                {
+                    _cancelled = true;
+                    return;
+                }
+                oppId = Convert.ToInt32(opp);
+            }
+            _opponentAccountId = oppId;
             InventoryService.Load(oppId);
             using var cmd = new MySqlCommand("SELECT id, name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM characters WHERE account_id=@aid AND is_dead=0", conn);
             cmd.Parameters.AddWithValue("@aid", oppId);
