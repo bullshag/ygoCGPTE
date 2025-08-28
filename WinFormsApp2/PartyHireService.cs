@@ -110,18 +110,21 @@ namespace WinFormsApp2.Multiplayer
             conn.Open();
             using MySqlCommand cmd = new MySqlCommand("SELECT name,strength,dex,intelligence,experience_points FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn);
             cmd.Parameters.AddWithValue("@id", ownerId);
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
+            using (var reader = cmd.ExecuteReader())
             {
-                members.Add(new HireableMember
+                while (reader.Read())
                 {
-                    Name = reader.GetString("name"),
-                    Strength = reader.GetInt32("strength"),
-                    Dexterity = reader.GetInt32("dex"),
-                    Intelligence = reader.GetInt32("intelligence"),
-                    Experience = reader.GetInt32("experience_points")
-                });
+                    members.Add(new HireableMember
+                    {
+                        Name = reader.GetString("name"),
+                        Strength = reader.GetInt32("strength"),
+                        Dexterity = reader.GetInt32("dex"),
+                        Intelligence = reader.GetInt32("intelligence"),
+                        Experience = reader.GetInt32("experience_points")
+                    });
+                }
             }
+
             if (members.Count == 0) return false;
 
             using (var upd = new MySqlCommand("UPDATE characters SET in_tavern=1 WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn))
