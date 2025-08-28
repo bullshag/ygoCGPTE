@@ -16,6 +16,7 @@ namespace WinFormsApp2
         private void btnLogin_Click(object? sender, EventArgs e)
         {
             DatabaseConfig.DebugMode = chkDebugMode.Checked;
+            DatabaseConfig.UseKimServer = kimCheckbox.Checked;
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
             using MySqlCommand cmd = new MySqlCommand("SELECT id, nickname FROM Users WHERE Username=@u AND PasswordHash=@p", conn);
@@ -58,6 +59,11 @@ namespace WinFormsApp2
         private void chkDebugMode_CheckedChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void kimCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            DatabaseConfig.UseKimServer = kimCheckbox.Checked;
         }
     }
 }

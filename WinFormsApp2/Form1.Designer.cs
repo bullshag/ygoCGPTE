@@ -16,6 +16,7 @@ namespace WinFormsApp2
         private Label lblUsername = null!;
         private Label lblPassword = null!;
         private CheckBox chkDebugMode = null!;
+        private CheckBox kimCheckbox = null!;
 
         /// <summary>
         ///  Clean up any resources being used.
@@ -45,6 +46,7 @@ namespace WinFormsApp2
             lblUsername = new Label();
             lblPassword = new Label();
             chkDebugMode = new CheckBox();
+            kimCheckbox = new CheckBox();
             SuspendLayout();
             // 
             // txtUsername
@@ -110,12 +112,24 @@ namespace WinFormsApp2
             chkDebugMode.Text = "Enable debug mode";
             chkDebugMode.UseVisualStyleBackColor = true;
             chkDebugMode.CheckedChanged += chkDebugMode_CheckedChanged;
-            // 
+            //
+            // kimCheckbox
+            //
+            kimCheckbox.AutoSize = true;
+            kimCheckbox.Location = new Point(30, 204);
+            kimCheckbox.Name = "kimCheckbox";
+            kimCheckbox.Size = new Size(123, 19);
+            kimCheckbox.TabIndex = 7;
+            kimCheckbox.Text = "Use Kim address";
+            kimCheckbox.UseVisualStyleBackColor = true;
+            kimCheckbox.CheckedChanged += kimCheckbox_CheckedChanged;
+            //
             // Form1
-            // 
+            //
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(264, 211);
+            ClientSize = new Size(264, 240);
+            Controls.Add(kimCheckbox);
             Controls.Add(chkDebugMode);
             Controls.Add(btnCreateAccount);
             Controls.Add(btnLogin);
