@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using MySql.Data.MySqlClient;
 using System.Text.RegularExpressions;
+using WinFormsApp2.Multiplayer;
 
 namespace WinFormsApp2
 {
@@ -13,6 +14,8 @@ namespace WinFormsApp2
         private readonly List<Creature> _players = new();
         private readonly List<Creature> _npcs = new();
         private readonly Dictionary<Creature, System.Windows.Forms.Timer> _timers = new();
+        private readonly Dictionary<Creature, int> _playerIds = new();
+        private readonly HashSet<int> _mercenaryIds = new();
         private readonly Random _rng = new();
         private readonly int _userId;
         private readonly System.Windows.Forms.Timer _progressTimer = new System.Windows.Forms.Timer();
@@ -68,17 +71,19 @@ namespace WinFormsApp2
             conn.Open();
 
             string playerQuery = _arenaBattle
-                ? "SELECT id, name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=1 AND in_tavern=0"
-                : "SELECT id, name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND in_tavern=0";
+                ? "SELECT id, name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style, is_mercenary FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=1 AND in_tavern=0"
+                : "SELECT id, name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style, is_mercenary FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND in_tavern=0";
             using var cmd = new MySqlCommand(playerQuery, conn);
             cmd.Parameters.AddWithValue("@id", _userId);
 
-            var playerIds = new Dictionary<Creature, int>();
+            _playerIds.Clear();
+            _mercenaryIds.Clear();
             using (var r = cmd.ExecuteReader())
             {
                 while (r.Read())
                 {
                     int cid = r.GetInt32("id");
+                    bool merc = r.GetBoolean("is_mercenary");
                     int intelligence = r.GetInt32("intelligence");
                     var player = new Creature
                     {
@@ -103,12 +108,13 @@ namespace WinFormsApp2
                     }
 
                     _players.Add(player);
-                    playerIds[player] = cid;
+                    _playerIds[player] = cid;
+                    if (merc) _mercenaryIds.Add(cid);
                 }
             }
 
             // load abilities after closing the reader to avoid multiple active data readers on the same connection
-            foreach (var kv in playerIds)
+            foreach (var kv in _playerIds)
             {
                 foreach (var abil in AbilityService.GetEquippedAbilities(kv.Value, conn))
                 {
@@ -896,7 +902,7 @@ namespace WinFormsApp2
                 AppendLog(playersWin ? "Players win!" : "NPCs win!", playersWin);
                 if (playersWin)
                 {
-                    AwardExperience(_npcs.Sum(n => n.Level));
+                    AwardExperience(_npcs.Sum(n => n.Level), _playerIds.Values);
                     foreach (var npc in _npcs)
                     {
                         EnemyKnowledgeService.RecordKill(_userId, npc.Name);
@@ -980,20 +986,58 @@ namespace WinFormsApp2
             return 0;
         }
 
-        private void AwardExperience(int totalEnemyLevels)
+        private void AwardExperience(int totalEnemyLevels, IEnumerable<int> participantIds)
         {
+            var ids = participantIds.ToList();
+            int partySize = ids.Count;
+            if (partySize <= 0) return;
+
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            int partySize = _players.Count;
-            if (partySize <= 0) return;
+
             int expGain = totalEnemyLevels * 10;
-            int expPer = expGain / partySize;
-            using var updateCmd = new MySqlCommand("UPDATE characters SET experience_points = experience_points + @exp WHERE account_id=@id AND is_dead=0 AND in_arena=@arena AND in_tavern=0", conn);
-            updateCmd.Parameters.AddWithValue("@exp", expPer);
-            updateCmd.Parameters.AddWithValue("@id", _userId);
-            updateCmd.Parameters.AddWithValue("@arena", _arenaBattle ? 1 : 0);
-            updateCmd.ExecuteNonQuery();
-            AppendLog($"Each party member gains {expPer} EXP!", true);
+            double expPer = expGain / (double)partySize;
+            int baseExp = (int)Math.Floor(expPer);
+            int remainder = expGain - baseExp * partySize;
+
+            var idToCreature = _playerIds.ToDictionary(kv => kv.Value, kv => kv.Key);
+
+            string allClause = string.Join(",", ids.Select((_, i) => "@id" + i));
+            using (var updateCmd = new MySqlCommand($"UPDATE characters SET experience_points = experience_points + @exp WHERE id IN ({allClause})", conn))
+            {
+                updateCmd.Parameters.AddWithValue("@exp", baseExp);
+                for (int i = 0; i < ids.Count; i++)
+                    updateCmd.Parameters.AddWithValue("@id" + i, ids[i]);
+                updateCmd.ExecuteNonQuery();
+            }
+
+            var bonusIds = new List<int>();
+            if (remainder > 0)
+            {
+                var ordered = ids.OrderByDescending(id => idToCreature[id].Level).Take(remainder).ToList();
+                bonusIds.AddRange(ordered);
+                string bonusClause = string.Join(",", bonusIds.Select((id, i) => "@bid" + i));
+                using var bonusCmd = new MySqlCommand($"UPDATE characters SET experience_points = experience_points + 1 WHERE id IN ({bonusClause})", conn);
+                for (int i = 0; i < bonusIds.Count; i++)
+                    bonusCmd.Parameters.AddWithValue("@bid" + i, bonusIds[i]);
+                bonusCmd.ExecuteNonQuery();
+            }
+
+            var mercGains = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            foreach (int id in ids)
+            {
+                var c = idToCreature[id];
+                int gain = baseExp + (bonusIds.Contains(id) ? 1 : 0);
+                if (_mercenaryIds.Contains(id))
+                    mercGains[c.Name] = gain;
+            }
+            if (mercGains.Count > 0)
+                PartyHireService.ApplyMercenaryExperience(_userId, mercGains);
+
+            if (remainder > 0)
+                AppendLog($"Each party member gains {baseExp} EXP ({remainder} member(s) gain +1).", true);
+            else
+                AppendLog($"Each party member gains {baseExp} EXP!", true);
         }
 
         private class Creature
