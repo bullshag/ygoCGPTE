@@ -1,11 +1,13 @@
 
 using System;
 using System.Collections.Generic;
+
 using System.Drawing;
 using System.Windows.Forms;
 
 namespace WinFormsApp2
 {
+
     public class HireableMember
     {
         public string Name { get; set; } = string.Empty;
@@ -32,6 +34,7 @@ namespace WinFormsApp2
         private readonly Label _costLabel = new();
         private readonly Label _statsLabel = new();
         private readonly TabControl _tabs = new();
+
         private readonly List<HireableParty> _availableParties = new();
         private readonly int _accountId;
 
@@ -70,37 +73,39 @@ namespace WinFormsApp2
             hireButton.Click += (s, e) => HireSelectedParty();
             hireTab.Controls.Add(hireButton);
 
-            // Hire out tab placeholder
-            hireOutTab.Controls.Add(new Label
-            {
-                Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.MiddleCenter,
-                Text = "Depositing parties not implemented"
-            });
+            // Hire-out tab controls
+            _myPartyList.SetBounds(10, 10, 200, 240);
+            hireOutTab.Controls.Add(_myPartyList);
 
-            LoadParties();
-            foreach (var party in _availableParties)
-                _partyList.Items.Add(party);
+            _costInput.SetBounds(220, 10, 80, 23);
+            _costInput.Minimum = 1;
+            _costInput.Maximum = 10000;
+            _costInput.Value = 100;
+            hireOutTab.Controls.Add(_costInput);
+
+            var depositBtn = new Button { Text = "Deposit", Left = 220, Top = 40, Width = 100 };
+            depositBtn.Click += (s, e) => DepositParty();
+            hireOutTab.Controls.Add(depositBtn);
+
+            var withdrawBtn = new Button { Text = "Withdraw", Left = 220, Top = 80, Width = 100 };
+            withdrawBtn.Click += (s, e) => WithdrawParty();
+            hireOutTab.Controls.Add(withdrawBtn);
+
+            RefreshLists();
         }
 
-        private void LoadParties()
+        private void RefreshLists()
         {
-            // Placeholder data until backend is implemented
-            var rng = new Random();
-            for (int p = 0; p < 3; p++)
+            _partyList.Items.Clear();
+            foreach (var party in PartyHireService.GetAvailableParties())
+                _partyList.Items.Add(party);
+
+            _myPartyList.Items.Clear();
+            foreach (var party in PartyHireService.GetOwnerParties(_accountId))
             {
-                var party = new HireableParty { Name = $"Party {p + 1}", Cost = 100 * (p + 1), OwnerId = p + 1 };
-                for (int m = 0; m < 3; m++)
-                {
-                    party.Members.Add(new HireableMember
-                    {
-                        Name = $"Member {p + 1}-{m + 1}",
-                        Strength = rng.Next(5, 11),
-                        Dexterity = rng.Next(5, 11),
-                        Intelligence = rng.Next(5, 11)
-                    });
-                }
-                _availableParties.Add(party);
+                string status = party.OnMission ? "(Hired)" : "(Idle)";
+                _myPartyList.Items.Add($"{party.Name} {status} - Earned {party.GoldEarned}g");
+
             }
         }
 
@@ -112,9 +117,8 @@ namespace WinFormsApp2
             {
                 _costLabel.Text = $"Cost: {party.Cost}g";
                 foreach (var m in party.Members)
-                {
                     _memberList.Items.Add(m);
-                }
+
             }
             else
             {
@@ -138,11 +142,48 @@ namespace WinFormsApp2
         {
             if (_partyList.SelectedItem is HireableParty party)
             {
-                MessageBox.Show($"Hired {party.Name} for {party.Cost}g. Gameplay not implemented.");
-                TavernService.NotifyPartyHired(party.OwnerId);
-                TavernService.NotifyPartyReturned(party.OwnerId);
+                if (PartyHireService.HireParty(_accountId, party))
+                {
+                    MessageBox.Show($"Hired {party.Name} for {party.Cost}g.");
+                    RefreshLists();
+                }
+                else
+                {
+                    MessageBox.Show("Unable to hire party.");
+                }
             }
+        }
 
+        private void DepositParty()
+        {
+            int cost = (int)_costInput.Value;
+            if (PartyHireService.DepositAccountParty(_accountId, cost))
+            {
+                MessageBox.Show("Party deposited for hire.");
+                RefreshLists();
+            }
+            else
+            {
+                MessageBox.Show("No available party to deposit.");
+            }
+        }
+
+        private void WithdrawParty()
+        {
+            int index = _myPartyList.SelectedIndex;
+            if (index < 0) return;
+            var parties = PartyHireService.GetOwnerParties(_accountId);
+            if (index >= parties.Count) return;
+            var party = parties[index];
+            if (party.OnMission)
+            {
+                MessageBox.Show("Party is currently hired and cannot be withdrawn.");
+                return;
+            }
+            int gold = PartyHireService.RetrieveParty(_accountId, party);
+            MessageBox.Show(gold > 0 ? $"Party retrieved. Earned {gold}g." : "Party retrieved.");
+            RefreshLists();
         }
     }
 }
+
