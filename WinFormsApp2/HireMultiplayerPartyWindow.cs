@@ -1,23 +1,43 @@
+
 using System;
+using System.Collections.Generic;
+
 using System.Drawing;
 using System.Windows.Forms;
 
 namespace WinFormsApp2
 {
+
+    public class HireableMember
+    {
+        public string Name { get; set; } = string.Empty;
+        public int Strength { get; set; }
+        public int Dexterity { get; set; }
+        public int Intelligence { get; set; }
+        public int MaxHp => 10 + Strength * 5;
+        public override string ToString() => Name;
+    }
+
+    public class HireableParty
+    {
+        public string Name { get; set; } = string.Empty;
+        public int Cost { get; set; }
+        public List<HireableMember> Members { get; set; } = new();
+        public override string ToString() => Name;
+    }
+
     public class HireMultiplayerPartyWindow : Form
     {
-        private readonly int _accountId;
         private readonly ListBox _partyList = new();
         private readonly ListBox _memberList = new();
         private readonly Label _costLabel = new();
         private readonly Label _statsLabel = new();
         private readonly TabControl _tabs = new();
-        private readonly ListBox _myPartyList = new();
-        private readonly NumericUpDown _costInput = new();
+
+        private readonly List<HireableParty> _availableParties = new();
 
         public HireMultiplayerPartyWindow(int accountId, bool showHireOut = false)
         {
-            _accountId = accountId;
             Text = "Multiplayer Tavern";
             Width = 520;
             Height = 360;
@@ -82,6 +102,7 @@ namespace WinFormsApp2
             {
                 string status = party.OnMission ? "(Hired)" : "(Idle)";
                 _myPartyList.Items.Add($"{party.Name} {status} - Earned {party.GoldEarned}g");
+
             }
         }
 
@@ -94,6 +115,7 @@ namespace WinFormsApp2
                 _costLabel.Text = $"Cost: {party.Cost}g";
                 foreach (var m in party.Members)
                     _memberList.Items.Add(m);
+
             }
             else
             {
