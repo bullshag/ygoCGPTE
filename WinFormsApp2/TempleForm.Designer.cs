@@ -1,0 +1,39 @@
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace WinFormsApp2
+{
+    partial class TempleForm
+    {
+        private Button btnBless = null!;
+
+        private void InitializeComponent()
+        {
+            btnBless = new Button();
+            SuspendLayout();
+            // 
+            // btnBless
+            // 
+            btnBless.Location = new Point(40, 30);
+            btnBless.Name = "btnBless";
+            btnBless.Size = new Size(200, 23);
+            btnBless.TabIndex = 0;
+            btnBless.Text = "Buy Travel Blessing (100g)";
+            btnBless.UseVisualStyleBackColor = true;
+            btnBless.Click += btnBless_Click;
+            // 
+            // TempleForm
+            // 
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(280, 150);
+            Controls.Add(btnBless);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            Name = "TempleForm";
+            StartPosition = FormStartPosition.CenterParent;
+            Text = "Temple";
+            ResumeLayout(false);
+        }
+    }
+}
+

@@ -4,7 +4,7 @@ using MySql.Data.MySqlClient;
 
 namespace WinFormsApp2
 {
-    public class TempleForm : Form
+    public partial class TempleForm : Form
     {
         private readonly int _accountId;
         private readonly Action _onBlessing;
@@ -13,18 +13,10 @@ namespace WinFormsApp2
         {
             _accountId = accountId;
             _onBlessing = onBlessing;
-            Text = "Temple";
-            Width = 280;
-            Height = 150;
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            StartPosition = FormStartPosition.CenterParent;
-
-            var btnBless = new Button { Text = "Buy Travel Blessing (100g)", Left = 40, Top = 30, Width = 200 };
-            btnBless.Click += BtnBless_Click;
-            Controls.Add(btnBless);
+            InitializeComponent();
         }
 
-        private void BtnBless_Click(object? sender, EventArgs e)
+        private void btnBless_Click(object? sender, EventArgs e)
         {
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
@@ -52,3 +44,4 @@ namespace WinFormsApp2
         }
     }
 }
+
