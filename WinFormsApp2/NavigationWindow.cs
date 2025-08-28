@@ -207,10 +207,12 @@ namespace WinFormsApp2
         private void BtnShop_Click(object? sender, EventArgs e)
         {
             var shop = new ShopForm(_accountId, _currentNode);
+            if (sender is Button btn) btn.Enabled = false;
             shop.FormClosed += (_, __) =>
             {
                 _refresh();
                 UpdatePartySize();
+                if (sender is Button b) b.Enabled = true;
                 shop.Dispose();
             };
             shop.Show(this);
@@ -219,14 +221,24 @@ namespace WinFormsApp2
         private void BtnGraveyard_Click(object? sender, EventArgs e)
         {
             var grave = new GraveyardForm(_accountId, () => { _refresh(); UpdatePartySize(); });
-            grave.FormClosed += (_, __) => grave.Dispose();
+            if (sender is Button btn) btn.Enabled = false;
+            grave.FormClosed += (_, __) =>
+            {
+                if (sender is Button b) b.Enabled = true;
+                grave.Dispose();
+            };
             grave.Show(this);
         }
 
         private void BtnTavern_Click(object? sender, EventArgs e)
         {
             var tavern = new TavernForm(_accountId, () => { _refresh(); UpdatePartySize(); });
-            tavern.FormClosed += (_, __) => tavern.Dispose();
+            if (sender is Button btn) btn.Enabled = false;
+            tavern.FormClosed += (_, __) =>
+            {
+                if (sender is Button b) b.Enabled = true;
+                tavern.Dispose();
+            };
             tavern.Show(this);
         }
 
@@ -234,11 +246,13 @@ namespace WinFormsApp2
         {
             var node = WorldMapService.GetNode(_currentNode);
             var battle = new BattleForm(_accountId, areaMinLevel: node.MinEnemyLevel, areaMaxLevel: node.MaxEnemyLevel);
+            if (sender is Button btn) btn.Enabled = false;
             battle.FormClosed += (_, __) =>
             {
                 _refresh();
                 UpdatePartySize();
                 LoadNode(_currentNode);
+                if (sender is Button b) b.Enabled = true;
                 battle.Dispose();
             };
             battle.Show(this);
@@ -247,14 +261,24 @@ namespace WinFormsApp2
         private void BtnArena_Click(object? sender, EventArgs e)
         {
             var arena = new ArenaForm(_accountId);
-            arena.FormClosed += (_, __) => arena.Dispose();
+            if (sender is Button btn) btn.Enabled = false;
+            arena.FormClosed += (_, __) =>
+            {
+                if (sender is Button b) b.Enabled = true;
+                arena.Dispose();
+            };
             arena.Show(this);
         }
 
         private void BtnTemple_Click(object? sender, EventArgs e)
         {
             var temple = new TempleForm(_accountId, RefreshBlessing);
-            temple.FormClosed += (_, __) => temple.Dispose();
+            if (sender is Button btn) btn.Enabled = false;
+            temple.FormClosed += (_, __) =>
+            {
+                if (sender is Button b) b.Enabled = true;
+                temple.Dispose();
+            };
             temple.Show(this);
         }
 
