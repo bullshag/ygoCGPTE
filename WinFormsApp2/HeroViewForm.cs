@@ -64,7 +64,7 @@ namespace WinFormsApp2
             {
                 countCmd.Parameters.AddWithValue("@id", _userId);
                 int partyCount = Convert.ToInt32(countCmd.ExecuteScalar());
-                if (partyCount >= 5)
+                if (partyCount >= 10)
                 {
                     MessageBox.Show("Party is full. Release a member before hiring.");
                     return;

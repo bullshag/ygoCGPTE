@@ -89,7 +89,7 @@ namespace WinFormsApp2
                 using var arenaCountCmd = new MySqlCommand("SELECT COUNT(*) FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=1", conn);
                 arenaCountCmd.Parameters.AddWithValue("@id", _userId);
                 int arenaCount = Convert.ToInt32(arenaCountCmd.ExecuteScalar());
-                if (partyCount + arenaCount > 5)
+                if (partyCount + arenaCount > 10)
                 {
                     MessageBox.Show("You need to make room to withdraw your party members.");
                     return;
