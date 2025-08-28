@@ -260,6 +260,12 @@ namespace WinFormsApp2
             LoadPartyData();
         }
 
+        private void btnMail_Click(object? sender, EventArgs e)
+        {
+            using var box = new MailboxForm(_userId);
+            box.ShowDialog(this);
+        }
+
         private void btnInventory_Click(object? sender, EventArgs e)
         {
             using var inv = new InventoryForm(_userId);

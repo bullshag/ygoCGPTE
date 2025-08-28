@@ -23,10 +23,11 @@ namespace WinFormsApp2
         public string Name { get; set; } = string.Empty;
         public int Cost { get; set; }
         public List<HireableMember> Members { get; set; } = new();
+        public int OwnerId { get; set; }
         public override string ToString() => Name;
     }
 
-    public class HireMultiplayerPartyWindow : Form
+    public partial class HireMultiplayerPartyWindow : Form
     {
         private readonly ListBox _partyList = new();
         private readonly ListBox _memberList = new();
@@ -35,9 +36,11 @@ namespace WinFormsApp2
         private readonly TabControl _tabs = new();
 
         private readonly List<HireableParty> _availableParties = new();
+        private readonly int _accountId;
 
         public HireMultiplayerPartyWindow(int accountId, bool showHireOut = false)
         {
+            _accountId = accountId;
             Text = "Multiplayer Tavern";
             Width = 520;
             Height = 360;

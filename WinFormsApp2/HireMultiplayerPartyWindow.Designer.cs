@@ -1,4 +1,7 @@
-﻿namespace BattleLands
+using System.Windows.Forms;
+using System.Drawing;
+
+namespace WinFormsApp2
 {
     partial class HireMultiplayerPartyWindow
     {
