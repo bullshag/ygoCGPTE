@@ -6,37 +6,16 @@ using MySql.Data.MySqlClient;
 
 namespace WinFormsApp2
 {
-    public class ArenaForm : Form
+    public partial class ArenaForm : Form
     {
         private readonly int _userId;
         private int _wins;
-        private readonly ListBox _lstTeams;
-        private readonly Button _btnChallenge;
-        private readonly Button _btnDeposit;
-        private readonly Label _lblStatus;
-        private readonly ToolTip _tip = new();
         private bool _deposited;
 
         public ArenaForm(int userId)
         {
             _userId = userId;
-            Text = "Battle Arena";
-            Width = 300;
-            Height = 260;
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            StartPosition = FormStartPosition.CenterParent;
-
-            _lblStatus = new Label { Left = 10, Top = 10, AutoSize = true };
-            _lstTeams = new ListBox { Left = 10, Top = 40, Width = 260, Height = 140 };
-            _lstTeams.SelectedIndexChanged += (s, e) => UpdateButtons();
-            _lstTeams.MouseMove += LstTeams_MouseMove;
-
-            _btnChallenge = new Button { Text = "Challenge", Width = 100, Left = 30, Top = 190 };
-            _btnChallenge.Click += BtnChallenge_Click;
-            _btnDeposit = new Button { Text = "Deposit", Width = 100, Left = 150, Top = 190 };
-            _btnDeposit.Click += BtnDeposit_Click;
-
-            Controls.AddRange(new Control[] { _lblStatus, _lstTeams, _btnChallenge, _btnDeposit });
+            InitializeComponent();
             Load += ArenaForm_Load;
         }
 
@@ -95,6 +74,8 @@ namespace WinFormsApp2
         {
             _btnChallenge.Enabled = _lstTeams.SelectedItem != null && _lstTeams.Items.Count > 0;
         }
+
+        private void LstTeams_SelectedIndexChanged(object? sender, EventArgs e) => UpdateButtons();
 
         private void BtnDeposit_Click(object? sender, EventArgs e)
         {
@@ -219,6 +200,15 @@ namespace WinFormsApp2
             {
                 MessageBox.Show("Defeat!");
             }
+            var logs = string.Join("\n", BattleLogService.GetLogs());
+            string challenger;
+            using (var nameCmd = new MySqlCommand("SELECT nickname FROM users WHERE id=@id", conn))
+            {
+                nameCmd.Parameters.AddWithValue("@id", _userId);
+                challenger = nameCmd.ExecuteScalar()?.ToString() ?? "Unknown";
+            }
+            string resultText = battle.PlayersWin ? $"was defeated by {challenger}" : $"defeated {challenger}";
+            MailService.SendMail(null, team.AccountId, "Arena Battle Result", $"Your arena team {resultText}.\n\nBattle Log:\n{logs}");
             RefreshStatus();
             RefreshTeams();
         }

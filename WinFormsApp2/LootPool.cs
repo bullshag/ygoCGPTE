@@ -83,7 +83,7 @@ namespace WinFormsApp2
                 new HealingPotion()
             };
 
-            for (int i = items.Count; i < 5; i++)
+            for (int i = items.Count; i < 15; i++)
             {
                 var available = pool.Where(n => !_usedItems.Contains(n)).ToList();
                 if (available.Count == 0)
