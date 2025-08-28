@@ -985,7 +985,7 @@ namespace WinFormsApp2
             conn.Open();
             int partySize = _players.Count;
             if (partySize <= 0) return;
-            int expGain = totalEnemyLevels * 20;
+            int expGain = totalEnemyLevels * 10;
             int expPer = expGain / partySize;
             using var updateCmd = new MySqlCommand("UPDATE characters SET experience_points = experience_points + @exp WHERE account_id=@id AND is_dead=0 AND in_arena=@arena", conn);
             updateCmd.Parameters.AddWithValue("@exp", expPer);
