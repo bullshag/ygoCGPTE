@@ -19,5 +19,6 @@ CREATE TABLE IF NOT EXISTS characters (
     magic_defense INT NOT NULL,
     level INT NOT NULL DEFAULT 1,
     skill_points INT NOT NULL DEFAULT 0,
+    in_tavern TINYINT NOT NULL DEFAULT 0,
     FOREIGN KEY (account_id) REFERENCES users(id)
 );
