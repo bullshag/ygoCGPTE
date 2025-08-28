@@ -206,44 +206,56 @@ namespace WinFormsApp2
 
         private void BtnShop_Click(object? sender, EventArgs e)
         {
-            using var shop = new ShopForm(_accountId, _currentNode);
-            shop.ShowDialog(this);
-            _refresh();
-            UpdatePartySize();
+            var shop = new ShopForm(_accountId, _currentNode);
+            shop.FormClosed += (_, __) =>
+            {
+                _refresh();
+                UpdatePartySize();
+                shop.Dispose();
+            };
+            shop.Show(this);
         }
 
         private void BtnGraveyard_Click(object? sender, EventArgs e)
         {
-            using var grave = new GraveyardForm(_accountId, () => { _refresh(); UpdatePartySize(); });
-            grave.ShowDialog(this);
+            var grave = new GraveyardForm(_accountId, () => { _refresh(); UpdatePartySize(); });
+            grave.FormClosed += (_, __) => grave.Dispose();
+            grave.Show(this);
         }
 
         private void BtnTavern_Click(object? sender, EventArgs e)
         {
-            using var tavern = new TavernForm(_accountId, () => { _refresh(); UpdatePartySize(); });
-            tavern.ShowDialog(this);
+            var tavern = new TavernForm(_accountId, () => { _refresh(); UpdatePartySize(); });
+            tavern.FormClosed += (_, __) => tavern.Dispose();
+            tavern.Show(this);
         }
 
         private void BtnFindEnemies_Click(object? sender, EventArgs e)
         {
             var node = WorldMapService.GetNode(_currentNode);
-            using var battle = new BattleForm(_accountId, areaMinLevel: node.MinEnemyLevel, areaMaxLevel: node.MaxEnemyLevel);
-            battle.ShowDialog(this);
-            _refresh();
-            UpdatePartySize();
-            LoadNode(_currentNode);
+            var battle = new BattleForm(_accountId, areaMinLevel: node.MinEnemyLevel, areaMaxLevel: node.MaxEnemyLevel);
+            battle.FormClosed += (_, __) =>
+            {
+                _refresh();
+                UpdatePartySize();
+                LoadNode(_currentNode);
+                battle.Dispose();
+            };
+            battle.Show(this);
         }
 
         private void BtnArena_Click(object? sender, EventArgs e)
         {
-            using var arena = new ArenaForm(_accountId);
-            arena.ShowDialog(this);
+            var arena = new ArenaForm(_accountId);
+            arena.FormClosed += (_, __) => arena.Dispose();
+            arena.Show(this);
         }
 
         private void BtnTemple_Click(object? sender, EventArgs e)
         {
-            using var temple = new TempleForm(_accountId, RefreshBlessing);
-            temple.ShowDialog(this);
+            var temple = new TempleForm(_accountId, RefreshBlessing);
+            temple.FormClosed += (_, __) => temple.Dispose();
+            temple.Show(this);
         }
 
         private void RefreshBlessing()
@@ -267,7 +279,15 @@ namespace WinFormsApp2
         private void TravelManager_AmbushEncounter()
         {
             lblTravelInfo.Text = "Ambushed by wild enemies!";
-            using var battle = new BattleForm(_accountId, true);
+            var battle = new BattleForm(_accountId, true);
+            battle.FormClosed += (_, __) =>
+            {
+                _refresh();
+                UpdatePartySize();
+                LoadNode(_currentNode);
+                _travelManager.ResumeAfterEncounter();
+                battle.Dispose();
+            };
             // If the navigation window has already been disposed (for example
             // when the user closes the form while travel continues), showing
             // a dialog with this form as the owner will throw an
@@ -275,16 +295,12 @@ namespace WinFormsApp2
             // form as the owner when it's still alive.
             if (!IsDisposed && IsHandleCreated)
             {
-                battle.ShowDialog(this);
+                battle.Show(this);
             }
             else
             {
-                battle.ShowDialog();
+                battle.Show();
             }
-            _refresh();
-            UpdatePartySize();
-            LoadNode(_currentNode);
-            _travelManager.ResumeAfterEncounter();
         }
 
         protected override void OnFormClosed(FormClosedEventArgs e)
