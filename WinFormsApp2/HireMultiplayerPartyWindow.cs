@@ -25,7 +25,7 @@ namespace WinFormsApp2
         public override string ToString() => Name;
     }
 
-    public class HireMultiplayerPartyWindow : Form
+    public partial class HireMultiplayerPartyWindow : Form
     {
         private readonly ListBox _partyList = new();
         private readonly ListBox _memberList = new();
