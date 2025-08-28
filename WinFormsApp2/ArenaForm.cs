@@ -173,44 +173,52 @@ namespace WinFormsApp2
             if (_lstTeams.SelectedItem is not ArenaTeam team) return;
             int playerPower = GetTeamPower(_userId);
             int oppPower = GetTeamPower(team.AccountId);
-            using var battle = new BattleForm(_userId, arenaBattle: true, arenaOpponentId: team.AccountId);
-            battle.ShowDialog(this);
-            if (battle.Cancelled) return;
-            using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
-            conn.Open();
-            if (battle.PlayersWin)
+            var battle = new BattleForm(_userId, arenaBattle: true, arenaOpponentId: team.AccountId);
+            battle.FormClosed += (_, __) =>
             {
-                if (oppPower > playerPower)
+                if (battle.Cancelled)
                 {
-                    InventoryService.AddItem(new ArenaCoin());
-                    MessageBox.Show("You earned an Arena Coin!");
+                    battle.Dispose();
+                    return;
                 }
-                using var del = new MySqlCommand("DELETE FROM arena_teams WHERE account_id=@id", conn);
-                del.Parameters.AddWithValue("@id", team.AccountId);
-                del.ExecuteNonQuery();
-                using var kill = new MySqlCommand("UPDATE characters SET is_dead=1, in_graveyard=1, in_arena=0, in_tavern=0, current_hp=0, death_time=NOW(), cause_of_death='Arena defeat' WHERE account_id=@id AND is_dead=0", conn);
-                kill.Parameters.AddWithValue("@id", team.AccountId);
-                kill.ExecuteNonQuery();
-                using var winCmd = new MySqlCommand("UPDATE arena_teams SET wins=wins+1 WHERE account_id=@id", conn);
-                winCmd.Parameters.AddWithValue("@id", _userId);
-                winCmd.ExecuteNonQuery();
-                MessageBox.Show("Victory!");
-            }
-            else
-            {
-                MessageBox.Show("Defeat!");
-            }
-            var logs = string.Join("\n", BattleLogService.GetLogs());
-            string challenger;
-            using (var nameCmd = new MySqlCommand("SELECT nickname FROM users WHERE id=@id", conn))
-            {
-                nameCmd.Parameters.AddWithValue("@id", _userId);
-                challenger = nameCmd.ExecuteScalar()?.ToString() ?? "Unknown";
-            }
-            string resultText = battle.PlayersWin ? $"was defeated by {challenger}" : $"defeated {challenger}";
-            MailService.SendMail(null, team.AccountId, "Arena Battle Result", $"Your arena team {resultText}.\n\nBattle Log:\n{logs}");
-            RefreshStatus();
-            RefreshTeams();
+                using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+                conn.Open();
+                if (battle.PlayersWin)
+                {
+                    if (oppPower > playerPower)
+                    {
+                        InventoryService.AddItem(new ArenaCoin());
+                        MessageBox.Show("You earned an Arena Coin!");
+                    }
+                    using var del = new MySqlCommand("DELETE FROM arena_teams WHERE account_id=@id", conn);
+                    del.Parameters.AddWithValue("@id", team.AccountId);
+                    del.ExecuteNonQuery();
+                    using var kill = new MySqlCommand("UPDATE characters SET is_dead=1, in_graveyard=1, in_arena=0, in_tavern=0, current_hp=0, death_time=NOW(), cause_of_death='Arena defeat' WHERE account_id=@id AND is_dead=0", conn);
+                    kill.Parameters.AddWithValue("@id", team.AccountId);
+                    kill.ExecuteNonQuery();
+                    using var winCmd = new MySqlCommand("UPDATE arena_teams SET wins=wins+1 WHERE account_id=@id", conn);
+                    winCmd.Parameters.AddWithValue("@id", _userId);
+                    winCmd.ExecuteNonQuery();
+                    MessageBox.Show("Victory!");
+                }
+                else
+                {
+                    MessageBox.Show("Defeat!");
+                }
+                var logs = string.Join("\n", BattleLogService.GetLogs());
+                string challenger;
+                using (var nameCmd = new MySqlCommand("SELECT nickname FROM users WHERE id=@id", conn))
+                {
+                    nameCmd.Parameters.AddWithValue("@id", _userId);
+                    challenger = nameCmd.ExecuteScalar()?.ToString() ?? "Unknown";
+                }
+                string resultText = battle.PlayersWin ? $"was defeated by {challenger}" : $"defeated {challenger}";
+                MailService.SendMail(null, team.AccountId, "Arena Battle Result", $"Your arena team {resultText}.\n\nBattle Log:\n{logs}");
+                RefreshStatus();
+                RefreshTeams();
+                battle.Dispose();
+            };
+            battle.Show(this);
         }
 
         private class ArenaTeam

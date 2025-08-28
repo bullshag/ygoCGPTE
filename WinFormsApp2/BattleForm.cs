@@ -916,9 +916,10 @@ namespace WinFormsApp2
                 SaveState();
                 var playerSummaries = _players.Select(p => new CombatantSummary(p.Name, p.DamageDone, p.DamageTaken));
                 var enemySummaries = _npcs.Select(n => new CombatantSummary(n.Name, n.DamageDone, n.DamageTaken));
-                using var summary = new BattleSummaryForm(playerSummaries, enemySummaries, playersWin, lootSummary);
+                var summary = new BattleSummaryForm(playerSummaries, enemySummaries, playersWin, lootSummary);
                 Hide();
-                summary.ShowDialog(this.Owner);
+                summary.FormClosed += (_, __) => summary.Dispose();
+                summary.Show(this.Owner);
                 Close();
             }
         }

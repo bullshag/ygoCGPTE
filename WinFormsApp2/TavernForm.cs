@@ -59,20 +59,23 @@ namespace WinFormsApp2
                 candidates.Add(RecruitCandidate.Generate(rng, i));
             }
 
-            using var recruitForm = new RecruitForm(_accountId, candidates, () => _searchCost, OnHire);
-            recruitForm.ShowDialog(this);
+            var recruitForm = new RecruitForm(_accountId, candidates, () => _searchCost, OnHire);
+            recruitForm.FormClosed += (_, __) => recruitForm.Dispose();
+            recruitForm.Show(this);
         }
 
         private void btnJoin_Click(object? sender, EventArgs e)
         {
-            using var window = new HireMultiplayerPartyWindow(_accountId, OnHire);
-            window.ShowDialog(this);
+            var window = new HireMultiplayerPartyWindow(_accountId, OnHire);
+            window.FormClosed += (_, __) => window.Dispose();
+            window.Show(this);
         }
 
         private void btnHireOut_Click(object? sender, EventArgs e)
         {
-            using var window = new HireMultiplayerPartyWindow(_accountId, OnHire, showHireOut: true);
-            window.ShowDialog(this);
+            var window = new HireMultiplayerPartyWindow(_accountId, OnHire, showHireOut: true);
+            window.FormClosed += (_, __) => window.Dispose();
+            window.Show(this);
         }
 
         private void OnHire()

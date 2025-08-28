@@ -45,8 +45,9 @@ namespace WinFormsApp2
 
         private void btnCreateAccount_Click(object? sender, EventArgs e)
         {
-            using RegisterForm register = new RegisterForm();
-            register.ShowDialog();
+            var register = new RegisterForm();
+            register.FormClosed += (_, __) => register.Dispose();
+            register.Show(this);
         }
 
         internal static string HashPassword(string password)
