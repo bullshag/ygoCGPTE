@@ -41,8 +41,9 @@ namespace WinFormsApp2
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
 
+            _hiredMembers = PartyHireService.GetHiredMemberNames(_userId);
 
-            using MySqlCommand cmd = new MySqlCommand("SELECT name, experience_points, level, current_hp, max_hp, mana, intelligence FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn);
+            using MySqlCommand cmd = new MySqlCommand("SELECT name, experience_points, level, current_hp, max_hp, mana, intelligence, in_tavern FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0", conn);
 
             cmd.Parameters.AddWithValue("@id", _userId);
             using MySqlDataReader reader = cmd.ExecuteReader();
@@ -55,6 +56,9 @@ namespace WinFormsApp2
             while (reader.Read())
             {
                 string name = reader.GetString("name");
+                bool inTavern = reader.GetBoolean("in_tavern");
+                if (inTavern && !_hiredMembers.Contains(name))
+                    continue;
                 int exp = reader.GetInt32("experience_points");
                 int level = reader.GetInt32("level");
                 int hp = reader.GetInt32("current_hp");
