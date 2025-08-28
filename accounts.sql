@@ -40,3 +40,15 @@ CREATE TABLE IF NOT EXISTS friends (
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (friend_id) REFERENCES users(id)
 );
+
+CREATE TABLE IF NOT EXISTS mail_messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    sender_id INT NULL,
+    recipient_id INT NOT NULL,
+    subject VARCHAR(255) NOT NULL,
+    body TEXT NOT NULL,
+    sent_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    is_read TINYINT(1) NOT NULL DEFAULT 0,
+    FOREIGN KEY (sender_id) REFERENCES users(id),
+    FOREIGN KEY (recipient_id) REFERENCES users(id)
+);
