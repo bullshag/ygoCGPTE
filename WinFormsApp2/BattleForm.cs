@@ -12,10 +12,9 @@ namespace WinFormsApp2
     {
         private readonly List<Creature> _players = new();
         private readonly List<Creature> _npcs = new();
-        private readonly Dictionary<Creature, System.Windows.Forms.Timer> _timers = new();
         private readonly Random _rng = new();
         private readonly int _userId;
-        private readonly System.Windows.Forms.Timer _progressTimer = new System.Windows.Forms.Timer();
+        private readonly System.Windows.Forms.Timer _gameTimer = new System.Windows.Forms.Timer();
         private readonly Dictionary<string, string> _deathCauses = new();
         private readonly bool _wildEncounter;
         private readonly bool _arenaBattle;
@@ -315,42 +314,40 @@ namespace WinFormsApp2
         {
             foreach (var p in _players)
             {
-                var t = new System.Windows.Forms.Timer();
                 double speed = p.ActionSpeed + p.Dex / 25.0;
                 Weapon? left = p.Equipment.GetValueOrDefault(EquipmentSlot.LeftHand) as Weapon;
                 Weapon? right = p.Equipment.GetValueOrDefault(EquipmentSlot.RightHand) as Weapon;
                 if (left != null) speed *= (1 + left.AttackSpeedMod);
                 if (right != null) speed *= (1 + right.AttackSpeedMod);
                 if (left != null && right != null && left.Name != right.Name) speed *= 1.5;
-                t.Interval = (int)(3000 / speed);
-                p.AttackInterval = t.Interval;
-                p.AttackBar.Maximum = t.Interval;
-                p.AttackBar.Value = t.Interval;
-                t.Tick += (s, e) => Act(p, _players, _npcs);
-                t.Start();
-                _timers[p] = t;
+                p.AttackInterval = (int)(3000 / speed);
+                p.AttackBar.Maximum = p.AttackInterval;
+                p.AttackBar.Value = p.AttackInterval;
+                p.NextActionMs = p.AttackInterval;
             }
             foreach (var n in _npcs)
             {
-                var t = new System.Windows.Forms.Timer();
                 double speed = n.ActionSpeed + n.Dex / 25.0;
-                t.Interval = (int)(3000 / speed);
-                n.AttackInterval = t.Interval;
-                n.AttackBar.Maximum = t.Interval;
-                n.AttackBar.Value = t.Interval;
-                t.Tick += (s, e) => Act(n, _npcs, _players);
-                t.Start();
-                _timers[n] = t;
+                n.AttackInterval = (int)(3000 / speed);
+                n.AttackBar.Maximum = n.AttackInterval;
+                n.AttackBar.Value = n.AttackInterval;
+                n.NextActionMs = n.AttackInterval;
             }
-            _progressTimer.Interval = 100;
-            _progressTimer.Tick += (s, e) =>
+            _gameTimer.Interval = 100;
+            _gameTimer.Tick += (s, e) =>
             {
                 foreach (var c in _players.Concat(_npcs))
                 {
-                    if (c.AttackBar.Value > 0)
+                    c.NextActionMs = Math.Max(0, c.NextActionMs - 100);
+                    if (c.NextActionMs == 0)
                     {
-                        c.AttackBar.Value = Math.Max(0, c.AttackBar.Value - 100);
+                        if (_players.Contains(c))
+                            Act(c, _players, _npcs);
+                        else
+                            Act(c, _npcs, _players);
+                        c.NextActionMs = c.AttackInterval;
                     }
+                    c.AttackBar.Value = Math.Min(c.AttackBar.Maximum, c.NextActionMs);
 
                     var cdKeys = c.Cooldowns.Keys.ToList();
                     foreach (var k in cdKeys)
@@ -412,7 +409,7 @@ namespace WinFormsApp2
                 }
                 CheckEnd();
             };
-            _progressTimer.Start();
+            _gameTimer.Start();
         }
 
         private void Act(Creature actor, List<Creature> allies, List<Creature> opponents)
@@ -888,8 +885,7 @@ namespace WinFormsApp2
             foreach (var n in _npcs) n.HpBar.Value = Math.Min(n.HpBar.Maximum, Math.Max(0, n.CurrentHp));
             if (_players.All(p => p.CurrentHp <= 0) || _npcs.All(n => n.CurrentHp <= 0))
             {
-                foreach (var t in _timers.Values) t.Stop();
-                _progressTimer.Stop();
+                _gameTimer.Stop();
                 bool playersWin = _players.Any(p => p.CurrentHp > 0);
                 _playersWin = playersWin;
                 string lootSummary = string.Empty;
@@ -1021,6 +1017,7 @@ namespace WinFormsApp2
             public ProgressBar ManaBar { get; set; } = new();
             public ProgressBar AttackBar { get; set; } = new();
             public int AttackInterval { get; set; }
+            public int NextActionMs { get; set; }
             public int DamageDone { get; set; }
             public int DamageTaken { get; set; }
             public List<Ability> Abilities { get; } = new();
