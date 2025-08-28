@@ -89,9 +89,9 @@ namespace WinFormsApp2
                 using var arenaCountCmd = new MySqlCommand("SELECT COUNT(*) FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=1", conn);
                 arenaCountCmd.Parameters.AddWithValue("@id", _userId);
                 int arenaCount = Convert.ToInt32(arenaCountCmd.ExecuteScalar());
-                if (partyCount + arenaCount > 10)
+                if (partyCount + arenaCount > GameConfig.MAX_PARTY_SIZE)
                 {
-                    MessageBox.Show("You need to make room to withdraw your party members.");
+                    MessageBox.Show($"You need to make room to withdraw your party members (max {GameConfig.MAX_PARTY_SIZE}).");
                     return;
                 }
                 using var del = new MySqlCommand("DELETE FROM arena_teams WHERE account_id=@id", conn);
