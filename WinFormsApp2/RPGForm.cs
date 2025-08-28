@@ -39,7 +39,7 @@ namespace WinFormsApp2
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
 
-            using MySqlCommand cmd = new MySqlCommand("SELECT name, experience_points, level, current_hp, max_hp, mana, intelligence FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0", conn);
+            using MySqlCommand cmd = new MySqlCommand("SELECT name, experience_points, level, current_hp, max_hp, mana, intelligence FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             using MySqlDataReader reader = cmd.ExecuteReader();
             lstParty.Items.Clear();
@@ -90,7 +90,7 @@ namespace WinFormsApp2
 
             lblTotalExp.Text = $"Party EXP: {totalExp}";
             int totalSkills = 0;
-            using (var skillCmd = new MySqlCommand("SELECT COUNT(*) FROM character_abilities ca JOIN characters c ON ca.character_id=c.id WHERE c.account_id=@id AND c.is_dead=0 AND in_arena=0", conn))
+            using (var skillCmd = new MySqlCommand("SELECT COUNT(*) FROM character_abilities ca JOIN characters c ON ca.character_id=c.id WHERE c.account_id=@id AND c.is_dead=0 AND in_arena=0 AND in_tavern=0", conn))
             {
                 skillCmd.Parameters.AddWithValue("@id", _userId);
                 object? sres = skillCmd.ExecuteScalar();
@@ -136,7 +136,7 @@ namespace WinFormsApp2
 
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using MySqlCommand cmd = new MySqlCommand("SELECT id FROM characters WHERE account_id=@id AND name=@name AND is_dead=0 AND in_arena=0", conn);
+            using MySqlCommand cmd = new MySqlCommand("SELECT id FROM characters WHERE account_id=@id AND name=@name AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             cmd.Parameters.AddWithValue("@name", name);
             object? result = cmd.ExecuteScalar();
@@ -184,7 +184,7 @@ namespace WinFormsApp2
 
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using MySqlCommand cmd = new MySqlCommand("SELECT id, level FROM characters WHERE account_id=@id AND name=@name AND is_dead=0 AND in_arena=0", conn);
+            using MySqlCommand cmd = new MySqlCommand("SELECT id, level FROM characters WHERE account_id=@id AND name=@name AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             cmd.Parameters.AddWithValue("@name", name);
             using var reader = cmd.ExecuteReader();
@@ -281,7 +281,7 @@ namespace WinFormsApp2
                 "UPDATE characters SET " +
                 "current_hp = LEAST(max_hp, current_hp + 5 + CEILING(max_hp*0.05)), " +
                 "mana = LEAST(10 + 5*intelligence, mana + 5 + CEILING((10 + 5*intelligence)*0.05)) " +
-                "WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND current_hp>0 AND (current_hp < max_hp OR mana < (10 + 5*intelligence))",
+                "WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND in_tavern=0 AND current_hp>0 AND (current_hp < max_hp OR mana < (10 + 5*intelligence))",
                 conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             cmd.ExecuteNonQuery();
