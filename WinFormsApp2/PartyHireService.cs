@@ -19,6 +19,7 @@ namespace WinFormsApp2.Multiplayer
         public int ActionSpeed { get; set; }
         public Dictionary<EquipmentSlot, string?> Equipment { get; set; } = new();
         public Dictionary<int, AbilitySlotMapping> AbilitySlots { get; set; } = new();
+        public HashSet<int> Abilities { get; set; } = new();
         public Dictionary<int, int> Passives { get; set; } = new();
         public int MaxHp => 10 + Strength * 5;
         public override string ToString() => Name;
@@ -108,6 +109,14 @@ namespace WinFormsApp2.Multiplayer
                     eqCmd.ExecuteNonQuery();
                 }
 
+                foreach (var abil in m.Abilities)
+                {
+                    using var abilCmd = new MySqlCommand("INSERT INTO character_abilities(character_id, ability_id) VALUES(@cid,@aid)", conn);
+                    abilCmd.Parameters.AddWithValue("@cid", characterId);
+                    abilCmd.Parameters.AddWithValue("@aid", abil);
+                    abilCmd.ExecuteNonQuery();
+                }
+
                 foreach (var slot in m.AbilitySlots)
                 {
                     using var slotCmd = new MySqlCommand("INSERT INTO character_ability_slots(character_id, slot, ability_id, priority) VALUES(@cid,@slot,@aid,@pri)", conn);
@@ -143,6 +152,7 @@ namespace WinFormsApp2.Multiplayer
             {
                 new MySqlCommand($"DELETE FROM character_equipment WHERE account_id=@a AND character_name IN ({inClause})", conn),
                 new MySqlCommand($"DELETE s FROM character_ability_slots s JOIN characters c ON s.character_id=c.id WHERE c.account_id=@a AND c.is_mercenary=1 AND c.name IN ({inClause})", conn),
+                new MySqlCommand($"DELETE a FROM character_abilities a JOIN characters c ON a.character_id=c.id WHERE c.account_id=@a AND c.is_mercenary=1 AND c.name IN ({inClause})", conn),
                 new MySqlCommand($"DELETE p FROM character_passives p JOIN characters c ON p.character_id=c.id WHERE c.account_id=@a AND c.is_mercenary=1 AND c.name IN ({inClause})", conn),
                 new MySqlCommand($"DELETE FROM characters WHERE account_id=@a AND is_mercenary=1 AND name IN ({inClause})", conn)
             };
@@ -191,6 +201,17 @@ namespace WinFormsApp2.Multiplayer
                     {
                         var slot = Enum.Parse<EquipmentSlot>(eqReader.GetString("slot"), true);
                         m.Equipment[slot] = eqReader.GetString("item_name");
+                    }
+                }
+
+                using (var abilCmd = new MySqlCommand("SELECT ability_id FROM character_abilities WHERE character_id=@cid", conn))
+                {
+                    abilCmd.Parameters.AddWithValue("@cid", charId);
+                    using var abilReader = abilCmd.ExecuteReader();
+                    m.Abilities = new();
+                    while (abilReader.Read())
+                    {
+                        m.Abilities.Add(abilReader.GetInt32("ability_id"));
                     }
                 }
 
@@ -299,6 +320,16 @@ namespace WinFormsApp2.Multiplayer
                     {
                         var slot = Enum.Parse<EquipmentSlot>(eqReader.GetString("slot"), true);
                         member.Equipment[slot] = eqReader.GetString("item_name");
+                    }
+                }
+
+                using (var abilCmd = new MySqlCommand("SELECT ability_id FROM character_abilities WHERE character_id=@cid", conn))
+                {
+                    abilCmd.Parameters.AddWithValue("@cid", charId);
+                    using var abilReader = abilCmd.ExecuteReader();
+                    while (abilReader.Read())
+                    {
+                        member.Abilities.Add(abilReader.GetInt32("ability_id"));
                     }
                 }
 
