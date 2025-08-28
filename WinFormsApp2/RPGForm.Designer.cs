@@ -16,6 +16,7 @@ namespace WinFormsApp2
         private Button btnInventory;
         private Button btnLogs;
         private Button btnNavigate;
+        private Button btnMail;
         private Label lblGold;
         private Label lblTotalExp;
         private Label partyPowerLabel;
@@ -56,6 +57,7 @@ namespace WinFormsApp2
             btnInventory = new Button();
             btnLogs = new Button();
             btnNavigate = new Button();
+            btnMail = new Button();
             lblGold = new Label();
             lblTotalExp = new Label();
             partyPowerLabel = new Label();
@@ -71,7 +73,6 @@ namespace WinFormsApp2
             txtFriendNick = new TextBox();
             btnAddFriend = new Button();
             btnAcceptFriend = new Button();
-            partyPowerLabel = new Label();
             tabSocial.SuspendLayout();
             tabChat.SuspendLayout();
             tabFriends.SuspendLayout();
@@ -149,9 +150,19 @@ namespace WinFormsApp2
             btnNavigate.Text = "World Map";
             btnNavigate.UseVisualStyleBackColor = true;
             btnNavigate.Click += btnNavigate_Click;
-            // 
+            //
+            // btnMail
+            //
+            btnMail.Location = new Point(291, 157);
+            btnMail.Name = "btnMail";
+            btnMail.Size = new Size(260, 23);
+            btnMail.TabIndex = 11;
+            btnMail.Text = "Mail";
+            btnMail.UseVisualStyleBackColor = true;
+            btnMail.Click += btnMail_Click;
+            //
             // lblGold
-            // 
+            //
             lblGold.AutoSize = true;
             lblGold.Location = new Point(567, 16);
             lblGold.Name = "lblGold";
@@ -310,13 +321,13 @@ namespace WinFormsApp2
             Controls.Add(partyPowerLabel);
             Controls.Add(tabSocial);
             Controls.Add(lblTotalExp);
-            Controls.Add(partyPowerLabel);
             Controls.Add(lblGold);
             Controls.Add(btnLogs);
             Controls.Add(btnInventory);
             Controls.Add(btnFire);
             Controls.Add(btnInspect);
             Controls.Add(btnNavigate);
+            Controls.Add(btnMail);
             Controls.Add(pnlParty);
             Controls.Add(lstParty);
             Name = "RPGForm";

@@ -219,6 +219,15 @@ namespace WinFormsApp2
             {
                 MessageBox.Show("Defeat!");
             }
+            var logs = string.Join("\n", BattleLogService.GetLogs());
+            string challenger;
+            using (var nameCmd = new MySqlCommand("SELECT nickname FROM users WHERE id=@id", conn))
+            {
+                nameCmd.Parameters.AddWithValue("@id", _userId);
+                challenger = nameCmd.ExecuteScalar()?.ToString() ?? "Unknown";
+            }
+            string resultText = battle.PlayersWin ? $"was defeated by {challenger}" : $"defeated {challenger}";
+            MailService.SendMail(null, team.AccountId, "Arena Battle Result", $"Your arena team {resultText}.\n\nBattle Log:\n{logs}");
             RefreshStatus();
             RefreshTeams();
         }
