@@ -32,7 +32,7 @@ namespace WinFormsApp2
             Controls.Add(_btnRecruit);
             RefreshSearchCost();
 
-            var btnJoin = new Button { Text = "Join Another Party", Left = 50, Top = 60, Width = 160 };
+            var btnJoin = new Button { Text = "Join/Start Raiding Party", Left = 50, Top = 60, Width = 160 };
             btnJoin.Click += (s, e) =>
             {
                 using var window = new HireMultiplayerPartyWindow(_accountId);
@@ -46,7 +46,7 @@ namespace WinFormsApp2
                 using var window = new HireMultiplayerPartyWindow(_accountId, showHireOut: true);
                 window.ShowDialog(this);
             };
-            Controls.Add(btnHireOut);
+            //Controls.Add(btnHireOut);
         }
 
         private void BtnRecruit_Click(object? sender, EventArgs e)
@@ -112,6 +112,11 @@ namespace WinFormsApp2
                 _btnRecruit.Text = $"Find Recruits ({_searchCost}g)";
                 _btnRecruit.Enabled = true;
             }
+        }
+
+        private void InitializeComponent()
+        {
+
         }
 
         private int CalculateSearchCost(out int partyCount)

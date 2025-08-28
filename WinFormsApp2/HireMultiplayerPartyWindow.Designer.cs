@@ -45,8 +45,8 @@ namespace WinFormsApp2
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
             tabPage2 = new TabPage();
-            costLabel = new Label();
             hirePartyBtn = new Button();
+            costLabel = new Label();
             tabControl1.SuspendLayout();
             tabPage2.SuspendLayout();
             SuspendLayout();
@@ -197,15 +197,6 @@ namespace WinFormsApp2
             tabPage2.Text = "Hire a Party";
             tabPage2.UseVisualStyleBackColor = true;
             // 
-            // costLabel
-            // 
-            costLabel.AutoSize = true;
-            costLabel.Location = new Point(6, 103);
-            costLabel.Name = "costLabel";
-            costLabel.Size = new Size(62, 15);
-            costLabel.TabIndex = 11;
-            costLabel.Text = "Gold Cost:";
-            // 
             // hirePartyBtn
             // 
             hirePartyBtn.Location = new Point(6, 283);
@@ -215,11 +206,20 @@ namespace WinFormsApp2
             hirePartyBtn.Text = "Hire Selected Party";
             hirePartyBtn.UseVisualStyleBackColor = true;
             // 
+            // costLabel
+            // 
+            costLabel.AutoSize = true;
+            costLabel.Location = new Point(6, 103);
+            costLabel.Name = "costLabel";
+            costLabel.Size = new Size(62, 15);
+            costLabel.TabIndex = 11;
+            costLabel.Text = "Gold Cost:";
+            // 
             // HireMultiplayerPartyWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(383, 365);
+            ClientSize = new Size(379, 364);
             Controls.Add(tabControl1);
             Name = "HireMultiplayerPartyWindow";
             Text = "HireMultiplayerPartyWindow";
