@@ -124,6 +124,7 @@ namespace WinFormsApp2
             kimCheckbox.UseVisualStyleBackColor = true;
             kimCheckbox.CheckedChanged += kimCheckbox_CheckedChanged;
             //
+
             // Form1
             //
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -144,5 +145,7 @@ namespace WinFormsApp2
         }
 
         #endregion
+
+        private CheckBox kimCheckbox;
     }
 }
