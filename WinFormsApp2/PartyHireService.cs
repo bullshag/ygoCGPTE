@@ -73,7 +73,7 @@ namespace WinFormsApp2.Multiplayer
             {
                 using var cmd = new MySqlCommand(
                     "INSERT INTO characters (account_id, name, current_hp, max_hp, mana, experience_points, action_speed, strength, dex, intelligence, melee_defense, magic_defense, level, skill_points, in_tavern, in_arena, is_dead, role, targeting_style, is_mercenary) " +
-                    "VALUES (@a,@n,@hp,@max,@mana,@exp,100,@str,@dex,@int,0,0,1,0,0,0,0,'DPS','no priorities',1)", conn);
+                    "VALUES (@a,@n,@hp,@max,@mana,@exp,1,@str,@dex,@int,0,0,1,0,0,0,0,'DPS','no priorities',1)", conn);
                 cmd.Parameters.AddWithValue("@a", hirerId);
                 cmd.Parameters.AddWithValue("@n", m.Name);
                 int hp = m.MaxHp;
