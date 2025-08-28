@@ -94,6 +94,15 @@ namespace WinFormsApp2.Multiplayer
             return LoadState().Where(p => p.OwnerId == ownerId).ToList();
         }
 
+        public static HashSet<string> GetHiredMemberNames(int ownerId)
+        {
+            CleanupExpired();
+            return LoadState()
+                .Where(p => p.OwnerId == ownerId && p.OnMission)
+                .SelectMany(p => p.Members.Select(m => m.Name))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        }
+
         public static bool DepositAccountParty(int ownerId, int cost)
         {
             var members = new List<HireableMember>();

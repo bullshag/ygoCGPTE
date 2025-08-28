@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Drawing;
 using MySql.Data.MySqlClient;
+using WinFormsApp2.Multiplayer;
 
 namespace WinFormsApp2
 {
@@ -14,6 +15,7 @@ namespace WinFormsApp2
         private readonly System.Windows.Forms.Timer _chatTimer = new System.Windows.Forms.Timer();
         private readonly System.Windows.Forms.Timer _regenTimer = new System.Windows.Forms.Timer();
         private DateTime _lastMessage = DateTime.MinValue;
+        private HashSet<string> _hiredMembers = new();
 
         public RPGForm(int userId, string nickname)
         {
@@ -39,7 +41,9 @@ namespace WinFormsApp2
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
 
+
             using MySqlCommand cmd = new MySqlCommand("SELECT name, experience_points, level, current_hp, max_hp, mana, intelligence FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn);
+
             cmd.Parameters.AddWithValue("@id", _userId);
             using MySqlDataReader reader = cmd.ExecuteReader();
             lstParty.Items.Clear();
@@ -59,7 +63,10 @@ namespace WinFormsApp2
                 int intel = reader.GetInt32("intelligence");
                 int maxMana = 10 + 5 * intel;
                 int nextExp = ExperienceHelper.GetNextLevelRequirement(level);
-                lstParty.Items.Add($"{name} - LVL {level} EXP {exp}/{nextExp}");
+                string display = $"{name} - LVL {level} EXP {exp}/{nextExp}";
+                if (_hiredMembers.Contains(name))
+                    display += " (Hired Out)";
+                lstParty.Items.Add(display);
 
                 var panel = new Panel { Width = 180, Height = maxMana > 0 ? 60 : 40, Margin = new Padding(3) };
                 var lbl = new Label { Text = name, AutoSize = true };
@@ -123,8 +130,9 @@ namespace WinFormsApp2
                 string name = item.Split(" - ")[0];
                 btnInspect.Enabled = true;
                 btnInspect.Text = $"Inspect {name}";
-                btnFire.Enabled = true;
-                btnFire.Text = $"Fire {name}";
+                bool hired = _hiredMembers.Contains(name);
+                btnFire.Enabled = !hired;
+                btnFire.Text = hired ? "Hired Out" : $"Fire {name}";
             }
         }
 
@@ -143,7 +151,7 @@ namespace WinFormsApp2
                 if (result != null)
                 {
                     int charId = Convert.ToInt32(result);
-                    using var inspect = new HeroInspectForm(_userId, charId);
+                    using var inspect = new HeroInspectForm(_userId, charId, _hiredMembers.Contains(name));
                     inspect.ShowDialog(this);
                     LoadPartyData();
                 }
@@ -179,6 +187,12 @@ namespace WinFormsApp2
             if (lstParty.SelectedItem == null) return;
             string item = lstParty.SelectedItem.ToString() ?? string.Empty;
             string name = item.Split(" - ")[0];
+
+            if (_hiredMembers.Contains(name))
+            {
+                MessageBox.Show("This hero is currently hired and cannot be fired.");
+                return;
+            }
 
             if (!ConfirmFire(name)) return;
 
