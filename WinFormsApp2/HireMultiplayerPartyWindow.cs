@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -136,6 +137,7 @@ namespace WinFormsApp2
             {
                 MessageBox.Show($"Hired {party.Name} for {party.Cost}g. Gameplay not implemented.");
             }
+
         }
     }
 }

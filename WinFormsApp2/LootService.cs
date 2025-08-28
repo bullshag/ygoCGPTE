@@ -36,8 +36,10 @@ namespace WinFormsApp2
             int avgLevel = Math.Max(1, (int)Math.Round(npcs.Average(n => n.level)));
             if (drops.TryGetValue("gold", out int gold))
             {
+                int boostedGold = (int)Math.Round(gold * 1.5);
+                drops["gold"] = boostedGold;
                 using MySqlCommand goldCmd = new MySqlCommand("UPDATE users SET gold = gold + @g WHERE id=@id", conn);
-                goldCmd.Parameters.AddWithValue("@g", gold);
+                goldCmd.Parameters.AddWithValue("@g", boostedGold);
                 goldCmd.Parameters.AddWithValue("@id", userId);
                 goldCmd.ExecuteNonQuery();
             }
