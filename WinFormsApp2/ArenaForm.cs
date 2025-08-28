@@ -83,7 +83,7 @@ namespace WinFormsApp2
             conn.Open();
             if (_deposited)
             {
-                using var partyCountCmd = new MySqlCommand("SELECT COUNT(*) FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0", conn);
+                using var partyCountCmd = new MySqlCommand("SELECT COUNT(*) FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn);
                 partyCountCmd.Parameters.AddWithValue("@id", _userId);
                 int partyCount = Convert.ToInt32(partyCountCmd.ExecuteScalar());
                 using var arenaCountCmd = new MySqlCommand("SELECT COUNT(*) FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=1", conn);
@@ -104,7 +104,7 @@ namespace WinFormsApp2
             }
             else
             {
-                using var chk = new MySqlCommand("SELECT COUNT(*) FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0", conn);
+                using var chk = new MySqlCommand("SELECT COUNT(*) FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn);
                 chk.Parameters.AddWithValue("@id", _userId);
                 if (Convert.ToInt32(chk.ExecuteScalar()) == 0)
                 {
@@ -114,7 +114,7 @@ namespace WinFormsApp2
                 using var ins = new MySqlCommand("INSERT INTO arena_teams(account_id,wins) VALUES(@id,0) ON DUPLICATE KEY UPDATE wins=wins", conn);
                 ins.Parameters.AddWithValue("@id", _userId);
                 ins.ExecuteNonQuery();
-                using var upd = new MySqlCommand("UPDATE characters SET in_arena=1 WHERE account_id=@id AND is_dead=0 AND in_arena=0", conn);
+                using var upd = new MySqlCommand("UPDATE characters SET in_arena=1 WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn);
                 upd.Parameters.AddWithValue("@id", _userId);
                 upd.ExecuteNonQuery();
                 _deposited = true;
@@ -188,7 +188,7 @@ namespace WinFormsApp2
                 using var del = new MySqlCommand("DELETE FROM arena_teams WHERE account_id=@id", conn);
                 del.Parameters.AddWithValue("@id", team.AccountId);
                 del.ExecuteNonQuery();
-                using var kill = new MySqlCommand("UPDATE characters SET is_dead=1, in_graveyard=1, in_arena=0, current_hp=0, death_time=NOW(), cause_of_death='Arena defeat' WHERE account_id=@id AND is_dead=0", conn);
+                using var kill = new MySqlCommand("UPDATE characters SET is_dead=1, in_graveyard=1, in_arena=0, in_tavern=0, current_hp=0, death_time=NOW(), cause_of_death='Arena defeat' WHERE account_id=@id AND is_dead=0", conn);
                 kill.Parameters.AddWithValue("@id", team.AccountId);
                 kill.ExecuteNonQuery();
                 using var winCmd = new MySqlCommand("UPDATE arena_teams SET wins=wins+1 WHERE account_id=@id", conn);

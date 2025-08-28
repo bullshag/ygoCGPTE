@@ -60,7 +60,7 @@ namespace WinFormsApp2
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
 
-            using (var countCmd = new MySqlCommand("SELECT COUNT(*) FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0", conn))
+            using (var countCmd = new MySqlCommand("SELECT COUNT(*) FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn))
             {
                 countCmd.Parameters.AddWithValue("@id", _userId);
                 int partyCount = Convert.ToInt32(countCmd.ExecuteScalar());
