@@ -64,9 +64,9 @@ namespace WinFormsApp2
             {
                 countCmd.Parameters.AddWithValue("@id", _userId);
                 int partyCount = Convert.ToInt32(countCmd.ExecuteScalar());
-                if (partyCount >= 10)
+                if (partyCount >= GameConfig.MAX_PARTY_SIZE)
                 {
-                    MessageBox.Show("Party is full. Release a member before hiring.");
+                    MessageBox.Show($"Party is full. Maximum size is {GameConfig.MAX_PARTY_SIZE}. Release a member before hiring.");
                     return;
                 }
             }

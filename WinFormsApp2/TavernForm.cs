@@ -22,9 +22,9 @@ namespace WinFormsApp2
         private void btnRecruit_Click(object? sender, EventArgs e)
         {
             _searchCost = CalculateSearchCost(out int partyCount);
-            if (partyCount >= 10)
+            if (partyCount >= GameConfig.MAX_PARTY_SIZE)
             {
-                MessageBox.Show("Party is full. Release a member before recruiting.");
+                MessageBox.Show($"Party is full. Maximum size is {GameConfig.MAX_PARTY_SIZE}. Release a member before recruiting.");
                 RefreshSearchCost();
                 return;
             }
@@ -87,9 +87,9 @@ namespace WinFormsApp2
         private void RefreshSearchCost()
         {
             _searchCost = CalculateSearchCost(out int partyCount);
-            if (partyCount >= 10)
+            if (partyCount >= GameConfig.MAX_PARTY_SIZE)
             {
-                btnRecruit.Text = "Party Full";
+                btnRecruit.Text = $"Party Full (Max {GameConfig.MAX_PARTY_SIZE})";
                 btnRecruit.Enabled = false;
             }
             else

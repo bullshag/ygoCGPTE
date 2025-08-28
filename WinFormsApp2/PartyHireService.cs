@@ -357,6 +357,13 @@ namespace WinFormsApp2.Multiplayer
                 if (gold < party.Cost)
                     return false;
             }
+            using (var sizeCmd = new MySqlCommand("SELECT COUNT(*) FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn))
+            {
+                sizeCmd.Parameters.AddWithValue("@id", hirerId);
+                int currentSize = Convert.ToInt32(sizeCmd.ExecuteScalar() ?? 0);
+                if (currentSize + party.Members.Count > GameConfig.MAX_PARTY_SIZE)
+                    return false;
+            }
             using (var pay = new MySqlCommand("UPDATE users SET gold = GREATEST(gold-@c,0) WHERE id=@id", conn))
             {
                 pay.Parameters.AddWithValue("@c", party.Cost);
