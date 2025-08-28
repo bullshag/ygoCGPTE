@@ -5,51 +5,21 @@ using MySql.Data.MySqlClient;
 
 namespace WinFormsApp2
 {
-    public class TavernForm : Form
+    public partial class TavernForm : Form
     {
         private readonly int _accountId;
         private readonly Action _onUpdate;
         private int _searchCost;
-        private Button _btnRecruit = null!;
 
         public TavernForm(int accountId, Action onUpdate)
         {
             _accountId = accountId;
             _onUpdate = onUpdate;
-            Text = "Tavern";
-            Width = 280;
-            Height = 200;
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            StartPosition = FormStartPosition.CenterParent;
-
-            _btnRecruit = new Button
-            {
-                Left = 50,
-                Top = 20,
-                Width = 160
-            };
-            _btnRecruit.Click += BtnRecruit_Click;
-            Controls.Add(_btnRecruit);
+            InitializeComponent();
             RefreshSearchCost();
-
-            var btnJoin = new Button { Text = "Join/Start Raiding Party", Left = 50, Top = 60, Width = 160 };
-            btnJoin.Click += (s, e) =>
-            {
-                using var window = new HireMultiplayerPartyWindow(_accountId);
-                window.ShowDialog(this);
-            };
-            Controls.Add(btnJoin);
-
-            var btnHireOut = new Button { Text = "Leave Party for Hire", Left = 50, Top = 100, Width = 160 };
-            btnHireOut.Click += (s, e) =>
-            {
-                using var window = new HireMultiplayerPartyWindow(_accountId, showHireOut: true);
-                window.ShowDialog(this);
-            };
-            //Controls.Add(btnHireOut);
         }
 
-        private void BtnRecruit_Click(object? sender, EventArgs e)
+        private void btnRecruit_Click(object? sender, EventArgs e)
         {
             _searchCost = CalculateSearchCost(out int partyCount);
             if (partyCount >= 5)
@@ -93,6 +63,18 @@ namespace WinFormsApp2
             recruitForm.ShowDialog(this);
         }
 
+        private void btnJoin_Click(object? sender, EventArgs e)
+        {
+            using var window = new HireMultiplayerPartyWindow(_accountId);
+            window.ShowDialog(this);
+        }
+
+        private void btnHireOut_Click(object? sender, EventArgs e)
+        {
+            using var window = new HireMultiplayerPartyWindow(_accountId, showHireOut: true);
+            window.ShowDialog(this);
+        }
+
         private void OnHire()
         {
             _onUpdate();
@@ -104,19 +86,14 @@ namespace WinFormsApp2
             _searchCost = CalculateSearchCost(out int partyCount);
             if (partyCount >= 5)
             {
-                _btnRecruit.Text = "Party Full";
-                _btnRecruit.Enabled = false;
+                btnRecruit.Text = "Party Full";
+                btnRecruit.Enabled = false;
             }
             else
             {
-                _btnRecruit.Text = $"Find Recruits ({_searchCost}g)";
-                _btnRecruit.Enabled = true;
+                btnRecruit.Text = $"Find Recruits ({_searchCost}g)";
+                btnRecruit.Enabled = true;
             }
-        }
-
-        private void InitializeComponent()
-        {
-
         }
 
         private int CalculateSearchCost(out int partyCount)
