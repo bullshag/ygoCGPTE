@@ -129,9 +129,13 @@ namespace WinFormsApp2
         private void BtnLevelUp_Click(object? sender, EventArgs e)
         {
             if (_readOnly) return;
-            using var form = new LevelUpForm(_userId, _characterId);
-            form.ShowDialog(this);
-            HeroInspectForm_Load(null, EventArgs.Empty);
+            var form = new LevelUpForm(_userId, _characterId);
+            form.FormClosed += (_, __) =>
+            {
+                HeroInspectForm_Load(null, EventArgs.Empty);
+                form.Dispose();
+            };
+            form.Show(this);
         }
 
         private void CmbRole_SelectedIndexChanged(object? sender, EventArgs e)

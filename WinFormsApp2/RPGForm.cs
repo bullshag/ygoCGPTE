@@ -175,12 +175,13 @@ namespace WinFormsApp2
                     using var inspect = new HeroInspectForm(_userId, charId, readOnly);
                     inspect.ShowDialog(this);
                     LoadPartyData();
+
                 }
         }
 
-        private bool ConfirmFire(string name)
+        private void ConfirmFire(string name, Action onConfirm)
         {
-            using var confirm = new Form
+            var confirm = new Form
             {
                 Width = 300,
                 Height = 150,
@@ -191,16 +192,16 @@ namespace WinFormsApp2
 
             var lbl = new Label { Left = 10, Top = 10, Width = 260, Text = $"Type '{name}' to confirm firing:" };
             var txt = new TextBox { Left = 10, Top = 40, Width = 260 };
-            var btn = new Button { Text = "Confirm", Left = 10, Top = 70, Width = 100, DialogResult = DialogResult.OK, Enabled = false };
-            btn.Click += (s, e) => confirm.Close();
+            var btn = new Button { Text = "Confirm", Left = 10, Top = 70, Width = 100, Enabled = false };
+            btn.Click += (s, e) => { confirm.Close(); onConfirm(); };
             txt.TextChanged += (s, e) => btn.Enabled = txt.Text == name;
 
             confirm.Controls.Add(lbl);
             confirm.Controls.Add(txt);
             confirm.Controls.Add(btn);
             confirm.AcceptButton = btn;
-
-            return confirm.ShowDialog(this) == DialogResult.OK;
+            confirm.FormClosed += (_, __) => confirm.Dispose();
+            confirm.Show(this);
         }
 
         private void btnFire_Click(object? sender, EventArgs e)
@@ -223,6 +224,8 @@ namespace WinFormsApp2
 
             if (!ConfirmFire(name)) return;
 
+        private void FireHero(string name)
+        {
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
             using MySqlCommand cmd = new MySqlCommand("SELECT id, level FROM characters WHERE account_id=@id AND name=@name AND is_dead=0 AND in_arena=0 AND in_tavern=0 AND is_mercenary=0", conn);
@@ -282,8 +285,9 @@ namespace WinFormsApp2
 
         private void btnLogs_Click(object? sender, EventArgs e)
         {
-            using var logs = new BattleLogForm();
-            logs.ShowDialog(this);
+            var logs = new BattleLogForm();
+            logs.FormClosed += (_, __) => logs.Dispose();
+            logs.Show(this);
         }
 
         private void btnNavigate_Click(object? sender, EventArgs e)
@@ -296,22 +300,31 @@ namespace WinFormsApp2
                 cmd.Parameters.AddWithValue("@a", _userId);
                 hasBlessing = Convert.ToBoolean(cmd.ExecuteScalar() ?? 0);
             }
-            using var nav = new NavigationWindow(_userId, lstParty.Items.Count, hasBlessing, LoadPartyData);
-            nav.ShowDialog(this);
-            LoadPartyData();
+            var nav = new NavigationWindow(_userId, lstParty.Items.Count, hasBlessing, LoadPartyData);
+            nav.FormClosed += (_, __) =>
+            {
+                LoadPartyData();
+                nav.Dispose();
+            };
+            nav.Show(this);
         }
 
         private void btnMail_Click(object? sender, EventArgs e)
         {
-            using var box = new MailboxForm(_userId);
-            box.ShowDialog(this);
+            var box = new MailboxForm(_userId);
+            box.FormClosed += (_, __) => box.Dispose();
+            box.Show(this);
         }
 
         private void btnInventory_Click(object? sender, EventArgs e)
         {
-            using var inv = new InventoryForm(_userId);
-            inv.ShowDialog(this);
-            LoadPartyData();
+            var inv = new InventoryForm(_userId);
+            inv.FormClosed += (_, __) =>
+            {
+                LoadPartyData();
+                inv.Dispose();
+            };
+            inv.Show(this);
         }
 
         private void Regenerate()

@@ -32,14 +32,19 @@ namespace WinFormsApp2
         {
             if (lstCandidates.SelectedIndex < 0) return;
             var candidate = _candidates[lstCandidates.SelectedIndex];
-            using var view = new HeroViewForm(_userId, candidate, _getSearchCost());
-            if (view.ShowDialog(this) == DialogResult.OK)
+            int index = lstCandidates.SelectedIndex;
+            var view = new HeroViewForm(_userId, candidate, _getSearchCost());
+            view.FormClosed += (_, __) =>
             {
-                int index = lstCandidates.SelectedIndex;
-                _candidates.RemoveAt(index);
-                lstCandidates.Items.RemoveAt(index);
-                _onHire();
-            }
+                if (view.DialogResult == DialogResult.OK)
+                {
+                    _candidates.RemoveAt(index);
+                    lstCandidates.Items.RemoveAt(index);
+                    _onHire();
+                }
+                view.Dispose();
+            };
+            view.Show(this);
         }
     }
 }
