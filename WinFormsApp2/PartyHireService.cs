@@ -7,6 +7,7 @@ using MySql.Data.MySqlClient;
 using WinFormsApp2;
 
 namespace WinFormsApp2.Multiplayer
+
 {
     public class HireableMember
     {

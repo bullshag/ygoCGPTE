@@ -1,3 +1,4 @@
+
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -8,6 +9,7 @@ namespace WinFormsApp2
     public partial class HireMultiplayerPartyWindow : Form
     {
         private readonly int _accountId;
+
         private readonly ListBox _partyList = new();
         private readonly ListBox _memberList = new();
         private readonly Label _costLabel = new();
@@ -83,6 +85,7 @@ namespace WinFormsApp2
             {
                 string status = party.OnMission ? "(Hired)" : "(Idle)";
                 _myPartyList.Items.Add($"{party.Name} {status} - Earned {party.GoldEarned}g");
+
             }
         }
 
@@ -95,6 +98,7 @@ namespace WinFormsApp2
                 _costLabel.Text = $"Cost: {party.Cost}g";
                 foreach (var m in party.Members)
                     _memberList.Items.Add(m);
+
             }
             else
             {
