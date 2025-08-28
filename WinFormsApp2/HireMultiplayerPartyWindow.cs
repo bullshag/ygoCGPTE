@@ -130,6 +130,7 @@ namespace WinFormsApp2
                 if (PartyHireService.HireParty(_accountId, party))
                 {
                     MessageBox.Show($"Hired {party.Name} for {party.Cost}g.");
+                    InventoryService.Reload(_accountId);
                     RefreshLists();
                     _onChange?.Invoke();
                 }
