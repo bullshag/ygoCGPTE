@@ -83,13 +83,18 @@ namespace WinFormsApp2
                 new HealingPotion()
             };
 
-            for (int i = items.Count; i < 15; i++)
+            // Track item names added to this shop to avoid duplicates within the shop
+            var localUsed = new HashSet<string>(items.Select(i => i.Name), StringComparer.OrdinalIgnoreCase);
+
+            while (items.Count < 15)
             {
-                var available = pool.Where(n => !_usedItems.Contains(n)).ToList();
+                var available = pool.Where(n => !_usedItems.Contains(n) && !localUsed.Contains(n)).ToList();
                 if (available.Count == 0)
-                    available = pool; // allow reuse if pool exhausted
+                    break; // no more unique items to add
+
                 string name = available[_rng.Next(available.Count)];
                 _usedItems.Add(name);
+                localUsed.Add(name);
                 Item? item = InventoryService.CreateItem(name);
                 if (item != null)
                     items.Add(item);
