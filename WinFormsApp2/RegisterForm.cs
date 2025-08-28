@@ -32,6 +32,7 @@ namespace WinFormsApp2
                 return;
             }
             DatabaseConfig.DebugMode = chkDebugMode2.Checked;
+            DatabaseConfig.UseKimServer = kimCheckbox.Checked;
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
 
@@ -75,6 +76,11 @@ namespace WinFormsApp2
 
             MessageBox.Show("Account created");
             Close();
+        }
+
+        private void kimCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            DatabaseConfig.UseKimServer = kimCheckbox.Checked;
         }
     }
 }

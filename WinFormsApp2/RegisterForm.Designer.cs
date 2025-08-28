@@ -39,6 +39,7 @@ namespace WinFormsApp2
             lblPassword = new Label();
             lblConfirm = new Label();
             chkDebugMode2 = new CheckBox();
+            kimCheckbox = new CheckBox();
             SuspendLayout();
             // 
             // txtUsername
@@ -118,7 +119,7 @@ namespace WinFormsApp2
             lblConfirm.Text = "Confirm Password";
             // 
             // chkDebugMode2
-            // 
+            //
             chkDebugMode2.AutoSize = true;
             chkDebugMode2.Location = new Point(39, 301);
             chkDebugMode2.Name = "chkDebugMode2";
@@ -126,12 +127,24 @@ namespace WinFormsApp2
             chkDebugMode2.TabIndex = 9;
             chkDebugMode2.Text = "Debug Mode";
             chkDebugMode2.UseVisualStyleBackColor = true;
-            // 
+            //
+            // kimCheckbox
+            //
+            kimCheckbox.AutoSize = true;
+            kimCheckbox.Location = new Point(39, 326);
+            kimCheckbox.Name = "kimCheckbox";
+            kimCheckbox.Size = new Size(123, 19);
+            kimCheckbox.TabIndex = 10;
+            kimCheckbox.Text = "Use Kim address";
+            kimCheckbox.UseVisualStyleBackColor = true;
+            kimCheckbox.CheckedChanged += kimCheckbox_CheckedChanged;
+            //
             // RegisterForm
-            // 
+            //
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(264, 321);
+            ClientSize = new Size(264, 356);
+            Controls.Add(kimCheckbox);
             Controls.Add(chkDebugMode2);
             Controls.Add(btnRegister);
             Controls.Add(txtConfirmPassword);
@@ -151,5 +164,6 @@ namespace WinFormsApp2
         #endregion
 
         private CheckBox chkDebugMode2;
+        private CheckBox kimCheckbox;
     }
 }
