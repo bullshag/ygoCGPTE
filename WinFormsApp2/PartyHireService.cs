@@ -16,8 +16,18 @@ namespace WinFormsApp2.Multiplayer
         public int Dexterity { get; set; }
         public int Intelligence { get; set; }
         public int Experience { get; set; }
+        public int ActionSpeed { get; set; }
+        public Dictionary<EquipmentSlot, string?> Equipment { get; set; } = new();
+        public Dictionary<int, AbilitySlotMapping> AbilitySlots { get; set; } = new();
+        public Dictionary<int, int> Passives { get; set; } = new();
         public int MaxHp => 10 + Strength * 5;
         public override string ToString() => Name;
+    }
+
+    public class AbilitySlotMapping
+    {
+        public int? AbilityId { get; set; }
+        public int Priority { get; set; }
     }
 
     public class HireableParty
@@ -73,7 +83,7 @@ namespace WinFormsApp2.Multiplayer
             {
                 using var cmd = new MySqlCommand(
                     "INSERT INTO characters (account_id, name, current_hp, max_hp, mana, experience_points, action_speed, strength, dex, intelligence, melee_defense, magic_defense, level, skill_points, in_tavern, in_arena, is_dead, role, targeting_style, is_mercenary) " +
-                    "VALUES (@a,@n,@hp,@max,@mana,@exp,1,@str,@dex,@int,0,0,1,0,0,0,0,'DPS','no priorities',1)", conn);
+                    "VALUES (@a,@n,@hp,@max,@mana,@exp,@spd,@str,@dex,@int,0,0,1,0,0,0,0,'DPS','no priorities',1)", conn);
                 cmd.Parameters.AddWithValue("@a", hirerId);
                 cmd.Parameters.AddWithValue("@n", m.Name);
                 int hp = m.MaxHp;
@@ -81,10 +91,44 @@ namespace WinFormsApp2.Multiplayer
                 cmd.Parameters.AddWithValue("@max", hp);
                 cmd.Parameters.AddWithValue("@mana", 10 + 5 * m.Intelligence);
                 cmd.Parameters.AddWithValue("@exp", m.Experience);
+                cmd.Parameters.AddWithValue("@spd", m.ActionSpeed);
                 cmd.Parameters.AddWithValue("@str", m.Strength);
                 cmd.Parameters.AddWithValue("@dex", m.Dexterity);
                 cmd.Parameters.AddWithValue("@int", m.Intelligence);
                 cmd.ExecuteNonQuery();
+                long characterId = cmd.LastInsertedId;
+
+                foreach (var eq in m.Equipment)
+                {
+                    using var eqCmd = new MySqlCommand("INSERT INTO character_equipment(account_id, character_name, slot, item_name) VALUES(@acc,@name,@slot,@item)", conn);
+                    eqCmd.Parameters.AddWithValue("@acc", hirerId);
+                    eqCmd.Parameters.AddWithValue("@name", m.Name);
+                    eqCmd.Parameters.AddWithValue("@slot", eq.Key.ToString());
+                    eqCmd.Parameters.AddWithValue("@item", eq.Value);
+                    eqCmd.ExecuteNonQuery();
+                }
+
+                foreach (var slot in m.AbilitySlots)
+                {
+                    using var slotCmd = new MySqlCommand("INSERT INTO character_ability_slots(character_id, slot, ability_id, priority) VALUES(@cid,@slot,@aid,@pri)", conn);
+                    slotCmd.Parameters.AddWithValue("@cid", characterId);
+                    slotCmd.Parameters.AddWithValue("@slot", slot.Key);
+                    if (slot.Value.AbilityId.HasValue)
+                        slotCmd.Parameters.AddWithValue("@aid", slot.Value.AbilityId.Value);
+                    else
+                        slotCmd.Parameters.AddWithValue("@aid", DBNull.Value);
+                    slotCmd.Parameters.AddWithValue("@pri", slot.Value.Priority);
+                    slotCmd.ExecuteNonQuery();
+                }
+
+                foreach (var pas in m.Passives)
+                {
+                    using var passCmd = new MySqlCommand("INSERT INTO character_passives(character_id, passive_id, level) VALUES(@cid,@pid,@lvl)", conn);
+                    passCmd.Parameters.AddWithValue("@cid", characterId);
+                    passCmd.Parameters.AddWithValue("@pid", pas.Key);
+                    passCmd.Parameters.AddWithValue("@lvl", pas.Value);
+                    passCmd.ExecuteNonQuery();
+                }
             }
         }
 
@@ -94,16 +138,87 @@ namespace WinFormsApp2.Multiplayer
             conn.Open();
             string inClause = string.Join(",", names.Select((_, i) => "@n" + i));
             if (string.IsNullOrEmpty(inClause)) return;
-            string sql = $"DELETE FROM characters WHERE account_id=@a AND is_mercenary=1 AND name IN ({inClause})";
-            using var cmd = new MySqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@a", hirerId);
-            int index = 0;
-            foreach (var n in names)
+
+            var commands = new List<MySqlCommand>
             {
-                cmd.Parameters.AddWithValue("@n" + index, n);
-                index++;
+                new MySqlCommand($"DELETE FROM character_equipment WHERE account_id=@a AND character_name IN ({inClause})", conn),
+                new MySqlCommand($"DELETE s FROM character_ability_slots s JOIN characters c ON s.character_id=c.id WHERE c.account_id=@a AND c.is_mercenary=1 AND c.name IN ({inClause})", conn),
+                new MySqlCommand($"DELETE p FROM character_passives p JOIN characters c ON p.character_id=c.id WHERE c.account_id=@a AND c.is_mercenary=1 AND c.name IN ({inClause})", conn),
+                new MySqlCommand($"DELETE FROM characters WHERE account_id=@a AND is_mercenary=1 AND name IN ({inClause})", conn)
+            };
+
+            foreach (var cmd in commands)
+            {
+                cmd.Parameters.AddWithValue("@a", hirerId);
+                int idx = 0;
+                foreach (var n in names)
+                {
+                    cmd.Parameters.AddWithValue("@n" + idx, n);
+                    idx++;
+                }
+                cmd.ExecuteNonQuery();
             }
-            cmd.ExecuteNonQuery();
+        }
+
+        private static void SyncFromMercenaries(int hirerId, HireableParty party)
+        {
+            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            foreach (var m in party.Members)
+            {
+                int charId = 0;
+                using (var cmd = new MySqlCommand("SELECT id, experience_points, action_speed FROM characters WHERE account_id=@a AND name=@n AND is_mercenary=1", conn))
+                {
+                    cmd.Parameters.AddWithValue("@a", hirerId);
+                    cmd.Parameters.AddWithValue("@n", m.Name);
+                    using var reader = cmd.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        charId = reader.GetInt32("id");
+                        m.Experience = reader.GetInt32("experience_points");
+                        m.ActionSpeed = reader.GetInt32("action_speed");
+                    }
+                }
+                if (charId == 0) continue;
+
+                using (var eqCmd = new MySqlCommand("SELECT slot, item_name FROM character_equipment WHERE account_id=@a AND character_name=@n", conn))
+                {
+                    eqCmd.Parameters.AddWithValue("@a", hirerId);
+                    eqCmd.Parameters.AddWithValue("@n", m.Name);
+                    using var eqReader = eqCmd.ExecuteReader();
+                    m.Equipment = new();
+                    while (eqReader.Read())
+                    {
+                        var slot = Enum.Parse<EquipmentSlot>(eqReader.GetString("slot"), true);
+                        m.Equipment[slot] = eqReader.GetString("item_name");
+                    }
+                }
+
+                using (var slotCmd = new MySqlCommand("SELECT slot, ability_id, priority FROM character_ability_slots WHERE character_id=@cid", conn))
+                {
+                    slotCmd.Parameters.AddWithValue("@cid", charId);
+                    using var slotReader = slotCmd.ExecuteReader();
+                    m.AbilitySlots = new();
+                    while (slotReader.Read())
+                    {
+                        int slot = slotReader.GetInt32("slot");
+                        int priority = slotReader.GetInt32("priority");
+                        int? abilityId = slotReader.IsDBNull(slotReader.GetOrdinal("ability_id")) ? (int?)null : slotReader.GetInt32("ability_id");
+                        m.AbilitySlots[slot] = new AbilitySlotMapping { AbilityId = abilityId, Priority = priority };
+                    }
+                }
+
+                using (var passCmd = new MySqlCommand("SELECT passive_id, level FROM character_passives WHERE character_id=@cid", conn))
+                {
+                    passCmd.Parameters.AddWithValue("@cid", charId);
+                    using var passReader = passCmd.ExecuteReader();
+                    m.Passives = new();
+                    while (passReader.Read())
+                    {
+                        m.Passives[passReader.GetInt32("passive_id")] = passReader.GetInt32("level");
+                    }
+                }
+            }
         }
 
         private static void CleanupExpired()
@@ -115,6 +230,7 @@ namespace WinFormsApp2.Multiplayer
             {
                 if (p.CurrentHirer.HasValue)
                 {
+                    SyncFromMercenaries(p.CurrentHirer.Value, p);
                     RemoveMercenaries(p.CurrentHirer.Value, p.Members.Select(m => m.Name));
                 }
                 p.OnMission = false;
@@ -148,27 +264,67 @@ namespace WinFormsApp2.Multiplayer
 
         public static bool DepositAccountParty(int ownerId, int cost)
         {
-            var members = new List<HireableMember>();
+            var members = new List<(int Id, HireableMember Member)>();
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using MySqlCommand cmd = new MySqlCommand("SELECT name,strength,dex,intelligence,experience_points FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn);
+            using MySqlCommand cmd = new MySqlCommand("SELECT id,name,strength,dex,intelligence,experience_points,action_speed FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn);
             cmd.Parameters.AddWithValue("@id", ownerId);
             using (var reader = cmd.ExecuteReader())
             {
                 while (reader.Read())
                 {
-                    members.Add(new HireableMember
+                    var member = new HireableMember
                     {
                         Name = reader.GetString("name"),
                         Strength = reader.GetInt32("strength"),
                         Dexterity = reader.GetInt32("dex"),
                         Intelligence = reader.GetInt32("intelligence"),
-                        Experience = reader.GetInt32("experience_points")
-                    });
+                        Experience = reader.GetInt32("experience_points"),
+                        ActionSpeed = reader.GetInt32("action_speed")
+                    };
+                    members.Add((reader.GetInt32("id"), member));
                 }
             }
 
             if (members.Count == 0) return false;
+
+            foreach (var (charId, member) in members)
+            {
+                using (var eqCmd = new MySqlCommand("SELECT slot, item_name FROM character_equipment WHERE account_id=@a AND character_name=@n", conn))
+                {
+                    eqCmd.Parameters.AddWithValue("@a", ownerId);
+                    eqCmd.Parameters.AddWithValue("@n", member.Name);
+                    using var eqReader = eqCmd.ExecuteReader();
+                    while (eqReader.Read())
+                    {
+                        var slot = Enum.Parse<EquipmentSlot>(eqReader.GetString("slot"), true);
+                        member.Equipment[slot] = eqReader.GetString("item_name");
+                    }
+                }
+
+                using (var slotCmd = new MySqlCommand("SELECT slot, ability_id, priority FROM character_ability_slots WHERE character_id=@cid", conn))
+                {
+                    slotCmd.Parameters.AddWithValue("@cid", charId);
+                    using var slotReader = slotCmd.ExecuteReader();
+                    while (slotReader.Read())
+                    {
+                        int slot = slotReader.GetInt32("slot");
+                        int priority = slotReader.GetInt32("priority");
+                        int? abilityId = slotReader.IsDBNull(slotReader.GetOrdinal("ability_id")) ? (int?)null : slotReader.GetInt32("ability_id");
+                        member.AbilitySlots[slot] = new AbilitySlotMapping { AbilityId = abilityId, Priority = priority };
+                    }
+                }
+
+                using (var passCmd = new MySqlCommand("SELECT passive_id, level FROM character_passives WHERE character_id=@cid", conn))
+                {
+                    passCmd.Parameters.AddWithValue("@cid", charId);
+                    using var passReader = passCmd.ExecuteReader();
+                    while (passReader.Read())
+                    {
+                        member.Passives[passReader.GetInt32("passive_id")] = passReader.GetInt32("level");
+                    }
+                }
+            }
 
             using (var upd = new MySqlCommand("UPDATE characters SET in_tavern=1 WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn))
             {
@@ -178,9 +334,9 @@ namespace WinFormsApp2.Multiplayer
             var party = new HireableParty
             {
                 OwnerId = ownerId,
-                Name = $"{members[0].Name}'s Party",
+                Name = $"{members[0].Member.Name}'s Party",
                 Cost = cost,
-                Members = members
+                Members = members.Select(m => m.Member).ToList()
             };
             var list = LoadState();
             list.Add(party);
@@ -227,6 +383,7 @@ namespace WinFormsApp2.Multiplayer
             if (existing == null || existing.OnMission) return 0;
             if (existing.CurrentHirer.HasValue)
             {
+                SyncFromMercenaries(existing.CurrentHirer.Value, existing);
                 RemoveMercenaries(existing.CurrentHirer.Value, existing.Members.Select(m => m.Name));
                 existing.CurrentHirer = null;
             }
