@@ -17,6 +17,10 @@ namespace WinFormsApp2
         private DateTime _lastMessage = DateTime.MinValue;
         private HashSet<string> _hiredMembers = new();
         private HashSet<string> _mercenaryMembers = new();
+        private NavigationWindow? _navigationWindow;
+        private InventoryForm? _inventoryForm;
+        private MailboxForm? _mailboxForm;
+        private BattleLogForm? _battleLogForm;
 
         public RPGForm(int userId, string nickname)
         {
@@ -286,13 +290,33 @@ namespace WinFormsApp2
 
         private void btnLogs_Click(object? sender, EventArgs e)
         {
-            var logs = new BattleLogForm();
-            logs.FormClosed += (_, __) => logs.Dispose();
-            logs.Show(this);
+            if (_battleLogForm != null && !_battleLogForm.IsDisposed)
+            {
+                _battleLogForm.BringToFront();
+                _battleLogForm.Focus();
+                return;
+            }
+
+            btnLogs.Enabled = false;
+            _battleLogForm = new BattleLogForm();
+            _battleLogForm.FormClosed += (_, __) =>
+            {
+                btnLogs.Enabled = true;
+                _battleLogForm.Dispose();
+                _battleLogForm = null;
+            };
+            _battleLogForm.Show(this);
         }
 
         private void btnNavigate_Click(object? sender, EventArgs e)
         {
+            if (_navigationWindow != null && !_navigationWindow.IsDisposed)
+            {
+                _navigationWindow.BringToFront();
+                _navigationWindow.Focus();
+                return;
+            }
+
             bool hasBlessing = false;
             using (var conn = new MySqlConnection(DatabaseConfig.ConnectionString))
             {
@@ -301,31 +325,58 @@ namespace WinFormsApp2
                 cmd.Parameters.AddWithValue("@a", _userId);
                 hasBlessing = Convert.ToBoolean(cmd.ExecuteScalar() ?? 0);
             }
-            var nav = new NavigationWindow(_userId, lstParty.Items.Count, hasBlessing, LoadPartyData);
-            nav.FormClosed += (_, __) =>
+
+            btnNavigate.Enabled = false;
+            _navigationWindow = new NavigationWindow(_userId, lstParty.Items.Count, hasBlessing, LoadPartyData);
+            _navigationWindow.FormClosed += (_, __) =>
             {
+                btnNavigate.Enabled = true;
                 LoadPartyData();
-                nav.Dispose();
+                _navigationWindow.Dispose();
+                _navigationWindow = null;
             };
-            nav.Show(this);
+            _navigationWindow.Show(this);
         }
 
         private void btnMail_Click(object? sender, EventArgs e)
         {
-            var box = new MailboxForm(_userId);
-            box.FormClosed += (_, __) => box.Dispose();
-            box.Show(this);
+            if (_mailboxForm != null && !_mailboxForm.IsDisposed)
+            {
+                _mailboxForm.BringToFront();
+                _mailboxForm.Focus();
+                return;
+            }
+
+            btnMail.Enabled = false;
+            _mailboxForm = new MailboxForm(_userId);
+            _mailboxForm.FormClosed += (_, __) =>
+            {
+                btnMail.Enabled = true;
+                _mailboxForm.Dispose();
+                _mailboxForm = null;
+            };
+            _mailboxForm.Show(this);
         }
 
         private void btnInventory_Click(object? sender, EventArgs e)
         {
-            var inv = new InventoryForm(_userId);
-            inv.FormClosed += (_, __) =>
+            if (_inventoryForm != null && !_inventoryForm.IsDisposed)
             {
+                _inventoryForm.BringToFront();
+                _inventoryForm.Focus();
+                return;
+            }
+
+            btnInventory.Enabled = false;
+            _inventoryForm = new InventoryForm(_userId);
+            _inventoryForm.FormClosed += (_, __) =>
+            {
+                btnInventory.Enabled = true;
                 LoadPartyData();
-                inv.Dispose();
+                _inventoryForm.Dispose();
+                _inventoryForm = null;
             };
-            inv.Show(this);
+            _inventoryForm.Show(this);
         }
 
         private void Regenerate()
