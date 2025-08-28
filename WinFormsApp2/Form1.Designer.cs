@@ -45,6 +45,7 @@ namespace WinFormsApp2
             lblUsername = new Label();
             lblPassword = new Label();
             chkDebugMode = new CheckBox();
+            kimCheckbox = new CheckBox();
             SuspendLayout();
             // 
             // txtUsername
@@ -111,11 +112,22 @@ namespace WinFormsApp2
             chkDebugMode.UseVisualStyleBackColor = true;
             chkDebugMode.CheckedChanged += chkDebugMode_CheckedChanged;
             // 
+            // kimCheckbox
+            // 
+            kimCheckbox.AutoSize = true;
+            kimCheckbox.Location = new Point(168, 179);
+            kimCheckbox.Name = "kimCheckbox";
+            kimCheckbox.Size = new Size(81, 19);
+            kimCheckbox.TabIndex = 7;
+            kimCheckbox.Text = "Kim Mode";
+            kimCheckbox.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(264, 211);
+            Controls.Add(kimCheckbox);
             Controls.Add(chkDebugMode);
             Controls.Add(btnCreateAccount);
             Controls.Add(btnLogin);
@@ -130,5 +142,7 @@ namespace WinFormsApp2
         }
 
         #endregion
+
+        private CheckBox kimCheckbox;
     }
 }
