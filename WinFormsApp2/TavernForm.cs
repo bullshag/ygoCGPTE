@@ -22,7 +22,7 @@ namespace WinFormsApp2
         private void btnRecruit_Click(object? sender, EventArgs e)
         {
             _searchCost = CalculateSearchCost(out int partyCount);
-            if (partyCount >= 5)
+            if (partyCount >= 10)
             {
                 MessageBox.Show("Party is full. Release a member before recruiting.");
                 RefreshSearchCost();
@@ -65,13 +65,13 @@ namespace WinFormsApp2
 
         private void btnJoin_Click(object? sender, EventArgs e)
         {
-            using var window = new HireMultiplayerPartyWindow(_accountId);
+            using var window = new HireMultiplayerPartyWindow(_accountId, OnHire);
             window.ShowDialog(this);
         }
 
         private void btnHireOut_Click(object? sender, EventArgs e)
         {
-            using var window = new HireMultiplayerPartyWindow(_accountId, showHireOut: true);
+            using var window = new HireMultiplayerPartyWindow(_accountId, OnHire, showHireOut: true);
             window.ShowDialog(this);
         }
 
@@ -84,7 +84,7 @@ namespace WinFormsApp2
         private void RefreshSearchCost()
         {
             _searchCost = CalculateSearchCost(out int partyCount);
-            if (partyCount >= 5)
+            if (partyCount >= 10)
             {
                 btnRecruit.Text = "Party Full";
                 btnRecruit.Enabled = false;

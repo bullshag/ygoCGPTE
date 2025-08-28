@@ -9,6 +9,7 @@ namespace WinFormsApp2
     public partial class HireMultiplayerPartyWindow : Form
     {
         private readonly int _accountId;
+        private readonly Action? _onChange;
 
         private readonly ListBox _partyList = new();
         private readonly ListBox _memberList = new();
@@ -18,9 +19,10 @@ namespace WinFormsApp2
         private readonly ListBox _myPartyList = new();
         private readonly NumericUpDown _costInput = new();
 
-        public HireMultiplayerPartyWindow(int accountId, bool showHireOut = false)
+        public HireMultiplayerPartyWindow(int accountId, Action? onChange = null, bool showHireOut = false)
         {
             _accountId = accountId;
+            _onChange = onChange;
             Text = "Multiplayer Tavern";
             Width = 520;
             Height = 360;
@@ -87,6 +89,9 @@ namespace WinFormsApp2
                 _myPartyList.Items.Add($"{party.Name} {status} - Earned {party.GoldEarned}g");
 
             }
+
+            _memberList.Items.Clear();
+            _statsLabel.Text = string.Empty;
         }
 
         private void PartySelected(object? sender, EventArgs e)
@@ -126,6 +131,7 @@ namespace WinFormsApp2
                 {
                     MessageBox.Show($"Hired {party.Name} for {party.Cost}g.");
                     RefreshLists();
+                    _onChange?.Invoke();
                 }
                 else
                 {
@@ -141,6 +147,7 @@ namespace WinFormsApp2
             {
                 MessageBox.Show("Party deposited for hire.");
                 RefreshLists();
+                _onChange?.Invoke();
             }
             else
             {
@@ -163,6 +170,7 @@ namespace WinFormsApp2
             int gold = PartyHireService.RetrieveParty(_accountId, party);
             MessageBox.Show(gold > 0 ? $"Party retrieved. Earned {gold}g." : "Party retrieved.");
             RefreshLists();
+            _onChange?.Invoke();
         }
     }
 }
