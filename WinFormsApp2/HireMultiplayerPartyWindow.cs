@@ -21,6 +21,7 @@ namespace WinFormsApp2
         public string Name { get; set; } = string.Empty;
         public int Cost { get; set; }
         public List<HireableMember> Members { get; set; } = new();
+        public int OwnerId { get; set; }
         public override string ToString() => Name;
     }
 
@@ -32,9 +33,11 @@ namespace WinFormsApp2
         private readonly Label _statsLabel = new();
         private readonly TabControl _tabs = new();
         private readonly List<HireableParty> _availableParties = new();
+        private readonly int _accountId;
 
         public HireMultiplayerPartyWindow(int accountId, bool showHireOut = false)
         {
+            _accountId = accountId;
             Text = "Multiplayer Tavern";
             Width = 520;
             Height = 360;
@@ -86,7 +89,7 @@ namespace WinFormsApp2
             var rng = new Random();
             for (int p = 0; p < 3; p++)
             {
-                var party = new HireableParty { Name = $"Party {p + 1}", Cost = 100 * (p + 1) };
+                var party = new HireableParty { Name = $"Party {p + 1}", Cost = 100 * (p + 1), OwnerId = p + 1 };
                 for (int m = 0; m < 3; m++)
                 {
                     party.Members.Add(new HireableMember
@@ -136,6 +139,8 @@ namespace WinFormsApp2
             if (_partyList.SelectedItem is HireableParty party)
             {
                 MessageBox.Show($"Hired {party.Name} for {party.Cost}g. Gameplay not implemented.");
+                TavernService.NotifyPartyHired(party.OwnerId);
+                TavernService.NotifyPartyReturned(party.OwnerId);
             }
 
         }
