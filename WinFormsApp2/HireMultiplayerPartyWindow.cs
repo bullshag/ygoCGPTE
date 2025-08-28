@@ -1,42 +1,23 @@
 
 using System;
-using System.Collections.Generic;
-
 using System.Drawing;
 using System.Windows.Forms;
+using WinFormsApp2.Multiplayer;
 
 namespace WinFormsApp2
 {
-
-    public class HireableMember
+    public class HireMultiplayerPartyWindow : Form
     {
-        public string Name { get; set; } = string.Empty;
-        public int Strength { get; set; }
-        public int Dexterity { get; set; }
-        public int Intelligence { get; set; }
-        public int MaxHp => 10 + Strength * 5;
-        public override string ToString() => Name;
-    }
+        private readonly int _accountId;
 
-    public class HireableParty
-    {
-        public string Name { get; set; } = string.Empty;
-        public int Cost { get; set; }
-        public List<HireableMember> Members { get; set; } = new();
-        public int OwnerId { get; set; }
-        public override string ToString() => Name;
-    }
-
-    public partial class HireMultiplayerPartyWindow : Form
-    {
         private readonly ListBox _partyList = new();
         private readonly ListBox _memberList = new();
         private readonly Label _costLabel = new();
         private readonly Label _statsLabel = new();
         private readonly TabControl _tabs = new();
+        private readonly ListBox _myPartyList = new();
+        private readonly NumericUpDown _costInput = new();
 
-        private readonly List<HireableParty> _availableParties = new();
-        private readonly int _accountId;
 
         public HireMultiplayerPartyWindow(int accountId, bool showHireOut = false)
         {

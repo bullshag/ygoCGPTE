@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using MySql.Data.MySqlClient;
+using WinFormsApp2;
 
-namespace WinFormsApp2
+namespace WinFormsApp2.Multiplayer
+
 {
     public class HireableMember
     {
