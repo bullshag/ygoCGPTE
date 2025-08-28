@@ -108,7 +108,7 @@ namespace WinFormsApp2.Multiplayer
             var members = new List<HireableMember>();
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using MySqlCommand cmd = new MySqlCommand("SELECT name,strength,dex,intelligence,experience_points FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0", conn);
+            using MySqlCommand cmd = new MySqlCommand("SELECT name,strength,dex,intelligence,experience_points FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn);
             cmd.Parameters.AddWithValue("@id", ownerId);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
@@ -123,6 +123,12 @@ namespace WinFormsApp2.Multiplayer
                 });
             }
             if (members.Count == 0) return false;
+
+            using (var upd = new MySqlCommand("UPDATE characters SET in_tavern=1 WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn))
+            {
+                upd.Parameters.AddWithValue("@id", ownerId);
+                upd.ExecuteNonQuery();
+            }
             var party = new HireableParty
             {
                 OwnerId = ownerId,
@@ -175,10 +181,15 @@ namespace WinFormsApp2.Multiplayer
             list.Remove(existing);
             SaveState();
             int gold = existing.GoldEarned;
+            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            using (var upd = new MySqlCommand("UPDATE characters SET in_tavern=0 WHERE account_id=@id", conn))
+            {
+                upd.Parameters.AddWithValue("@id", ownerId);
+                upd.ExecuteNonQuery();
+            }
             if (gold > 0)
             {
-                using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
-                conn.Open();
                 using MySqlCommand add = new MySqlCommand("UPDATE users SET gold = gold + @g WHERE id=@id", conn);
                 add.Parameters.AddWithValue("@g", gold);
                 add.Parameters.AddWithValue("@id", ownerId);

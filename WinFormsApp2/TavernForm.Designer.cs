@@ -38,7 +38,7 @@ namespace WinFormsApp2
             // 
             // btnJoin
             // 
-            btnJoin.Location = new Point(50, 60);
+            btnJoin.Location = new Point(50, 51);
             btnJoin.Name = "btnJoin";
             btnJoin.Size = new Size(160, 23);
             btnJoin.TabIndex = 1;
@@ -48,6 +48,7 @@ namespace WinFormsApp2
             // 
             // btnHireOut
             // 
+            btnHireOut.Enabled = false;
             btnHireOut.Location = new Point(50, 100);
             btnHireOut.Name = "btnHireOut";
             btnHireOut.Size = new Size(160, 23);
@@ -60,7 +61,7 @@ namespace WinFormsApp2
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(280, 200);
+            ClientSize = new Size(280, 86);
             Controls.Add(btnHireOut);
             Controls.Add(btnJoin);
             Controls.Add(btnRecruit);
