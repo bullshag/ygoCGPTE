@@ -16,6 +16,7 @@ namespace WinFormsApp2
         private readonly System.Windows.Forms.Timer _regenTimer = new System.Windows.Forms.Timer();
         private DateTime _lastMessage = DateTime.MinValue;
         private HashSet<string> _hiredMembers = new();
+        private HashSet<string> _mercenaryMembers = new();
 
         public RPGForm(int userId, string nickname)
         {
@@ -42,8 +43,9 @@ namespace WinFormsApp2
             conn.Open();
 
             _hiredMembers = PartyHireService.GetHiredMemberNames(_userId);
+            _mercenaryMembers.Clear();
 
-            using MySqlCommand cmd = new MySqlCommand("SELECT name, experience_points, level, current_hp, max_hp, mana, intelligence, in_tavern FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0", conn);
+            using MySqlCommand cmd = new MySqlCommand("SELECT name, experience_points, level, current_hp, max_hp, mana, intelligence, in_tavern, is_mercenary FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0", conn);
 
             cmd.Parameters.AddWithValue("@id", _userId);
             using MySqlDataReader reader = cmd.ExecuteReader();
@@ -57,6 +59,9 @@ namespace WinFormsApp2
             {
                 string name = reader.GetString("name");
                 bool inTavern = reader.GetBoolean("in_tavern");
+                bool isMerc = reader.GetBoolean("is_mercenary");
+                if (isMerc)
+                    _mercenaryMembers.Add(name);
                 if (inTavern && !_hiredMembers.Contains(name))
                     continue;
                 int exp = reader.GetInt32("experience_points");
@@ -68,7 +73,9 @@ namespace WinFormsApp2
                 int maxMana = 10 + 5 * intel;
                 int nextExp = ExperienceHelper.GetNextLevelRequirement(level);
                 string display = $"{name} - LVL {level} EXP {exp}/{nextExp}";
-                if (_hiredMembers.Contains(name))
+                if (isMerc)
+                    display += " (Mercenary)";
+                else if (_hiredMembers.Contains(name))
                     display += " (Hired Out)";
                 lstParty.Items.Add(display);
 
@@ -135,8 +142,14 @@ namespace WinFormsApp2
                 btnInspect.Enabled = true;
                 btnInspect.Text = $"Inspect {name}";
                 bool hired = _hiredMembers.Contains(name);
-                btnFire.Enabled = !hired;
-                btnFire.Text = hired ? "Hired Out" : $"Fire {name}";
+                bool merc = _mercenaryMembers.Contains(name);
+                btnFire.Enabled = !hired && !merc;
+                if (merc)
+                    btnFire.Text = "Mercenary";
+                else if (hired)
+                    btnFire.Text = "Hired Out";
+                else
+                    btnFire.Text = $"Fire {name}";
             }
         }
 
@@ -148,20 +161,21 @@ namespace WinFormsApp2
 
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using MySqlCommand cmd = new MySqlCommand("SELECT id FROM characters WHERE account_id=@id AND name=@name AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn);
+            bool isMerc = _mercenaryMembers.Contains(name);
+            string sql = "SELECT id FROM characters WHERE account_id=@id AND name=@name AND is_dead=0 AND in_arena=0 AND in_tavern=0 AND is_mercenary=@m";
+            using MySqlCommand cmd = new MySqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             cmd.Parameters.AddWithValue("@name", name);
+            cmd.Parameters.AddWithValue("@m", isMerc ? 1 : 0);
             object? result = cmd.ExecuteScalar();
                 if (result != null)
                 {
                     int charId = Convert.ToInt32(result);
-                    var inspect = new HeroInspectForm(_userId, charId, _hiredMembers.Contains(name));
-                    inspect.FormClosed += (_, __) =>
-                    {
-                        LoadPartyData();
-                        inspect.Dispose();
-                    };
-                    inspect.Show(this);
+                    bool readOnly = _hiredMembers.Contains(name) || isMerc;
+                    using var inspect = new HeroInspectForm(_userId, charId, readOnly);
+                    inspect.ShowDialog(this);
+                    LoadPartyData();
+
                 }
         }
 
@@ -202,14 +216,19 @@ namespace WinFormsApp2
                 return;
             }
 
-            ConfirmFire(name, () => FireHero(name));
-        }
+            if (_mercenaryMembers.Contains(name))
+            {
+                MessageBox.Show("Mercenary characters cannot be fired; they will depart automatically.");
+                return;
+            }
+
+            if (!ConfirmFire(name)) return;
 
         private void FireHero(string name)
         {
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using MySqlCommand cmd = new MySqlCommand("SELECT id, level FROM characters WHERE account_id=@id AND name=@name AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn);
+            using MySqlCommand cmd = new MySqlCommand("SELECT id, level FROM characters WHERE account_id=@id AND name=@name AND is_dead=0 AND in_arena=0 AND in_tavern=0 AND is_mercenary=0", conn);
             cmd.Parameters.AddWithValue("@id", _userId);
             cmd.Parameters.AddWithValue("@name", name);
             using var reader = cmd.ExecuteReader();

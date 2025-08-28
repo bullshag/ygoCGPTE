@@ -67,13 +67,56 @@ namespace WinFormsApp2.Multiplayer
             }
         }
 
+        private static void CreateMercenaries(int hirerId, HireableParty party, MySqlConnection conn)
+        {
+            foreach (var m in party.Members)
+            {
+                using var cmd = new MySqlCommand(
+                    "INSERT INTO characters (account_id, name, current_hp, max_hp, mana, experience_points, action_speed, strength, dex, intelligence, melee_defense, magic_defense, level, skill_points, in_tavern, in_arena, is_dead, role, targeting_style, is_mercenary) " +
+                    "VALUES (@a,@n,@hp,@max,@mana,@exp,100,@str,@dex,@int,0,0,1,0,0,0,0,'DPS','no priorities',1)", conn);
+                cmd.Parameters.AddWithValue("@a", hirerId);
+                cmd.Parameters.AddWithValue("@n", m.Name);
+                int hp = m.MaxHp;
+                cmd.Parameters.AddWithValue("@hp", hp);
+                cmd.Parameters.AddWithValue("@max", hp);
+                cmd.Parameters.AddWithValue("@mana", 10 + 5 * m.Intelligence);
+                cmd.Parameters.AddWithValue("@exp", m.Experience);
+                cmd.Parameters.AddWithValue("@str", m.Strength);
+                cmd.Parameters.AddWithValue("@dex", m.Dexterity);
+                cmd.Parameters.AddWithValue("@int", m.Intelligence);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        private static void RemoveMercenaries(int hirerId, IEnumerable<string> names)
+        {
+            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            string inClause = string.Join(",", names.Select((_, i) => "@n" + i));
+            if (string.IsNullOrEmpty(inClause)) return;
+            string sql = $"DELETE FROM characters WHERE account_id=@a AND is_mercenary=1 AND name IN ({inClause})";
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@a", hirerId);
+            int index = 0;
+            foreach (var n in names)
+            {
+                cmd.Parameters.AddWithValue("@n" + index, n);
+                index++;
+            }
+            cmd.ExecuteNonQuery();
+        }
+
         private static void CleanupExpired()
         {
             var list = LoadState();
             bool changed = false;
             var now = DateTime.UtcNow;
-            foreach (var p in list.Where(p => p.OnMission && p.HiredUntil <= now))
+            foreach (var p in list.Where(p => p.OnMission && p.HiredUntil <= now).ToList())
             {
+                if (p.CurrentHirer.HasValue)
+                {
+                    RemoveMercenaries(p.CurrentHirer.Value, p.Members.Select(m => m.Name));
+                }
                 p.OnMission = false;
                 p.CurrentHirer = null;
                 p.HiredUntil = null;
@@ -172,6 +215,7 @@ namespace WinFormsApp2.Multiplayer
             target.HiredUntil = DateTime.UtcNow.AddMinutes(30);
             target.GoldEarned += party.Cost;
             SaveState();
+            CreateMercenaries(hirerId, target, conn);
             return true;
         }
 
@@ -181,6 +225,11 @@ namespace WinFormsApp2.Multiplayer
             var list = LoadState();
             var existing = list.FirstOrDefault(p => p.Id == party.Id && p.OwnerId == ownerId);
             if (existing == null || existing.OnMission) return 0;
+            if (existing.CurrentHirer.HasValue)
+            {
+                RemoveMercenaries(existing.CurrentHirer.Value, existing.Members.Select(m => m.Name));
+                existing.CurrentHirer = null;
+            }
             list.Remove(existing);
             SaveState();
             int gold = existing.GoldEarned;
