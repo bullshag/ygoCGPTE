@@ -222,7 +222,8 @@ namespace WinFormsApp2
                 return;
             }
 
-            if (!ConfirmFire(name)) return;
+            ConfirmFire(name, () => FireHero(name));
+        }
 
         private void FireHero(string name)
         {
