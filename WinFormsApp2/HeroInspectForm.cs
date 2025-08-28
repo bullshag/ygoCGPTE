@@ -10,6 +10,7 @@ namespace WinFormsApp2
     {
         private readonly int _userId;
         private readonly int _characterId;
+        private readonly bool _readOnly;
         private ComboBox[] _abilityCombos = new ComboBox[3];
         private NumericUpDown[] _priorityNums = new NumericUpDown[3];
         private System.Collections.Generic.List<Ability> _knownAbilities = new();
@@ -19,10 +20,11 @@ namespace WinFormsApp2
         private System.Collections.Generic.List<Passive> _passives = new();
         private readonly ToolTip _tip = new();
 
-        public HeroInspectForm(int userId, int characterId)
+        public HeroInspectForm(int userId, int characterId, bool readOnly = false)
         {
             _userId = userId;
             _characterId = characterId;
+            _readOnly = readOnly;
             InitializeComponent();
             _abilityCombos = new[] { cmbAbility1, cmbAbility2, cmbAbility3 };
             _priorityNums = new[] { numPriority1, numPriority2, numPriority3 };
@@ -72,7 +74,7 @@ namespace WinFormsApp2
                 int nextExp = ExperienceHelper.GetNextLevelRequirement(level);
                 lblStats.Text = $"{name}\nLevel: {level}\nEXP: {exp}/{nextExp}\nHP: {hp}/{maxHp}\nSTR: {str}\nDEX: {dex}\nINT: {intel}";
                 ShowPredictions(str, dex, intel);
-                btnLevelUp.Enabled = exp >= nextExp;
+                btnLevelUp.Enabled = !_readOnly && exp >= nextExp;
 
                 string role = reader.GetString("role");
                 string targeting = reader.GetString("targeting_style");
@@ -82,6 +84,21 @@ namespace WinFormsApp2
                 LoadEquipment();
                 LoadAbilities();
                 LoadPassives();
+
+                if (_readOnly)
+                {
+                    cmbRole.Enabled = false;
+                    cmbTarget.Enabled = false;
+                    btnLevelUp.Enabled = false;
+                    foreach (var cmb in _abilityCombos) cmb.Enabled = false;
+                    foreach (var num in _priorityNums) num.Enabled = false;
+                    cmbLeft.Enabled = false;
+                    cmbRight.Enabled = false;
+                    cmbBody.Enabled = false;
+                    cmbLegs.Enabled = false;
+                    cmbHead.Enabled = false;
+                    cmbTrinket.Enabled = false;
+                }
             }
         }
 
@@ -111,6 +128,7 @@ namespace WinFormsApp2
 
         private void BtnLevelUp_Click(object? sender, EventArgs e)
         {
+            if (_readOnly) return;
             using var form = new LevelUpForm(_userId, _characterId);
             form.ShowDialog(this);
             HeroInspectForm_Load(null, EventArgs.Empty);
@@ -118,6 +136,7 @@ namespace WinFormsApp2
 
         private void CmbRole_SelectedIndexChanged(object? sender, EventArgs e)
         {
+            if (_readOnly) return;
             string role = cmbRole.SelectedItem?.ToString() ?? "DPS";
             LoadTargetOptions(role);
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
@@ -130,6 +149,7 @@ namespace WinFormsApp2
 
         private void CmbTarget_SelectedIndexChanged(object? sender, EventArgs e)
         {
+            if (_readOnly) return;
             string targeting = cmbTarget.SelectedItem?.ToString() ?? "no priorities";
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
@@ -239,7 +259,7 @@ namespace WinFormsApp2
 
         private void EquipSlot(EquipmentSlot slot, ComboBox combo)
         {
-            if (_loadingEquipment) return;
+            if (_loadingEquipment || _readOnly) return;
             string selected = combo.SelectedItem?.ToString() ?? "-empty-";
             if (selected == "-empty-")
             {
@@ -300,7 +320,7 @@ namespace WinFormsApp2
 
         private void UpdateAbilityOptions()
         {
-            if (_loadingAbilities) return;
+            if (_loadingAbilities || _readOnly) return;
             _loadingAbilities = true;
             var selected = new HashSet<string>(_abilityCombos.Select(c => c.SelectedItem?.ToString() ?? ""));
             for (int i = 0; i < 3; i++)
@@ -323,7 +343,7 @@ namespace WinFormsApp2
 
         private void AbilityComboChanged(object? sender, EventArgs e)
         {
-            if (_loadingAbilities) return;
+            if (_loadingAbilities || _readOnly) return;
             UpdateAbilityOptions();
             var combo = (ComboBox)sender!;
             int index = Array.IndexOf(_abilityCombos, combo);
@@ -332,7 +352,7 @@ namespace WinFormsApp2
 
         private void PriorityChanged(object? sender, EventArgs e)
         {
-            if (_loadingAbilities) return;
+            if (_loadingAbilities || _readOnly) return;
             var num = (NumericUpDown)sender!;
             int index = Array.IndexOf(_priorityNums, num);
             SaveAbility(index);
@@ -340,6 +360,7 @@ namespace WinFormsApp2
 
         private void SaveAbility(int index)
         {
+            if (_readOnly) return;
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
             string name = _abilityCombos[index].SelectedItem?.ToString() ?? "-basic attack-";
