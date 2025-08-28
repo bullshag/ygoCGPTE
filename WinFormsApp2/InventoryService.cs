@@ -19,12 +19,21 @@ namespace WinFormsApp2
 
         public static IReadOnlyList<InventoryItem> Items => _items;
 
-        public static void Load(int userId)
+        public static void Reload(int userId)
         {
-            if (_loaded && _userId == userId) return;
+            _items.Clear();
+            _equipment.Clear();
+            _loaded = false;
+            Load(userId, true);
+        }
+
+        public static void Load(int userId, bool forceReload = false)
+        {
+            if (_loaded && _userId == userId && !forceReload) return;
             _loaded = true;
             _userId = userId;
             _items.Clear();
+            _equipment.Clear();
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
             using MySqlCommand cmd = new MySqlCommand("SELECT item_name, quantity FROM user_items WHERE account_id=@id", conn);
