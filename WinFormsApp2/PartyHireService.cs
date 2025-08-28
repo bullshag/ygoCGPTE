@@ -249,6 +249,26 @@ namespace WinFormsApp2.Multiplayer
             }
             return gold;
         }
+
+        public static void ApplyMercenaryExperience(int hirerId, Dictionary<string, int> expGains)
+        {
+            if (expGains == null || expGains.Count == 0) return;
+            CleanupExpired();
+            var list = LoadState();
+            bool changed = false;
+            foreach (var party in list.Where(p => p.OnMission && p.CurrentHirer == hirerId))
+            {
+                foreach (var member in party.Members)
+                {
+                    if (expGains.TryGetValue(member.Name, out int gain))
+                    {
+                        member.Experience += gain;
+                        changed = true;
+                    }
+                }
+            }
+            if (changed) SaveState();
+        }
     }
 }
 
