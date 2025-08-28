@@ -6,7 +6,7 @@ using WinFormsApp2.Multiplayer;
 
 namespace WinFormsApp2
 {
-    public class HireMultiplayerPartyWindow : Form
+    public partial class HireMultiplayerPartyWindow : Form
     {
         private readonly int _accountId;
 
@@ -17,7 +17,6 @@ namespace WinFormsApp2
         private readonly TabControl _tabs = new();
         private readonly ListBox _myPartyList = new();
         private readonly NumericUpDown _costInput = new();
-
 
         public HireMultiplayerPartyWindow(int accountId, bool showHireOut = false)
         {
