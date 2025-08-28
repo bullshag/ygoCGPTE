@@ -33,11 +33,19 @@ namespace WinFormsApp2
             RefreshSearchCost();
 
             var btnJoin = new Button { Text = "Join Another Party", Left = 50, Top = 60, Width = 160 };
-            btnJoin.Click += (s, e) => MessageBox.Show("Joining parties not yet implemented.");
+            btnJoin.Click += (s, e) =>
+            {
+                using var window = new HireMultiplayerPartyWindow(_accountId);
+                window.ShowDialog(this);
+            };
             Controls.Add(btnJoin);
 
             var btnHireOut = new Button { Text = "Leave Party for Hire", Left = 50, Top = 100, Width = 160 };
-            btnHireOut.Click += (s, e) => MessageBox.Show("Hiring out your party not yet implemented.");
+            btnHireOut.Click += (s, e) =>
+            {
+                using var window = new HireMultiplayerPartyWindow(_accountId, showHireOut: true);
+                window.ShowDialog(this);
+            };
             Controls.Add(btnHireOut);
         }
 
