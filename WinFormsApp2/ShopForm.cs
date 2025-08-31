@@ -23,10 +23,14 @@ namespace WinFormsApp2
             _btnBuy.Click += BtnBuy_Click;
             _btnSell.Click += BtnSell_Click;
             Load += ShopForm_Load;
-            _lstShop.DrawMode = DrawMode.OwnerDrawFixed;
+            _lstShop.HorizontalScrollbar = true;
+            _lstInventory.HorizontalScrollbar = true;
+            _lstShop.DrawMode = DrawMode.OwnerDrawVariable;
             _lstShop.DrawItem += LstShop_DrawItem;
-            _lstInventory.DrawMode = DrawMode.OwnerDrawFixed;
+            _lstShop.MeasureItem += LstShop_MeasureItem;
+            _lstInventory.DrawMode = DrawMode.OwnerDrawVariable;
             _lstInventory.DrawItem += LstInventory_DrawItem;
+            _lstInventory.MeasureItem += LstInventory_MeasureItem;
             _lstShop.SelectedIndexChanged += (s, e) => ShowShopDesc();
             _lstInventory.SelectedIndexChanged += (s, e) => ShowInventoryDesc();
             _lstShop.MouseMove += LstShop_MouseMove;
@@ -53,6 +57,7 @@ namespace WinFormsApp2
 
         private void RefreshShop()
         {
+            _lstShop.HorizontalExtent = 0;
             _lstShop.Items.Clear();
             foreach (var item in _shopItems)
             {
@@ -62,6 +67,7 @@ namespace WinFormsApp2
 
         private void RefreshInventory()
         {
+            _lstInventory.HorizontalExtent = 0;
             _lstInventory.Items.Clear();
             foreach (var inv in InventoryService.Items)
             {
@@ -162,6 +168,55 @@ namespace WinFormsApp2
             InventoryService.RemoveItem(inv.Item);
             RefreshGold();
             RefreshInventory();
+        }
+
+        private void LstShop_MeasureItem(object? sender, MeasureItemEventArgs e)
+        {
+            if (e.Index < 0) return;
+            var item = (Item)_lstShop.Items[e.Index];
+            string price = $" - {item.Price}g";
+            float width;
+            if (item.RainbowColors != null)
+            {
+                width = 0;
+                foreach (char ch in item.Name)
+                    width += e.Graphics.MeasureString(ch.ToString(), _lstShop.Font).Width;
+                width += e.Graphics.MeasureString(price, _lstShop.Font).Width;
+            }
+            else
+            {
+                width = e.Graphics.MeasureString(item.Name + price, _lstShop.Font).Width;
+            }
+            int w = (int)Math.Ceiling(width) + 1;
+            e.ItemHeight = _lstShop.Font.Height;
+            e.ItemWidth = w;
+            if (w > _lstShop.HorizontalExtent)
+                _lstShop.HorizontalExtent = w;
+        }
+
+        private void LstInventory_MeasureItem(object? sender, MeasureItemEventArgs e)
+        {
+            if (e.Index < 0) return;
+            var inv = (InventoryItem)_lstInventory.Items[e.Index];
+            var item = inv.Item;
+            string suffix = item.Stackable ? $" x{inv.Quantity}" : string.Empty;
+            float width;
+            if (item.RainbowColors != null)
+            {
+                width = 0;
+                foreach (char ch in item.Name)
+                    width += e.Graphics.MeasureString(ch.ToString(), _lstInventory.Font).Width;
+                width += e.Graphics.MeasureString(suffix, _lstInventory.Font).Width;
+            }
+            else
+            {
+                width = e.Graphics.MeasureString(item.Name + suffix, _lstInventory.Font).Width;
+            }
+            int w = (int)Math.Ceiling(width) + 1;
+            e.ItemHeight = _lstInventory.Font.Height;
+            e.ItemWidth = w;
+            if (w > _lstInventory.HorizontalExtent)
+                _lstInventory.HorizontalExtent = w;
         }
 
         private void LstShop_DrawItem(object? sender, DrawItemEventArgs e)
