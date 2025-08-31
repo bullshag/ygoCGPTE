@@ -68,7 +68,7 @@ namespace WinFormsApp2
             toolTip1.SetToolTip(btnShop, "Buy and sell items");
             toolTip1.SetToolTip(btnGraveyard, "View and resurrect fallen heroes");
             toolTip1.SetToolTip(btnTavern, "Visit the tavern");
-            toolTip1.SetToolTip(btnFindEnemies, "Search the area for trouble");
+            toolTip1.SetToolTip(btnFindEnemies, "Search the area for enemies scaled to your party");
             toolTip1.SetToolTip(btnArena, "Enter the battle arena");
             toolTip1.SetToolTip(btnTemple, "Receive divine blessings");
             _travelManager.Resume();
