@@ -50,20 +50,25 @@ namespace WinFormsApp2.Multiplayer
         private static readonly string FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "party_hires.json");
         private static readonly object _sync = new();
         private static List<HireableParty>? _cache;
+        private static DateTime _lastLoaded = DateTime.MinValue;
 
         private static List<HireableParty> LoadState()
         {
             lock (_sync)
             {
-                if (_cache != null) return _cache;
-                if (!File.Exists(FilePath))
+                var lastWrite = File.Exists(FilePath) ? File.GetLastWriteTimeUtc(FilePath) : DateTime.MinValue;
+                if (_cache == null || lastWrite > _lastLoaded)
                 {
-                    _cache = new List<HireableParty>();
-                }
-                else
-                {
-                    string json = File.ReadAllText(FilePath);
-                    _cache = JsonSerializer.Deserialize<List<HireableParty>>(json) ?? new List<HireableParty>();
+                    if (!File.Exists(FilePath))
+                    {
+                        _cache = new List<HireableParty>();
+                    }
+                    else
+                    {
+                        string json = File.ReadAllText(FilePath);
+                        _cache = JsonSerializer.Deserialize<List<HireableParty>>(json) ?? new List<HireableParty>();
+                    }
+                    _lastLoaded = lastWrite;
                 }
                 return _cache;
             }
@@ -75,6 +80,7 @@ namespace WinFormsApp2.Multiplayer
             {
                 var json = JsonSerializer.Serialize(_cache ?? new List<HireableParty>());
                 File.WriteAllText(FilePath, json);
+                _lastLoaded = File.GetLastWriteTimeUtc(FilePath);
             }
         }
 
