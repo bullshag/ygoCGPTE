@@ -139,12 +139,22 @@ namespace WinFormsApp2
             int avgLevel = _players.Count > 0 ? (int)Math.Ceiling(_players.Average(p => p.Level)) : 1;
             int areaMin = _areaMinLevel ?? 1;
             int areaMax = _areaMaxLevel ?? int.MaxValue;
-            int perNpcMin = Math.Max(areaMin, (int)Math.Ceiling(avgLevel * (_wildEncounter ? 0.8 : 1.0)));
-            int perNpcMax = Math.Min(areaMax, (int)Math.Ceiling(avgLevel * (_wildEncounter ? 1.0 : 1.4)));
+
+            int minTotal = (int)Math.Ceiling(totalLevel * 0.8);
+            int maxTotal = _wildEncounter ? (int)Math.Ceiling(totalLevel * 1.0)
+                                          : (int)Math.Ceiling(totalLevel * 1.2);
+            if (totalLevel < areaMin)
+            {
+                int tough = (int)Math.Ceiling(areaMin * 1.2);
+                minTotal = maxTotal = tough;
+            }
+
+            int targetAvg = totalLevel < areaMin ? areaMin : avgLevel;
+            int perNpcMin = Math.Max(areaMin, (int)Math.Ceiling(targetAvg * 0.8));
+            int perNpcMax = Math.Min(areaMax, (int)Math.Ceiling(targetAvg * (_wildEncounter ? 1.0 : 1.2)));
             if (perNpcMin > perNpcMax)
                 perNpcMin = perNpcMax = Math.Min(areaMax, perNpcMin);
-            int minTotal = _wildEncounter ? (int)Math.Ceiling(totalLevel * 0.8) : totalLevel;
-            int maxTotal = _wildEncounter ? (int)Math.Ceiling(totalLevel * 1.0) : (int)Math.Ceiling(totalLevel * 1.4);
+
             int npcLevel = 0;
 
             Creature? AddNpc(int minLevel, int maxLevel)
@@ -214,15 +224,15 @@ namespace WinFormsApp2
                 return null;
             }
 
-            int strongMin = Math.Max(perNpcMin, (int)Math.Ceiling(avgLevel * 1.2));
-            int strongMax = Math.Min(perNpcMax, (int)Math.Ceiling(avgLevel * 1.5));
+            int strongMin = Math.Max(perNpcMin, (int)Math.Ceiling(targetAvg * 1.2));
+            int strongMax = Math.Min(perNpcMax, (int)Math.Ceiling(targetAvg * 1.5));
             AddNpc(strongMin, strongMax);
 
             int weakerCount = _rng.Next(1, 3);
             for (int i = 0; i < weakerCount && npcLevel < maxTotal; i++)
             {
                 int remaining = maxTotal - npcLevel;
-                int weakMax = Math.Min(avgLevel, remaining);
+                int weakMax = Math.Min(targetAvg, remaining);
                 if (weakMax < perNpcMin) break;
                 AddNpc(perNpcMin, weakMax);
             }
@@ -231,7 +241,7 @@ namespace WinFormsApp2
             {
                 int remaining = maxTotal - npcLevel;
                 if (remaining < perNpcMin) break;
-                AddNpc(perNpcMin, Math.Min(avgLevel, remaining));
+                AddNpc(perNpcMin, Math.Min(targetAvg, remaining));
             }
 
             if (_npcs.Count == 0)
