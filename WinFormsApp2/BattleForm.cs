@@ -746,6 +746,20 @@ namespace WinFormsApp2
             target.CurrentTarget = actor;
             actor.CurrentTarget = target;
             AfterDamageDealt(actor, target, dmg);
+            if (ability.Name == "Shield Bash" && dmg > 0)
+            {
+                int shield = (int)(dmg * 0.5);
+                actor.Effects.Add(new StatusEffect
+                {
+                    Kind = EffectKind.Shield,
+                    RemainingMs = 15000,
+                    TickIntervalMs = int.MaxValue,
+                    TimeUntilTickMs = int.MaxValue,
+                    AmountPerTick = shield,
+                    SourceIsPlayer = _players.Contains(actor)
+                });
+                AppendLog($"{actor.Name} gains a shield ({shield}).", _players.Contains(actor), true);
+            }
             if (actor.SplashDamagePercent > 0)
             {
                 var splashTargets = opponents.Where(o => o != target && o.CurrentHp > 0).ToList();
