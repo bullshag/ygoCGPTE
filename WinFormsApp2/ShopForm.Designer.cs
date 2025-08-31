@@ -35,7 +35,9 @@ namespace WinFormsApp2
             // 
             // _lstShop
             // 
+            _lstShop.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             _lstShop.ItemHeight = 15;
+            _lstShop.Items.AddRange(new object[] { "1", "2", "3", "4", "5" });
             _lstShop.Location = new Point(10, 25);
             _lstShop.Name = "_lstShop";
             _lstShop.Size = new Size(250, 139);
@@ -73,9 +75,9 @@ namespace WinFormsApp2
             _lblGold.Size = new Size(35, 15);
             _lblGold.TabIndex = 0;
             _lblGold.Text = "Gold:";
-            //
+            // 
             // label1
-            //
+            // 
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label1.Location = new Point(73, 1);
@@ -96,10 +98,10 @@ namespace WinFormsApp2
             // 
             // shopDescBox
             // 
+            shopDescBox.BackColor = SystemColors.Window;
             shopDescBox.Location = new Point(10, 170);
             shopDescBox.Name = "shopDescBox";
             shopDescBox.ReadOnly = true;
-            shopDescBox.BackColor = SystemColors.Window;
             shopDescBox.Size = new Size(570, 48);
             shopDescBox.TabIndex = 8;
             shopDescBox.Text = "";
