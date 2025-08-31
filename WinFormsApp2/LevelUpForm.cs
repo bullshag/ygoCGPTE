@@ -16,6 +16,7 @@ namespace WinFormsApp2
         private int _playerGold;
         private List<Ability> _abilities = new List<Ability>();
         private List<Passive> _passives = new List<Passive>();
+        private int _ownedPassiveCount;
         private int _maxMana;
         private readonly ToolTip _tip = new();
 
@@ -33,6 +34,7 @@ namespace WinFormsApp2
             lstAbilities.SelectedIndexChanged += LstAbilities_SelectedIndexChanged;
             lstAbilities.MouseMove += LstAbilities_MouseMove;
             lstPassives.MouseMove += LstPassives_MouseMove;
+            lstPassives.SelectedIndexChanged += LstPassives_SelectedIndexChanged;
             Load += LevelUpForm_Load;
         }
 
@@ -82,11 +84,13 @@ namespace WinFormsApp2
             btnBuy.Text = "Buy";
             btnBuy.Enabled = false;
             _passives = PassiveService.GetAvailablePassives(_characterId, conn);
+            _ownedPassiveCount = PassiveService.GetOwnedPassives(_characterId, conn).Count;
             lstPassives.Items.Clear();
             foreach (var p in _passives)
             {
-                lstPassives.Items.Add($"{p.Name} - Cost: 1\n{p.Description}");
+                lstPassives.Items.Add(p.Name);
             }
+            UpdatePassiveCostButton();
         }
 
         private void StatsChanged(object? sender, EventArgs e)
@@ -100,6 +104,13 @@ namespace WinFormsApp2
             }
             lblPoints.Text = $"Points: {_availablePoints - spent}";
             _maxMana = 10 + 5 * (int)numInt.Value;
+        }
+
+        private void UpdatePassiveCostButton()
+        {
+            int cost = 1 + _ownedPassiveCount;
+            btnBuyPassive.Text = $"Buy Passive ({cost} pt{(cost > 1 ? "s" : string.Empty)})";
+            btnBuyPassive.Enabled = lstPassives.SelectedIndex >= 0 && cost <= _availablePoints;
         }
 
         private void BtnBuy_Click(object? sender, EventArgs e)
@@ -136,7 +147,7 @@ namespace WinFormsApp2
         {
             if (lstPassives.SelectedIndex < 0) return;
             var passive = _passives[lstPassives.SelectedIndex];
-            int cost = 1;
+            int cost = 1 + _ownedPassiveCount;
             if (_availablePoints < cost)
             {
                 MessageBox.Show("Not enough points.");
@@ -147,12 +158,19 @@ namespace WinFormsApp2
             PassiveService.PurchasePassive(_characterId, passive.Id, cost, conn);
             _availablePoints -= cost;
             lblPoints.Text = $"Points: {_availablePoints}";
+            _ownedPassiveCount++;
             _passives = PassiveService.GetAvailablePassives(_characterId, conn);
             lstPassives.Items.Clear();
             foreach (var p in _passives)
             {
-                lstPassives.Items.Add($"{p.Name} - Cost: 1\n{p.Description}");
+                lstPassives.Items.Add(p.Name);
             }
+            UpdatePassiveCostButton();
+        }
+
+        private void LstPassives_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            UpdatePassiveCostButton();
         }
 
         private void LstAbilities_SelectedIndexChanged(object? sender, EventArgs e)
