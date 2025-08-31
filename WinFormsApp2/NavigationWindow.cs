@@ -181,6 +181,10 @@ namespace WinFormsApp2
 
         private void TravelManager_TravelCompleted(string nodeId)
         {
+            if (_currentNode == "nodeDarkSpire" && nodeId != "nodeDarkSpire")
+            {
+                ResetDarkSpireBracket();
+            }
             LoadNode(nodeId);
             lblTravelInfo.Text = TravelLogService.GetArrivalFlavor(nodeId);
             btnBeginTravel.Enabled = true;
@@ -245,7 +249,14 @@ namespace WinFormsApp2
         private void BtnFindEnemies_Click(object? sender, EventArgs e)
         {
             var node = WorldMapService.GetNode(_currentNode);
-            var battle = new BattleForm(_accountId, areaMinLevel: node.MinEnemyLevel, areaMaxLevel: node.MaxEnemyLevel);
+            int? min = node.MinEnemyLevel;
+            int? max = node.MaxEnemyLevel;
+            bool darkSpire = _currentNode == "nodeDarkSpire";
+            if (darkSpire)
+            {
+                (min, max) = GetDarkSpireBracket();
+            }
+            var battle = new BattleForm(_accountId, areaMinLevel: min, areaMaxLevel: max, darkSpireBattle: darkSpire);
             if (sender is Button btn) btn.Enabled = false;
             battle.FormClosed += (_, __) =>
             {
@@ -298,6 +309,35 @@ namespace WinFormsApp2
             using var cmd = new MySqlCommand("SELECT COUNT(*) FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn);
             cmd.Parameters.AddWithValue("@id", _accountId);
             _partySize = Convert.ToInt32(cmd.ExecuteScalar());
+        }
+
+        private (int min, int max) GetDarkSpireBracket()
+        {
+            using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            using var cmd = new MySqlCommand("SELECT current_min, current_max FROM dark_spire_state WHERE account_id=@id", conn);
+            cmd.Parameters.AddWithValue("@id", _accountId);
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                int min = reader.GetInt32("current_min");
+                int max = reader.GetInt32("current_max");
+                return (min, max);
+            }
+            reader.Close();
+            using var ins = new MySqlCommand("INSERT INTO dark_spire_state(account_id, current_min, current_max) VALUES (@id, 1, 5)", conn);
+            ins.Parameters.AddWithValue("@id", _accountId);
+            ins.ExecuteNonQuery();
+            return (1, 5);
+        }
+
+        private void ResetDarkSpireBracket()
+        {
+            using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            using var cmd = new MySqlCommand("UPDATE dark_spire_state SET current_min=1, current_max=5 WHERE account_id=@id", conn);
+            cmd.Parameters.AddWithValue("@id", _accountId);
+            cmd.ExecuteNonQuery();
         }
 
         private void TravelManager_AmbushEncounter()

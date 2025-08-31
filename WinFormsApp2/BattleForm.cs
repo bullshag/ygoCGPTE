@@ -25,6 +25,7 @@ namespace WinFormsApp2
         private readonly int? _arenaOpponentId;
         private readonly int? _areaMinLevel;
         private readonly int? _areaMaxLevel;
+        private readonly bool _darkSpireBattle;
         private int _opponentAccountId;
         private bool _cancelled;
         private bool _playersWin;
@@ -53,7 +54,7 @@ namespace WinFormsApp2
             lstLog.SelectedIndex = lstLog.Items.Count - 1;
         }
 
-        public BattleForm(int userId, bool wildEncounter = false, bool arenaBattle = false, int? arenaOpponentId = null, int? areaMinLevel = null, int? areaMaxLevel = null)
+        public BattleForm(int userId, bool wildEncounter = false, bool arenaBattle = false, int? arenaOpponentId = null, int? areaMinLevel = null, int? areaMaxLevel = null, bool darkSpireBattle = false)
         {
             _userId = userId;
             _wildEncounter = wildEncounter;
@@ -61,6 +62,7 @@ namespace WinFormsApp2
             _arenaOpponentId = arenaOpponentId;
             _areaMinLevel = areaMinLevel;
             _areaMaxLevel = areaMaxLevel;
+            _darkSpireBattle = darkSpireBattle;
             InitializeComponent();
             LoadData();
         }
@@ -1100,6 +1102,14 @@ namespace WinFormsApp2
                 BattleLogService.AddLog(string.Join(Environment.NewLine, lstLog.Items.Cast<LogEntry>().Select(l => l.Text)));
                 HandlePlayerDeaths();
                 SaveState();
+                if (_darkSpireBattle)
+                {
+                    using var dsConn = new MySqlConnection(DatabaseConfig.ConnectionString);
+                    dsConn.Open();
+                    using var dsCmd = new MySqlCommand("UPDATE dark_spire_state SET current_min = current_min + 5, current_max = current_max + 5 WHERE account_id=@id", dsConn);
+                    dsCmd.Parameters.AddWithValue("@id", _userId);
+                    dsCmd.ExecuteNonQuery();
+                }
                 var playerSummaries = _players.Select(p => new CombatantSummary(p.Name, p.DamageDone, p.DamageTaken));
                 var enemySummaries = _npcs.Select(n => new CombatantSummary(n.Name, n.DamageDone, n.DamageTaken));
                 var summary = new BattleSummaryForm(playerSummaries, enemySummaries, playersWin, lootSummary);

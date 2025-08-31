@@ -305,6 +305,13 @@ CREATE TABLE IF NOT EXISTS quests (
     completed TINYINT(1) DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS dark_spire_state (
+    account_id INT PRIMARY KEY,
+    current_min INT NOT NULL,
+    current_max INT NOT NULL,
+    FOREIGN KEY (account_id) REFERENCES users(id)
+);
+
 -- File: npcs.sql
 -- MySQL script to create the 'npcs' table and a procedure to generate random NPCs
 -- Assumes the 'accounts' database already exists
