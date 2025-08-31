@@ -176,6 +176,32 @@ namespace WinFormsApp2
             return null;
         }
 
+
+        public static Dictionary<EquipmentSlot, Item?> GetNpcEquipment(string npcName)
+        {
+            var dict = new Dictionary<EquipmentSlot, Item?>();
+            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            using MySqlCommand cmd = new MySqlCommand("SELECT slot, item_name FROM npc_equipment WHERE npc_name=@n", conn);
+            cmd.Parameters.AddWithValue("@n", npcName);
+            using var r = cmd.ExecuteReader();
+            while (r.Read())
+            {
+                var slot = Enum.Parse<EquipmentSlot>(r.GetString("slot"));
+                var item = CreateItem(r.GetString("item_name"));
+                if (item is Weapon w && w.TwoHanded)
+                {
+                    dict[EquipmentSlot.LeftHand] = w;
+                    dict[EquipmentSlot.RightHand] = w;
+                }
+                else
+                {
+                    dict[slot] = item;
+                }
+            }
+            return dict;
+        }
+
         public static void Equip(string character, EquipmentSlot slot, Item? item)
         {
             if (!_equipment.ContainsKey(character))

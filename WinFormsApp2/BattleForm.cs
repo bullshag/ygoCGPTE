@@ -106,6 +106,7 @@ namespace WinFormsApp2
                     {
                         player.Equipment[slot] = InventoryService.GetEquippedItem(player.Name, slot);
                     }
+                    ApplyEquipmentBonuses(player);
 
                     _players.Add(player);
                     _playerIds[player] = cid;
@@ -196,6 +197,9 @@ namespace WinFormsApp2
                         Role = role,
                         TargetingStyle = style
                     };
+                    foreach (var kv in InventoryService.GetNpcEquipment(name))
+                        npc.Equipment[kv.Key] = kv.Value;
+                    ApplyEquipmentBonuses(npc);
                     using var abilCmd = new MySqlCommand(@"SELECT slot, priority, a.id, a.name, a.description, a.cost, a.cooldown
                                                           FROM npc_abilities na
                                                           JOIN abilities a ON na.ability_id = a.id
@@ -299,6 +303,7 @@ namespace WinFormsApp2
                     };
                     foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
                         npc.Equipment[slot] = InventoryService.GetEquippedItem(npc.Name, slot);
+                    ApplyEquipmentBonuses(npc);
                     _npcs.Add(npc);
                     npcIds[npc] = cid;
                 }
@@ -1318,6 +1323,95 @@ namespace WinFormsApp2
             public int AmountPerTick { get; set; }
             public bool SourceIsPlayer { get; set; }
             public string? SourceName { get; set; }
+        }
+
+
+        private void ApplyEquipmentBonuses(Creature c)
+        {
+            foreach (var item in c.Equipment.Values)
+            {
+                if (item == null) continue;
+                foreach (var kv in item.FlatBonuses)
+                {
+                    switch (kv.Key)
+                    {
+                        case "Strength":
+                            c.Strength += kv.Value;
+                            break;
+                        case "Dexterity":
+                            c.Dex += kv.Value;
+                            break;
+                        case "Intelligence":
+                            c.Intelligence += kv.Value;
+                            c.MaxMana += kv.Value;
+                            c.Mana += kv.Value;
+                            break;
+                        case "HP":
+                            c.MaxHp += kv.Value;
+                            c.CurrentHp += kv.Value;
+                            break;
+                        case "Mana":
+                            c.MaxMana += kv.Value;
+                            c.Mana += kv.Value;
+                            break;
+                        case "Melee Defense":
+                            c.MeleeDefense += kv.Value;
+                            break;
+                        case "Magic Defense":
+                            c.MagicDefense += kv.Value;
+                            break;
+                        case "Attack":
+                            c.AttackFlatBonus += kv.Value;
+                            break;
+                    }
+                }
+                foreach (var kv in item.PercentBonuses)
+                {
+                    switch (kv.Key)
+                    {
+                        case "Damage Dealt":
+                            c.DamageDealtMultiplier *= 1 + kv.Value / 100.0;
+                            break;
+                        case "Damage Taken":
+                            c.DamageTakenMultiplier *= 1 + kv.Value / 100.0;
+                            break;
+                        case "Attack Speed":
+                            c.AttackSpeedMultiplier *= 1 + kv.Value / 100.0;
+                            break;
+                        case "Healing Done":
+                            c.HealingDealtMultiplier *= 1 + kv.Value / 100.0;
+                            break;
+                        case "Healing Received":
+                            c.HealingReceivedMultiplier *= 1 + kv.Value / 100.0;
+                            break;
+                        case "Strength":
+                            c.Strength = (int)(c.Strength * (1 + kv.Value / 100.0));
+                            break;
+                        case "Dexterity":
+                            c.Dex = (int)(c.Dex * (1 + kv.Value / 100.0));
+                            break;
+                        case "Intelligence":
+                            c.Intelligence = (int)(c.Intelligence * (1 + kv.Value / 100.0));
+                            c.MaxMana = (int)(c.MaxMana * (1 + kv.Value / 100.0));
+                            c.Mana = (int)(c.Mana * (1 + kv.Value / 100.0));
+                            break;
+                        case "HP":
+                            c.MaxHp = (int)(c.MaxHp * (1 + kv.Value / 100.0));
+                            c.CurrentHp = (int)(c.CurrentHp * (1 + kv.Value / 100.0));
+                            break;
+                        case "Mana":
+                            c.MaxMana = (int)(c.MaxMana * (1 + kv.Value / 100.0));
+                            c.Mana = (int)(c.Mana * (1 + kv.Value / 100.0));
+                            break;
+                        case "Melee Defense":
+                            c.MeleeDefense = (int)(c.MeleeDefense * (1 + kv.Value / 100.0));
+                            break;
+                        case "Magic Defense":
+                            c.MagicDefense = (int)(c.MagicDefense * (1 + kv.Value / 100.0));
+                            break;
+                    }
+                }
+            }
         }
 
         private void ApplyPassiveModifiers(Creature c)
