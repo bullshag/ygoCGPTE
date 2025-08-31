@@ -72,8 +72,8 @@ namespace WinFormsApp2
             // 
             // InventoryForm
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(543, 542);
             Controls.Add(cmbTarget);
             Controls.Add(btnUse);

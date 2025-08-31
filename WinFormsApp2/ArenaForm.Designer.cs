@@ -59,8 +59,8 @@ namespace WinFormsApp2
             // 
             // ArenaForm
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(300, 260);
             Controls.Add(_lblStatus);
             Controls.Add(_lstTeams);

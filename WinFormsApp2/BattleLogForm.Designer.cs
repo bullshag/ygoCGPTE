@@ -45,8 +45,8 @@ namespace WinFormsApp2
             // 
             // BattleLogForm
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(841, 218);
             Controls.Add(lstLog);
             Controls.Add(lstBattles);

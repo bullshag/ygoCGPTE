@@ -34,8 +34,8 @@ namespace WinFormsApp2
             // 
             // TempleForm
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(280, 150);
             Controls.Add(btnBless);
             FormBorderStyle = FormBorderStyle.FixedDialog;
