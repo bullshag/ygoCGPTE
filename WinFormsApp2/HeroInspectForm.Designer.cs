@@ -314,8 +314,8 @@ namespace WinFormsApp2
             // 
             // HeroInspectForm
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(435, 572);
             Controls.Add(label12);
             Controls.Add(label11);

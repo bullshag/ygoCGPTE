@@ -85,6 +85,7 @@
             pictureBox1.Location = new Point(457, 8);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(641, 618);
+            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
             // 
@@ -563,8 +564,8 @@
             // 
             // NavigationWindow
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(1110, 640);
             Controls.Add(label11);
             Controls.Add(label10);
