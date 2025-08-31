@@ -97,4 +97,6 @@ INSERT INTO abilities (name, description, cost, cooldown) VALUES
 ('Bloodlust', 'Increase attack speed by 20% +1% per 30 STR and heal for 5% of damage dealt for 8s.', 0, 0),
 ('Cleave', 'Swing in an arc dealing 5 + 100% STR damage to nearby foes.', 0, 0),
 ('Toxic Breath', 'Exhale poison dealing 5 + 100% INT damage over 6s.', 0, 0),
-('Scale Barrage', 'Launch razor scales each for 3 + 70% DEX damage at all enemies.', 0, 0);
+('Scale Barrage', 'Launch razor scales each for 3 + 70% DEX damage at all enemies.', 0, 0),
+('Guardian Ward', 'Grant a shield to yourself and nearby allies absorbing 4 + 120% INT damage for 15s.', 0, 0),
+('Divine Aegis', 'Place a large barrier on an ally absorbing 8 + 250% INT damage for 15s.', 0, 0);

@@ -119,7 +119,9 @@ INSERT INTO abilities (name, description, cost, cooldown) VALUES
 ('Poison', 'Poison an enemy for 6s, dealing 1 + 35% of your DEX each second. "Watch them wither away."', 20, 10),
 ('Regenerate', 'Mend an ally for 6s, healing 1 + 80% of their INT every 3s. "Life blooms anew."', 25, 10),
 ('Taunting Blows', 'Taunt all enemies to attack you for 2s +1s per 30 STR. Cooldown 5s.', 0, 5),
-('Vanish', 'Disappear for 5 seconds, avoiding all attacks but unable to act.', 0, 30);
+('Vanish', 'Disappear for 5 seconds, avoiding all attacks but unable to act.', 0, 30),
+('Guardian Ward', 'Grant a shield to yourself and nearby allies absorbing 4 + 120% of your INT damage for 15s.', 55, 25),
+('Divine Aegis', 'Place a large barrier on an ally absorbing 8 + 250% of your INT damage for 15s.', 45, 20);
 
 -- File: add_more_spells.sql
 USE accounts;
@@ -133,7 +135,9 @@ INSERT INTO abilities (name, description, cost, cooldown) VALUES
 ('Poison Arrow', 'Fire a toxic shot dealing 2 + 40% of your DEX damage and poisoning for 6s.', 30, 0),
 ('Cleanse', 'Remove negative effects from an ally.', 20, 0),
 ('Berserk', 'Increase own damage by 40% for 8s.', 50, 0),
-('Drain Life', 'Steal 3 + 70% of your INT HP from an enemy.', 55, 0);
+('Drain Life', 'Steal 3 + 70% of your INT HP from an enemy.', 55, 0),
+('Guardian Ward', 'Grant a shield to yourself and nearby allies absorbing 4 + 120% of your INT damage for 15s.', 55, 25),
+('Divine Aegis', 'Place a large barrier on an ally absorbing 8 + 250% of your INT damage for 15s.', 45, 20);
 
 -- File: additional_skills.sql
 USE accounts;
@@ -167,7 +171,12 @@ INSERT INTO abilities (name, description, cost, cooldown) VALUES
 ('Stunning Fist', 'Punch for 4 + 80% of your STR damage and stun briefly.', 25, 6),
 ('Smokescreen', 'Obscure the area increasing dodge by 5 + 40% of your DEX for 6s.', 30, 18),
 ('Magic Missile', 'Launch a missile dealing 3 + 80% of your INT arcane damage.', 20, 0),
-('Thunderclap', 'Clap thunder for 6 + 100% of your STR damage to nearby foes.', 45, 12);
+('Thunderclap', 'Clap thunder for 6 + 100% of your STR damage to nearby foes.', 45, 12),
+('Chain Heal', 'Heal an ally for 5 + 100% of your INT then bounce to another ally for 50% of that amount.', 50, 12),
+('Prayer of Healing', 'Heal all allies for 6 + 80% of your INT.', 55, 15),
+('Holy Light', 'Heal a single ally for 8 + 150% of your INT.', 45, 8),
+('Guardian Ward', 'Grant a shield to yourself and nearby allies absorbing 4 + 120% of your INT damage for 15s.', 55, 25),
+('Divine Aegis', 'Place a large barrier on an ally absorbing 8 + 250% of your INT damage for 15s.', 45, 20);
 
 -- File: passives.sql
 -- MySQL script to create passive ability tables and seed data

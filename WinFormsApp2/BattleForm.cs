@@ -598,6 +598,7 @@ namespace WinFormsApp2
                 }
                 else if (ability.Name == "Taunting Blows") ApplyTaunt(actor, opponents);
                 else if (ability.Name == "Vanish") { actor.IsVanished = true; actor.VanishRemainingMs = 5000; actor.AttackBar.Value = actor.AttackInterval; CheckEnd(); return; }
+
                 else if (ability.Name == "Arcane Shield")
                 {
                     int shield = (int)Math.Max(1, 5 + actor.Intelligence * 1.5);
@@ -610,10 +611,13 @@ namespace WinFormsApp2
                 {
                     int shield = (int)Math.Max(1, 3 + actor.Intelligence * 0.6);
                     ApplyShield(actor, target, shield, 8000);
+
                     actor.AttackBar.Value = actor.AttackInterval;
                     CheckEnd();
                     return;
                 }
+                else if (ability.Name == "Divine Aegis") { ApplyShield(actor, target, 2.5); actor.AttackBar.Value = actor.AttackInterval; CheckEnd(); return; }
+
                 else if (ability.Name == "Shockwave" || ability.Name == "Frost Nova" || ability.Name == "Earthquake" || ability.Name == "Meteor" || ability.Name == "Flame Strike" || ability.Name == "Arcane Blast")
                 {
                     foreach (var o in opponents.Where(o => o.CurrentHp > 0))
@@ -829,6 +833,8 @@ namespace WinFormsApp2
                 "Drain Life" => $"{actor.Name} siphons vitality from {target.Name}!",
                 "Vanish" => $"{actor.Name} melts into the shadows!",
                 "Arcane Shield" => $"{actor.Name} conjures a shimmering shield around {target.Name}!",
+                "Guardian Ward" => $"{actor.Name} forms a guardian ward around the party!",
+                "Divine Aegis" => $"{actor.Name} blesses {target.Name} with a divine aegis!",
                 _ => $"{actor.Name} uses {ability.Name} on {target.Name}!"
             };
         }
@@ -870,8 +876,10 @@ namespace WinFormsApp2
             }
         }
 
-        private void ApplyShield(Creature actor, Creature target, int shieldAmount, int durationMs)
+        private void ApplyShield(Creature actor, Creature target, double intMultiplier = 1.5)
         {
+            int shield = (int)Math.Max(1, 5 + actor.Intelligence * intMultiplier);
+
             target.Effects.Add(new StatusEffect
             {
                 Kind = EffectKind.Shield,
