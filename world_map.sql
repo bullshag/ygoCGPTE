@@ -64,3 +64,10 @@ CREATE TABLE IF NOT EXISTS quests (
     target INT DEFAULT 0,
     completed TINYINT(1) DEFAULT 0
 );
+
+CREATE TABLE IF NOT EXISTS dark_spire_state (
+    account_id INT PRIMARY KEY,
+    current_min INT NOT NULL,
+    current_max INT NOT NULL,
+    FOREIGN KEY (account_id) REFERENCES users(id)
+);
