@@ -616,6 +616,17 @@ namespace WinFormsApp2
                     CheckEnd();
                     return;
                 }
+                else if (ability.Name == "Guardian Ward")
+                {
+                    int shield = (int)Math.Max(1, 4 + actor.Intelligence * 1.2);
+                    foreach (var ally in allies.Where(a => a.CurrentHp > 0))
+                    {
+                        ApplyShield(actor, ally, shield, 15000);
+                    }
+                    actor.AttackBar.Value = actor.AttackInterval;
+                    CheckEnd();
+                    return;
+                }
                 else if (ability.Name == "Divine Aegis") { ApplyShield(actor, target, 2.5); actor.AttackBar.Value = actor.AttackInterval; CheckEnd(); return; }
 
                 else if (ability.Name == "Shockwave" || ability.Name == "Frost Nova" || ability.Name == "Earthquake" || ability.Name == "Meteor" || ability.Name == "Flame Strike" || ability.Name == "Arcane Blast")
@@ -753,16 +764,7 @@ namespace WinFormsApp2
             if (ability.Name == "Shield Bash" && dmg > 0)
             {
                 int shield = (int)(dmg * 0.5);
-                actor.Effects.Add(new StatusEffect
-                {
-                    Kind = EffectKind.Shield,
-                    RemainingMs = 15000,
-                    TickIntervalMs = int.MaxValue,
-                    TimeUntilTickMs = int.MaxValue,
-                    AmountPerTick = shield,
-                    SourceIsPlayer = _players.Contains(actor)
-                });
-                AppendLog($"{actor.Name} gains a shield ({shield}).", _players.Contains(actor), true);
+                ApplyShield(actor, actor, shield, 15000);
             }
             if (actor.SplashDamagePercent > 0)
             {
@@ -876,10 +878,8 @@ namespace WinFormsApp2
             }
         }
 
-        private void ApplyShield(Creature actor, Creature target, double intMultiplier = 1.5)
+        private void ApplyShield(Creature actor, Creature target, int shieldAmount, int durationMs)
         {
-            int shield = (int)Math.Max(1, 5 + actor.Intelligence * intMultiplier);
-
             target.Effects.Add(new StatusEffect
             {
                 Kind = EffectKind.Shield,
@@ -890,10 +890,16 @@ namespace WinFormsApp2
                 SourceIsPlayer = _players.Contains(actor)
             });
 
-            target.ShieldBar.Maximum = Math.Max(1, shield);
-            target.ShieldBar.Value = Math.Max(0, shield);
+            target.ShieldBar.Maximum = Math.Max(1, shieldAmount);
+            target.ShieldBar.Value = Math.Max(0, shieldAmount);
             target.ShieldBar.Visible = true;
-            AppendLog($"{target.Name} is protected by a magical shield ({shield}).", _players.Contains(actor), true);
+            AppendLog($"{target.Name} is protected by a magical shield ({shieldAmount}).", _players.Contains(actor), true);
+        }
+
+        private void ApplyShield(Creature actor, Creature target, double intMultiplier, int durationMs = 15000)
+        {
+            int shieldAmount = (int)Math.Max(1, 5 + actor.Intelligence * intMultiplier);
+            ApplyShield(actor, target, shieldAmount, durationMs);
         }
 
         private void ApplyShieldReduction(Creature target, ref int dmg)
