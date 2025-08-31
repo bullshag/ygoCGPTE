@@ -22,7 +22,7 @@ INSERT INTO abilities (name, description, cost, cooldown) VALUES
 ('Blood Pact', 'Deal 8 + 120% of your STR damage but take 2 + 50% of your STR recoil.', 40, 10),
 ('Enrage', 'Increase your damage by 5 + 40% of your STR for 8s.', 30, 25),
 ('Healing Wave', 'Heal the party for 4 + 100% of your INT HP.', 60, 20),
-('Fortify', 'Grant a shield of 3 + 60% of your INT damage for 8s.', 35, 15),
+('Fortify', 'Grant a shield absorbing 3 + 60% of your INT damage for 8s.', 35, 15),
 ('Flame Strike', 'Smash the ground for 7 + 110% of your INT fire damage to all enemies.', 65, 12),
 ('Silencing Shot', 'Deal 4 + 80% of your DEX damage and silence for 3s.', 30, 8),
 ('Rend Armor', 'Rip armor dealing 3 + 70% of your STR damage and reducing defense.', 30, 10),

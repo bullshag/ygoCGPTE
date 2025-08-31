@@ -598,7 +598,22 @@ namespace WinFormsApp2
                 }
                 else if (ability.Name == "Taunting Blows") ApplyTaunt(actor, opponents);
                 else if (ability.Name == "Vanish") { actor.IsVanished = true; actor.VanishRemainingMs = 5000; actor.AttackBar.Value = actor.AttackInterval; CheckEnd(); return; }
-                else if (ability.Name == "Arcane Shield") { ApplyShield(actor, target); actor.AttackBar.Value = actor.AttackInterval; CheckEnd(); return; }
+                else if (ability.Name == "Arcane Shield")
+                {
+                    int shield = (int)Math.Max(1, 5 + actor.Intelligence * 1.5);
+                    ApplyShield(actor, target, shield, 15000);
+                    actor.AttackBar.Value = actor.AttackInterval;
+                    CheckEnd();
+                    return;
+                }
+                else if (ability.Name == "Fortify")
+                {
+                    int shield = (int)Math.Max(1, 3 + actor.Intelligence * 0.6);
+                    ApplyShield(actor, target, shield, 8000);
+                    actor.AttackBar.Value = actor.AttackInterval;
+                    CheckEnd();
+                    return;
+                }
                 else if (ability.Name == "Shockwave" || ability.Name == "Frost Nova" || ability.Name == "Earthquake" || ability.Name == "Meteor" || ability.Name == "Flame Strike" || ability.Name == "Arcane Blast")
                 {
                     foreach (var o in opponents.Where(o => o.CurrentHp > 0))
@@ -841,18 +856,18 @@ namespace WinFormsApp2
             }
         }
 
-        private void ApplyShield(Creature actor, Creature target)
+        private void ApplyShield(Creature actor, Creature target, int shieldAmount, int durationMs)
         {
-            int shield = (int)Math.Max(1, 5 + actor.Intelligence * 1.5);
             target.Effects.Add(new StatusEffect
             {
                 Kind = EffectKind.Shield,
-                RemainingMs = 15000,
+                RemainingMs = durationMs,
                 TickIntervalMs = int.MaxValue,
                 TimeUntilTickMs = int.MaxValue,
-                AmountPerTick = shield,
+                AmountPerTick = shieldAmount,
                 SourceIsPlayer = _players.Contains(actor)
             });
+
             target.ShieldBar.Maximum = Math.Max(1, shield);
             target.ShieldBar.Value = Math.Max(0, shield);
             target.ShieldBar.Visible = true;
