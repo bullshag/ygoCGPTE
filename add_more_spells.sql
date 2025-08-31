@@ -4,7 +4,7 @@ INSERT INTO abilities (name, description, cost, cooldown) VALUES
 ('Lightning Bolt', 'Call down lightning dealing 4 + 120% of your INT damage to a single foe.', 45, 0),
 ('Shield Bash', 'Bash a foe for 2 + 50% of your STR damage and stun briefly.', 30, 0),
 ('Rejuvenate', 'Heal an ally over time for 1 + 60% of your INT every 2s for 6s.', 35, 0),
-('Stone Skin', 'Increase an ally\'s defense by 20% for 5s.', 25, 0),
+('Stone Skin', 'Increase an ally\'s defense by 20% and grant an absorb shield for 5s.', 25, 0),
 ('Arcane Blast', 'Unleash arcane energy dealing 8 + 90% of your INT damage to all enemies.', 60, 0),
 ('Poison Arrow', 'Fire a toxic shot dealing 2 + 40% of your DEX damage and poisoning for 6s.', 30, 0),
 ('Cleanse', 'Remove negative effects from an ally.', 20, 0),

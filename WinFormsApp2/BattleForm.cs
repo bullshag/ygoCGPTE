@@ -424,6 +424,18 @@ namespace WinFormsApp2
                         c.ForcedTargetMs = Math.Max(0, c.ForcedTargetMs - 100);
                         if (c.ForcedTargetMs == 0) c.ForcedTarget = null;
                     }
+                    if (c.StoneSkinRemainingMs > 0)
+                    {
+                        c.StoneSkinRemainingMs = Math.Max(0, c.StoneSkinRemainingMs - 100);
+                        if (c.StoneSkinRemainingMs == 0)
+                        {
+                            c.MeleeDefense -= c.StoneSkinMeleeBonus;
+                            c.MagicDefense -= c.StoneSkinMagicBonus;
+                            c.StoneSkinMeleeBonus = 0;
+                            c.StoneSkinMagicBonus = 0;
+                            AppendLog($"{c.Name}'s stone skin fades.", _players.Contains(c));
+                        }
+                    }
                     if (c.IsVanished)
                     {
                         c.VanishRemainingMs = Math.Max(0, c.VanishRemainingMs - 100);
@@ -593,6 +605,35 @@ namespace WinFormsApp2
                 else if (ability.Name == "Taunting Blows") ApplyTaunt(actor, opponents);
                 else if (ability.Name == "Vanish") { actor.IsVanished = true; actor.VanishRemainingMs = 5000; actor.AttackBar.Value = actor.AttackInterval; CheckEnd(); return; }
                 else if (ability.Name == "Arcane Shield") { ApplyShield(actor, target); actor.AttackBar.Value = actor.AttackInterval; CheckEnd(); return; }
+                else if (ability.Name == "Stone Skin")
+                {
+                    if (target.StoneSkinRemainingMs > 0)
+                    {
+                        target.MeleeDefense -= target.StoneSkinMeleeBonus;
+                        target.MagicDefense -= target.StoneSkinMagicBonus;
+                    }
+                    int meleeBonus = (int)(target.MeleeDefense * 0.20);
+                    int magicBonus = (int)(target.MagicDefense * 0.20);
+                    target.MeleeDefense += meleeBonus;
+                    target.MagicDefense += magicBonus;
+                    target.StoneSkinMeleeBonus = meleeBonus;
+                    target.StoneSkinMagicBonus = magicBonus;
+                    target.StoneSkinRemainingMs = 5000;
+                    int shield = (int)Math.Max(1, 5 + actor.Strength * 1.0);
+                    target.Effects.Add(new StatusEffect
+                    {
+                        Kind = EffectKind.Shield,
+                        RemainingMs = 5000,
+                        TickIntervalMs = int.MaxValue,
+                        TimeUntilTickMs = int.MaxValue,
+                        AmountPerTick = shield,
+                        SourceIsPlayer = _players.Contains(actor)
+                    });
+                    AppendLog($"{target.Name} is encased in stone, gaining {shield} shield.", _players.Contains(actor), true);
+                    actor.AttackBar.Value = actor.AttackInterval;
+                    CheckEnd();
+                    return;
+                }
                 else if (ability.Name == "Shockwave" || ability.Name == "Frost Nova" || ability.Name == "Earthquake" || ability.Name == "Meteor" || ability.Name == "Flame Strike" || ability.Name == "Arcane Blast")
                 {
                     foreach (var o in opponents.Where(o => o.CurrentHp > 0))
@@ -1288,6 +1329,9 @@ namespace WinFormsApp2
             public int ForcedTargetMs { get; set; }
             public bool IsVanished { get; set; }
             public int VanishRemainingMs { get; set; }
+            public int StoneSkinRemainingMs { get; set; }
+            public int StoneSkinMeleeBonus { get; set; }
+            public int StoneSkinMagicBonus { get; set; }
             public double DamageDealtMultiplier { get; set; } = 1.0;
             public double HealingDealtMultiplier { get; set; } = 1.0;
             public double DamageTakenMultiplier { get; set; } = 1.0;
