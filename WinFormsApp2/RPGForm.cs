@@ -85,12 +85,12 @@ namespace WinFormsApp2
 
                 var panel = new Panel { Width = 180, Height = maxMana > 0 ? 60 : 40, Margin = new Padding(3) };
                 var lbl = new Label { Text = name, AutoSize = true };
-                var hpBar = new ProgressBar { Maximum = maxHp, Value = Math.Min(hp, maxHp), Width = 170, Location = new Point(0, 15), ForeColor = Color.Red, Style = ProgressBarStyle.Continuous };
+                var hpBar = new ColoredProgressBar { Maximum = maxHp, Value = Math.Min(hp, maxHp), Width = 170, Location = new Point(0, 15), ProgressColor = Color.Red, Style = ProgressBarStyle.Continuous };
                 panel.Controls.Add(lbl);
                 panel.Controls.Add(hpBar);
                 if (maxMana > 0)
                 {
-                    var manaBar = new ProgressBar { Maximum = maxMana, Value = Math.Min(mana, maxMana), Width = 170, Location = new Point(0, 35), ForeColor = Color.Blue, Style = ProgressBarStyle.Continuous };
+                    var manaBar = new ColoredProgressBar { Maximum = maxMana, Value = Math.Min(mana, maxMana), Width = 170, Location = new Point(0, 35), ProgressColor = Color.Blue, Style = ProgressBarStyle.Continuous };
                     panel.Controls.Add(manaBar);
                 }
                 int current = index;

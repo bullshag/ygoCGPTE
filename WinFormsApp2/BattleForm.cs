@@ -341,7 +341,7 @@ namespace WinFormsApp2
         {
             foreach (var p in _players)
             {
-                double speed = (p.ActionSpeed + p.Dex / 25.0) * p.AttackSpeedMultiplier;
+                double speed = p.ActionSpeed * (1 + p.Dex / 1000.0) * p.AttackSpeedMultiplier;
                 Weapon? left = p.Equipment.GetValueOrDefault(EquipmentSlot.LeftHand) as Weapon;
                 Weapon? right = p.Equipment.GetValueOrDefault(EquipmentSlot.RightHand) as Weapon;
                 if (left != null) speed *= (1 + left.AttackSpeedMod);
@@ -354,7 +354,7 @@ namespace WinFormsApp2
             }
             foreach (var n in _npcs)
             {
-                double speed = (n.ActionSpeed + n.Dex / 25.0) * n.AttackSpeedMultiplier;
+                double speed = n.ActionSpeed * (1 + n.Dex / 1000.0) * n.AttackSpeedMultiplier;
                 n.AttackInterval = (int)(3000 / speed);
                 n.AttackBar.Maximum = n.AttackInterval;
                 n.AttackBar.Value = n.AttackInterval;
@@ -1577,13 +1577,13 @@ namespace WinFormsApp2
             return panel;
         }
 
-        private ProgressBar CloneProgressBar(ProgressBar template)
+        private ColoredProgressBar CloneProgressBar(ColoredProgressBar template)
         {
-            return new ProgressBar
+            return new ColoredProgressBar
             {
                 Width = template.Width,
                 Height = template.Height,
-                ForeColor = template.ForeColor,
+                ProgressColor = template.ProgressColor,
                 BackColor = template.BackColor,
                 Style = template.Style
             };

@@ -9,9 +9,9 @@ namespace WinFormsApp2
         private FlowLayoutPanel pnlPlayers;
         private FlowLayoutPanel pnlEnemies;
         private ListBox lstLog;
-        private ProgressBar hpTemplate;
-        private ProgressBar manaTemplate;
-        private ProgressBar attackTemplate;
+        private ColoredProgressBar hpTemplate;
+        private ColoredProgressBar manaTemplate;
+        private ColoredProgressBar attackTemplate;
 
         protected override void Dispose(bool disposing)
         {
@@ -27,9 +27,9 @@ namespace WinFormsApp2
             pnlPlayers = new FlowLayoutPanel();
             pnlEnemies = new FlowLayoutPanel();
             lstLog = new ListBox();
-            hpTemplate = new ProgressBar();
-            manaTemplate = new ProgressBar();
-            attackTemplate = new ProgressBar();
+            hpTemplate = new ColoredProgressBar();
+            manaTemplate = new ColoredProgressBar();
+            attackTemplate = new ColoredProgressBar();
             SuspendLayout();
             // 
             // pnlPlayers
@@ -66,6 +66,7 @@ namespace WinFormsApp2
             hpTemplate.Location = new Point(210, 8);
             hpTemplate.Margin = new Padding(2, 2, 2, 2);
             hpTemplate.Name = "hpTemplate";
+            hpTemplate.ProgressColor = Color.Red;
             hpTemplate.Size = new Size(119, 12);
             hpTemplate.Style = ProgressBarStyle.Continuous;
             hpTemplate.TabIndex = 2;
@@ -76,6 +77,7 @@ namespace WinFormsApp2
             manaTemplate.Location = new Point(210, 26);
             manaTemplate.Margin = new Padding(2, 2, 2, 2);
             manaTemplate.Name = "manaTemplate";
+            manaTemplate.ProgressColor = Color.Blue;
             manaTemplate.Size = new Size(119, 12);
             manaTemplate.Style = ProgressBarStyle.Continuous;
             manaTemplate.TabIndex = 1;
@@ -86,7 +88,9 @@ namespace WinFormsApp2
             attackTemplate.Location = new Point(210, 44);
             attackTemplate.Margin = new Padding(2, 2, 2, 2);
             attackTemplate.Name = "attackTemplate";
+            attackTemplate.ProgressColor = Color.Yellow;
             attackTemplate.Size = new Size(119, 12);
+            attackTemplate.Style = ProgressBarStyle.Continuous;
             attackTemplate.TabIndex = 0;
             attackTemplate.Visible = false;
             // 
