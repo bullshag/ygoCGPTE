@@ -9,4 +9,6 @@ INSERT INTO abilities (name, description, cost, cooldown) VALUES
 ('Poison Arrow', 'Fire a toxic shot dealing 2 + 40% of your DEX damage and poisoning for 6s.', 30, 0),
 ('Cleanse', 'Remove negative effects from an ally.', 20, 0),
 ('Berserk', 'Increase own damage by 40% for 8s.', 50, 0),
-('Drain Life', 'Steal 3 + 70% of your INT HP from an enemy.', 55, 0);
+('Drain Life', 'Steal 3 + 70% of your INT HP from an enemy.', 55, 0),
+('Guardian Ward', 'Grant a shield to yourself and nearby allies absorbing 4 + 120% of your INT damage for 15s.', 55, 25),
+('Divine Aegis', 'Place a large barrier on an ally absorbing 8 + 250% of your INT damage for 15s.', 45, 20);

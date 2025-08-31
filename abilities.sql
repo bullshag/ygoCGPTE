@@ -34,4 +34,6 @@ INSERT INTO abilities (name, description, cost, cooldown) VALUES
 ('Poison', 'Poison an enemy for 6s, dealing 1 + 35% of your DEX each second. "Watch them wither away."', 20, 10),
 ('Regenerate', 'Mend an ally for 6s, healing 1 + 80% of their INT every 3s. "Life blooms anew."', 25, 10),
 ('Taunting Blows', 'Taunt all enemies to attack you for 2s +1s per 30 STR. Cooldown 5s.', 0, 5),
-('Vanish', 'Disappear for 5 seconds, avoiding all attacks but unable to act.', 0, 30);
+('Vanish', 'Disappear for 5 seconds, avoiding all attacks but unable to act.', 0, 30),
+('Guardian Ward', 'Grant a shield to yourself and nearby allies absorbing 4 + 120% of your INT damage for 15s.', 55, 25),
+('Divine Aegis', 'Place a large barrier on an ally absorbing 8 + 250% of your INT damage for 15s.', 45, 20);

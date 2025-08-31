@@ -32,4 +32,6 @@ INSERT INTO abilities (name, description, cost, cooldown) VALUES
 ('Thunderclap', 'Clap thunder for 6 + 100% of your STR damage to nearby foes.', 45, 12),
 ('Chain Heal', 'Heal an ally for 5 + 100% of your INT then bounce to another ally for 50% of that amount.', 50, 12),
 ('Prayer of Healing', 'Heal all allies for 6 + 80% of your INT.', 55, 15),
-('Holy Light', 'Heal a single ally for 8 + 150% of your INT.', 45, 8);
+('Holy Light', 'Heal a single ally for 8 + 150% of your INT.', 45, 8),
+('Guardian Ward', 'Grant a shield to yourself and nearby allies absorbing 4 + 120% of your INT damage for 15s.', 55, 25),
+('Divine Aegis', 'Place a large barrier on an ally absorbing 8 + 250% of your INT damage for 15s.', 45, 20);
