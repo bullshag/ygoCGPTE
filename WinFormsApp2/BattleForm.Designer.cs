@@ -35,6 +35,7 @@ namespace WinFormsApp2
             // pnlPlayers
             // 
             pnlPlayers.AutoScroll = true;
+            pnlPlayers.BackColor = Color.Silver;
             pnlPlayers.FlowDirection = FlowDirection.TopDown;
             pnlPlayers.Location = new Point(9, 8);
             pnlPlayers.Name = "pnlPlayers";
@@ -45,6 +46,7 @@ namespace WinFormsApp2
             // pnlEnemies
             // 
             pnlEnemies.AutoScroll = true;
+            pnlEnemies.BackColor = Color.FromArgb(224, 224, 224);
             pnlEnemies.FlowDirection = FlowDirection.TopDown;
             pnlEnemies.Location = new Point(734, 8);
             pnlEnemies.Name = "pnlEnemies";
@@ -64,7 +66,7 @@ namespace WinFormsApp2
             // hpTemplate
             // 
             hpTemplate.Location = new Point(210, 8);
-            hpTemplate.Margin = new Padding(2, 2, 2, 2);
+            hpTemplate.Margin = new Padding(2);
             hpTemplate.Name = "hpTemplate";
             hpTemplate.ProgressColor = Color.Red;
             hpTemplate.Size = new Size(119, 12);
@@ -75,7 +77,7 @@ namespace WinFormsApp2
             // manaTemplate
             // 
             manaTemplate.Location = new Point(210, 26);
-            manaTemplate.Margin = new Padding(2, 2, 2, 2);
+            manaTemplate.Margin = new Padding(2);
             manaTemplate.Name = "manaTemplate";
             manaTemplate.ProgressColor = Color.Blue;
             manaTemplate.Size = new Size(119, 12);
@@ -86,7 +88,7 @@ namespace WinFormsApp2
             // attackTemplate
             // 
             attackTemplate.Location = new Point(210, 44);
-            attackTemplate.Margin = new Padding(2, 2, 2, 2);
+            attackTemplate.Margin = new Padding(2);
             attackTemplate.Name = "attackTemplate";
             attackTemplate.ProgressColor = Color.Yellow;
             attackTemplate.Size = new Size(119, 12);
@@ -98,6 +100,7 @@ namespace WinFormsApp2
             // 
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
+            BackColor = SystemColors.ActiveCaptionText;
             ClientSize = new Size(931, 631);
             Controls.Add(attackTemplate);
             Controls.Add(manaTemplate);
