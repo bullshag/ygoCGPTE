@@ -29,4 +29,7 @@ INSERT INTO abilities (name, description, cost, cooldown) VALUES
 ('Stunning Fist', 'Punch for 4 + 80% of your STR damage and stun briefly.', 25, 6),
 ('Smokescreen', 'Obscure the area increasing dodge by 5 + 40% of your DEX for 6s.', 30, 18),
 ('Magic Missile', 'Launch a missile dealing 3 + 80% of your INT arcane damage.', 20, 0),
-('Thunderclap', 'Clap thunder for 6 + 100% of your STR damage to nearby foes.', 45, 12);
+('Thunderclap', 'Clap thunder for 6 + 100% of your STR damage to nearby foes.', 45, 12),
+('Chain Heal', 'Heal an ally for 5 + 100% of your INT then bounce to another ally for 50% of that amount.', 50, 12),
+('Prayer of Healing', 'Heal all allies for 6 + 80% of your INT.', 55, 15),
+('Holy Light', 'Heal a single ally for 8 + 150% of your INT.', 45, 8);

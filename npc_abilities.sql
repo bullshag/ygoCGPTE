@@ -122,3 +122,9 @@ INSERT INTO npc_abilities (npc_name, ability_id, slot, priority) VALUES
 ('Frost Wyrm', 20, 1, 1),
 ('Fire Spirit', 41, 1, 1),
 ('Forest Guardian', 40, 1, 1);
+
+INSERT INTO npc_abilities (npc_name, ability_id, slot, priority) VALUES
+('Goblin Shaman', 48, 2, 2),
+('Orc Shaman', 48, 2, 2),
+('Dark Priest', 49, 2, 2),
+('Cursed Paladin', 50, 2, 2);

@@ -126,6 +126,7 @@ namespace WinFormsApp2
                 }
                 foreach (var p in PassiveService.GetOwnedPassives(kv.Value, conn))
                     kv.Key.Passives[p.Name] = p.Level;
+                ApplyPassiveModifiers(kv.Key);
             }
 
             if (_arenaBattle)
@@ -300,6 +301,7 @@ namespace WinFormsApp2
                     kv.Key.Abilities.Add(new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0, Slot = 1 });
                 foreach (var p in PassiveService.GetOwnedPassives(kv.Value, conn))
                     kv.Key.Passives[p.Name] = p.Level;
+                ApplyPassiveModifiers(kv.Key);
             }
             InventoryService.Load(_userId);
             if (_npcs.Count == 0)
@@ -321,7 +323,7 @@ namespace WinFormsApp2
         {
             foreach (var p in _players)
             {
-                double speed = p.ActionSpeed + p.Dex / 25.0;
+                double speed = (p.ActionSpeed + p.Dex / 25.0) * p.AttackSpeedMultiplier;
                 Weapon? left = p.Equipment.GetValueOrDefault(EquipmentSlot.LeftHand) as Weapon;
                 Weapon? right = p.Equipment.GetValueOrDefault(EquipmentSlot.RightHand) as Weapon;
                 if (left != null) speed *= (1 + left.AttackSpeedMod);
@@ -334,7 +336,7 @@ namespace WinFormsApp2
             }
             foreach (var n in _npcs)
             {
-                double speed = n.ActionSpeed + n.Dex / 25.0;
+                double speed = (n.ActionSpeed + n.Dex / 25.0) * n.AttackSpeedMultiplier;
                 n.AttackInterval = (int)(3000 / speed);
                 n.AttackBar.Maximum = n.AttackInterval;
                 n.AttackBar.Value = n.AttackInterval;
@@ -461,14 +463,15 @@ namespace WinFormsApp2
             }
 
             var ability = ChooseAbility(actor);
-            if (ability.Name == "Regenerate" || ability.Name == "Heal" || ability.Name == "Rejuvenate" || ability.Name == "Healing Wave")
+            bool isHealAbility = ability.Name == "Regenerate" || ability.Name == "Heal" || ability.Name == "Rejuvenate" || ability.Name == "Healing Wave" || ability.Name == "Chain Heal" || ability.Name == "Prayer of Healing" || ability.Name == "Holy Light";
+            if (isHealAbility)
             {
                 if (actor.Role == "Healer")
                 {
                     target = ChooseHealerTarget(actor, allies);
                     if (target == null)
                     {
-                        if (ability.Name == "Healing Wave") target = actor; else return;
+                        if (ability.Name == "Healing Wave" || ability.Name == "Prayer of Healing") target = actor; else return;
                     }
                 }
                 else
@@ -484,37 +487,87 @@ namespace WinFormsApp2
 
             if (ability.Id != 0)
             {
-                actor.Mana -= ability.Cost;
+                int cost = (int)(ability.Cost * actor.AbilityCostMultiplier);
+                actor.Mana -= cost;
                 if (actor.ManaBar.Maximum > 0)
                 {
                     actor.ManaBar.Value = Math.Max(0, actor.Mana);
                 }
-                actor.Cooldowns[ability.Id] = ability.Cooldown * 1000;
+                actor.Cooldowns[ability.Id] = (int)(ability.Cooldown * actor.CooldownMultiplier * 1000);
                 bool actorIsPlayer = _players.Contains(actor);
-                AppendLog(GenerateAbilityLog(actor, target, ability), actorIsPlayer, ability.Name == "Heal" || ability.Name == "Regenerate" || ability.Name == "Rejuvenate" || ability.Name == "Healing Wave");
+                AppendLog(GenerateAbilityLog(actor, target, ability), actorIsPlayer, isHealAbility);
                 if (ability.Name == "Bleed") ApplyBleed(actor, target);
                 else if (ability.Name == "Poison") ApplyPoison(actor, target);
                 else if (ability.Name == "Regenerate") { ApplyHot(actor, target); CheckEnd(); return; }
                 else if (ability.Name == "Rejuvenate") { ApplyRejuvenate(actor, target); CheckEnd(); return; }
                 else if (ability.Name == "Heal")
                 {
-                    int healAmt = (int)Math.Max(1, 5 + actor.Intelligence * 1.2);
+                    int healAmt = (int)Math.Max(1, (5 + actor.Intelligence * 1.2) * actor.HealingDealtMultiplier);
+                    healAmt = (int)(healAmt * target.HealingReceivedMultiplier);
                     target.CurrentHp = Math.Min(target.MaxHp, target.CurrentHp + healAmt);
                     target.HpBar.Value = Math.Min(target.MaxHp, target.CurrentHp);
                     AppendLog($"{actor.Name} restores {healAmt} HP to {target.Name}!", _players.Contains(actor), true);
+                    AfterHeal(actor, target, healAmt);
                     actor.AttackBar.Value = actor.AttackInterval;
                     CheckEnd();
                     return;
                 }
                 else if (ability.Name == "Healing Wave")
                 {
-                    int healAmt = (int)Math.Max(1, 4 + actor.Intelligence * 1.0);
+                    int healAmt = (int)Math.Max(1, (4 + actor.Intelligence * 1.0) * actor.HealingDealtMultiplier);
                     foreach (var ally in allies.Where(a => a.CurrentHp > 0))
                     {
-                        ally.CurrentHp = Math.Min(ally.MaxHp, ally.CurrentHp + healAmt);
+                        int final = (int)(healAmt * ally.HealingReceivedMultiplier);
+                        ally.CurrentHp = Math.Min(ally.MaxHp, ally.CurrentHp + final);
                         ally.HpBar.Value = Math.Min(ally.MaxHp, ally.CurrentHp);
+                        AfterHeal(actor, ally, final);
                     }
                     AppendLog($"{actor.Name}'s healing wave restores {healAmt} HP to all allies!", _players.Contains(actor), true);
+                    actor.AttackBar.Value = actor.AttackInterval;
+                    CheckEnd();
+                    return;
+                }
+                else if (ability.Name == "Chain Heal")
+                {
+                    int healAmt = (int)Math.Max(1, (5 + actor.Intelligence * 1.0) * actor.HealingDealtMultiplier);
+                    healAmt = (int)(healAmt * target.HealingReceivedMultiplier);
+                    target.CurrentHp = Math.Min(target.MaxHp, target.CurrentHp + healAmt);
+                    target.HpBar.Value = Math.Min(target.MaxHp, target.CurrentHp);
+                    AfterHeal(actor, target, healAmt);
+                    var others = allies.Where(a => a != target && a.CurrentHp > 0 && a.CurrentHp < a.MaxHp).ToList();
+                    if (others.Any())
+                    {
+                        var second = others[_rng.Next(others.Count)];
+                        int heal2 = (int)(healAmt * 0.5 * second.HealingReceivedMultiplier);
+                        second.CurrentHp = Math.Min(second.MaxHp, second.CurrentHp + heal2);
+                        second.HpBar.Value = Math.Min(second.MaxHp, second.CurrentHp);
+                        AfterHeal(actor, second, heal2);
+                    }
+                    actor.AttackBar.Value = actor.AttackInterval;
+                    CheckEnd();
+                    return;
+                }
+                else if (ability.Name == "Prayer of Healing")
+                {
+                    int healAmt = (int)Math.Max(1, (6 + actor.Intelligence * 0.8) * actor.HealingDealtMultiplier);
+                    foreach (var ally in allies.Where(a => a.CurrentHp > 0))
+                    {
+                        int final = (int)(healAmt * ally.HealingReceivedMultiplier);
+                        ally.CurrentHp = Math.Min(ally.MaxHp, ally.CurrentHp + final);
+                        ally.HpBar.Value = Math.Min(ally.MaxHp, ally.CurrentHp);
+                        AfterHeal(actor, ally, final);
+                    }
+                    actor.AttackBar.Value = actor.AttackInterval;
+                    CheckEnd();
+                    return;
+                }
+                else if (ability.Name == "Holy Light")
+                {
+                    int healAmt = (int)Math.Max(1, (8 + actor.Intelligence * 1.5) * actor.HealingDealtMultiplier);
+                    healAmt = (int)(healAmt * target.HealingReceivedMultiplier);
+                    target.CurrentHp = Math.Min(target.MaxHp, target.CurrentHp + healAmt);
+                    target.HpBar.Value = Math.Min(target.MaxHp, target.CurrentHp);
+                    AfterHeal(actor, target, healAmt);
                     actor.AttackBar.Value = actor.AttackInterval;
                     CheckEnd();
                     return;
@@ -526,8 +579,19 @@ namespace WinFormsApp2
                 {
                     foreach (var o in opponents.Where(o => o.CurrentHp > 0))
                     {
+                        if (o.SpellDodgeChance > 0 && _rng.NextDouble() < o.SpellDodgeChance)
+                        {
+                            AppendLog($"{o.Name} deflects the spell!", actorIsPlayer);
+                            continue;
+                        }
                         int damage = CalculateSpellDamage(actor, o, ability);
+                        if (o.DamageReductionCurrent > 0)
+                        {
+                            damage = (int)(damage * (1 - o.DamageReductionCurrent));
+                            o.DamageReductionCurrent = Math.Max(0, o.DamageReductionCurrent - o.DamageReductionStep);
+                        }
                         ApplyShieldReduction(o, ref damage);
+                        ApplyManaShield(o, ref damage);
                         o.CurrentHp -= damage;
                         string spellLog = $"{actor.Name}'s {ability.Name} hits {o.Name} for {damage} damage!";
                         if (o.CurrentHp <= 0 && _players.Contains(o) && !_deathCauses.ContainsKey(o.Name))
@@ -540,6 +604,7 @@ namespace WinFormsApp2
                         o.HpBar.Value = Math.Min(o.HpBar.Maximum, Math.Max(0, o.CurrentHp));
                         o.Threat[actor] = o.Threat.GetValueOrDefault(actor) + damage;
                         o.CurrentTarget = actor;
+                        AfterDamageDealt(actor, o, damage);
                     }
                     actor.AttackBar.Value = actor.AttackInterval;
                     actor.CurrentTarget = target;
@@ -548,8 +613,20 @@ namespace WinFormsApp2
                 }
                 else
                 {
+                    if (target.SpellDodgeChance > 0 && _rng.NextDouble() < target.SpellDodgeChance)
+                    {
+                        AppendLog($"{target.Name} deflects the spell!", actorIsPlayer);
+                        actor.AttackBar.Value = actor.AttackInterval;
+                        return;
+                    }
                     int spellDamage = CalculateSpellDamage(actor, target, ability);
+                    if (target.DamageReductionCurrent > 0)
+                    {
+                        spellDamage = (int)(spellDamage * (1 - target.DamageReductionCurrent));
+                        target.DamageReductionCurrent = Math.Max(0, target.DamageReductionCurrent - target.DamageReductionStep);
+                    }
                     ApplyShieldReduction(target, ref spellDamage);
+                    ApplyManaShield(target, ref spellDamage);
                     target.CurrentHp -= spellDamage;
                     string spellLog = ability.Name == "Drain Life"
                         ? $"{actor.Name} siphons {spellDamage} life from {target.Name}!"
@@ -574,6 +651,7 @@ namespace WinFormsApp2
                     target.Threat[actor] = target.Threat.GetValueOrDefault(actor) + spellDamage;
                     target.CurrentTarget = actor;
                     actor.CurrentTarget = target;
+                    AfterDamageDealt(actor, target, spellDamage);
                     CheckEnd();
                     return;
                 }
@@ -601,7 +679,13 @@ namespace WinFormsApp2
             }
 
             int dmg = CalculateDamage(actor, target);
+            if (target.DamageReductionCurrent > 0)
+            {
+                dmg = (int)(dmg * (1 - target.DamageReductionCurrent));
+                target.DamageReductionCurrent = Math.Max(0, target.DamageReductionCurrent - target.DamageReductionStep);
+            }
             ApplyShieldReduction(target, ref dmg);
+            ApplyManaShield(target, ref dmg);
             if (target.Passives.ContainsKey("Bloodlust"))
             {
                 double missing = 1 - target.CurrentHp / (double)target.MaxHp;
@@ -622,6 +706,24 @@ namespace WinFormsApp2
             target.Threat[actor] = target.Threat.GetValueOrDefault(actor) + dmg;
             target.CurrentTarget = actor;
             actor.CurrentTarget = target;
+            AfterDamageDealt(actor, target, dmg);
+            if (actor.SplashDamagePercent > 0)
+            {
+                var splashTargets = opponents.Where(o => o != target && o.CurrentHp > 0).ToList();
+                if (splashTargets.Any())
+                {
+                    var st = splashTargets[_rng.Next(splashTargets.Count)];
+                    int splash = (int)(dmg * actor.SplashDamagePercent);
+                    ApplyShieldReduction(st, ref splash);
+                    ApplyManaShield(st, ref splash);
+                    st.CurrentHp -= splash;
+                    AppendLog($"{st.Name} is hit by cleaving damage for {splash}!", _players.Contains(actor));
+                    st.HpBar.Value = Math.Min(st.HpBar.Maximum, Math.Max(0, st.CurrentHp));
+                    st.DamageTaken += splash;
+                    st.Threat[actor] = st.Threat.GetValueOrDefault(actor) + splash;
+                    AfterDamageDealt(actor, st, splash);
+                }
+            }
             if (actor.Passives.ContainsKey("Flesh Rip"))
             {
                 int chance = 5 + actor.Strength / 15;
@@ -657,6 +759,9 @@ namespace WinFormsApp2
                 "Meteor" => $"{actor.Name} calls down a fiery meteor!",
                 "Flame Strike" => $"{actor.Name} smashes the ground with a flaming strike!",
                 "Healing Wave" => $"{actor.Name} releases a healing wave!",
+                "Chain Heal" => $"{actor.Name} channels a chain heal!",
+                "Prayer of Healing" => $"{actor.Name} utters a prayer of healing!",
+                "Holy Light" => $"{actor.Name} bathes {target.Name} in holy light!",
                 "Bleed" => $"{actor.Name} rends {target.Name}, drawing rivers of blood!",
                 "Poison" => $"{actor.Name} envenoms {target.Name} with a vile toxin!",
                 "Regenerate" => $"{actor.Name} calls forth rejuvenating winds around {target.Name}!",
@@ -684,19 +789,22 @@ namespace WinFormsApp2
         private void ApplyPoison(Creature actor, Creature target)
         {
             int amt = (int)Math.Max(1, 1 + actor.Dex * 0.35);
-            target.Effects.Add(new StatusEffect { Kind = EffectKind.Poison, RemainingMs = 6000, TickIntervalMs = 1000, TimeUntilTickMs = 1000, AmountPerTick = amt, SourceIsPlayer = _players.Contains(actor) });
+            int duration = actor.PoisonMastery ? 9000 : 6000;
+            target.Effects.Add(new StatusEffect { Kind = EffectKind.Poison, RemainingMs = duration, TickIntervalMs = 1000, TimeUntilTickMs = 1000, AmountPerTick = amt, SourceIsPlayer = _players.Contains(actor) });
         }
 
         private void ApplyHot(Creature actor, Creature target)
         {
-            int amt = (int)Math.Max(1, 1 + target.Intelligence * 0.80);
-            target.Effects.Add(new StatusEffect { Kind = EffectKind.HoT, RemainingMs = 6000, TickIntervalMs = 3000, TimeUntilTickMs = 3000, AmountPerTick = amt, SourceIsPlayer = _players.Contains(actor), SourceName = actor.Name });
+            int amt = (int)Math.Max(1, (1 + target.Intelligence * 0.80) * actor.HealingDealtMultiplier * target.HealingReceivedMultiplier);
+            int tick = actor.NatureGrace ? 1500 : 3000;
+            target.Effects.Add(new StatusEffect { Kind = EffectKind.HoT, RemainingMs = 6000, TickIntervalMs = tick, TimeUntilTickMs = tick, AmountPerTick = amt, SourceIsPlayer = _players.Contains(actor), SourceName = actor.Name });
         }
 
         private void ApplyRejuvenate(Creature actor, Creature target)
         {
-            int amt = (int)Math.Max(1, 1 + actor.Intelligence * 0.60);
-            target.Effects.Add(new StatusEffect { Kind = EffectKind.HoT, RemainingMs = 6000, TickIntervalMs = 2000, TimeUntilTickMs = 2000, AmountPerTick = amt, SourceIsPlayer = _players.Contains(actor), SourceName = actor.Name });
+            int amt = (int)Math.Max(1, (1 + actor.Intelligence * 0.60) * actor.HealingDealtMultiplier * target.HealingReceivedMultiplier);
+            int tick = actor.NatureGrace ? 1000 : 2000;
+            target.Effects.Add(new StatusEffect { Kind = EffectKind.HoT, RemainingMs = 6000, TickIntervalMs = tick, TimeUntilTickMs = tick, AmountPerTick = amt, SourceIsPlayer = _players.Contains(actor), SourceName = actor.Name });
         }
 
         private void ApplyTaunt(Creature actor, List<Creature> opponents)
@@ -736,6 +844,81 @@ namespace WinFormsApp2
                 {
                     target.Effects.Remove(shield);
                 }
+            }
+        }
+
+        private void ApplyManaShield(Creature target, ref int dmg)
+        {
+            if (target.ManaShield && dmg > 0 && target.Mana > 0)
+            {
+                int absorb = Math.Min(target.Mana, dmg / 2);
+                target.Mana -= absorb;
+                if (target.ManaBar.Maximum > 0) target.ManaBar.Value = target.Mana;
+                dmg -= absorb;
+            }
+        }
+
+        private void AfterDamageDealt(Creature actor, Creature target, int dmg)
+        {
+            if (actor.LeechPercent > 0 && dmg > 0)
+            {
+                int heal = (int)(dmg * actor.LeechPercent);
+                actor.CurrentHp = Math.Min(actor.MaxHp, actor.CurrentHp + heal);
+                actor.HpBar.Value = Math.Min(actor.MaxHp, actor.CurrentHp);
+            }
+            if (actor.SpellManaLeechPercent > 0 && dmg > 0)
+            {
+                actor.Mana = Math.Min(actor.MaxMana, actor.Mana + (int)(dmg * actor.SpellManaLeechPercent));
+                if (actor.ManaBar.Maximum > 0) actor.ManaBar.Value = actor.Mana;
+            }
+            if (actor.Momentum)
+            {
+                actor.MomentumBonus = Math.Min(0.25, actor.MomentumBonus + 0.05);
+                actor.DamageDealtMultiplier = 1 + actor.MomentumBonus;
+            }
+            if (target.ReturnDamagePercent > 0 && dmg > 0)
+            {
+                int ret = (int)(dmg * target.ReturnDamagePercent);
+                actor.CurrentHp -= ret;
+                actor.HpBar.Value = Math.Max(0, actor.CurrentHp);
+                actor.DamageTaken += ret;
+            }
+            if (target.Momentum)
+            {
+                target.MomentumBonus = 0;
+                target.DamageDealtMultiplier = 1.0;
+            }
+            if (target.SecondWindAvailable && target.CurrentHp <= target.MaxHp * 0.3 && target.CurrentHp > 0)
+            {
+                int heal = (int)(target.MaxHp * 0.25);
+                target.CurrentHp = Math.Min(target.MaxHp, target.CurrentHp + heal);
+                target.HpBar.Value = Math.Min(target.MaxHp, target.CurrentHp);
+                target.SecondWindAvailable = false;
+                AppendLog($"{target.Name} rallies with a second wind!", _players.Contains(target), true);
+            }
+        }
+
+        private void AfterHeal(Creature actor, Creature target, int healAmt)
+        {
+            if (actor.ManaOnHealPercent > 0 && target != actor)
+            {
+                int mana = (int)(healAmt * actor.ManaOnHealPercent);
+                target.Mana = Math.Min(target.MaxMana, target.Mana + mana);
+                if (target.ManaBar.Maximum > 0) target.ManaBar.Value = target.Mana;
+            }
+            if (actor.ShieldOnHealPercent > 0 && target != actor)
+            {
+                int shield = (int)(healAmt * actor.ShieldOnHealPercent);
+                if (shield > 0)
+                {
+                    target.Effects.Add(new StatusEffect { Kind = EffectKind.Shield, RemainingMs = 15000, TickIntervalMs = int.MaxValue, TimeUntilTickMs = int.MaxValue, AmountPerTick = shield, SourceIsPlayer = _players.Contains(actor) });
+                }
+            }
+            if (actor.SelfHealOnHealPercent > 0 && target != actor)
+            {
+                int self = (int)(healAmt * actor.SelfHealOnHealPercent);
+                actor.CurrentHp = Math.Min(actor.MaxHp, actor.CurrentHp + self);
+                actor.HpBar.Value = Math.Min(actor.MaxHp, actor.CurrentHp);
             }
         }
 
@@ -850,7 +1033,7 @@ namespace WinFormsApp2
             var abilities = actor.Abilities;
             var basic = abilities.FirstOrDefault(a => a.Id == 0) ?? new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0 };
             Ability? chosen = null;
-            var usable = abilities.Where(a => a.Id == 0 || (actor.Mana >= a.Cost && actor.Cooldowns.GetValueOrDefault(a.Id) <= 0)).ToList();
+            var usable = abilities.Where(a => a.Id == 0 || (actor.Mana >= a.Cost * actor.AbilityCostMultiplier && actor.Cooldowns.GetValueOrDefault(a.Id) <= 0)).ToList();
             var nonBasic = usable.Where(a => a.Id != 0).ToList();
             if (nonBasic.Any())
             {
@@ -945,6 +1128,7 @@ namespace WinFormsApp2
             double weaponDamage = Math.Max(1, statTotal * mult);
             int dmg = (int)Math.Max(1, weaponDamage - target.MeleeDefense);
             double critChance = 0.05 + actor.Dex / 5 * 0.01 + critChanceBonus;
+            if (target.NoCrits) critChance = 0;
             if (actor.Passives.TryGetValue("Deadly Strikes", out int dsLvl))
             {
                 critChance += dsLvl * (actor.Dex / 10 * 0.01);
@@ -960,6 +1144,9 @@ namespace WinFormsApp2
                 double bonusPercent = 0.02 + missing * 2;
                 dmg += (int)(weaponDamage * bonusPercent);
             }
+            dmg += actor.AttackFlatBonus + (int)(actor.Intelligence * actor.AttackIntBonusMultiplier);
+            dmg = (int)(dmg * actor.DamageDealtMultiplier);
+            dmg = (int)(dmg * target.DamageTakenMultiplier);
             return dmg;
         }
 
@@ -977,7 +1164,7 @@ namespace WinFormsApp2
                     "INT" => actor.Intelligence,
                     _ => 0
                 };
-                double dmg = baseVal + stat * percent;
+                double dmg = (baseVal + stat * percent) * actor.SpellDamageMultiplier * target.DamageTakenMultiplier;
                 return (int)Math.Max(1, dmg - target.MagicDefense);
             }
             return 0;
@@ -1073,6 +1260,34 @@ namespace WinFormsApp2
             public int ForcedTargetMs { get; set; }
             public bool IsVanished { get; set; }
             public int VanishRemainingMs { get; set; }
+            public double DamageDealtMultiplier { get; set; } = 1.0;
+            public double HealingDealtMultiplier { get; set; } = 1.0;
+            public double DamageTakenMultiplier { get; set; } = 1.0;
+            public double HealingReceivedMultiplier { get; set; } = 1.0;
+            public double SpellDamageMultiplier { get; set; } = 1.0;
+            public double AttackSpeedMultiplier { get; set; } = 1.0;
+            public double AbilityCostMultiplier { get; set; } = 1.0;
+            public double CooldownMultiplier { get; set; } = 1.0;
+            public double SplashDamagePercent { get; set; } = 0.0;
+            public double ManaOnHealPercent { get; set; } = 0.0;
+            public double ReturnDamagePercent { get; set; } = 0.0;
+            public double LeechPercent { get; set; } = 0.0;
+            public bool NoCrits { get; set; }
+            public double ShieldStartPercent { get; set; } = 0.0;
+            public double DamageReductionCurrent { get; set; } = 0.0;
+            public double DamageReductionStep { get; set; } = 0.0;
+            public bool Momentum { get; set; }
+            public double MomentumBonus { get; set; }
+            public bool PoisonMastery { get; set; }
+            public bool ManaShield { get; set; }
+            public bool SecondWindAvailable { get; set; }
+            public bool NatureGrace { get; set; }
+            public double SpellDodgeChance { get; set; } = 0.0;
+            public double ShieldOnHealPercent { get; set; } = 0.0;
+            public double SelfHealOnHealPercent { get; set; } = 0.0;
+            public double SpellManaLeechPercent { get; set; } = 0.0;
+            public double AttackIntBonusMultiplier { get; set; } = 0.0;
+            public int AttackFlatBonus { get; set; } = 0;
 
             public Weapon? GetWeapon()
             {
@@ -1093,6 +1308,109 @@ namespace WinFormsApp2
             public int AmountPerTick { get; set; }
             public bool SourceIsPlayer { get; set; }
             public string? SourceName { get; set; }
+        }
+
+        private void ApplyPassiveModifiers(Creature c)
+        {
+            foreach (var kv in c.Passives)
+            {
+                switch (kv.Key)
+                {
+                    case "Pacifist":
+                        c.DamageDealtMultiplier *= 0.5;
+                        c.HealingDealtMultiplier *= 1.5;
+                        break;
+                    case "Cleaving Strikes":
+                        c.SplashDamagePercent += 0.20;
+                        break;
+                    case "Iron Wall":
+                        c.DamageReductionCurrent = 1.0;
+                        c.DamageReductionStep = 0.10;
+                        break;
+                    case "Mana Conduit":
+                        c.ManaOnHealPercent += 0.15;
+                        break;
+                    case "Thornmail":
+                        c.ReturnDamagePercent += 0.10;
+                        break;
+                    case "Vampiric Strikes":
+                        c.LeechPercent += 0.10;
+                        break;
+                    case "Berserker":
+                        c.DamageDealtMultiplier *= 1.25;
+                        c.DamageTakenMultiplier *= 1.15;
+                        break;
+                    case "Bulwark":
+                        c.MeleeDefense = (int)(c.MeleeDefense * 1.20);
+                        c.AttackSpeedMultiplier *= 0.90;
+                        break;
+                    case "Arcane Mastery":
+                        c.SpellDamageMultiplier *= 1.20;
+                        break;
+                    case "Fleet Footed":
+                        c.AttackSpeedMultiplier *= 1.10;
+                        break;
+                    case "Regenerative":
+                        c.HealingReceivedMultiplier *= 1.10;
+                        break;
+                    case "Mana Efficiency":
+                        c.AbilityCostMultiplier *= 0.80;
+                        break;
+                    case "Quick Recovery":
+                        c.CooldownMultiplier *= 0.80;
+                        break;
+                    case "Steadfast":
+                        c.NoCrits = true;
+                        break;
+                    case "Guardian's Grace":
+                        c.ShieldOnHealPercent += 0.10;
+                        break;
+                    case "Protective Barrier":
+                        c.ShieldStartPercent = 0.20;
+                        break;
+                    case "Momentum":
+                        c.Momentum = true;
+                        break;
+                    case "Firebrand":
+                        c.AttackFlatBonus += 5;
+                        c.AttackIntBonusMultiplier += 0.20;
+                        break;
+                    case "Poison Mastery":
+                        c.PoisonMastery = true;
+                        break;
+                    case "Mana Shield":
+                        c.ManaShield = true;
+                        break;
+                    case "Second Wind":
+                        c.SecondWindAvailable = true;
+                        break;
+                    case "Nature's Grace":
+                        c.NatureGrace = true;
+                        break;
+                    case "Spell Deflection":
+                        c.SpellDodgeChance += 0.10;
+                        break;
+                    case "Rejuvenating Healer":
+                        c.SelfHealOnHealPercent += 0.20;
+                        break;
+                    case "Arcane Siphon":
+                        c.SpellManaLeechPercent += 0.05;
+                        break;
+                }
+            }
+            if (c.ShieldStartPercent > 0)
+            {
+                int shield = (int)(c.MaxHp * c.ShieldStartPercent);
+                c.Effects.Add(new StatusEffect
+                {
+                    Kind = EffectKind.Shield,
+                    RemainingMs = int.MaxValue,
+                    TickIntervalMs = int.MaxValue,
+                    TimeUntilTickMs = int.MaxValue,
+                    AmountPerTick = shield,
+                    SourceIsPlayer = _players.Contains(c)
+                });
+            }
         }
 
         private void BuildPanels()
