@@ -154,8 +154,21 @@ namespace WinFormsApp2
             }
 
             int targetAvg = totalLevel < areaMin ? areaMin : avgLevel;
-            int perNpcMin = Math.Max(areaMin, (int)Math.Ceiling(targetAvg * 0.8));
-            int perNpcMax = Math.Min(areaMax, (int)Math.Ceiling(targetAvg * (_wildEncounter ? 1.0 : 1.2)));
+
+            // NPC levels range from roughly 60% to 100% of the party's average level,
+            // while still respecting any area-level restrictions.
+            int perNpcMin = (int)(avgLevel * 0.6);
+            int perNpcMax = avgLevel;
+            if (_areaMinLevel.HasValue)
+            {
+                perNpcMin = Math.Max(perNpcMin, areaMin);
+                perNpcMax = Math.Max(perNpcMax, areaMin);
+            }
+            if (_areaMaxLevel.HasValue)
+            {
+                perNpcMin = Math.Min(perNpcMin, areaMax);
+                perNpcMax = Math.Min(perNpcMax, areaMax);
+            }
             if (perNpcMin > perNpcMax)
                 perNpcMin = perNpcMax = Math.Min(areaMax, perNpcMin);
 
@@ -231,8 +244,9 @@ namespace WinFormsApp2
                 return null;
             }
 
-            int strongMin = Math.Max(perNpcMin, (int)Math.Ceiling(targetAvg * 1.2));
-            int strongMax = Math.Min(perNpcMax, (int)Math.Ceiling(targetAvg * 1.5));
+            // Start with a foe at the upper end of the allowed range.
+            int strongMin = perNpcMax;
+            int strongMax = perNpcMax;
             AddNpc(strongMin, strongMax);
 
             int weakerCount = _rng.Next(1, 3);
