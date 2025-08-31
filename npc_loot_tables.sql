@@ -22,8 +22,8 @@ INSERT INTO npc_loot (npc_name, item_name, drop_chance, min_quantity, max_quanti
 ('Earth Guardian', 'Stone Armor', 0.15, 1, 1),
 
 ('Desert Raider', 'gold', 1.0, 110, 220),
-('Desert Raider', 'Scimitar', 0.2, 1, 1),
-('Desert Raider', 'Sand Cloak', 0.15, 1, 1),
+('Desert Raider', 'Desert Sword +1', 0.2, 1, 1),
+('Desert Raider', 'Desert Leather +1', 0.15, 1, 1),
 
 ('Sea Witch', 'gold', 1.0, 115, 230),
 ('Sea Witch', 'Coral Staff', 0.2, 1, 1),
@@ -50,8 +50,8 @@ INSERT INTO npc_loot (npc_name, item_name, drop_chance, min_quantity, max_quanti
 ('Lava Golem', 'Rock Plating', 0.15, 1, 1),
 
 ('Forest Sentinel', 'gold', 1.0, 145, 290),
-('Forest Sentinel', 'Longbow', 0.2, 1, 1),
-('Forest Sentinel', 'Bark Mail', 0.15, 1, 1),
+('Forest Sentinel', 'Forest Valley Sword +1', 0.2, 1, 1),
+('Forest Sentinel', 'Forest Valley Plate +1', 0.15, 1, 1),
 
 ('Sand Assassin', 'gold', 1.0, 135, 270),
 ('Sand Assassin', 'Curved Blade', 0.2, 1, 1),
@@ -118,8 +118,8 @@ INSERT INTO npc_loot (npc_name, item_name, drop_chance, min_quantity, max_quanti
 ('High Priestess', 'Golden Vestments', 0.15, 1, 1),
 
 ('Mountain Titan', 'gold', 1.0, 190, 380),
-('Mountain Titan', 'Granite Fists', 0.2, 1, 1),
-('Mountain Titan', 'Stone Carapace', 0.15, 1, 1),
+('Mountain Titan', 'Mountain Sword +2', 0.2, 1, 1),
+('Mountain Titan', 'Mountain Plate +2', 0.15, 1, 1),
 
 ('Plague Alchemist', 'gold', 1.0, 185, 370),
 ('Plague Alchemist', 'Alchemy Satchel', 0.2, 1, 1),

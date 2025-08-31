@@ -10,7 +10,7 @@ namespace WinFormsApp2
     {
         private static readonly Random _rng = new();
 
-        public static Dictionary<string, int> GenerateLoot(IEnumerable<(string name, int level)> npcs, int userId)
+        public static Dictionary<string, int> GenerateLoot(IEnumerable<(string name, int level)> npcs, int userId, string? areaId = null)
         {
             var drops = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
@@ -46,7 +46,7 @@ namespace WinFormsApp2
             conn.Close();
 
             // chance to drop additional loot from global pool
-            Item? bonusLoot = LootPool.GetEnemyLoot(avgLevel);
+            Item? bonusLoot = LootPool.GetEnemyLoot(areaId);
             if (bonusLoot != null)
             {
                 drops[bonusLoot.Name] = drops.GetValueOrDefault(bonusLoot.Name) + 1;

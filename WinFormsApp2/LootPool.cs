@@ -4,99 +4,60 @@ using System.Linq;
 
 namespace WinFormsApp2
 {
-    /// <summary>
-    /// Provides a global loot pool that is shared between shops and enemy drops.
-    /// Items are grouped into broad level brackets and shop stock is generated
-    /// without overlap so each shop offers unique wares.
-    /// </summary>
     public static class LootPool
     {
         private static readonly Random _rng = new();
 
-        // Pools keyed by (minLevel,maxLevel)
-        private static readonly Dictionary<(int Min, int Max), List<string>> _pools = new()
+        private static readonly Dictionary<string, List<string>> _areaPools = RegionData.NodeToDisplay.ToDictionary(
+            kv => kv.Key,
+            kv => CreateRegionalPool(kv.Value)
+        );
+
+        private static List<string> CreateRegionalPool(string regionDisplay)
         {
-            [(1,10)] = CreatePool(
-                "Healing Potion",
-                "Dagger",
-                "Shortsword",
-                "Leather Armor",
-                "Leather Cap",
-                "Leather Boots",
-                "Cloth Robe"),
-            [(11,20)] = CreatePool(
-                "Bow",
-                "Staff",
-                "Wand",
-                "Longsword",
-                "Plate Armor",
-                "Rod",
-                "Mace"),
-            [(21,40)] = CreatePool(
-                "Greataxe",
-                "Scythe",
-                "Greatsword",
-                "Greatmaul")
-        };
-
-        private static List<string> CreatePool(params string[] items) =>
-            items
-                .Where(n => !n.StartsWith("Tome: ", StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-        private static readonly HashSet<string> _usedItems = new(StringComparer.OrdinalIgnoreCase);
-        private static readonly Dictionary<string, List<Item>> _shopStocks = new();
-
-        private static List<string> GetPool(int level)
-        {
-            foreach (var kv in _pools)
+            var items = new List<string>();
+            for (int i = 1; i <= 3; i++)
             {
-                if (level >= kv.Key.Min && level <= kv.Key.Max)
-                    return kv.Value;
+                items.Add($"{regionDisplay} Cloth +{i}");
+                items.Add($"{regionDisplay} Leather +{i}");
+                items.Add($"{regionDisplay} Plate +{i}");
+                items.Add($"{regionDisplay} Sword +{i}");
             }
-            return _pools.First().Value;
+            return items;
         }
 
-        /// <summary>
-        /// Returns the stock for the given shop node. The stock is generated
-        /// once and cached so repeated visits show the same items. Items are
-        /// drawn from the global pool and are unique across shops.
-        /// </summary>
+        private static readonly Dictionary<string, HashSet<string>> _usedItems = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, List<Item>> _shopStocks = new();
+
+        private static List<string> GetPool(string nodeId)
+        {
+            if (_areaPools.TryGetValue(nodeId, out var pool))
+                return pool;
+            return _areaPools.Values.First();
+        }
+
         public static List<Item> GetShopStock(string nodeId)
         {
             if (_shopStocks.TryGetValue(nodeId, out var stock))
                 return stock;
 
-            int level = nodeId switch
-            {
-                "nodeSmallVillage" => 5,
-                "nodeMounttown" => 15,
-                "nodeRiverVillage" => 25,
-                _ => 5
-            };
+            var pool = GetPool(nodeId);
+            if (!_usedItems.TryGetValue(nodeId, out var used))
+                _usedItems[nodeId] = used = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            var pool = GetPool(level);
             var items = new List<Item>
             {
-                // every shop sells at least one potion
                 new HealingPotion()
             };
-
-            // Track item names added to this shop to avoid duplicates within the shop
             var localUsed = new HashSet<string>(items.Select(i => i.Name), StringComparer.OrdinalIgnoreCase);
 
             while (items.Count < 15)
             {
-                var available = pool
-                    .Where(n => !n.StartsWith("Tome: ", StringComparison.OrdinalIgnoreCase)
-                                && !_usedItems.Contains(n)
-                                && !localUsed.Contains(n))
-                    .ToList();
+                var available = pool.Where(n => !used.Contains(n) && !localUsed.Contains(n)).ToList();
                 if (available.Count == 0)
-                    break; // no more unique items to add
-
+                    break;
                 string name = available[_rng.Next(available.Count)];
-                _usedItems.Add(name);
+                used.Add(name);
                 localUsed.Add(name);
                 Item? item = InventoryService.CreateItem(name);
                 if (item != null)
@@ -107,14 +68,9 @@ namespace WinFormsApp2
             return items;
         }
 
-        /// <summary>
-        /// Returns a random item suitable for an enemy of the given level.
-        /// This does not affect shop stock and can return items already used
-        /// by shops.
-        /// </summary>
-        public static Item? GetEnemyLoot(int level)
+        public static Item? GetEnemyLoot(string? nodeId)
         {
-            var pool = GetPool(level);
+            var pool = GetPool(nodeId ?? RegionData.NodeToDisplay.Keys.First());
             if (pool.Count == 0)
                 return null;
             string name = pool[_rng.Next(pool.Count)];
