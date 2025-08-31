@@ -22,7 +22,7 @@ INSERT INTO abilities (name, description, cost, cooldown) VALUES
 ('Blood Pact', 'Deal 8 + 120% of your STR damage but take 2 + 50% of your STR recoil.', 40, 10),
 ('Enrage', 'Increase your damage by 5 + 40% of your STR for 8s.', 30, 25),
 ('Healing Wave', 'Heal the party for 4 + 100% of your INT HP.', 60, 20),
-('Fortify', 'Grant a shield of 3 + 60% of your INT damage for 8s.', 35, 15),
+('Fortify', 'Grant a shield absorbing 3 + 60% of your INT damage for 8s.', 35, 15),
 ('Flame Strike', 'Smash the ground for 7 + 110% of your INT fire damage to all enemies.', 65, 12),
 ('Silencing Shot', 'Deal 4 + 80% of your DEX damage and silence for 3s.', 30, 8),
 ('Rend Armor', 'Rip armor dealing 3 + 70% of your STR damage and reducing defense.', 30, 10),
@@ -32,4 +32,6 @@ INSERT INTO abilities (name, description, cost, cooldown) VALUES
 ('Thunderclap', 'Clap thunder for 6 + 100% of your STR damage to nearby foes.', 45, 12),
 ('Chain Heal', 'Heal an ally for 5 + 100% of your INT then bounce to another ally for 50% of that amount.', 50, 12),
 ('Prayer of Healing', 'Heal all allies for 6 + 80% of your INT.', 55, 15),
-('Holy Light', 'Heal a single ally for 8 + 150% of your INT.', 45, 8);
+('Holy Light', 'Heal a single ally for 8 + 150% of your INT.', 45, 8),
+('Guardian Ward', 'Grant a shield to yourself and nearby allies absorbing 4 + 120% of your INT damage for 15s.', 55, 25),
+('Divine Aegis', 'Place a large barrier on an ally absorbing 8 + 250% of your INT damage for 15s.', 45, 20);

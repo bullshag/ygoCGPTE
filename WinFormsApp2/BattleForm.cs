@@ -417,6 +417,12 @@ namespace WinFormsApp2
                         if (eff.RemainingMs <= 0)
                         {
                             c.Effects.RemoveAt(i);
+                            if (eff.Kind == EffectKind.Shield)
+                            {
+                                c.ShieldBar.Visible = false;
+                                c.ShieldBar.Value = 0;
+                                c.ShieldBar.Maximum = 1;
+                            }
                         }
                     }
                     if (c.ForcedTargetMs > 0)
@@ -592,7 +598,37 @@ namespace WinFormsApp2
                 }
                 else if (ability.Name == "Taunting Blows") ApplyTaunt(actor, opponents);
                 else if (ability.Name == "Vanish") { actor.IsVanished = true; actor.VanishRemainingMs = 5000; actor.AttackBar.Value = actor.AttackInterval; CheckEnd(); return; }
-                else if (ability.Name == "Arcane Shield") { ApplyShield(actor, target); actor.AttackBar.Value = actor.AttackInterval; CheckEnd(); return; }
+
+                else if (ability.Name == "Arcane Shield")
+                {
+                    int shield = (int)Math.Max(1, 5 + actor.Intelligence * 1.5);
+                    ApplyShield(actor, target, shield, 15000);
+                    actor.AttackBar.Value = actor.AttackInterval;
+                    CheckEnd();
+                    return;
+                }
+                else if (ability.Name == "Fortify")
+                {
+                    int shield = (int)Math.Max(1, 3 + actor.Intelligence * 0.6);
+                    ApplyShield(actor, target, shield, 8000);
+
+                    actor.AttackBar.Value = actor.AttackInterval;
+                    CheckEnd();
+                    return;
+                }
+                else if (ability.Name == "Guardian Ward")
+                {
+                    int shield = (int)Math.Max(1, 4 + actor.Intelligence * 1.2);
+                    foreach (var ally in allies.Where(a => a.CurrentHp > 0))
+                    {
+                        ApplyShield(actor, ally, shield, 15000);
+                    }
+                    actor.AttackBar.Value = actor.AttackInterval;
+                    CheckEnd();
+                    return;
+                }
+                else if (ability.Name == "Divine Aegis") { ApplyShield(actor, target, 2.5); actor.AttackBar.Value = actor.AttackInterval; CheckEnd(); return; }
+
                 else if (ability.Name == "Shockwave" || ability.Name == "Frost Nova" || ability.Name == "Earthquake" || ability.Name == "Meteor" || ability.Name == "Flame Strike" || ability.Name == "Arcane Blast")
                 {
                     foreach (var o in opponents.Where(o => o.CurrentHp > 0))
@@ -725,6 +761,11 @@ namespace WinFormsApp2
             target.CurrentTarget = actor;
             actor.CurrentTarget = target;
             AfterDamageDealt(actor, target, dmg);
+            if (ability.Name == "Shield Bash" && dmg > 0)
+            {
+                int shield = (int)(dmg * 0.5);
+                ApplyShield(actor, actor, shield, 15000);
+            }
             if (actor.SplashDamagePercent > 0)
             {
                 var splashTargets = opponents.Where(o => o != target && o.CurrentHp > 0).ToList();
@@ -794,6 +835,8 @@ namespace WinFormsApp2
                 "Drain Life" => $"{actor.Name} siphons vitality from {target.Name}!",
                 "Vanish" => $"{actor.Name} melts into the shadows!",
                 "Arcane Shield" => $"{actor.Name} conjures a shimmering shield around {target.Name}!",
+                "Guardian Ward" => $"{actor.Name} forms a guardian ward around the party!",
+                "Divine Aegis" => $"{actor.Name} blesses {target.Name} with a divine aegis!",
                 _ => $"{actor.Name} uses {ability.Name} on {target.Name}!"
             };
         }
@@ -835,19 +878,28 @@ namespace WinFormsApp2
             }
         }
 
-        private void ApplyShield(Creature actor, Creature target)
+        private void ApplyShield(Creature actor, Creature target, int shieldAmount, int durationMs)
         {
-            int shield = (int)Math.Max(1, 5 + actor.Intelligence * 1.5);
             target.Effects.Add(new StatusEffect
             {
                 Kind = EffectKind.Shield,
-                RemainingMs = 15000,
+                RemainingMs = durationMs,
                 TickIntervalMs = int.MaxValue,
                 TimeUntilTickMs = int.MaxValue,
-                AmountPerTick = shield,
+                AmountPerTick = shieldAmount,
                 SourceIsPlayer = _players.Contains(actor)
             });
-            AppendLog($"{target.Name} is protected by a magical shield ({shield}).", _players.Contains(actor), true);
+
+            target.ShieldBar.Maximum = Math.Max(1, shieldAmount);
+            target.ShieldBar.Value = Math.Max(0, shieldAmount);
+            target.ShieldBar.Visible = true;
+            AppendLog($"{target.Name} is protected by a magical shield ({shieldAmount}).", _players.Contains(actor), true);
+        }
+
+        private void ApplyShield(Creature actor, Creature target, double intMultiplier, int durationMs = 15000)
+        {
+            int shieldAmount = (int)Math.Max(1, 5 + actor.Intelligence * intMultiplier);
+            ApplyShield(actor, target, shieldAmount, durationMs);
         }
 
         private void ApplyShieldReduction(Creature target, ref int dmg)
@@ -858,9 +910,12 @@ namespace WinFormsApp2
                 int absorb = Math.Min(dmg, shield.AmountPerTick);
                 dmg -= absorb;
                 shield.AmountPerTick -= absorb;
+                target.ShieldBar.Maximum = Math.Max(1, shield.AmountPerTick);
+                target.ShieldBar.Value = Math.Max(0, shield.AmountPerTick);
                 if (shield.AmountPerTick <= 0)
                 {
                     target.Effects.Remove(shield);
+                    target.ShieldBar.Visible = false;
                 }
             }
         }
@@ -930,6 +985,9 @@ namespace WinFormsApp2
                 if (shield > 0)
                 {
                     target.Effects.Add(new StatusEffect { Kind = EffectKind.Shield, RemainingMs = 15000, TickIntervalMs = int.MaxValue, TimeUntilTickMs = int.MaxValue, AmountPerTick = shield, SourceIsPlayer = _players.Contains(actor) });
+                    target.ShieldBar.Maximum = Math.Max(1, shield);
+                    target.ShieldBar.Value = Math.Max(0, shield);
+                    target.ShieldBar.Visible = true;
                 }
             }
             if (actor.SelfHealOnHealPercent > 0 && target != actor)
@@ -1096,6 +1154,10 @@ namespace WinFormsApp2
             {
                 _battleEnded = true;
                 _gameTimer.Stop();
+                foreach (var c in _players.Concat(_npcs))
+                {
+                    c.ShieldBar.Visible = false;
+                }
                 bool playersWin = _players.Any(p => p.CurrentHp > 0);
                 _playersWin = playersWin;
                 string lootSummary = string.Empty;
@@ -1276,6 +1338,7 @@ namespace WinFormsApp2
             public ProgressBar HpBar { get; set; } = new();
             public ProgressBar ManaBar { get; set; } = new();
             public ProgressBar AttackBar { get; set; } = new();
+            public ProgressBar ShieldBar { get; set; } = new();
             public int AttackInterval { get; set; }
             public int NextActionMs { get; set; }
             public int DamageDone { get; set; }
@@ -1546,34 +1609,51 @@ namespace WinFormsApp2
 
         private Control CreatePanel(Creature c)
         {
-            var panel = new Panel { Width = 180, Height = 80 };
+            var panel = new Panel { Width = 180, Height = 100 };
             var lbl = new Label { Text = c.Name, AutoSize = true };
+            // shield bar, hidden by default and placed above HP
+            c.ShieldBar = CloneProgressBar(manaTemplate);
+            c.ShieldBar.Visible = false;
+            c.ShieldBar.Location = new Point(0, 15);
+
             c.HpBar = CloneProgressBar(hpTemplate);
             c.HpBar.Maximum = Math.Max(1, c.MaxHp);
             c.HpBar.Value = Math.Min(c.HpBar.Maximum, Math.Max(0, c.CurrentHp));
-            c.HpBar.Location = new Point(0, 15);
+            c.HpBar.Location = new Point(0, 35);
+
             panel.Controls.Add(lbl);
+            panel.Controls.Add(c.ShieldBar);
             panel.Controls.Add(c.HpBar);
+
             if (c.MaxMana > 0)
             {
                 c.ManaBar = CloneProgressBar(manaTemplate);
                 c.ManaBar.Maximum = Math.Max(1, c.MaxMana);
                 c.ManaBar.Value = Math.Min(c.ManaBar.Maximum, Math.Max(0, c.Mana));
-                c.ManaBar.Location = new Point(0, 35);
+                c.ManaBar.Location = new Point(0, 55);
                 panel.Controls.Add(c.ManaBar);
                 c.AttackBar = CloneProgressBar(attackTemplate);
                 c.AttackBar.Maximum = 100;
                 c.AttackBar.Value = 100;
-                c.AttackBar.Location = new Point(0, 55);
+                c.AttackBar.Location = new Point(0, 75);
             }
             else
             {
                 c.AttackBar = CloneProgressBar(attackTemplate);
                 c.AttackBar.Maximum = 100;
                 c.AttackBar.Value = 100;
-                c.AttackBar.Location = new Point(0, 35);
+                c.AttackBar.Location = new Point(0, 55);
             }
             panel.Controls.Add(c.AttackBar);
+
+            var existingShield = c.Effects.FirstOrDefault(e => e.Kind == EffectKind.Shield);
+            if (existingShield != null)
+            {
+                c.ShieldBar.Maximum = Math.Max(1, existingShield.AmountPerTick);
+                c.ShieldBar.Value = Math.Max(0, existingShield.AmountPerTick);
+                c.ShieldBar.Visible = true;
+            }
+
             return panel;
         }
 

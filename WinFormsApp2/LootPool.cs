@@ -16,34 +16,33 @@ namespace WinFormsApp2
         // Pools keyed by (minLevel,maxLevel)
         private static readonly Dictionary<(int Min, int Max), List<string>> _pools = new()
         {
-            [(1,10)] = new List<string>
-            {
+            [(1,10)] = CreatePool(
                 "Healing Potion",
                 "Dagger",
                 "Shortsword",
                 "Leather Armor",
                 "Leather Cap",
                 "Leather Boots",
-                "Cloth Robe"
-            },
-            [(11,20)] = new List<string>
-            {
+                "Cloth Robe"),
+            [(11,20)] = CreatePool(
                 "Bow",
                 "Staff",
                 "Wand",
                 "Longsword",
                 "Plate Armor",
                 "Rod",
-                "Mace"
-            },
-            [(21,40)] = new List<string>
-            {
+                "Mace"),
+            [(21,40)] = CreatePool(
                 "Greataxe",
                 "Scythe",
                 "Greatsword",
-                "Greatmaul"
-            }
+                "Greatmaul")
         };
+
+        private static List<string> CreatePool(params string[] items) =>
+            items
+                .Where(n => !n.StartsWith("Tome: ", StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
         private static readonly HashSet<string> _usedItems = new(StringComparer.OrdinalIgnoreCase);
         private static readonly Dictionary<string, List<Item>> _shopStocks = new();
@@ -88,7 +87,11 @@ namespace WinFormsApp2
 
             while (items.Count < 15)
             {
-                var available = pool.Where(n => !_usedItems.Contains(n) && !localUsed.Contains(n)).ToList();
+                var available = pool
+                    .Where(n => !n.StartsWith("Tome: ", StringComparison.OrdinalIgnoreCase)
+                                && !_usedItems.Contains(n)
+                                && !localUsed.Contains(n))
+                    .ToList();
                 if (available.Count == 0)
                     break; // no more unique items to add
 
