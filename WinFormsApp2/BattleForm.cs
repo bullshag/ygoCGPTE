@@ -29,6 +29,7 @@ namespace WinFormsApp2
         private int _opponentAccountId;
         private bool _cancelled;
         private bool _playersWin;
+        private bool _battleEnded;
 
         public bool PlayersWin => _playersWin;
         public bool Cancelled => _cancelled;
@@ -1088,10 +1089,12 @@ namespace WinFormsApp2
 
         private void CheckEnd()
         {
+            if (_battleEnded) return;
             foreach (var p in _players) p.HpBar.Value = Math.Min(p.HpBar.Maximum, Math.Max(0, p.CurrentHp));
             foreach (var n in _npcs) n.HpBar.Value = Math.Min(n.HpBar.Maximum, Math.Max(0, n.CurrentHp));
             if (_players.All(p => p.CurrentHp <= 0) || _npcs.All(n => n.CurrentHp <= 0))
             {
+                _battleEnded = true;
                 _gameTimer.Stop();
                 bool playersWin = _players.Any(p => p.CurrentHp > 0);
                 _playersWin = playersWin;
