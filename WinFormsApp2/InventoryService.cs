@@ -89,11 +89,29 @@ namespace WinFormsApp2
                     return new AbilityTome(id, abilityName, desc);
                 }
             }
-            string key = name.Replace(" ", "").ToLower();
+            string key = name.Replace(" ", "").Replace("+", "").ToLower();
             if (WeaponFactory.TryCreate(key, out var weapon)) return weapon;
             if (ArmorFactory.TryCreate(key, out var armor)) return armor;
 
-            string lower = name.ToLower();
+            string lower = name.ToLower().Replace("+", "");
+
+            foreach (var region in RegionData.Keys)
+            {
+                if (key.StartsWith(region))
+                {
+                    if (WeaponFactory.TryCreate(key, out weapon))
+                    {
+                        weapon.Stackable = false;
+                        weapon.Name = name;
+                        return weapon;
+                    }
+                    if (ArmorFactory.TryCreate(key, out armor))
+                    {
+                        armor.Name = name;
+                        return armor;
+                    }
+                }
+            }
             foreach (var type in new[] { "shortsword", "dagger", "bow", "longsword", "staff", "wand", "rod", "greataxe", "scythe", "greatsword", "mace", "greatmaul" })
             {
                 if (lower.Contains(type))

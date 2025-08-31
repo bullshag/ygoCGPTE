@@ -18,9 +18,13 @@ namespace WinFormsApp2
                 "greatsword" => new Weapon { Name = "Greatsword", Slot = EquipmentSlot.LeftHand, DexScaling = 0.55, StrScaling = 0.55, MinMultiplier = 1.1, MaxMultiplier = 1.6, CritChanceBonus = 0.05, CritDamageBonus = 0.05, AttackSpeedMod = 0.05, TwoHanded = true, Price = 150, Description = "Two-handed blade of legend." },
                 "mace" => new Weapon { Name = "Mace", Slot = EquipmentSlot.LeftHand, IntScaling = 0.15, DexScaling = 0.25, StrScaling = 0.35, MinMultiplier = 0.9, MaxMultiplier = 1.4, Price = 70, Description = "Blunt weapon that crushes armor." },
                 "greatmaul" => new Weapon { Name = "Greatmaul", Slot = EquipmentSlot.LeftHand, IntScaling = 0.25, StrScaling = 0.45, DexScaling = 0.45, MinMultiplier = 0.9, MaxMultiplier = 1.6, TwoHanded = true, Price = 130, Description = "A colossal hammer requiring both hands." },
-                _ => null
+                _ => null,
             };
-            return weapon != null;
+
+            if (weapon != null)
+                return true;
+
+            return TryCreateRegional(type, out weapon);
         }
 
         public static Weapon Create(string type)
@@ -28,6 +32,42 @@ namespace WinFormsApp2
             return TryCreate(type, out var weapon)
                 ? weapon
                 : new Weapon { Name = "Fists", Slot = EquipmentSlot.LeftHand, StrScaling = 1.0, MinMultiplier = 0.8, MaxMultiplier = 1.2, Description = "Your own two hands." };
+        }
+
+        private static bool TryCreateRegional(string type, out Weapon weapon)
+        {
+            weapon = null;
+            foreach (var kv in RegionData.KeyToDisplay)
+            {
+                var regionKey = kv.Key;
+                var regionName = kv.Value;
+                if (type.StartsWith(regionKey))
+                {
+                    var suffix = type.Substring(regionKey.Length);
+                    int i = suffix.Length - 1;
+                    while (i >= 0 && char.IsDigit(suffix[i])) i--;
+                    if (i < 0) return false;
+                    string tierStr = suffix[(i + 1)..];
+                    if (!int.TryParse(tierStr, out int tier)) return false;
+                    string baseType = suffix[..(i + 1)];
+                    if (baseType != "sword") return false;
+                    weapon = new Weapon
+                    {
+                        Name = $"{regionName} Sword +{tier}",
+                        Slot = EquipmentSlot.LeftHand,
+                        StrScaling = 0.6 + 0.1 * tier,
+                        DexScaling = 0.4 + 0.05 * tier,
+                        MinMultiplier = 1.0 + 0.1 * tier,
+                        MaxMultiplier = 1.4 + 0.1 * tier,
+                        Price = 80 + 40 * tier,
+                        Description = $"A finely crafted sword from {regionName}.",
+                        TwoHanded = false
+                    };
+                    weapon.Stackable = false;
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

@@ -26,6 +26,7 @@ namespace WinFormsApp2
         private readonly int? _areaMinLevel;
         private readonly int? _areaMaxLevel;
         private readonly bool _darkSpireBattle;
+        private readonly string? _areaId;
         private int _opponentAccountId;
         private bool _cancelled;
         private bool _playersWin;
@@ -55,7 +56,7 @@ namespace WinFormsApp2
             lstLog.SelectedIndex = lstLog.Items.Count - 1;
         }
 
-        public BattleForm(int userId, bool wildEncounter = false, bool arenaBattle = false, int? arenaOpponentId = null, int? areaMinLevel = null, int? areaMaxLevel = null, bool darkSpireBattle = false)
+        public BattleForm(int userId, bool wildEncounter = false, bool arenaBattle = false, int? arenaOpponentId = null, int? areaMinLevel = null, int? areaMaxLevel = null, bool darkSpireBattle = false, string? areaId = null)
         {
             _userId = userId;
             _wildEncounter = wildEncounter;
@@ -64,6 +65,7 @@ namespace WinFormsApp2
             _areaMinLevel = areaMinLevel;
             _areaMaxLevel = areaMaxLevel;
             _darkSpireBattle = darkSpireBattle;
+            _areaId = areaId;
             InitializeComponent();
             LoadData();
         }
@@ -1169,7 +1171,7 @@ namespace WinFormsApp2
                     {
                         EnemyKnowledgeService.RecordKill(_userId, npc.Name);
                     }
-                    var loot = LootService.GenerateLoot(_npcs.Select(n => (n.Name, n.Level)), _userId);
+                    var loot = LootService.GenerateLoot(_npcs.Select(n => (n.Name, n.Level)), _userId, _areaId);
                     if (loot.Count > 0)
                     {
                         var parts = new List<string>();

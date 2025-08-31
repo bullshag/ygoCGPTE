@@ -256,7 +256,7 @@ namespace WinFormsApp2
             {
                 (min, max) = GetDarkSpireBracket();
             }
-            var battle = new BattleForm(_accountId, areaMinLevel: min, areaMaxLevel: max, darkSpireBattle: darkSpire);
+            var battle = new BattleForm(_accountId, areaMinLevel: min, areaMaxLevel: max, darkSpireBattle: darkSpire, areaId: _currentNode);
             if (sender is Button btn) btn.Enabled = false;
             battle.FormClosed += (_, __) =>
             {
@@ -343,7 +343,7 @@ namespace WinFormsApp2
         private void TravelManager_AmbushEncounter()
         {
             lblTravelInfo.Text = "Ambushed by wild enemies!";
-            var battle = new BattleForm(_accountId, true);
+            var battle = new BattleForm(_accountId, true, areaId: _currentNode);
             battle.FormClosed += (_, __) =>
             {
                 _refresh();
