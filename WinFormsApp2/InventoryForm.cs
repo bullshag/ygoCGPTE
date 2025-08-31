@@ -77,7 +77,7 @@ namespace WinFormsApp2
             else
             {
                 lblDescription.Text = DescribeItem(item);
-                btnUse.Enabled = item is HealingPotion && _selectedTarget != null;
+                btnUse.Enabled = _selectedTarget != null && (item is HealingPotion || item is AbilityTome);
             }
         }
 
@@ -106,6 +106,18 @@ namespace WinFormsApp2
                 InventoryService.RemoveItem(item);
                 RefreshItems();
             }
+            else if (item is AbilityTome tome)
+            {
+                using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+                conn.Open();
+                using MySqlCommand cmd = new MySqlCommand("INSERT IGNORE INTO character_abilities(character_id, ability_id) SELECT id, @aid FROM characters WHERE account_id=@uid AND name=@name", conn);
+                cmd.Parameters.AddWithValue("@aid", tome.AbilityId);
+                cmd.Parameters.AddWithValue("@uid", _userId);
+                cmd.Parameters.AddWithValue("@name", _selectedTarget);
+                cmd.ExecuteNonQuery();
+                InventoryService.RemoveItem(item);
+                RefreshItems();
+            }
         }
 
         private void LoadTargets()
@@ -126,7 +138,7 @@ namespace WinFormsApp2
         {
             _selectedTarget = cmbTarget.SelectedItem?.ToString();
             var item = SelectedItem();
-            btnUse.Enabled = item is HealingPotion && _selectedTarget != null;
+            btnUse.Enabled = _selectedTarget != null && (item is HealingPotion || item is AbilityTome);
         }
 
         private void LstItems_DrawItem(object? sender, DrawItemEventArgs e)

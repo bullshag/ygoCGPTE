@@ -74,6 +74,21 @@ namespace WinFormsApp2
         {
             if (name == "Arena Coin") return new ArenaCoin();
             if (name == "Healing Potion") return new HealingPotion();
+            if (name.StartsWith("Tome: "))
+            {
+                string abilityName = name[6..];
+                using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+                conn.Open();
+                using MySqlCommand cmd = new MySqlCommand("SELECT id, description FROM abilities WHERE name=@n", conn);
+                cmd.Parameters.AddWithValue("@n", abilityName);
+                using var r = cmd.ExecuteReader();
+                if (r.Read())
+                {
+                    int id = r.GetInt32("id");
+                    string desc = r.GetString("description");
+                    return new AbilityTome(id, abilityName, desc);
+                }
+            }
             string key = name.Replace(" ", "").ToLower();
             if (WeaponFactory.TryCreate(key, out var weapon)) return weapon;
             if (ArmorFactory.TryCreate(key, out var armor)) return armor;
