@@ -47,4 +47,7 @@ INSERT INTO passives (name, description) VALUES
 ('Nature\'s Grace', 'Healing over time effects you cast tick 50% faster.'),
 ('Spell Deflection', '10% chance to completely avoid spell damage.'),
 ('Rejuvenating Healer', 'Healing others also heals you for 20% of the amount.'),
-('Arcane Siphon', 'Dealing spell damage restores mana equal to 5% of the damage done.');
+('Arcane Siphon', 'Dealing spell damage restores mana equal to 5% of the damage done.'),
+('Plate Mastery', 'Increases plate armor effectiveness by 50%.'),
+('Cloth Mastery', 'Increases cloth armor effectiveness by 50%.'),
+('Leather Mastery', 'Increases leather armor effectiveness by 50%.');

@@ -1592,6 +1592,42 @@ namespace WinFormsApp2
                     case "Arcane Siphon":
                         c.SpellManaLeechPercent += 0.05;
                         break;
+                    case "Plate Mastery":
+                        foreach (var item in c.Equipment.Values)
+                        {
+                            if (item is Armor a && a.Name.Contains("Plate", StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (a.FlatBonuses.TryGetValue("Melee Defense", out int md))
+                                    c.MeleeDefense += (int)(md * 0.5);
+                                if (a.FlatBonuses.TryGetValue("Magic Defense", out int mgd))
+                                    c.MagicDefense += (int)(mgd * 0.5);
+                            }
+                        }
+                        break;
+                    case "Cloth Mastery":
+                        foreach (var item in c.Equipment.Values)
+                        {
+                            if (item is Armor a && (a.Name.Contains("Cloth", StringComparison.OrdinalIgnoreCase) || a.Name.Contains("Robe", StringComparison.OrdinalIgnoreCase)))
+                            {
+                                if (a.FlatBonuses.TryGetValue("Melee Defense", out int md))
+                                    c.MeleeDefense += (int)(md * 0.5);
+                                if (a.FlatBonuses.TryGetValue("Magic Defense", out int mgd))
+                                    c.MagicDefense += (int)(mgd * 0.5);
+                            }
+                        }
+                        break;
+                    case "Leather Mastery":
+                        foreach (var item in c.Equipment.Values)
+                        {
+                            if (item is Armor a && a.Name.Contains("Leather", StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (a.FlatBonuses.TryGetValue("Melee Defense", out int md))
+                                    c.MeleeDefense += (int)(md * 0.5);
+                                if (a.FlatBonuses.TryGetValue("Magic Defense", out int mgd))
+                                    c.MagicDefense += (int)(mgd * 0.5);
+                            }
+                        }
+                        break;
                 }
             }
             if (c.ShieldStartPercent > 0)
