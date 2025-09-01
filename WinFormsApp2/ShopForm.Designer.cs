@@ -37,7 +37,6 @@ namespace WinFormsApp2
             // 
             _lstShop.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             _lstShop.ItemHeight = 15;
-            _lstShop.Items.AddRange(new object[] { "1", "2", "3", "4", "5" });
             _lstShop.Location = new Point(10, 25);
             _lstShop.Name = "_lstShop";
             _lstShop.Size = new Size(250, 139);

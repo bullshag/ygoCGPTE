@@ -173,7 +173,7 @@ namespace WinFormsApp2
         private void LstShop_MeasureItem(object? sender, MeasureItemEventArgs e)
         {
             if (e.Index < 0) return;
-            var item = (Item)_lstShop.Items[e.Index];
+            if (_lstShop.Items[e.Index] is not Item item) return;
             string price = $" - {item.Price}g";
             float width;
             if (item.RainbowColors != null)
@@ -222,7 +222,7 @@ namespace WinFormsApp2
         private void LstShop_DrawItem(object? sender, DrawItemEventArgs e)
         {
             if (e.Index < 0) return;
-            var item = (Item)_lstShop.Items[e.Index];
+            if (_lstShop.Items[e.Index] is not Item item) return;
             e.DrawBackground();
             if (item.RainbowColors != null)
             {
