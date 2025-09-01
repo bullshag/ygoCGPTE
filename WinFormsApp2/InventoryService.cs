@@ -112,7 +112,7 @@ namespace WinFormsApp2
                     }
                 }
             }
-            foreach (var type in new[] { "shortsword", "dagger", "bow", "longsword", "staff", "wand", "rod", "greataxe", "scythe", "greatsword", "mace", "greatmaul" })
+            foreach (var type in new[] { "shortsword", "dagger", "bow", "longsword", "staff", "wand", "rod", "greataxe", "scythe", "greatsword", "mace", "greatmaul", "blade", "sword", "rapier", "cutlass", "axe", "hammer", "club", "maul", "scepter", "lance", "spear", "claw", "talon", "tome", "codex" })
             {
                 if (lower.Contains(type))
                 {
