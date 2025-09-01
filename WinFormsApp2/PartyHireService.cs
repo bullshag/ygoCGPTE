@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text.Json;
 using MySql.Data.MySqlClient;
@@ -47,40 +46,69 @@ namespace WinFormsApp2.Multiplayer
 
     public static class PartyHireService
     {
-        private static readonly string FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "party_hires.json");
         private static readonly object _sync = new();
-        private static List<HireableParty>? _cache;
-        private static DateTime _lastLoaded = DateTime.MinValue;
 
         private static List<HireableParty> LoadState()
         {
             lock (_sync)
             {
-                var lastWrite = File.Exists(FilePath) ? File.GetLastWriteTimeUtc(FilePath) : DateTime.MinValue;
-                if (_cache == null || lastWrite > _lastLoaded)
+                var list = new List<HireableParty>();
+                using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+                conn.Open();
+                using MySqlCommand cmd = new MySqlCommand("SELECT * FROM party_hires", conn);
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
                 {
-                    if (!File.Exists(FilePath))
+                    var party = new HireableParty
                     {
-                        _cache = new List<HireableParty>();
-                    }
-                    else
-                    {
-                        string json = File.ReadAllText(FilePath);
-                        _cache = JsonSerializer.Deserialize<List<HireableParty>>(json) ?? new List<HireableParty>();
-                    }
-                    _lastLoaded = lastWrite;
+                        Id = reader.GetString("id"),
+                        OwnerId = reader.GetInt32("owner_id"),
+                        Name = reader.GetString("name"),
+                        Cost = reader.GetInt32("cost"),
+                        Members = JsonSerializer.Deserialize<List<HireableMember>>(reader.GetString("members_json")) ?? new List<HireableMember>(),
+                        OnMission = reader.GetBoolean("on_mission"),
+                        CurrentHirer = reader.IsDBNull(reader.GetOrdinal("current_hirer")) ? (int?)null : reader.GetInt32("current_hirer"),
+                        HiredUntil = reader.IsDBNull(reader.GetOrdinal("hired_until")) ? (DateTime?)null : reader.GetDateTime("hired_until"),
+                        GoldEarned = reader.GetInt32("gold_earned")
+                    };
+                    list.Add(party);
                 }
-                return _cache;
+                return list;
             }
         }
 
-        private static void SaveState()
+        private static void SaveState(List<HireableParty> list)
         {
             lock (_sync)
             {
-                var json = JsonSerializer.Serialize(_cache ?? new List<HireableParty>());
-                File.WriteAllText(FilePath, json);
-                _lastLoaded = File.GetLastWriteTimeUtc(FilePath);
+                using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+                conn.Open();
+                using (var del = new MySqlCommand("DELETE FROM party_hires", conn))
+                {
+                    del.ExecuteNonQuery();
+                }
+                foreach (var p in list)
+                {
+                    using var cmd = new MySqlCommand(
+                        "INSERT INTO party_hires(id, owner_id, name, cost, members_json, on_mission, current_hirer, hired_until, gold_earned) " +
+                        "VALUES(@id,@owner,@name,@cost,@members,@mission,@hirer,@until,@gold)", conn);
+                    cmd.Parameters.AddWithValue("@id", p.Id);
+                    cmd.Parameters.AddWithValue("@owner", p.OwnerId);
+                    cmd.Parameters.AddWithValue("@name", p.Name);
+                    cmd.Parameters.AddWithValue("@cost", p.Cost);
+                    cmd.Parameters.AddWithValue("@members", JsonSerializer.Serialize(p.Members));
+                    cmd.Parameters.AddWithValue("@mission", p.OnMission);
+                    if (p.CurrentHirer.HasValue)
+                        cmd.Parameters.AddWithValue("@hirer", p.CurrentHirer.Value);
+                    else
+                        cmd.Parameters.AddWithValue("@hirer", DBNull.Value);
+                    if (p.HiredUntil.HasValue)
+                        cmd.Parameters.AddWithValue("@until", p.HiredUntil.Value);
+                    else
+                        cmd.Parameters.AddWithValue("@until", DBNull.Value);
+                    cmd.Parameters.AddWithValue("@gold", p.GoldEarned);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
@@ -265,7 +293,7 @@ namespace WinFormsApp2.Multiplayer
                 p.HiredUntil = null;
                 changed = true;
             }
-            if (changed) SaveState();
+            if (changed) SaveState(list);
         }
 
         public static List<HireableParty> GetAvailableParties()
@@ -377,7 +405,7 @@ namespace WinFormsApp2.Multiplayer
             };
             var list = LoadState();
             list.Add(party);
-            SaveState();
+            SaveState(list);
             return true;
         }
 
@@ -414,7 +442,7 @@ namespace WinFormsApp2.Multiplayer
             target.CurrentHirer = hirerId;
             target.HiredUntil = DateTime.UtcNow.AddMinutes(30);
             target.GoldEarned += party.Cost;
-            SaveState();
+            SaveState(list);
             CreateMercenaries(hirerId, target, conn);
             return true;
         }
@@ -432,7 +460,7 @@ namespace WinFormsApp2.Multiplayer
                 existing.CurrentHirer = null;
             }
             list.Remove(existing);
-            SaveState();
+            SaveState(list);
             int gold = existing.GoldEarned;
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
@@ -468,7 +496,7 @@ namespace WinFormsApp2.Multiplayer
                     }
                 }
             }
-            if (changed) SaveState();
+            if (changed) SaveState(list);
         }
     }
 }
