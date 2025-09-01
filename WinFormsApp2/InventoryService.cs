@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using MySql.Data.MySqlClient;
 
 namespace WinFormsApp2
@@ -87,6 +88,29 @@ namespace WinFormsApp2
                     int id = r.GetInt32("id");
                     string desc = r.GetString("description");
                     return new AbilityTome(id, abilityName, desc);
+                }
+            }
+            using (MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString))
+            {
+                conn.Open();
+                using MySqlCommand cmd = new MySqlCommand("SELECT description,effect_json FROM trinkets WHERE name=@n", conn);
+                cmd.Parameters.AddWithValue("@n", name);
+                using var r = cmd.ExecuteReader();
+                if (r.Read())
+                {
+                    var tr = new Trinket { Name = name, Description = r.GetString("description") };
+                    var dict = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(r.GetString("effect_json"));
+                    if (dict != null)
+                    {
+                        foreach (var kv in dict)
+                        {
+                            if (kv.Value.ValueKind == JsonValueKind.True || kv.Value.ValueKind == JsonValueKind.False)
+                                tr.Effects[kv.Key] = kv.Value.GetBoolean() ? 1 : 0;
+                            else if (kv.Value.ValueKind == JsonValueKind.Number)
+                                tr.Effects[kv.Key] = kv.Value.GetDouble();
+                        }
+                    }
+                    return tr;
                 }
             }
             string key = name.Replace(" ", "").Replace("+", "").ToLower();

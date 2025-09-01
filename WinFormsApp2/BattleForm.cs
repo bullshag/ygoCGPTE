@@ -411,6 +411,11 @@ namespace WinFormsApp2
                             if (eff.Kind == EffectKind.HoT)
                             {
                                 c.CurrentHp = Math.Min(c.MaxHp, c.CurrentHp + eff.AmountPerTick);
+                                if (eff.ManaPerTick > 0)
+                                {
+                                    c.Mana = Math.Min(c.MaxMana, c.Mana + eff.ManaPerTick);
+                                    if (c.ManaBar.Maximum > 0) c.ManaBar.Value = c.Mana;
+                                }
                                 if (!string.IsNullOrEmpty(eff.SourceName))
                                     AppendLog($"{eff.SourceName} heals {c.Name} for {eff.AmountPerTick}.", eff.SourceIsPlayer, true);
                                 else
@@ -421,11 +426,14 @@ namespace WinFormsApp2
                                 int tick = eff.AmountPerTick;
                                 ApplyShieldReduction(c, ref tick);
                                 c.CurrentHp -= tick;
-                                AppendLog($"{c.Name} takes {tick} {eff.Kind.ToString().ToLower()} damage.", eff.SourceIsPlayer);
-                                if (c.CurrentHp <= 0 && _players.Contains(c) && !_deathCauses.ContainsKey(c.Name))
+                                if (c.CurrentHp <= 0)
                                 {
-                                    _deathCauses[c.Name] = $"{c.Name} succumbed to {eff.Kind}.";
+                                    if (!TryCheatDeath(c) && _players.Contains(c) && !_deathCauses.ContainsKey(c.Name))
+                                    {
+                                        _deathCauses[c.Name] = $"{c.Name} succumbed to {eff.Kind}.";
+                                    }
                                 }
+                                AppendLog($"{c.Name} takes {tick} {eff.Kind.ToString().ToLower()} damage.", eff.SourceIsPlayer);
                                 c.HpBar.Value = Math.Min(c.HpBar.Maximum, Math.Max(0, c.CurrentHp));
                                 eff.TimeUntilTickMs += eff.TickIntervalMs;
                             }
@@ -662,12 +670,22 @@ namespace WinFormsApp2
                         }
                         ApplyShieldReduction(o, ref damage);
                         ApplyManaShield(o, ref damage);
-                        o.CurrentHp -= damage;
-                        string spellLog = $"{actor.Name}'s {ability.Name} hits {o.Name} for {damage} damage!";
-                        if (o.CurrentHp <= 0 && _players.Contains(o) && !_deathCauses.ContainsKey(o.Name))
+                        if (actor.DrainManaFirst && o.Mana > 0)
                         {
-                            _deathCauses[o.Name] = spellLog;
+                            int drain = Math.Min(damage, o.Mana);
+                            o.Mana -= drain;
+                            if (o.ManaBar.Maximum > 0) o.ManaBar.Value = o.Mana;
+                            damage -= drain;
                         }
+                        o.CurrentHp -= damage;
+                        if (o.CurrentHp <= 0)
+                        {
+                            if (!TryCheatDeath(o) && _players.Contains(o) && !_deathCauses.ContainsKey(o.Name))
+                            {
+                                _deathCauses[o.Name] = $"{actor.Name}'s {ability.Name} hits {o.Name} for {damage} damage!"; 
+                            }
+                        }
+                        string spellLog = $"{actor.Name}'s {ability.Name} hits {o.Name} for {damage} damage!";
                         AppendLog(spellLog, actorIsPlayer);
                         actor.DamageDone += damage;
                         o.DamageTaken += damage;
@@ -697,15 +715,26 @@ namespace WinFormsApp2
                     }
                     ApplyShieldReduction(target, ref spellDamage);
                     ApplyManaShield(target, ref spellDamage);
+                    if (actor.DrainManaFirst && target.Mana > 0)
+                    {
+                        int drain = Math.Min(spellDamage, target.Mana);
+                        target.Mana -= drain;
+                        if (target.ManaBar.Maximum > 0) target.ManaBar.Value = target.Mana;
+                        spellDamage -= drain;
+                    }
                     target.CurrentHp -= spellDamage;
+                    if (target.CurrentHp <= 0)
+                    {
+                        if (!TryCheatDeath(target) && _players.Contains(target) && !_deathCauses.ContainsKey(target.Name))
+                        {
+                            _deathCauses[target.Name] = ability.Name == "Drain Life"
+                                ? $"{actor.Name} siphons {spellDamage} life from {target.Name}!"
+                                : $"{actor.Name}'s {ability.Name} hits {target.Name} for {spellDamage} damage!";
+                        }
+                    }
                     string spellLog = ability.Name == "Drain Life"
                         ? $"{actor.Name} siphons {spellDamage} life from {target.Name}!"
                         : $"{actor.Name}'s {ability.Name} hits {target.Name} for {spellDamage} damage!";
-
-                    if (target.CurrentHp <= 0 && _players.Contains(target) && !_deathCauses.ContainsKey(target.Name))
-                    {
-                        _deathCauses[target.Name] = spellLog;
-                    }
                     AppendLog(spellLog, actorIsPlayer);
                     if (ability.Name == "Drain Life")
                     {
@@ -762,12 +791,22 @@ namespace WinFormsApp2
                 double mult = 1.75 - missing;
                 dmg = (int)(dmg * mult);
             }
-            target.CurrentHp -= dmg;
-            string attackLog = GenerateAttackLog(actor, target, dmg);
-            if (target.CurrentHp <= 0 && _players.Contains(target) && !_deathCauses.ContainsKey(target.Name))
+            if (actor.DrainManaFirst && target.Mana > 0)
             {
-                _deathCauses[target.Name] = attackLog;
+                int drain = Math.Min(dmg, target.Mana);
+                target.Mana -= drain;
+                if (target.ManaBar.Maximum > 0) target.ManaBar.Value = target.Mana;
+                dmg -= drain;
             }
+            target.CurrentHp -= dmg;
+            if (target.CurrentHp <= 0)
+            {
+                if (!TryCheatDeath(target) && _players.Contains(target) && !_deathCauses.ContainsKey(target.Name))
+                {
+                    _deathCauses[target.Name] = GenerateAttackLog(actor, target, dmg);
+                }
+            }
+            string attackLog = GenerateAttackLog(actor, target, dmg);
             AppendLog(attackLog, _players.Contains(actor));
             actor.DamageDone += dmg;
             target.DamageTaken += dmg;
@@ -777,6 +816,21 @@ namespace WinFormsApp2
             target.CurrentTarget = actor;
             actor.CurrentTarget = target;
             AfterDamageDealt(actor, target, dmg);
+            if (target.RetaliateLowestStat && dmg > 0)
+            {
+                int low = Math.Min(target.Strength, Math.Min(target.Dex, target.Intelligence));
+                actor.CurrentHp -= low;
+                if (actor.CurrentHp <= 0)
+                {
+                    if (!TryCheatDeath(actor) && _players.Contains(actor) && !_deathCauses.ContainsKey(actor.Name))
+                    {
+                        _deathCauses[actor.Name] = $"{actor.Name} was slain by thorns.";
+                    }
+                }
+                actor.HpBar.Value = Math.Min(actor.HpBar.Maximum, Math.Max(0, actor.CurrentHp));
+                actor.DamageTaken += low;
+                AppendLog($"{actor.Name} suffers {low} retaliatory damage!", _players.Contains(target));
+            }
             if (ability.Name == "Shield Bash" && dmg > 0)
             {
                 int shield = (int)(dmg * 0.5);
@@ -938,6 +992,14 @@ namespace WinFormsApp2
 
         private void ApplyManaShield(Creature target, ref int dmg)
         {
+            if (target.ManaBarrierThreshold > 0 && dmg > 0 && target.Mana > target.MaxMana * target.ManaBarrierThreshold)
+            {
+                int excess = target.Mana - (int)(target.MaxMana * target.ManaBarrierThreshold);
+                int absorb = Math.Min(dmg, excess);
+                target.Mana -= absorb;
+                if (target.ManaBar.Maximum > 0) target.ManaBar.Value = target.Mana;
+                dmg -= absorb;
+            }
             if (target.ManaShield && dmg > 0 && target.Mana > 0)
             {
                 int absorb = Math.Min(target.Mana, dmg / 2);
@@ -945,6 +1007,23 @@ namespace WinFormsApp2
                 if (target.ManaBar.Maximum > 0) target.ManaBar.Value = target.Mana;
                 dmg -= absorb;
             }
+        }
+
+        private bool TryCheatDeath(Creature target)
+        {
+            if (target.CheatDeathTrinket != null)
+            {
+                target.CurrentHp = target.MaxHp;
+                target.Mana = target.MaxMana;
+                target.HpBar.Value = target.MaxHp;
+                if (target.ManaBar.Maximum > 0) target.ManaBar.Value = target.Mana;
+                InventoryService.RemoveItem(target.CheatDeathTrinket);
+                target.Equipment[EquipmentSlot.Trinket] = null;
+                AppendLog($"{target.Name} is revived by {target.CheatDeathTrinket.Name}!", _players.Contains(target), true);
+                target.CheatDeathTrinket = null;
+                return true;
+            }
+            return false;
         }
 
         private void AfterDamageDealt(Creature actor, Creature target, int dmg)
@@ -1233,7 +1312,7 @@ namespace WinFormsApp2
             double mult = min + _rng.NextDouble() * (max - min);
             double weaponDamage = Math.Max(1, statTotal * mult);
             int dmg = (int)Math.Max(1, weaponDamage - target.MeleeDefense);
-            double critChance = 0.05 + actor.Dex / 5 * 0.01 + critChanceBonus;
+            double critChance = 0.05 + actor.Dex / 5 * 0.01 + critChanceBonus + actor.CritChanceBonus;
             if (target.NoCrits) critChance = 0;
             if (actor.Passives.TryGetValue("Deadly Strikes", out int dsLvl))
             {
@@ -1241,8 +1320,9 @@ namespace WinFormsApp2
             }
             if (_rng.NextDouble() < Math.Min(1.0, critChance))
             {
-                dmg = (int)(dmg * (1.5 + critDamageBonus));
-                weaponDamage *= (1.5 + critDamageBonus);
+                double critMult = 1.5 + critDamageBonus + actor.CritDamageBonus;
+                dmg = (int)(dmg * critMult);
+                weaponDamage *= critMult;
             }
             if (actor.Passives.ContainsKey("Bloodlust"))
             {
@@ -1292,12 +1372,14 @@ namespace WinFormsApp2
 
             var idToCreature = _playerIds.ToDictionary(kv => kv.Value, kv => kv.Key);
 
-            string allClause = string.Join(",", ids.Select((_, i) => "@id" + i));
-            using (var updateCmd = new MySqlCommand($"UPDATE characters SET experience_points = experience_points + @exp WHERE id IN ({allClause})", conn))
+            var expIds = ids.Where(id => !idToCreature[id].ConvertExpToGold).ToList();
+            if (expIds.Count > 0)
             {
+                string allClause = string.Join(",", expIds.Select((_, i) => "@id" + i));
+                using var updateCmd = new MySqlCommand($"UPDATE characters SET experience_points = experience_points + @exp WHERE id IN ({allClause})", conn);
                 updateCmd.Parameters.AddWithValue("@exp", baseExp);
-                for (int i = 0; i < ids.Count; i++)
-                    updateCmd.Parameters.AddWithValue("@id" + i, ids[i]);
+                for (int i = 0; i < expIds.Count; i++)
+                    updateCmd.Parameters.AddWithValue("@id" + i, expIds[i]);
                 updateCmd.ExecuteNonQuery();
             }
 
@@ -1306,11 +1388,15 @@ namespace WinFormsApp2
             {
                 var ordered = ids.OrderByDescending(id => idToCreature[id].Level).Take(remainder).ToList();
                 bonusIds.AddRange(ordered);
-                string bonusClause = string.Join(",", bonusIds.Select((id, i) => "@bid" + i));
-                using var bonusCmd = new MySqlCommand($"UPDATE characters SET experience_points = experience_points + 1 WHERE id IN ({bonusClause})", conn);
-                for (int i = 0; i < bonusIds.Count; i++)
-                    bonusCmd.Parameters.AddWithValue("@bid" + i, bonusIds[i]);
-                bonusCmd.ExecuteNonQuery();
+                var bonusExpIds = ordered.Where(id => !idToCreature[id].ConvertExpToGold).ToList();
+                if (bonusExpIds.Count > 0)
+                {
+                    string bonusClause = string.Join(",", bonusExpIds.Select((id, i) => "@bid" + i));
+                    using var bonusCmd = new MySqlCommand($"UPDATE characters SET experience_points = experience_points + 1 WHERE id IN ({bonusClause})", conn);
+                    for (int i = 0; i < bonusExpIds.Count; i++)
+                        bonusCmd.Parameters.AddWithValue("@bid" + i, bonusExpIds[i]);
+                    bonusCmd.ExecuteNonQuery();
+                }
             }
 
             var mercGains = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -1318,7 +1404,14 @@ namespace WinFormsApp2
             {
                 var c = idToCreature[id];
                 int gain = baseExp + (bonusIds.Contains(id) ? 1 : 0);
-                if (_mercenaryIds.Contains(id))
+                if (c.ConvertExpToGold)
+                {
+                    using var goldCmd = new MySqlCommand("UPDATE users SET gold = gold + @g WHERE id=@uid", conn);
+                    goldCmd.Parameters.AddWithValue("@g", gain);
+                    goldCmd.Parameters.AddWithValue("@uid", _userId);
+                    goldCmd.ExecuteNonQuery();
+                }
+                else if (_mercenaryIds.Contains(id))
                     mercGains[c.Name] = gain;
             }
             if (mercGains.Count > 0)
@@ -1395,6 +1488,13 @@ namespace WinFormsApp2
             public double SpellManaLeechPercent { get; set; } = 0.0;
             public double AttackIntBonusMultiplier { get; set; } = 0.0;
             public int AttackFlatBonus { get; set; } = 0;
+            public double CritChanceBonus { get; set; } = 0.0;
+            public double CritDamageBonus { get; set; } = 0.0;
+            public double ManaBarrierThreshold { get; set; } = 0.0;
+            public bool ConvertExpToGold { get; set; }
+            public Trinket? CheatDeathTrinket { get; set; }
+            public bool RetaliateLowestStat { get; set; }
+            public bool DrainManaFirst { get; set; }
 
             public Weapon? GetWeapon()
             {
@@ -1415,6 +1515,7 @@ namespace WinFormsApp2
             public int AmountPerTick { get; set; }
             public bool SourceIsPlayer { get; set; }
             public string? SourceName { get; set; }
+            public int ManaPerTick { get; set; }
         }
 
 
@@ -1501,6 +1602,100 @@ namespace WinFormsApp2
                         case "Magic Defense":
                             c.MagicDefense = (int)(c.MagicDefense * (1 + kv.Value / 100.0));
                             break;
+                    }
+                }
+                if (item is Trinket tr)
+                {
+                    foreach (var ev in tr.Effects)
+                    {
+                        switch (ev.Key)
+                        {
+                            case "max_hp_pct":
+                                c.MaxHp = (int)(c.MaxHp * (1 + ev.Value / 100.0));
+                                c.CurrentHp = (int)(c.CurrentHp * (1 + ev.Value / 100.0));
+                                break;
+                            case "max_mana_pct":
+                                c.MaxMana = (int)(c.MaxMana * (1 + ev.Value / 100.0));
+                                c.Mana = (int)(c.Mana * (1 + ev.Value / 100.0));
+                                break;
+                            case "damage_dealt_pct":
+                                c.DamageDealtMultiplier *= 1 + ev.Value / 100.0;
+                                c.SpellDamageMultiplier *= 1 + ev.Value / 100.0;
+                                break;
+                            case "ability_damage_per5_lowest_stat_pct":
+                                int low = Math.Min(c.Strength, Math.Min(c.Dex, c.Intelligence));
+                                int bonus = (low / 5) * (int)ev.Value;
+                                c.SpellDamageMultiplier *= 1 + bonus / 100.0;
+                                break;
+                            case "auto_attack_damage_per5_lowest_stat_pct":
+                                int low2 = Math.Min(c.Strength, Math.Min(c.Dex, c.Intelligence));
+                                int bonus2 = (low2 / 5) * (int)ev.Value;
+                                c.DamageDealtMultiplier *= 1 + bonus2 / 100.0;
+                                break;
+                            case "convert_exp_to_gold":
+                                c.ConvertExpToGold = true;
+                                break;
+                            case "cheat_death":
+                                c.CheatDeathTrinket = tr;
+                                break;
+                            case "combat_regen_pct":
+                                int amt = (int)(c.MaxHp * (ev.Value / 100.0));
+                                int manaAmt = amt;
+                                double sec = tr.Effects.ContainsKey("combat_regen_interval_sec") ? tr.Effects["combat_regen_interval_sec"] : 3;
+                                int interval = (int)(sec * 1000);
+                                c.Effects.Add(new StatusEffect { Kind = EffectKind.HoT, RemainingMs = int.MaxValue, TickIntervalMs = interval, TimeUntilTickMs = interval, AmountPerTick = amt, ManaPerTick = manaAmt, SourceIsPlayer = _players.Contains(c) });
+                                break;
+                            case "mana_shield_threshold_pct":
+                                c.ManaBarrierThreshold = ev.Value / 100.0;
+                                break;
+                            case "retaliate_lowest_stat":
+                                c.RetaliateLowestStat = true;
+                                break;
+                            case "crit_chance_pct":
+                                c.CritChanceBonus += ev.Value / 100.0;
+                                break;
+                            case "crit_damage_pct":
+                                c.CritDamageBonus += ev.Value / 100.0;
+                                break;
+                            case "tank_health_defense_pct":
+                                if (c.Role.Equals("Tank", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    double mult = 1 + ev.Value / 100.0;
+                                    c.MaxHp = (int)(c.MaxHp * mult);
+                                    c.CurrentHp = (int)(c.CurrentHp * mult);
+                                    c.MeleeDefense = (int)(c.MeleeDefense * mult);
+                                    c.MagicDefense = (int)(c.MagicDefense * mult);
+                                }
+                                break;
+                            case "dps_damage_pct":
+                                if (c.Role.Equals("DPS", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    c.DamageDealtMultiplier *= 1 + ev.Value / 100.0;
+                                    c.SpellDamageMultiplier *= 1 + ev.Value / 100.0;
+                                }
+                                break;
+                            case "healer_healing_pct":
+                                if (c.Role.Equals("Healer", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    c.HealingDealtMultiplier *= 1 + ev.Value / 100.0;
+                                }
+                                break;
+                            case "damage_pct":
+                                c.DamageDealtMultiplier *= 1 + ev.Value / 100.0;
+                                c.SpellDamageMultiplier *= 1 + ev.Value / 100.0;
+                                break;
+                            case "drain_mana_first":
+                                c.DrainManaFirst = true;
+                                break;
+                            case "damage_healing_pct":
+                                c.DamageDealtMultiplier *= 1 + ev.Value / 100.0;
+                                c.SpellDamageMultiplier *= 1 + ev.Value / 100.0;
+                                c.HealingDealtMultiplier *= 1 + ev.Value / 100.0;
+                                break;
+                            case "action_speed_pct":
+                                c.AttackSpeedMultiplier *= 1 + ev.Value / 100.0;
+                                break;
+                        }
                     }
                 }
             }
