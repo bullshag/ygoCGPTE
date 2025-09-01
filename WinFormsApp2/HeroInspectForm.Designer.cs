@@ -163,14 +163,14 @@ namespace WinFormsApp2
             // 
             // cmbHead
             // 
-            cmbHead.Location = new Point(88, 438);
+            cmbHead.Location = new Point(90, 409);
             cmbHead.Name = "cmbHead";
             cmbHead.Size = new Size(121, 23);
             cmbHead.TabIndex = 2;
             // 
             // cmbTrinket
             // 
-            cmbTrinket.Location = new Point(88, 409);
+            cmbTrinket.Location = new Point(90, 438);
             cmbTrinket.Name = "cmbTrinket";
             cmbTrinket.Size = new Size(121, 23);
             cmbTrinket.TabIndex = 1;
@@ -236,17 +236,17 @@ namespace WinFormsApp2
             // 
             label5.AutoSize = true;
             label5.Font = new Font("Tahoma", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label5.Location = new Point(38, 412);
+            label5.Location = new Point(40, 441);
             label5.Name = "label5";
-            label5.Size = new Size(46, 14);
+            label5.Size = new Size(50, 14);
             label5.TabIndex = 21;
-            label5.Text = "Gloves";
+            label5.Text = "Trinket";
             // 
             // label6
             // 
             label6.AutoSize = true;
             label6.Font = new Font("Tahoma", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label6.Location = new Point(34, 441);
+            label6.Location = new Point(36, 412);
             label6.Name = "label6";
             label6.Size = new Size(50, 14);
             label6.TabIndex = 22;
