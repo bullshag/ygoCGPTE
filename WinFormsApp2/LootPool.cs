@@ -13,6 +13,28 @@ namespace WinFormsApp2
             kv => CreateRegionalPool(kv.Value)
         );
 
+        private static readonly List<string> _baseItems = new()
+        {
+            "Cloth Robe",
+            "Leather Armor",
+            "Leather Cap",
+            "Leather Boots",
+            "Plate Armor",
+            "Heavy Shield",
+            "Shortsword",
+            "Dagger",
+            "Bow",
+            "Longsword",
+            "Staff",
+            "Wand",
+            "Rod",
+            "Greataxe",
+            "Scythe",
+            "Greatsword",
+            "Mace",
+            "Greatmaul"
+        };
+
         private static List<string> CreateRegionalPool(string regionDisplay)
         {
             var items = new List<string>();
@@ -41,7 +63,7 @@ namespace WinFormsApp2
             if (_shopStocks.TryGetValue(nodeId, out var stock))
                 return stock;
 
-            var pool = GetPool(nodeId);
+            var pool = _baseItems;
             if (!_usedItems.TryGetValue(nodeId, out var used))
                 _usedItems[nodeId] = used = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
