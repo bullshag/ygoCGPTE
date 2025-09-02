@@ -148,16 +148,15 @@ namespace WinFormsApp2
             int areaMin = _areaMinPower ?? 1;
             int areaMax = _areaMaxPower ?? int.MaxValue;
 
-            int minTotal = (int)Math.Ceiling(playerPower * 0.8);
-            int maxTotal = _wildEncounter ? (int)Math.Ceiling(playerPower * 1.0)
-                                          : (int)Math.Ceiling(playerPower * 1.2);
-            if (playerPower < areaMin)
-            {
-                int tough = (int)Math.Ceiling(areaMin * 1.2);
-                minTotal = maxTotal = tough;
-            }
+            int effectivePlayerPower = playerPower;
+            if (playerPower < areaMin && _areaMaxPower.HasValue)
+                effectivePlayerPower = areaMax;
 
-            int targetAvg = playerPower < areaMin ? areaMin : avgPower;
+            int minTotal = (int)Math.Ceiling(effectivePlayerPower * 0.8);
+            int maxTotal = _wildEncounter ? (int)Math.Ceiling(effectivePlayerPower * 1.0)
+                                          : (int)Math.Ceiling(effectivePlayerPower * 1.2);
+
+            int targetAvg = playerPower < areaMin && _areaMaxPower.HasValue ? areaMax : avgPower;
 
             // NPC party power ranges from roughly 60% to 100% of the party's average party power,
             // while still respecting any area power restrictions.
