@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
+using Microsoft.VisualBasic;
 
 namespace WinFormsApp2
 {
@@ -25,6 +26,7 @@ namespace WinFormsApp2
             Load += ShopForm_Load;
             _lstShop.HorizontalScrollbar = true;
             _lstInventory.HorizontalScrollbar = true;
+            _lstInventory.SelectionMode = SelectionMode.MultiExtended;
             _lstShop.DrawMode = DrawMode.OwnerDrawVariable;
             _lstShop.DrawItem += LstShop_DrawItem;
             _lstShop.MeasureItem += LstShop_MeasureItem;
@@ -155,17 +157,42 @@ namespace WinFormsApp2
 
         private void BtnSell_Click(object? sender, EventArgs e)
         {
-            int index = _lstInventory.SelectedIndex;
-            if (index < 0 || index >= InventoryService.Items.Count) return;
-            var inv = InventoryService.Items[index];
-            int value = inv.Item is ArenaCoin ? 200 : (int)(inv.Item.Price * 0.45);
+            if (_lstInventory.SelectedIndices.Count == 0) return;
+
+            var sales = new List<(Item item, int qty)>();
+            var indices = _lstInventory.SelectedIndices.Cast<int>().ToArray();
+            foreach (int idx in indices)
+            {
+                if (idx < 0 || idx >= InventoryService.Items.Count) continue;
+                var inv = InventoryService.Items[idx];
+                int qtyToSell = 1;
+                if (inv.Item.Stackable && inv.Quantity > 1)
+                {
+                    string input = Interaction.InputBox($"How many {inv.Item.Name} (max {inv.Quantity}) would you like to sell?", "Sell Item", "1");
+                    if (!int.TryParse(input, out qtyToSell) || qtyToSell < 1 || qtyToSell > inv.Quantity)
+                    {
+                        MessageBox.Show("Invalid quantity.");
+                        return;
+                    }
+                }
+                sales.Add((inv.Item, qtyToSell));
+            }
+
+            int totalGold = 0;
+            foreach (var sale in sales)
+            {
+                int valuePer = sale.item is ArenaCoin ? 200 : (int)(sale.item.Price * 0.45);
+                totalGold += valuePer * sale.qty;
+                InventoryService.RemoveItem(sale.item, sale.qty);
+            }
+
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
             using MySqlCommand cmd = new MySqlCommand("UPDATE users SET gold = gold + @amt WHERE id=@id", conn);
-            cmd.Parameters.AddWithValue("@amt", value);
+            cmd.Parameters.AddWithValue("@amt", totalGold);
             cmd.Parameters.AddWithValue("@id", _userId);
             cmd.ExecuteNonQuery();
-            InventoryService.RemoveItem(inv.Item);
+
             RefreshGold();
             RefreshInventory();
         }
