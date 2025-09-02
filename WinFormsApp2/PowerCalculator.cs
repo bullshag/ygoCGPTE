@@ -33,6 +33,7 @@ namespace WinFormsApp2
         public static int CalculatePower(int level, int equipmentCost, int abilityCount)
         {
             return (int)Math.Ceiling((level + equipmentCost + 3 * abilityCount) * 0.15);
+
         }
     }
 }
