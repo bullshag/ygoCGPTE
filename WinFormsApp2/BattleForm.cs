@@ -899,17 +899,18 @@ namespace WinFormsApp2
                 "Regenerate" => $"{actor.Name} calls forth rejuvenating winds around {target.Name}!",
                 "Rejuvenate" => $"{actor.Name} bathes {target.Name} in rejuvenating energy!",
                 "Heal" => $"{actor.Name} channels soothing light into {target.Name}!",
-                "Stone Skin" => $"{actor.Name} hardens {target.Name}'s skin like stone!",
+                "Stone Skin" => $"{actor.Name} hardens {target.Name}'s skin like stone, reducing damage taken!",
                 "Taunting Blows" => $"{actor.Name} bellows a challenge, daring foes to attack!",
                 "Shield Bash" => $"{actor.Name} slams their shield into {target.Name}!",
                 "Poison Arrow" => $"{actor.Name} fires a venom-tipped arrow at {target.Name}!",
                 "Cleanse" => $"{actor.Name} purges foul magic from {target.Name}!",
-                "Berserk" => $"{actor.Name} enters a berserk fury!",
+                "Berserk" => $"{actor.Name} enters a berserk fury, increasing damage!",
                 "Drain Life" => $"{actor.Name} siphons vitality from {target.Name}!",
-                "Vanish" => $"{actor.Name} melts into the shadows!",
-                "Arcane Shield" => $"{actor.Name} conjures a shimmering shield around {target.Name}!",
-                "Guardian Ward" => $"{actor.Name} forms a guardian ward around the party!",
-                "Divine Aegis" => $"{actor.Name} blesses {target.Name} with a divine aegis!",
+                "Vanish" => $"{actor.Name} melts into the shadows, avoiding attacks!",
+                "Arcane Shield" => $"{actor.Name} conjures a shimmering shield around {target.Name}, absorbing damage!",
+                "Guardian Ward" => $"{actor.Name} forms a guardian ward that absorbs damage for the party!",
+                "Divine Aegis" => $"{actor.Name} blesses {target.Name} with a divine aegis that absorbs damage!",
+                "Fortify" => $"{actor.Name} fortifies {target.Name} with a protective shield!",
                 _ => $"{actor.Name} uses {ability.Name} on {target.Name}!"
             };
         }
@@ -1197,6 +1198,7 @@ namespace WinFormsApp2
                 return actor.ForcedTarget;
             var alive = opponents.Where(o => o.CurrentHp > 0 && !o.IsVanished).ToList();
             if (!alive.Any()) return null;
+            bool actorIsPlayer = _players.Contains(actor);
             switch (actor.Role)
             {
                 case "Tank":
@@ -1208,9 +1210,9 @@ namespace WinFormsApp2
                             return alive.OrderBy(o => o.Strength).First();
                         case "prioritize targets that arent attack you":
                             var notOnMe = alive.Where(o => o.CurrentTarget != actor).ToList();
-                            return notOnMe.Any() ? notOnMe[_rng.Next(notOnMe.Count)] : alive[_rng.Next(alive.Count)];
+                            return notOnMe.Any() ? ChooseRandomTarget(notOnMe, actorIsPlayer) : ChooseRandomTarget(alive, actorIsPlayer);
                         default:
-                            return alive[_rng.Next(alive.Count)];
+                            return ChooseRandomTarget(alive, actorIsPlayer);
                     }
                 case "DPS":
                     switch (actor.TargetingStyle)
@@ -1221,17 +1223,31 @@ namespace WinFormsApp2
                             break;
                         case "prioritize targets attacking you":
                             var atkMe = alive.Where(o => o.CurrentTarget == actor).ToList();
-                            if (atkMe.Any()) return atkMe[_rng.Next(atkMe.Count)];
+                            if (atkMe.Any()) return ChooseRandomTarget(atkMe, actorIsPlayer);
                             break;
+        
                         case "prioritize targets that attack non-tanks":
                             var atkNonTank = alive.Where(o => o.CurrentTarget != null && o.CurrentTarget.Role != "Tank").ToList();
-                            if (atkNonTank.Any()) return atkNonTank[_rng.Next(atkNonTank.Count)];
+                            if (atkNonTank.Any()) return ChooseRandomTarget(atkNonTank, actorIsPlayer);
                             break;
                     }
-                    return alive[_rng.Next(alive.Count)];
+                    return ChooseRandomTarget(alive, actorIsPlayer);
                 default:
-                    return alive[_rng.Next(alive.Count)];
+                    return ChooseRandomTarget(alive, actorIsPlayer);
             }
+        }
+
+        private Creature ChooseRandomTarget(List<Creature> candidates, bool actorIsPlayer)
+        {
+            if (actorIsPlayer)
+                return candidates[_rng.Next(candidates.Count)];
+            var weighted = new List<Creature>();
+            foreach (var c in candidates)
+            {
+                weighted.Add(c);
+                if (c.Role == "Tank") weighted.Add(c);
+            }
+            return weighted[_rng.Next(weighted.Count)];
         }
 
         private Ability ChooseAbility(Creature actor)
