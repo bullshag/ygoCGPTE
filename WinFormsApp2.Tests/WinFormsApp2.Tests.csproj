@@ -30,4 +30,8 @@
     <ProjectReference Include="../WinFormsApp2/BattleLands.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\WinFormsApp2\LootService.Probability.cs" Link="LootService.Probability.cs" />
+  </ItemGroup>
+
 </Project>
