@@ -267,7 +267,7 @@ namespace WinFormsApp2
             {
                 (min, max) = GetDarkSpireBracket();
             }
-            var battle = new BattleForm(_accountId, areaMinLevel: min, areaMaxLevel: max, darkSpireBattle: darkSpire, areaId: _currentNode);
+            var battle = new BattleForm(_accountId, areaMinPower: min, areaMaxPower: max, darkSpireBattle: darkSpire, areaId: _currentNode);
             if (sender is Button btn) btn.Enabled = false;
             battle.FormClosed += (_, __) =>
             {
