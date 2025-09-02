@@ -178,9 +178,18 @@ namespace WinFormsApp2
 
             Creature? AddNpc(int minLevel, int maxLevel)
             {
-                using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM npcs WHERE level BETWEEN @minLevel AND @maxLevel ORDER BY RAND() LIMIT 1", conn);
+                using var countCmd = new MySqlCommand("SELECT COUNT(*) FROM npcs WHERE level BETWEEN @minLevel AND @maxLevel", conn);
+                countCmd.Parameters.AddWithValue("@minLevel", minLevel);
+                countCmd.Parameters.AddWithValue("@maxLevel", maxLevel);
+                var countObj = countCmd.ExecuteScalar();
+                int count = Convert.ToInt32(countObj);
+                if (count == 0)
+                    return null;
+                int offset = _rng.Next(count);
+                using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM npcs WHERE level BETWEEN @minLevel AND @maxLevel LIMIT 1 OFFSET @offset", conn);
                 npcCmd.Parameters.AddWithValue("@minLevel", minLevel);
                 npcCmd.Parameters.AddWithValue("@maxLevel", maxLevel);
+                npcCmd.Parameters.AddWithValue("@offset", offset);
                 using var r2 = npcCmd.ExecuteReader();
                 if (r2.Read())
                 {
@@ -197,7 +206,6 @@ namespace WinFormsApp2
                     int magicDef = r2.GetInt32("magic_defense");
                     string role = r2.GetString("role");
                     string style = r2.GetString("targeting_style");
-                    r2.Close();
                     var npc = new Creature
                     {
                         Name = name,
