@@ -229,7 +229,7 @@ namespace WinFormsApp2
                     TargetingStyle = style
                 };
 
-                foreach (var kv in InventoryService.GetNpcEquipment(name))
+                foreach (var kv in InventoryService.GetNpcEquipment(name, level))
                     npc.Equipment[kv.Key] = kv.Value;
                 ApplyEquipmentBonuses(npc);
 
