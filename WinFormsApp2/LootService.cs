@@ -45,6 +45,13 @@ namespace WinFormsApp2
             }
             conn.Close();
 
+            if (_rng.NextDouble() <= 0.03)
+            {
+                string? trinket = GetRandomTrinket();
+                if (trinket != null)
+                    drops[trinket] = drops.GetValueOrDefault(trinket) + 1;
+            }
+
             // chance to drop additional loot from global pool
             Item? bonusLoot = LootPool.GetEnemyLoot(areaId);
             if (bonusLoot != null)
@@ -76,6 +83,30 @@ namespace WinFormsApp2
                 }
             }
             return drops;
+        }
+
+        private static string? GetRandomTrinket()
+        {
+            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            using MySqlCommand cmd = new MySqlCommand("SELECT name, drop_chance FROM trinkets", conn);
+            using var r = cmd.ExecuteReader();
+            var trinkets = new List<(string name, double chance)>();
+            while (r.Read())
+            {
+                trinkets.Add((r.GetString("name"), r.GetDouble("drop_chance")));
+            }
+            if (trinkets.Count == 0) return null;
+            double total = trinkets.Sum(t => t.chance);
+            double roll = _rng.NextDouble() * total;
+            double cumulative = 0;
+            foreach (var t in trinkets)
+            {
+                cumulative += t.chance;
+                if (roll <= cumulative)
+                    return t.name;
+            }
+            return trinkets[trinkets.Count - 1].name;
         }
 
         private static Rarity RollRarity()
