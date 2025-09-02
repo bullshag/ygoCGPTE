@@ -105,6 +105,13 @@ namespace WinFormsApp2
             btnGraveyard.Enabled = activities.Any(a => a.StartsWith("Graveyard"));
             btnTavern.Enabled = activities.Any(a => a.Contains("Tavern"));
             btnFindEnemies.Enabled = node.MinEnemyLevel.HasValue;
+            btnFindEnemies.Text = "Search for Enemies";
+            if (id == "nodeDarkSpire")
+            {
+                var (dsMin, _) = GetDarkSpireBracket();
+                int floor = (dsMin - 1) / 5 + 1;
+                btnFindEnemies.Text = $"Search for Enemies (Floor {floor})";
+            }
             btnArena.Enabled = activities.Any(a => a.Contains("Battle Arena"));
             btnTemple.Enabled = activities.Any(a => a.Contains("Temple"));
             lstConnections.Items.Clear();
@@ -127,6 +134,10 @@ namespace WinFormsApp2
             if (!node.MinEnemyLevel.HasValue) return;
             int min = node.MinEnemyLevel.Value;
             int max = node.MaxEnemyLevel ?? int.MaxValue;
+            if (_currentNode == "nodeDarkSpire")
+            {
+                (min, max) = GetDarkSpireBracket();
+            }
             foreach (var info in EnemyKnowledgeService.GetEnemiesForArea(min, max))
             {
                 int kills = EnemyKnowledgeService.GetKillCount(_accountId, info.Name);
