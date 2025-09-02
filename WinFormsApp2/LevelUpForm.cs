@@ -63,6 +63,10 @@ namespace WinFormsApp2
                     numStr.Value = _baseStr;
                     numDex.Value = _baseDex;
                     numInt.Value = _baseInt;
+                    // Prevent lowering stats below their original values
+                    numStr.Minimum = _baseStr;
+                    numDex.Minimum = _baseDex;
+                    numInt.Minimum = _baseInt;
                     lblPoints.Text = $"Points: {_availablePoints}";
                 }
             }
@@ -96,6 +100,12 @@ namespace WinFormsApp2
         private void StatsChanged(object? sender, EventArgs e)
         {
             int spent = (int)((numStr.Value - _baseStr) + (numDex.Value - _baseDex) + (numInt.Value - _baseInt));
+            if (spent < 0)
+            {
+                var control = (NumericUpDown)sender!;
+                control.Value += -spent;
+                spent = 0;
+            }
             if (spent > _availablePoints)
             {
                 var control = (NumericUpDown)sender!;
