@@ -157,8 +157,8 @@ namespace WinFormsApp2
 
             int targetAvg = totalLevel < areaMin ? areaMin : avgLevel;
 
-            // NPC levels range from roughly 60% to 100% of the party's average level,
-            // while still respecting any area-level restrictions.
+            // NPC party power ranges from roughly 60% to 100% of the party's average party power,
+            // while still respecting any area power restrictions.
             int perNpcMin = (int)(avgLevel * 0.8);
             int perNpcMax = (int)(avgLevel * 1.2);
             if (_areaMinLevel.HasValue)
