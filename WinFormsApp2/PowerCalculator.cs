@@ -5,6 +5,7 @@ namespace WinFormsApp2
 {
     public static class PowerCalculator
     {
+
         public static int CalculateNpcPower(MySqlConnection conn, string npcName, int level)
         {
             int equipCost = 0;
@@ -21,6 +22,7 @@ namespace WinFormsApp2
             }
 
             int abilityCount;
+
             using (var abilCmd = new MySqlCommand("SELECT COUNT(*) FROM npc_abilities WHERE npc_name=@n", conn))
             {
                 abilCmd.Parameters.AddWithValue("@n", npcName);
