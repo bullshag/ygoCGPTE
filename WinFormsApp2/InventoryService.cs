@@ -138,17 +138,17 @@ namespace WinFormsApp2
             }
             if (name.StartsWith("Tome: "))
             {
-                string abilityName = name[6..];
+                string tomeAbility = name[6..];
                 using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
                 conn.Open();
                 using MySqlCommand cmd = new MySqlCommand("SELECT id, description FROM abilities WHERE name=@n", conn);
-                cmd.Parameters.AddWithValue("@n", abilityName);
+                cmd.Parameters.AddWithValue("@n", tomeAbility);
                 using var r = cmd.ExecuteReader();
                 if (r.Read())
                 {
                     int id = r.GetInt32("id");
                     string desc = r.GetString("description");
-                    return new AbilityTome(id, abilityName, desc);
+                    return new AbilityTome(id, tomeAbility, desc);
                 }
             }
             using (MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString))
