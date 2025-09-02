@@ -421,7 +421,7 @@ namespace WinFormsApp2
                                 else
                                     AppendLog($"{c.Name} is healed for {eff.AmountPerTick}.", eff.SourceIsPlayer, true);
                             }
-                            else if (eff.Kind != EffectKind.Shield)
+                            else if (eff.Kind == EffectKind.Bleed || eff.Kind == EffectKind.Poison)
                             {
                                 int tick = eff.AmountPerTick;
                                 ApplyShieldReduction(c, ref tick);
@@ -446,6 +446,11 @@ namespace WinFormsApp2
                                 c.ShieldBar.Visible = false;
                                 c.ShieldBar.Value = 0;
                                 c.ShieldBar.Maximum = 1;
+                            }
+                            else if (eff.Kind == EffectKind.DamageDown)
+                            {
+                                double factor = 1 - eff.AmountPerTick / 100.0;
+                                c.DamageDealtMultiplier /= factor;
                             }
                         }
                     }
@@ -543,6 +548,7 @@ namespace WinFormsApp2
                 AppendLog(GenerateAbilityLog(actor, target, ability), actorIsPlayer, isHealAbility);
                 if (ability.Name == "Bleed") ApplyBleed(actor, target);
                 else if (ability.Name == "Poison") ApplyPoison(actor, target);
+                else if (ability.Name == "Curse") { ApplyCurse(actor, target); actor.AttackBar.Value = actor.AttackInterval; CheckEnd(); return; }
                 else if (ability.Name == "Regenerate") { ApplyHot(actor, target); CheckEnd(); return; }
                 else if (ability.Name == "Rejuvenate") { ApplyRejuvenate(actor, target); CheckEnd(); return; }
                 else if (ability.Name == "Heal")
@@ -889,6 +895,7 @@ namespace WinFormsApp2
                 "Holy Light" => $"{actor.Name} bathes {target.Name} in holy light!",
                 "Bleed" => $"{actor.Name} rends {target.Name}, drawing rivers of blood!",
                 "Poison" => $"{actor.Name} envenoms {target.Name} with a vile toxin!",
+                "Curse" => $"{actor.Name} curses {target.Name}, sapping their strength!",
                 "Regenerate" => $"{actor.Name} calls forth rejuvenating winds around {target.Name}!",
                 "Rejuvenate" => $"{actor.Name} bathes {target.Name} in rejuvenating energy!",
                 "Heal" => $"{actor.Name} channels soothing light into {target.Name}!",
@@ -918,6 +925,14 @@ namespace WinFormsApp2
             int amt = (int)Math.Max(1, 1 + actor.Dex * 0.35);
             int duration = actor.PoisonMastery ? 9000 : 6000;
             target.Effects.Add(new StatusEffect { Kind = EffectKind.Poison, RemainingMs = duration, TickIntervalMs = 1000, TimeUntilTickMs = 1000, AmountPerTick = amt, SourceIsPlayer = _players.Contains(actor) });
+        }
+
+        private void ApplyCurse(Creature actor, Creature target)
+        {
+            int percent = 10 + actor.Intelligence / 20;
+            double factor = 1 - percent / 100.0;
+            target.DamageDealtMultiplier *= factor;
+            target.Effects.Add(new StatusEffect { Kind = EffectKind.DamageDown, RemainingMs = 10000, TickIntervalMs = int.MaxValue, TimeUntilTickMs = int.MaxValue, AmountPerTick = percent, SourceIsPlayer = _players.Contains(actor) });
         }
 
         private void ApplyHot(Creature actor, Creature target)
@@ -1509,7 +1524,7 @@ namespace WinFormsApp2
             }
         }
 
-        private enum EffectKind { Bleed, Poison, HoT, Shield }
+        private enum EffectKind { Bleed, Poison, HoT, Shield, DamageDown }
 
         private class StatusEffect
         {
