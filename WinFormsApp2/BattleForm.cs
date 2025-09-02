@@ -568,7 +568,7 @@ namespace WinFormsApp2
                 else if (ability.Name == "Rejuvenate") { ApplyRejuvenate(actor, target); CheckEnd(); return; }
                 else if (ability.Name == "Heal")
                 {
-                    int healAmt = (int)Math.Max(1, (5 + actor.Intelligence * 1.2) * actor.HealingDealtMultiplier);
+                    int healAmt = (int)Math.Max(1, (5 + actor.Level + actor.Intelligence * 1.2) * actor.HealingDealtMultiplier);
                     healAmt = (int)(healAmt * target.HealingReceivedMultiplier);
                     target.CurrentHp = Math.Min(target.MaxHp, target.CurrentHp + healAmt);
                     target.HpBar.Value = Math.Min(target.MaxHp, target.CurrentHp);
@@ -580,7 +580,7 @@ namespace WinFormsApp2
                 }
                 else if (ability.Name == "Healing Wave")
                 {
-                    int healAmt = (int)Math.Max(1, (4 + actor.Intelligence * 1.0) * actor.HealingDealtMultiplier);
+                    int healAmt = (int)Math.Max(1, (4 + actor.Level + actor.Intelligence * 1.0) * actor.HealingDealtMultiplier);
                     foreach (var ally in allies.Where(a => a.CurrentHp > 0))
                     {
                         int final = (int)(healAmt * ally.HealingReceivedMultiplier);
@@ -595,7 +595,7 @@ namespace WinFormsApp2
                 }
                 else if (ability.Name == "Chain Heal")
                 {
-                    int healAmt = (int)Math.Max(1, (5 + actor.Intelligence * 1.0) * actor.HealingDealtMultiplier);
+                    int healAmt = (int)Math.Max(1, (5 + actor.Level + actor.Intelligence * 1.0) * actor.HealingDealtMultiplier);
                     healAmt = (int)(healAmt * target.HealingReceivedMultiplier);
                     target.CurrentHp = Math.Min(target.MaxHp, target.CurrentHp + healAmt);
                     target.HpBar.Value = Math.Min(target.MaxHp, target.CurrentHp);
@@ -615,7 +615,7 @@ namespace WinFormsApp2
                 }
                 else if (ability.Name == "Prayer of Healing")
                 {
-                    int healAmt = (int)Math.Max(1, (6 + actor.Intelligence * 0.8) * actor.HealingDealtMultiplier);
+                    int healAmt = (int)Math.Max(1, (6 + actor.Level + actor.Intelligence * 0.8) * actor.HealingDealtMultiplier);
                     foreach (var ally in allies.Where(a => a.CurrentHp > 0))
                     {
                         int final = (int)(healAmt * ally.HealingReceivedMultiplier);
@@ -629,7 +629,7 @@ namespace WinFormsApp2
                 }
                 else if (ability.Name == "Holy Light")
                 {
-                    int healAmt = (int)Math.Max(1, (8 + actor.Intelligence * 1.5) * actor.HealingDealtMultiplier);
+                    int healAmt = (int)Math.Max(1, (8 + actor.Level + actor.Intelligence * 1.5) * actor.HealingDealtMultiplier);
                     healAmt = (int)(healAmt * target.HealingReceivedMultiplier);
                     target.CurrentHp = Math.Min(target.MaxHp, target.CurrentHp + healAmt);
                     target.HpBar.Value = Math.Min(target.MaxHp, target.CurrentHp);
@@ -795,7 +795,8 @@ namespace WinFormsApp2
                 }
             }
 
-            int dmg = CalculateDamage(actor, target);
+            bool isAbilityAttack = ability.Name != "-basic attack-";
+            int dmg = CalculateDamage(actor, target, isAbilityAttack);
             if (target.DamageReductionCurrent > 0)
             {
                 dmg = (int)(dmg * (1 - target.DamageReductionCurrent));
@@ -1361,7 +1362,7 @@ namespace WinFormsApp2
             }
         }
 
-        private int CalculateDamage(Creature actor, Creature target)
+        private int CalculateDamage(Creature actor, Creature target, bool isAbility = false)
         {
             var weapon = actor.GetWeapon();
             double statTotal = actor.Strength * 0.3 + actor.Dex * 0.3;
@@ -1399,6 +1400,7 @@ namespace WinFormsApp2
             dmg += actor.AttackFlatBonus + (int)(actor.Intelligence * actor.AttackIntBonusMultiplier);
             dmg = (int)(dmg * actor.DamageDealtMultiplier);
             dmg = (int)(dmg * target.DamageTakenMultiplier);
+            if (isAbility) dmg += actor.Level;
             return dmg;
         }
 
@@ -1417,7 +1419,8 @@ namespace WinFormsApp2
                     _ => 0
                 };
                 double dmg = (baseVal + stat * percent) * actor.SpellDamageMultiplier * target.DamageTakenMultiplier;
-                return (int)Math.Max(1, dmg - target.MagicDefense);
+                int total = (int)Math.Max(1, dmg - target.MagicDefense);
+                return total + actor.Level;
             }
             return 0;
         }
