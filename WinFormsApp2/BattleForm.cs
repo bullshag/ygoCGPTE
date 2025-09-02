@@ -414,7 +414,7 @@ namespace WinFormsApp2
                                 if (eff.ManaPerTick > 0)
                                 {
                                     c.Mana = Math.Min(c.MaxMana, c.Mana + eff.ManaPerTick);
-                                    if (c.ManaBar.Maximum > 0) c.ManaBar.Value = c.Mana;
+                                    UpdateManaBar(c);
                                 }
                                 if (!string.IsNullOrEmpty(eff.SourceName))
                                     AppendLog($"{eff.SourceName} heals {c.Name} for {eff.AmountPerTick}.", eff.SourceIsPlayer, true);
@@ -536,11 +536,8 @@ namespace WinFormsApp2
             if (ability.Id != 0)
             {
                 int cost = (int)(ability.Cost * actor.AbilityCostMultiplier);
-                actor.Mana -= cost;
-                if (actor.ManaBar.Maximum > 0)
-                {
-                    actor.ManaBar.Value = Math.Max(0, actor.Mana);
-                }
+                actor.Mana = Math.Max(0, Math.Min(actor.MaxMana, actor.Mana - cost));
+                UpdateManaBar(actor);
                 actor.Cooldowns[ability.Id] = (int)(ability.Cooldown * actor.CooldownMultiplier * 1000);
                 bool actorIsPlayer = _players.Contains(actor);
                 AppendLog(GenerateAbilityLog(actor, target, ability), actorIsPlayer, isHealAbility);
@@ -674,7 +671,7 @@ namespace WinFormsApp2
                         {
                             int drain = Math.Min(damage, o.Mana);
                             o.Mana -= drain;
-                            if (o.ManaBar.Maximum > 0) o.ManaBar.Value = o.Mana;
+                            UpdateManaBar(o);
                             damage -= drain;
                         }
                         o.CurrentHp -= damage;
@@ -719,7 +716,7 @@ namespace WinFormsApp2
                     {
                         int drain = Math.Min(spellDamage, target.Mana);
                         target.Mana -= drain;
-                        if (target.ManaBar.Maximum > 0) target.ManaBar.Value = target.Mana;
+                        UpdateManaBar(target);
                         spellDamage -= drain;
                     }
                     target.CurrentHp -= spellDamage;
@@ -795,7 +792,7 @@ namespace WinFormsApp2
             {
                 int drain = Math.Min(dmg, target.Mana);
                 target.Mana -= drain;
-                if (target.ManaBar.Maximum > 0) target.ManaBar.Value = target.Mana;
+                UpdateManaBar(target);
                 dmg -= drain;
             }
             target.CurrentHp -= dmg;
@@ -868,8 +865,7 @@ namespace WinFormsApp2
             {
                 int mana = (int)(actor.Intelligence * 0.15);
                 actor.Mana = Math.Min(actor.MaxMana, actor.Mana + mana);
-                if (actor.ManaBar.Maximum > 0)
-                    actor.ManaBar.Value = actor.Mana;
+                UpdateManaBar(actor);
             }
             CheckEnd();
         }
@@ -938,6 +934,15 @@ namespace WinFormsApp2
             target.Effects.Add(new StatusEffect { Kind = EffectKind.HoT, RemainingMs = 6000, TickIntervalMs = tick, TimeUntilTickMs = tick, AmountPerTick = amt, SourceIsPlayer = _players.Contains(actor), SourceName = actor.Name });
         }
 
+        private void UpdateManaBar(Creature creature)
+        {
+            if (creature.ManaBar.Maximum > 0)
+            {
+                creature.ManaBar.Value = Math.Max(creature.ManaBar.Minimum,
+                    Math.Min(creature.ManaBar.Maximum, creature.Mana));
+            }
+        }
+
         private void ApplyTaunt(Creature actor, List<Creature> opponents)
         {
             int duration = 2000 + (actor.Strength / 30) * 1000;
@@ -997,14 +1002,14 @@ namespace WinFormsApp2
                 int excess = target.Mana - (int)(target.MaxMana * target.ManaBarrierThreshold);
                 int absorb = Math.Min(dmg, excess);
                 target.Mana -= absorb;
-                if (target.ManaBar.Maximum > 0) target.ManaBar.Value = target.Mana;
+                UpdateManaBar(target);
                 dmg -= absorb;
             }
             if (target.ManaShield && dmg > 0 && target.Mana > 0)
             {
                 int absorb = Math.Min(target.Mana, dmg / 2);
                 target.Mana -= absorb;
-                if (target.ManaBar.Maximum > 0) target.ManaBar.Value = target.Mana;
+                UpdateManaBar(target);
                 dmg -= absorb;
             }
         }
@@ -1016,7 +1021,7 @@ namespace WinFormsApp2
                 target.CurrentHp = target.MaxHp;
                 target.Mana = target.MaxMana;
                 target.HpBar.Value = target.MaxHp;
-                if (target.ManaBar.Maximum > 0) target.ManaBar.Value = target.Mana;
+                UpdateManaBar(target);
                 InventoryService.RemoveItem(target.CheatDeathTrinket);
                 target.Equipment[EquipmentSlot.Trinket] = null;
                 AppendLog($"{target.Name} is revived by {target.CheatDeathTrinket.Name}!", _players.Contains(target), true);
@@ -1037,7 +1042,7 @@ namespace WinFormsApp2
             if (actor.SpellManaLeechPercent > 0 && dmg > 0)
             {
                 actor.Mana = Math.Min(actor.MaxMana, actor.Mana + (int)(dmg * actor.SpellManaLeechPercent));
-                if (actor.ManaBar.Maximum > 0) actor.ManaBar.Value = actor.Mana;
+                UpdateManaBar(actor);
             }
             if (actor.Momentum)
             {
@@ -1072,7 +1077,7 @@ namespace WinFormsApp2
             {
                 int mana = (int)(healAmt * actor.ManaOnHealPercent);
                 target.Mana = Math.Min(target.MaxMana, target.Mana + mana);
-                if (target.ManaBar.Maximum > 0) target.ManaBar.Value = target.Mana;
+                UpdateManaBar(target);
             }
             if (actor.ShieldOnHealPercent > 0 && target != actor)
             {
@@ -1876,7 +1881,7 @@ namespace WinFormsApp2
             {
                 c.ManaBar = CloneProgressBar(manaTemplate);
                 c.ManaBar.Maximum = Math.Max(1, c.MaxMana);
-                c.ManaBar.Value = Math.Min(c.ManaBar.Maximum, Math.Max(0, c.Mana));
+                UpdateManaBar(c);
                 c.ManaBar.Location = new Point(0, 55);
                 panel.Controls.Add(c.ManaBar);
                 c.AttackBar = CloneProgressBar(attackTemplate);
