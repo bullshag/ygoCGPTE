@@ -191,67 +191,72 @@ namespace WinFormsApp2
                 npcCmd.Parameters.AddWithValue("@maxLevel", maxLevel);
                 npcCmd.Parameters.AddWithValue("@offset", offset);
                 using var r2 = npcCmd.ExecuteReader();
-                if (r2.Read())
+                if (!r2.Read())
+                    return null;
+
+                int level = r2.GetInt32("level");
+                string name = r2.GetString("name");
+                int currentHp = r2.GetInt32("current_hp");
+                int maxHp = r2.GetInt32("max_hp");
+                int mana = r2.GetInt32("mana");
+                int strength = r2.GetInt32("strength");
+                int dex = r2.GetInt32("dex");
+                int intelligence = r2.GetInt32("intelligence");
+                int action = r2.GetInt32("action_speed");
+                int meleeDef = r2.GetInt32("melee_defense");
+                int magicDef = r2.GetInt32("magic_defense");
+                string role = r2.GetString("role");
+                string style = r2.GetString("targeting_style");
+
+                // close the reader before issuing another command on the same connection
+                r2.Close();
+
+                var npc = new Creature
                 {
-                    int level = r2.GetInt32("level");
-                    string name = r2.GetString("name");
-                    int currentHp = r2.GetInt32("current_hp");
-                    int maxHp = r2.GetInt32("max_hp");
-                    int mana = r2.GetInt32("mana");
-                    int strength = r2.GetInt32("strength");
-                    int dex = r2.GetInt32("dex");
-                    int intelligence = r2.GetInt32("intelligence");
-                    int action = r2.GetInt32("action_speed");
-                    int meleeDef = r2.GetInt32("melee_defense");
-                    int magicDef = r2.GetInt32("magic_defense");
-                    string role = r2.GetString("role");
-                    string style = r2.GetString("targeting_style");
-                    var npc = new Creature
+                    Name = name,
+                    Level = level,
+                    CurrentHp = currentHp,
+                    MaxHp = maxHp,
+                    Mana = mana,
+                    MaxMana = 10 + 5 * intelligence,
+                    Strength = strength,
+                    Dex = dex,
+                    Intelligence = intelligence,
+                    ActionSpeed = action,
+                    MeleeDefense = meleeDef,
+                    MagicDefense = magicDef,
+                    Role = role,
+                    TargetingStyle = style
+                };
+
+                foreach (var kv in InventoryService.GetNpcEquipment(name))
+                    npc.Equipment[kv.Key] = kv.Value;
+                ApplyEquipmentBonuses(npc);
+
+                using var abilCmd = new MySqlCommand(@"SELECT slot, priority, a.id, a.name, a.description, a.cost, a.cooldown
+                                                      FROM npc_abilities na
+                                                      JOIN abilities a ON na.ability_id = a.id
+                                                      WHERE na.npc_name=@n", conn);
+                abilCmd.Parameters.AddWithValue("@n", name);
+                using var abilR = abilCmd.ExecuteReader();
+                while (abilR.Read())
+                {
+                    npc.Abilities.Add(new Ability
                     {
-                        Name = name,
-                        Level = level,
-                        CurrentHp = currentHp,
-                        MaxHp = maxHp,
-                        Mana = mana,
-                        MaxMana = 10 + 5 * intelligence,
-                        Strength = strength,
-                        Dex = dex,
-                        Intelligence = intelligence,
-                        ActionSpeed = action,
-                        MeleeDefense = meleeDef,
-                        MagicDefense = magicDef,
-                        Role = role,
-                        TargetingStyle = style
-                    };
-                    foreach (var kv in InventoryService.GetNpcEquipment(name))
-                        npc.Equipment[kv.Key] = kv.Value;
-                    ApplyEquipmentBonuses(npc);
-                    using var abilCmd = new MySqlCommand(@"SELECT slot, priority, a.id, a.name, a.description, a.cost, a.cooldown
-                                                          FROM npc_abilities na
-                                                          JOIN abilities a ON na.ability_id = a.id
-                                                          WHERE na.npc_name=@n", conn);
-                    abilCmd.Parameters.AddWithValue("@n", name);
-                    using var abilR = abilCmd.ExecuteReader();
-                    while (abilR.Read())
-                    {
-                        npc.Abilities.Add(new Ability
-                        {
-                            Slot = abilR.GetInt32("slot"),
-                            Priority = abilR.GetInt32("priority"),
-                            Id = abilR.GetInt32("id"),
-                            Name = abilR.GetString("name"),
-                            Description = abilR.GetString("description"),
-                            Cost = abilR.GetInt32("cost"),
-                            Cooldown = abilR.GetInt32("cooldown")
-                        });
-                    }
-                    if (!npc.Abilities.Any())
-                        npc.Abilities.Add(new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0, Slot = 1 });
-                    _npcs.Add(npc);
-                    npcLevel += level;
-                    return npc;
+                        Slot = abilR.GetInt32("slot"),
+                        Priority = abilR.GetInt32("priority"),
+                        Id = abilR.GetInt32("id"),
+                        Name = abilR.GetString("name"),
+                        Description = abilR.GetString("description"),
+                        Cost = abilR.GetInt32("cost"),
+                        Cooldown = abilR.GetInt32("cooldown")
+                    });
                 }
-                return null;
+                if (!npc.Abilities.Any())
+                    npc.Abilities.Add(new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0, Slot = 1 });
+                _npcs.Add(npc);
+                npcLevel += level;
+                return npc;
             }
 
             // Start with a foe at the upper end of the allowed range.
