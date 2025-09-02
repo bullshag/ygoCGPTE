@@ -144,6 +144,7 @@ namespace WinFormsApp2
 
             int playerPower = _players.Sum(p => p.Power);
             int avgPower = _players.Count > 0 ? (int)Math.Ceiling(playerPower / (double)_players.Count) : 1;
+
             int areaMin = _areaMinPower ?? 1;
             int areaMax = _areaMaxPower ?? int.MaxValue;
 
@@ -158,10 +159,11 @@ namespace WinFormsApp2
 
             int targetAvg = playerPower < areaMin ? areaMin : avgPower;
 
-            // NPC powers range from roughly 60% to 100% of the party's average power,
-            // while still respecting any area power restrictions.
-            int perNpcMin = (int)(avgPower * 0.8);
-            int perNpcMax = (int)(avgPower * 1.2);
+            // NPC levels range from roughly 60% to 100% of the party's average level,
+            // while still respecting any area-level restrictions.
+            int perNpcMin = (int)(avgLevel * 0.8);
+            int perNpcMax = (int)(avgLevel * 1.2);
+
             if (_areaMinPower.HasValue)
             {
                 perNpcMin = Math.Max(perNpcMin, areaMin);
@@ -180,6 +182,19 @@ namespace WinFormsApp2
             Creature? AddNpc(int minPower, int maxPower)
             {
                 for (int attempt = 0; attempt < 50; attempt++)
+
+                foreach (var kv in InventoryService.GetNpcEquipment(name, level))
+                    npc.Equipment[kv.Key] = kv.Value;
+                ApplyEquipmentBonuses(npc);
+
+                using var abilCmd = new MySqlCommand(@"SELECT slot, priority, a.id, a.name, a.description, a.cost, a.cooldown
+                                                      FROM npc_abilities na
+                                                      JOIN abilities a ON na.ability_id = a.id
+                                                      WHERE na.npc_name=@n", conn);
+                abilCmd.Parameters.AddWithValue("@n", name);
+                using var abilR = abilCmd.ExecuteReader();
+                while (abilR.Read())
+
                 {
                     using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM npcs ORDER BY RAND() LIMIT 1", conn);
                     using var r2 = npcCmd.ExecuteReader();
@@ -565,7 +580,7 @@ namespace WinFormsApp2
                 else if (ability.Name == "Rejuvenate") { ApplyRejuvenate(actor, target); CheckEnd(); return; }
                 else if (ability.Name == "Heal")
                 {
-                    int healAmt = (int)Math.Max(1, (5 + actor.Intelligence * 1.2) * actor.HealingDealtMultiplier);
+                    int healAmt = (int)Math.Max(1, (5 + actor.Level + actor.Intelligence * 1.2) * actor.HealingDealtMultiplier);
                     healAmt = (int)(healAmt * target.HealingReceivedMultiplier);
                     target.CurrentHp = Math.Min(target.MaxHp, target.CurrentHp + healAmt);
                     target.HpBar.Value = Math.Min(target.MaxHp, target.CurrentHp);
@@ -577,7 +592,7 @@ namespace WinFormsApp2
                 }
                 else if (ability.Name == "Healing Wave")
                 {
-                    int healAmt = (int)Math.Max(1, (4 + actor.Intelligence * 1.0) * actor.HealingDealtMultiplier);
+                    int healAmt = (int)Math.Max(1, (4 + actor.Level + actor.Intelligence * 1.0) * actor.HealingDealtMultiplier);
                     foreach (var ally in allies.Where(a => a.CurrentHp > 0))
                     {
                         int final = (int)(healAmt * ally.HealingReceivedMultiplier);
@@ -592,7 +607,7 @@ namespace WinFormsApp2
                 }
                 else if (ability.Name == "Chain Heal")
                 {
-                    int healAmt = (int)Math.Max(1, (5 + actor.Intelligence * 1.0) * actor.HealingDealtMultiplier);
+                    int healAmt = (int)Math.Max(1, (5 + actor.Level + actor.Intelligence * 1.0) * actor.HealingDealtMultiplier);
                     healAmt = (int)(healAmt * target.HealingReceivedMultiplier);
                     target.CurrentHp = Math.Min(target.MaxHp, target.CurrentHp + healAmt);
                     target.HpBar.Value = Math.Min(target.MaxHp, target.CurrentHp);
@@ -612,7 +627,7 @@ namespace WinFormsApp2
                 }
                 else if (ability.Name == "Prayer of Healing")
                 {
-                    int healAmt = (int)Math.Max(1, (6 + actor.Intelligence * 0.8) * actor.HealingDealtMultiplier);
+                    int healAmt = (int)Math.Max(1, (6 + actor.Level + actor.Intelligence * 0.8) * actor.HealingDealtMultiplier);
                     foreach (var ally in allies.Where(a => a.CurrentHp > 0))
                     {
                         int final = (int)(healAmt * ally.HealingReceivedMultiplier);
@@ -626,7 +641,7 @@ namespace WinFormsApp2
                 }
                 else if (ability.Name == "Holy Light")
                 {
-                    int healAmt = (int)Math.Max(1, (8 + actor.Intelligence * 1.5) * actor.HealingDealtMultiplier);
+                    int healAmt = (int)Math.Max(1, (8 + actor.Level + actor.Intelligence * 1.5) * actor.HealingDealtMultiplier);
                     healAmt = (int)(healAmt * target.HealingReceivedMultiplier);
                     target.CurrentHp = Math.Min(target.MaxHp, target.CurrentHp + healAmt);
                     target.HpBar.Value = Math.Min(target.MaxHp, target.CurrentHp);
@@ -792,7 +807,8 @@ namespace WinFormsApp2
                 }
             }
 
-            int dmg = CalculateDamage(actor, target);
+            bool isAbilityAttack = ability.Name != "-basic attack-";
+            int dmg = CalculateDamage(actor, target, isAbilityAttack);
             if (target.DamageReductionCurrent > 0)
             {
                 dmg = (int)(dmg * (1 - target.DamageReductionCurrent));
@@ -1344,7 +1360,7 @@ namespace WinFormsApp2
                 {
                     using var dsConn = new MySqlConnection(DatabaseConfig.ConnectionString);
                     dsConn.Open();
-                    using var dsCmd = new MySqlCommand("UPDATE dark_spire_state SET current_min = current_min + 5, current_max = current_max + 5 WHERE account_id=@id", dsConn);
+                    using var dsCmd = new MySqlCommand("UPDATE dark_spire_state SET current_min_power = current_min_power + 5, current_max_power = current_max_power + 5 WHERE account_id=@id", dsConn);
                     dsCmd.Parameters.AddWithValue("@id", _userId);
                     dsCmd.ExecuteNonQuery();
                 }
@@ -1358,7 +1374,7 @@ namespace WinFormsApp2
             }
         }
 
-        private int CalculateDamage(Creature actor, Creature target)
+        private int CalculateDamage(Creature actor, Creature target, bool isAbility = false)
         {
             var weapon = actor.GetWeapon();
             double statTotal = actor.Strength * 0.3 + actor.Dex * 0.3;
@@ -1396,6 +1412,7 @@ namespace WinFormsApp2
             dmg += actor.AttackFlatBonus + (int)(actor.Intelligence * actor.AttackIntBonusMultiplier);
             dmg = (int)(dmg * actor.DamageDealtMultiplier);
             dmg = (int)(dmg * target.DamageTakenMultiplier);
+            if (isAbility) dmg += actor.Level;
             return dmg;
         }
 
@@ -1414,7 +1431,8 @@ namespace WinFormsApp2
                     _ => 0
                 };
                 double dmg = (baseVal + stat * percent) * actor.SpellDamageMultiplier * target.DamageTakenMultiplier;
-                return (int)Math.Max(1, dmg - target.MagicDefense);
+                int total = (int)Math.Max(1, dmg - target.MagicDefense);
+                return total + actor.Level;
             }
             return 0;
         }
