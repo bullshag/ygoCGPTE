@@ -15,5 +15,8 @@ namespace WinFormsApp2
         public double CritDamageBonus { get; init; }
         public double AttackSpeedMod { get; init; }
         public bool TwoHanded { get; init; }
+
+        public double ProcChance { get; set; }
+        public Ability? ProcAbility { get; set; }
     }
 }

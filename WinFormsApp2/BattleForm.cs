@@ -1084,6 +1084,21 @@ namespace WinFormsApp2
                 target.SecondWindAvailable = false;
                 AppendLog($"{target.Name} rallies with a second wind!", _players.Contains(target), true);
             }
+            var weapon = actor.GetWeapon();
+            if (weapon?.ProcAbility != null && _rng.NextDouble() <= weapon.ProcChance)
+            {
+                int procDmg = CalculateSpellDamage(actor, target, weapon.ProcAbility);
+                target.CurrentHp -= procDmg;
+                target.HpBar.Value = Math.Max(0, target.CurrentHp);
+                AppendLog($"{actor.Name}'s {weapon.Name} triggers {weapon.ProcAbility.Name} for {procDmg} damage!", _players.Contains(actor), false);
+                actor.DamageDone += procDmg;
+                target.DamageTaken += procDmg;
+                if (target.CurrentHp <= 0)
+                {
+                    _deathCauses[target.Name] = $"{actor.Name}'s {weapon.ProcAbility.Name} hits {target.Name} for {procDmg} damage!";
+                    CheckEnd();
+                }
+            }
         }
 
         private void AfterHeal(Creature actor, Creature target, int healAmt)
