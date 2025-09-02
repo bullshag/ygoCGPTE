@@ -12,6 +12,8 @@ namespace WinFormsApp2
         private int _baseStr;
         private int _baseDex;
         private int _baseInt;
+        private int _baseHp;
+        private int _baseMp;
         private int _availablePoints;
         private int _playerGold;
         private List<Ability> _abilities = new List<Ability>();
@@ -29,6 +31,8 @@ namespace WinFormsApp2
             numStr.ValueChanged += StatsChanged;
             numDex.ValueChanged += StatsChanged;
             numInt.ValueChanged += StatsChanged;
+            numHP.ValueChanged += StatsChanged;
+            numMP.ValueChanged += StatsChanged;
             btnBuy.Click += BtnBuy_Click;
             btnBuyPassive.Click += BtnBuyPassive_Click;
             btnSave.Click += BtnSave_Click;
@@ -51,7 +55,7 @@ namespace WinFormsApp2
                 update.ExecuteNonQuery();
             }
 
-            using (MySqlCommand cmd = new MySqlCommand("SELECT strength, dex, intelligence, skill_points, mana FROM characters WHERE id=@cid", conn))
+            using (MySqlCommand cmd = new MySqlCommand("SELECT strength, dex, intelligence, skill_points, max_hp, mana FROM characters WHERE id=@cid", conn))
             {
                 cmd.Parameters.AddWithValue("@cid", _characterId);
                 using MySqlDataReader reader = cmd.ExecuteReader();
@@ -60,14 +64,20 @@ namespace WinFormsApp2
                     _baseStr = reader.GetInt32("strength");
                     _baseDex = reader.GetInt32("dex");
                     _baseInt = reader.GetInt32("intelligence");
+                    _baseHp = reader.GetInt32("max_hp");
+                    _baseMp = reader.GetInt32("mana");
                     _availablePoints = reader.GetInt32("skill_points");
-                    _maxMana = 10 + 5 * _baseInt;
+                    _maxMana = _baseMp;
                     numStr.Minimum = _baseStr;
                     numDex.Minimum = _baseDex;
                     numInt.Minimum = _baseInt;
+                    numHP.Minimum = _baseHp;
+                    numMP.Minimum = _baseMp;
                     numStr.Value = _baseStr;
                     numDex.Value = _baseDex;
                     numInt.Value = _baseInt;
+                    numHP.Value = _baseHp;
+                    numMP.Value = _baseMp;
                     lblPoints.Text = $"Points: {_availablePoints}";
                 }
             }
@@ -102,21 +112,30 @@ namespace WinFormsApp2
         private void StatsChanged(object? sender, EventArgs e)
         {
             if (_loading) return;
-            int spent = (int)((numStr.Value - _baseStr) + (numDex.Value - _baseDex) + (numInt.Value - _baseInt));
+            int spent = (int)((numStr.Value - _baseStr) + (numDex.Value - _baseDex) + (numInt.Value - _baseInt)
+                + ((numHP.Value - _baseHp) / 5) + ((numMP.Value - _baseMp) / 5));
             if (spent < 0)
             {
                 var control = (NumericUpDown)sender!;
-                control.Value += -spent;
+                int adjust = -spent;
+                if (control == numHP || control == numMP)
+                    control.Value += adjust * 5;
+                else
+                    control.Value += adjust;
                 spent = 0;
             }
             if (spent > _availablePoints)
             {
                 var control = (NumericUpDown)sender!;
-                control.Value -= spent - _availablePoints;
+                int adjust = spent - _availablePoints;
+                if (control == numHP || control == numMP)
+                    control.Value -= adjust * 5;
+                else
+                    control.Value -= adjust;
                 spent = _availablePoints;
             }
             lblPoints.Text = $"Points: {_availablePoints - spent}";
-            _maxMana = 10 + 5 * (int)numInt.Value;
+            _maxMana = (int)numMP.Value;
         }
 
         private void UpdatePassiveCostButton()
@@ -224,17 +243,22 @@ namespace WinFormsApp2
             int newStr = (int)numStr.Value;
             int newDex = (int)numDex.Value;
             int newInt = (int)numInt.Value;
-            int spent = (newStr - _baseStr) + (newDex - _baseDex) + (newInt - _baseInt);
+            int newHp = (int)numHP.Value;
+            int newMp = (int)numMP.Value;
+            int spent = (newStr - _baseStr) + (newDex - _baseDex) + (newInt - _baseInt)
+                + ((newHp - _baseHp) / 5) + ((newMp - _baseMp) / 5);
             int remaining = _availablePoints - spent;
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
             using (MySqlCommand cmd = new MySqlCommand(
-                "UPDATE characters SET strength=@s, dex=@d, intelligence=@i, skill_points=@sp WHERE id=@cid",
+                "UPDATE characters SET strength=@s, dex=@d, intelligence=@i, max_hp=@hp, mana=@mana, skill_points=@sp WHERE id=@cid",
                 conn))
             {
                 cmd.Parameters.AddWithValue("@s", newStr);
                 cmd.Parameters.AddWithValue("@d", newDex);
                 cmd.Parameters.AddWithValue("@i", newInt);
+                cmd.Parameters.AddWithValue("@hp", newHp);
+                cmd.Parameters.AddWithValue("@mana", newMp);
                 cmd.Parameters.AddWithValue("@sp", remaining);
                 cmd.Parameters.AddWithValue("@cid", _characterId);
                 cmd.ExecuteNonQuery();

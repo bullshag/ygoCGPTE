@@ -17,9 +17,13 @@ namespace WinFormsApp2
         private NumericUpDown numStr;
         private NumericUpDown numDex;
         private NumericUpDown numInt;
+        private NumericUpDown numHP;
+        private NumericUpDown numMP;
         private Label labelStr;
         private Label labelDex;
         private Label labelInt;
+        private Label labelHP;
+        private Label labelMP;
 
         protected override void Dispose(bool disposing)
         {
@@ -46,14 +50,20 @@ namespace WinFormsApp2
             rtbAbility = new RichTextBox();
             lstPassives = new ListBox();
             btnBuyPassive = new Button();
+            numHP = new NumericUpDown();
+            numMP = new NumericUpDown();
+            labelHP = new Label();
+            labelMP = new Label();
             ((System.ComponentModel.ISupportInitialize)numStr).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numDex).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numInt).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numHP).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numMP).BeginInit();
             SuspendLayout();
             // 
             // lblPoints
             // 
-            lblPoints.Location = new Point(10, 100);
+            lblPoints.Location = new Point(10, 160);
             lblPoints.Name = "lblPoints";
             lblPoints.Size = new Size(200, 15);
             lblPoints.TabIndex = 4;
@@ -112,6 +122,24 @@ namespace WinFormsApp2
             numInt.Name = "numInt";
             numInt.Size = new Size(60, 23);
             numInt.TabIndex = 5;
+            //
+            // numHP
+            //
+            numHP.Increment = new decimal(new int[] { 5, 0, 0, 0 });
+            numHP.Location = new Point(60, 98);
+            numHP.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
+            numHP.Name = "numHP";
+            numHP.Size = new Size(60, 23);
+            numHP.TabIndex = 13;
+            //
+            // numMP
+            //
+            numMP.Increment = new decimal(new int[] { 5, 0, 0, 0 });
+            numMP.Location = new Point(60, 128);
+            numMP.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
+            numMP.Name = "numMP";
+            numMP.Size = new Size(60, 23);
+            numMP.TabIndex = 15;
             // 
             // labelStr
             // 
@@ -136,6 +164,22 @@ namespace WinFormsApp2
             labelInt.Size = new Size(40, 15);
             labelInt.TabIndex = 6;
             labelInt.Text = "INT";
+            //
+            // labelHP
+            //
+            labelHP.Location = new Point(10, 100);
+            labelHP.Name = "labelHP";
+            labelHP.Size = new Size(40, 15);
+            labelHP.TabIndex = 14;
+            labelHP.Text = "HP";
+            //
+            // labelMP
+            //
+            labelMP.Location = new Point(10, 130);
+            labelMP.Name = "labelMP";
+            labelMP.Size = new Size(40, 15);
+            labelMP.TabIndex = 16;
+            labelMP.Text = "MP";
             // 
             // rtbAbility
             // 
@@ -143,7 +187,7 @@ namespace WinFormsApp2
             rtbAbility.Name = "rtbAbility";
             rtbAbility.ReadOnly = true;
             rtbAbility.Size = new Size(150, 68);
-            rtbAbility.TabIndex = 13;
+            rtbAbility.TabIndex = 17;
             rtbAbility.Text = "";
             // 
             // lstPassives
@@ -175,6 +219,10 @@ namespace WinFormsApp2
             Controls.Add(lblGold);
             Controls.Add(btnSave);
             Controls.Add(lblPoints);
+            Controls.Add(numMP);
+            Controls.Add(labelMP);
+            Controls.Add(numHP);
+            Controls.Add(labelHP);
             Controls.Add(numInt);
             Controls.Add(labelInt);
             Controls.Add(numDex);
@@ -186,6 +234,8 @@ namespace WinFormsApp2
             ((System.ComponentModel.ISupportInitialize)numStr).EndInit();
             ((System.ComponentModel.ISupportInitialize)numDex).EndInit();
             ((System.ComponentModel.ISupportInitialize)numInt).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numHP).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numMP).EndInit();
             ResumeLayout(false);
         }
     }
