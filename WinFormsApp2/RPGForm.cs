@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Linq;
 using MySql.Data.MySqlClient;
 using WinFormsApp2.Multiplayer;
 
@@ -55,6 +56,10 @@ namespace WinFormsApp2
             using MySqlDataReader reader = cmd.ExecuteReader();
             lstParty.Items.Clear();
             pnlParty.SuspendLayout();
+            foreach (Control c in pnlParty.Controls.Cast<Control>().ToArray())
+            {
+                c.Dispose();
+            }
             pnlParty.Controls.Clear();
             int totalExp = 0;
             int totalLevel = 0;
