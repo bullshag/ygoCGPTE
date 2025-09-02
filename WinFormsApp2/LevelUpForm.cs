@@ -19,6 +19,7 @@ namespace WinFormsApp2
         private int _ownedPassiveCount;
         private int _maxMana;
         private readonly ToolTip _tip = new();
+        private bool _loading;
 
         public LevelUpForm(int userId, int characterId)
         {
@@ -40,6 +41,7 @@ namespace WinFormsApp2
 
         private void LevelUpForm_Load(object? sender, EventArgs e)
         {
+            _loading = true;
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
 
@@ -60,13 +62,12 @@ namespace WinFormsApp2
                     _baseInt = reader.GetInt32("intelligence");
                     _availablePoints = reader.GetInt32("skill_points");
                     _maxMana = 10 + 5 * _baseInt;
-                    numStr.Value = _baseStr;
-                    numDex.Value = _baseDex;
-                    numInt.Value = _baseInt;
-                    // Prevent lowering stats below their original values
                     numStr.Minimum = _baseStr;
                     numDex.Minimum = _baseDex;
                     numInt.Minimum = _baseInt;
+                    numStr.Value = _baseStr;
+                    numDex.Value = _baseDex;
+                    numInt.Value = _baseInt;
                     lblPoints.Text = $"Points: {_availablePoints}";
                 }
             }
@@ -95,10 +96,12 @@ namespace WinFormsApp2
                 lstPassives.Items.Add(p.Name);
             }
             UpdatePassiveCostButton();
+            _loading = false;
         }
 
         private void StatsChanged(object? sender, EventArgs e)
         {
+            if (_loading) return;
             int spent = (int)((numStr.Value - _baseStr) + (numDex.Value - _baseDex) + (numInt.Value - _baseInt));
             if (spent < 0)
             {
