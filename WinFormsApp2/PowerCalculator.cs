@@ -5,18 +5,9 @@ namespace WinFormsApp2
 {
     public static class PowerCalculator
     {
-        public static int GetNpcPower(string npcName)
+
+        public static int CalculateNpcPower(MySqlConnection conn, string npcName, int level)
         {
-            using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
-            conn.Open();
-
-            int level;
-            using (var lvlCmd = new MySqlCommand("SELECT level FROM npcs WHERE name=@n", conn))
-            {
-                lvlCmd.Parameters.AddWithValue("@n", npcName);
-                level = Convert.ToInt32(lvlCmd.ExecuteScalar() ?? 0);
-            }
-
             int equipCost = 0;
             using (var eqCmd = new MySqlCommand("SELECT item_name FROM npc_equipment WHERE npc_name=@n", conn))
             {
@@ -31,13 +22,20 @@ namespace WinFormsApp2
             }
 
             int abilityCount;
-            using (var sCmd = new MySqlCommand("SELECT COUNT(*) FROM npc_abilities WHERE npc_name=@n", conn))
+
+            using (var abilCmd = new MySqlCommand("SELECT COUNT(*) FROM npc_abilities WHERE npc_name=@n", conn))
             {
-                sCmd.Parameters.AddWithValue("@n", npcName);
-                abilityCount = Convert.ToInt32(sCmd.ExecuteScalar() ?? 0);
+                abilCmd.Parameters.AddWithValue("@n", npcName);
+                abilityCount = Convert.ToInt32(abilCmd.ExecuteScalar() ?? 0);
             }
 
-            return (int)Math.Ceiling((level + equipCost + 3 * abilityCount) * 0.15);
+            return CalculatePower(level, equipCost, abilityCount);
+        }
+
+        public static int CalculatePower(int level, int equipmentCost, int abilityCount)
+        {
+            return (int)Math.Ceiling((level + equipmentCost + 3 * abilityCount) * 0.15);
+
         }
     }
 }

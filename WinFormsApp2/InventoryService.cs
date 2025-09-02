@@ -295,7 +295,7 @@ namespace WinFormsApp2
         }
 
 
-        public static Dictionary<EquipmentSlot, Item?> GetNpcEquipment(string npcName)
+        public static Dictionary<EquipmentSlot, Item?> GetNpcEquipment(string npcName, int level)
         {
             var dict = new Dictionary<EquipmentSlot, Item?>();
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
@@ -307,6 +307,17 @@ namespace WinFormsApp2
             {
                 var slot = Enum.Parse<EquipmentSlot>(r.GetString("slot"));
                 var item = CreateItem(r.GetString("item_name"));
+                if (item is Weapon or Armor)
+                {
+                    var rarity = LootService.RollRarityForLevel(level);
+                    if (rarity != Rarity.None && item != null)
+                    {
+                        string baseName = item.Name;
+                        item.Stackable = false;
+                        item.Name = MagicItemNameGenerator.Generate(baseName, rarity);
+                        LootService.ApplyBonuses(item, level, rarity);
+                    }
+                }
                 if (item is Weapon w && w.TwoHanded)
                 {
                     dict[EquipmentSlot.LeftHand] = w;

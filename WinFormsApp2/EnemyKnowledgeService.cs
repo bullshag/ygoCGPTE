@@ -47,6 +47,8 @@ ON DUPLICATE KEY UPDATE kill_count = kill_count + 1", conn);
             conn.Open();
             using (var cmd = new MySqlCommand("SELECT name, role, targeting_style FROM npcs", conn))
             {
+                cmd.Parameters.AddWithValue("@min", minPower);
+                cmd.Parameters.AddWithValue("@max", maxPower);
                 using var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
