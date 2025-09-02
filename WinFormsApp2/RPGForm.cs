@@ -122,7 +122,7 @@ namespace WinFormsApp2
                 object? sres = skillCmd.ExecuteScalar();
                 totalSkills = sres == null || sres == DBNull.Value ? 0 : Convert.ToInt32(sres);
             }
-            int partyPower = (int)Math.Ceiling((totalLevel + totalEquipCost + 3 * totalSkills) * 0.15);
+            int partyPower = PowerCalculator.CalculatePartyPower(totalLevel, totalEquipCost, totalSkills);
             partyPowerLabel.Text = $"Party Power: {partyPower}";
 
             using MySqlCommand goldCmd = new MySqlCommand("SELECT gold FROM users WHERE id=@id", conn);
