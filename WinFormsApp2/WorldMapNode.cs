@@ -11,7 +11,7 @@ namespace WinFormsApp2
     {
         public string Id { get; }
         public string Name { get; }
-        public string Description { get; }
+        public string Description { get; set; }
         public Dictionary<string, int> Connections { get; } = new();
         public List<string> Activities { get; } = new();
         /// <summary>

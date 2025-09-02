@@ -73,11 +73,14 @@ namespace WinFormsApp2
             {
                 lblDescription.Text = string.Empty;
                 btnUse.Enabled = false;
+                btnUse.Text = "Use";
             }
             else
             {
                 lblDescription.Text = DescribeItem(item);
-                btnUse.Enabled = _selectedTarget != null && (item is HealingPotion || item is AbilityTome);
+                bool isEquipment = item is Weapon || item is Armor || item is Trinket;
+                btnUse.Text = isEquipment ? "Equip" : "Use";
+                btnUse.Enabled = _selectedTarget != null && (isEquipment || item is HealingPotion || item is AbilityTome);
             }
         }
 
@@ -118,7 +121,16 @@ namespace WinFormsApp2
                 InventoryService.RemoveItem(item);
                 RefreshItems();
             }
+            else if (item is Weapon || item is Armor || item is Trinket)
+            {
+                InventoryService.Equip(_selectedTarget, item.Slot!.Value, item);
+                InventoryService.RemoveItem(item);
+                RefreshItems();
+                ShowMessage($"Equipped {item.Name} to {_selectedTarget}");
+            }
         }
+
+        protected virtual void ShowMessage(string text) => MessageBox.Show(text);
 
         private void LoadTargets()
         {
@@ -138,7 +150,9 @@ namespace WinFormsApp2
         {
             _selectedTarget = cmbTarget.SelectedItem?.ToString();
             var item = SelectedItem();
-            btnUse.Enabled = _selectedTarget != null && (item is HealingPotion || item is AbilityTome);
+            bool isEquipment = item is Weapon || item is Armor || item is Trinket;
+            btnUse.Text = isEquipment ? "Equip" : "Use";
+            btnUse.Enabled = _selectedTarget != null && (isEquipment || item is HealingPotion || item is AbilityTome);
         }
 
         private void LstItems_DrawItem(object? sender, DrawItemEventArgs e)
