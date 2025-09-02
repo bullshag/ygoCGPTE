@@ -40,15 +40,15 @@ ON DUPLICATE KEY UPDATE kill_count = kill_count + 1", conn);
             return result == null ? 0 : System.Convert.ToInt32(result);
         }
 
-        public static List<EnemyInfo> GetEnemiesForArea(int minLevel, int maxLevel)
+        public static List<EnemyInfo> GetEnemiesForArea(int minPower, int maxPower)
         {
             var list = new List<EnemyInfo>();
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
             using (var cmd = new MySqlCommand("SELECT name, level, role, targeting_style FROM npcs WHERE level BETWEEN @min AND @max ORDER BY level", conn))
             {
-                cmd.Parameters.AddWithValue("@min", minLevel);
-                cmd.Parameters.AddWithValue("@max", maxLevel);
+                cmd.Parameters.AddWithValue("@min", minPower);
+                cmd.Parameters.AddWithValue("@max", maxPower);
                 using var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
