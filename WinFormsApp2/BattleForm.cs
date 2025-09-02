@@ -1347,7 +1347,7 @@ namespace WinFormsApp2
                 {
                     using var dsConn = new MySqlConnection(DatabaseConfig.ConnectionString);
                     dsConn.Open();
-                    using var dsCmd = new MySqlCommand("UPDATE dark_spire_state SET current_min = current_min + 5, current_max = current_max + 5 WHERE account_id=@id", dsConn);
+                    using var dsCmd = new MySqlCommand("UPDATE dark_spire_state SET current_min_power = current_min_power + 5, current_max_power = current_max_power + 5 WHERE account_id=@id", dsConn);
                     dsCmd.Parameters.AddWithValue("@id", _userId);
                     dsCmd.ExecuteNonQuery();
                 }

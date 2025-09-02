@@ -326,17 +326,17 @@ namespace WinFormsApp2
         {
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using var cmd = new MySqlCommand("SELECT current_min, current_max FROM dark_spire_state WHERE account_id=@id", conn);
+            using var cmd = new MySqlCommand("SELECT current_min_power, current_max_power FROM dark_spire_state WHERE account_id=@id", conn);
             cmd.Parameters.AddWithValue("@id", _accountId);
             using var reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                int min = reader.GetInt32("current_min");
-                int max = reader.GetInt32("current_max");
+                int min = reader.GetInt32("current_min_power");
+                int max = reader.GetInt32("current_max_power");
                 return (min, max);
             }
             reader.Close();
-            using var ins = new MySqlCommand("INSERT INTO dark_spire_state(account_id, current_min, current_max) VALUES (@id, 1, 5)", conn);
+            using var ins = new MySqlCommand("INSERT INTO dark_spire_state(account_id, current_min_power, current_max_power) VALUES (@id, 1, 5)", conn);
             ins.Parameters.AddWithValue("@id", _accountId);
             ins.ExecuteNonQuery();
             return (1, 5);
@@ -346,7 +346,7 @@ namespace WinFormsApp2
         {
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using var cmd = new MySqlCommand("UPDATE dark_spire_state SET current_min=1, current_max=5 WHERE account_id=@id", conn);
+            using var cmd = new MySqlCommand("UPDATE dark_spire_state SET current_min_power=1, current_max_power=5 WHERE account_id=@id", conn);
             cmd.Parameters.AddWithValue("@id", _accountId);
             cmd.ExecuteNonQuery();
         }
