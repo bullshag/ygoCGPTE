@@ -154,7 +154,7 @@ namespace WinFormsApp2
                 {
                     var sb = new StringBuilder();
                     sb.AppendLine($"Name: {item.Info.Name}");
-                    sb.AppendLine($"Level: {item.Info.Level}");
+                    sb.AppendLine($"Power: {item.Info.Power}");
                     sb.AppendLine(item.Info.Description);
                     if (item.Info.Skills.Count > 0)
                     {
