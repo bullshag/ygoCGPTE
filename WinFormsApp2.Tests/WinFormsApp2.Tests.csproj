@@ -22,4 +22,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\WinFormsApp2\LootService.Probability.cs" Link="LootService.Probability.cs" />
+  </ItemGroup>
+
 </Project>

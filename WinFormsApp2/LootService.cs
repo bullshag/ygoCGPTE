@@ -6,7 +6,7 @@ using MySql.Data.MySqlClient;
 
 namespace WinFormsApp2
 {
-    public static class LootService
+    public static partial class LootService
     {
         private static readonly Random _rng = new();
 
@@ -52,12 +52,15 @@ namespace WinFormsApp2
                     drops[trinket] = drops.GetValueOrDefault(trinket) + 1;
             }
 
-            // chance to drop additional loot from global pool
-            Item? bonusLoot = LootPool.GetEnemyLoot(areaId);
-            if (bonusLoot != null)
+            // 50% chance to drop additional loot from global pool
+            if (ShouldDropBonusLoot(_rng))
             {
-                drops[bonusLoot.Name] = drops.GetValueOrDefault(bonusLoot.Name) + 1;
-                InventoryService.AddItem(bonusLoot);
+                Item? bonusLoot = LootPool.GetEnemyLoot(areaId);
+                if (bonusLoot != null)
+                {
+                    drops[bonusLoot.Name] = drops.GetValueOrDefault(bonusLoot.Name) + 1;
+                    InventoryService.AddItem(bonusLoot);
+                }
             }
 
             foreach (var kvp in drops.Where(k => k.Key != "gold"))
