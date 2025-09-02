@@ -270,14 +270,16 @@ namespace WinFormsApp2
                 int remaining = maxTotal - npcLevel;
                 int weakMax = Math.Min(targetAvg, remaining);
                 if (weakMax < perNpcMin) break;
-                AddNpc(perNpcMin, weakMax);
+                if (AddNpc(perNpcMin, weakMax) == null)
+                    break;
             }
 
             while (npcLevel < minTotal)
             {
                 int remaining = maxTotal - npcLevel;
                 if (remaining < perNpcMin) break;
-                AddNpc(perNpcMin, Math.Min(targetAvg, remaining));
+                if (AddNpc(perNpcMin, Math.Min(targetAvg, remaining)) == null)
+                    break;
             }
 
             if (_npcs.Count == 0)
