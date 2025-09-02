@@ -13,9 +13,16 @@ namespace WinFormsApp2
         public static Dictionary<string, int> GenerateLoot(IEnumerable<(string name, int level)> npcs, int userId, string? areaId = null)
         {
             var drops = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+            var npcList = npcs.ToList();
+            if (npcList.Count == 0)
+            {
+                return drops;
+            }
+
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            foreach (var npc in npcs)
+            foreach (var npc in npcList)
             {
                 using MySqlCommand cmd = new MySqlCommand("SELECT item_name, drop_chance, min_quantity, max_quantity FROM npc_loot WHERE npc_name=@name", conn);
                 cmd.Parameters.AddWithValue("@name", npc.name);
@@ -33,7 +40,7 @@ namespace WinFormsApp2
                     }
                 }
             }
-            int avgLevel = Math.Max(1, (int)Math.Round(npcs.Average(n => n.level)));
+            int avgLevel = Math.Max(1, (int)Math.Round(npcList.Average(n => n.level)));
             if (drops.TryGetValue("gold", out int gold))
             {
                 int boostedGold = (int)Math.Round(gold * 1.5);
