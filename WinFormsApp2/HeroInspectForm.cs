@@ -19,6 +19,7 @@ namespace WinFormsApp2
         private bool _loadingEquipment;
         private System.Collections.Generic.List<Passive> _passives = new();
         private readonly ToolTip _tip = new();
+        private int _baseStr, _baseDex, _baseInt, _baseHp, _baseMaxHp, _baseMana, _level, _exp;
 
         public HeroInspectForm(int userId, int characterId, bool readOnly = false)
         {
@@ -64,17 +65,16 @@ namespace WinFormsApp2
             {
                 string name = reader.GetString("name");
                 _characterName = name;
-                int level = reader.GetInt32("level");
-                int exp = reader.GetInt32("experience_points");
-                int str = reader.GetInt32("strength");
-                int dex = reader.GetInt32("dex");
-                int intel = reader.GetInt32("intelligence");
-                int hp = reader.GetInt32("current_hp");
-                int maxHp = reader.GetInt32("max_hp");
-                int nextExp = ExperienceHelper.GetNextLevelRequirement(level);
-                lblStats.Text = $"{name}\nLevel: {level}\nEXP: {exp}/{nextExp}\nHP: {hp}/{maxHp}\nSTR: {str}\nDEX: {dex}\nINT: {intel}";
-                ShowPredictions(str, dex, intel);
-                btnLevelUp.Enabled = !_readOnly && exp >= nextExp;
+                _level = reader.GetInt32("level");
+                _exp = reader.GetInt32("experience_points");
+                _baseStr = reader.GetInt32("strength");
+                _baseDex = reader.GetInt32("dex");
+                _baseInt = reader.GetInt32("intelligence");
+                _baseHp = reader.GetInt32("current_hp");
+                _baseMaxHp = reader.GetInt32("max_hp");
+                _baseMana = 10 + 5 * _baseInt;
+                DisplayStats();
+                btnLevelUp.Enabled = !_readOnly && _exp >= ExperienceHelper.GetNextLevelRequirement(_level);
 
                 string role = reader.GetString("role");
                 string targeting = reader.GetString("targeting_style");
@@ -100,6 +100,15 @@ namespace WinFormsApp2
                     cmbTrinket.Enabled = false;
                 }
             }
+        }
+
+        private void DisplayStats()
+        {
+            int str = _baseStr, dex = _baseDex, intel = _baseInt, hp = _baseHp, maxHp = _baseMaxHp, mana = _baseMana, maxMana = _baseMana;
+            InventoryService.ApplyEquipmentBonuses(_characterName, ref str, ref dex, ref intel, ref hp, ref maxHp, ref mana, ref maxMana);
+            int nextExp = ExperienceHelper.GetNextLevelRequirement(_level);
+            lblStats.Text = $"{_characterName}\nLevel: {_level}\nEXP: {_exp}/{nextExp}\nHP: {hp}/{maxHp}\nSTR: {str}\nDEX: {dex}\nINT: {intel}";
+            ShowPredictions(str, dex, intel);
         }
 
         private void ShowPredictions(int str, int dex, int intel)
@@ -282,6 +291,7 @@ namespace WinFormsApp2
                 }
             }
             LoadEquipment();
+            DisplayStats();
         }
 
         private void LoadAbilities()

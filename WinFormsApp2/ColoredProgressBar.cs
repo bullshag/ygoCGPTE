@@ -10,7 +10,9 @@ namespace WinFormsApp2
 
         public ColoredProgressBar()
         {
-            this.SetStyle(ControlStyles.UserPaint, true);
+            SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint |
+                     ControlStyles.OptimizedDoubleBuffer, true);
+            DoubleBuffered = true;
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -24,6 +26,10 @@ namespace WinFormsApp2
                 e.Graphics.FillRectangle(brush, 0, 0, rect.Width, rect.Height);
             }
             e.Graphics.DrawRectangle(Pens.Black, 0, 0, this.Width - 1, this.Height - 1);
+        }
+
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
         }
     }
 }
