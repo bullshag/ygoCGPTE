@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using System.Linq;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace WinFormsApp2
 {
@@ -38,6 +39,11 @@ namespace WinFormsApp2
             cmbLegs.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.Legs, cmbLegs);
             cmbHead.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.Head, cmbHead);
             cmbTrinket.SelectedIndexChanged += (s, e) => EquipSlot(EquipmentSlot.Trinket, cmbTrinket);
+            foreach (var combo in new[] { cmbLeft, cmbRight, cmbBody, cmbLegs, cmbHead, cmbTrinket })
+            {
+                combo.DrawMode = DrawMode.OwnerDrawFixed;
+                combo.DrawItem += Combo_DrawItem;
+            }
             foreach (var cmb in _abilityCombos)
             {
                 cmb.SelectedIndexChanged += AbilityComboChanged;
@@ -244,14 +250,14 @@ namespace WinFormsApp2
             var items = InventoryService.GetEquippableItems(slot, _characterName);
             foreach (var i in items)
             {
-                combo.Items.Add(i.Name);
+                combo.Items.Add(new ComboItem(i.Name, i.NameColor));
             }
             var equipped = InventoryService.GetEquippedItem(_characterName, slot);
-            if (equipped != null && !combo.Items.Contains(equipped.Name))
+            if (equipped != null && !combo.Items.Cast<object>().Any(o => o.ToString() == equipped.Name))
             {
-                combo.Items.Add(equipped.Name);
+                combo.Items.Add(new ComboItem(equipped.Name, equipped.NameColor));
             }
-            combo.SelectedItem = equipped?.Name ?? "-empty-";
+            combo.SelectedItem = combo.Items.Cast<object>().FirstOrDefault(o => o.ToString() == equipped?.Name) ?? "-empty-";
             if (equipped is Weapon w && w.TwoHanded)
             {
                 if (slot == EquipmentSlot.LeftHand)
@@ -268,6 +274,26 @@ namespace WinFormsApp2
                 cmbLeft.Enabled = true;
                 cmbRight.Enabled = true;
             }
+        }
+
+        private void Combo_DrawItem(object? sender, DrawItemEventArgs e)
+        {
+            if (e.Index < 0) return;
+            var combo = (ComboBox)sender!;
+            e.DrawBackground();
+            object item = combo.Items[e.Index];
+            string text = item.ToString() ?? string.Empty;
+            Color color = item is ComboItem ci ? ci.Color : Color.Black;
+            using var brush = new SolidBrush(color);
+            e.Graphics.DrawString(text, e.Font, brush, e.Bounds);
+        }
+
+        private class ComboItem
+        {
+            public string Name { get; }
+            public Color Color { get; }
+            public ComboItem(string name, Color color) { Name = name; Color = color; }
+            public override string ToString() => Name;
         }
 
         private void EquipSlot(EquipmentSlot slot, ComboBox combo)
