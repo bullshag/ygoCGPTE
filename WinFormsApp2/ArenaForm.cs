@@ -152,7 +152,7 @@ namespace WinFormsApp2
                 sCmd.Parameters.AddWithValue("@id", accountId);
                 skillCount = Convert.ToInt32(sCmd.ExecuteScalar() ?? 0);
             }
-            return (int)Math.Ceiling((totalLevel + equipCost + 3 * skillCount) * 0.15);
+            return PowerCalculator.CalculatePartyPower(totalLevel, equipCost, skillCount);
         }
 
         private void LstTeams_MouseMove(object? sender, MouseEventArgs e)
