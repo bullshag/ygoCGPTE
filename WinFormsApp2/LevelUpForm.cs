@@ -266,5 +266,10 @@ namespace WinFormsApp2
             this.DialogResult = System.Windows.Forms.DialogResult.OK;
             Close();
         }
+
+        private void numMP_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

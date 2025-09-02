@@ -122,24 +122,6 @@ namespace WinFormsApp2
             numInt.Name = "numInt";
             numInt.Size = new Size(60, 23);
             numInt.TabIndex = 5;
-            //
-            // numHP
-            //
-            numHP.Increment = new decimal(new int[] { 5, 0, 0, 0 });
-            numHP.Location = new Point(60, 98);
-            numHP.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
-            numHP.Name = "numHP";
-            numHP.Size = new Size(60, 23);
-            numHP.TabIndex = 13;
-            //
-            // numMP
-            //
-            numMP.Increment = new decimal(new int[] { 5, 0, 0, 0 });
-            numMP.Location = new Point(60, 128);
-            numMP.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
-            numMP.Name = "numMP";
-            numMP.Size = new Size(60, 23);
-            numMP.TabIndex = 15;
             // 
             // labelStr
             // 
@@ -164,22 +146,6 @@ namespace WinFormsApp2
             labelInt.Size = new Size(40, 15);
             labelInt.TabIndex = 6;
             labelInt.Text = "INT";
-            //
-            // labelHP
-            //
-            labelHP.Location = new Point(10, 100);
-            labelHP.Name = "labelHP";
-            labelHP.Size = new Size(40, 15);
-            labelHP.TabIndex = 14;
-            labelHP.Text = "HP";
-            //
-            // labelMP
-            //
-            labelMP.Location = new Point(10, 130);
-            labelMP.Name = "labelMP";
-            labelMP.Size = new Size(40, 15);
-            labelMP.TabIndex = 16;
-            labelMP.Text = "MP";
             // 
             // rtbAbility
             // 
@@ -205,6 +171,41 @@ namespace WinFormsApp2
             btnBuyPassive.Size = new Size(150, 23);
             btnBuyPassive.TabIndex = 12;
             btnBuyPassive.Text = "Buy Passive";
+            // 
+            // numHP
+            // 
+            numHP.Increment = new decimal(new int[] { 5, 0, 0, 0 });
+            numHP.Location = new Point(60, 98);
+            numHP.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
+            numHP.Name = "numHP";
+            numHP.Size = new Size(60, 23);
+            numHP.TabIndex = 13;
+            // 
+            // numMP
+            // 
+            numMP.Increment = new decimal(new int[] { 5, 0, 0, 0 });
+            numMP.Location = new Point(60, 128);
+            numMP.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
+            numMP.Name = "numMP";
+            numMP.Size = new Size(60, 23);
+            numMP.TabIndex = 15;
+            numMP.ValueChanged += numMP_ValueChanged;
+            // 
+            // labelHP
+            // 
+            labelHP.Location = new Point(10, 100);
+            labelHP.Name = "labelHP";
+            labelHP.Size = new Size(40, 15);
+            labelHP.TabIndex = 14;
+            labelHP.Text = "HP";
+            // 
+            // labelMP
+            // 
+            labelMP.Location = new Point(10, 130);
+            labelMP.Name = "labelMP";
+            labelMP.Size = new Size(40, 15);
+            labelMP.TabIndex = 16;
+            labelMP.Text = "MP";
             // 
             // LevelUpForm
             // 
