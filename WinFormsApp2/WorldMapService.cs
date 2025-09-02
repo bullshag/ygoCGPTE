@@ -17,11 +17,21 @@ namespace WinFormsApp2
         {
             Nodes = new Dictionary<string, WorldMapNode>();
 
-            var nodeMountain = new WorldMapNode("nodeMountain", "Mountain", "Towering peaks home to dangerous beasts.");
+            var nodeMountain = new WorldMapNode("nodeMountain", "Mountain", "Towering peaks home to dangerous beasts. Enemies around Lv10-20.")
+            {
+                MinEnemyPower = 10,
+                MaxEnemyPower = 20
+            };
+
             nodeMountain.Connections["nodeMounttown"] = 2;
             Nodes[nodeMountain.Id] = nodeMountain;
 
-            var nodeMounttown = new WorldMapNode("nodeMounttown", "Mounttown", "A bustling town carved into the mountainside. Generally safe from wild enemies.");
+            var nodeMounttown = new WorldMapNode("nodeMounttown", "Mounttown", "A bustling town carved into the mountainside. Generally safe from wild enemies.")
+            {
+                MinEnemyPower = 5,
+                MaxEnemyPower = 15
+            };
+
             nodeMounttown.Connections["nodeMountain"] = 2;
             nodeMounttown.Connections["nodeDarkSpire"] = 1;
             nodeMounttown.Connections["nodeRiverVillage"] = 3;
@@ -31,20 +41,35 @@ namespace WinFormsApp2
             nodeMounttown.Activities.Add("Tavern (recruit Lv5 adventurers w/2 random passives)");
             Nodes[nodeMounttown.Id] = nodeMounttown;
 
-            var nodeDarkSpire = new WorldMapNode("nodeDarkSpire", "Dark Spire", "An ominous tower shrouded in eternal twilight. Foes grow stronger each floor.");
+            var nodeDarkSpire = new WorldMapNode("nodeDarkSpire", "Dark Spire", "An ominous tower shrouded in eternal twilight. Foes start around Lv1-5 and grow stronger each floor.")
+            {
+                MinEnemyPower = 1,
+                MaxEnemyPower = 999
+            };
+
             nodeDarkSpire.Connections["nodeMounttown"] = 1;
             nodeDarkSpire.Connections["nodeRiverVillage"] = 3;
             nodeDarkSpire.Connections["nodeForestValley"] = 3;
             nodeDarkSpire.Activities.Add("Track floors cleared and reward bonus (15-20% for Lv15-20 floor)");
             Nodes[nodeDarkSpire.Id] = nodeDarkSpire;
 
-            var nodeNorthernIsland = new WorldMapNode("nodeNorthernIsland", "Northern Island", "A remote island swept by cold winds.");
+            var nodeNorthernIsland = new WorldMapNode("nodeNorthernIsland", "Northern Island", "A remote island swept by cold winds. Home to formidable Lv25-35 foes.")
+            {
+                MinEnemyPower = 25,
+                MaxEnemyPower = 35
+            };
+
             nodeNorthernIsland.Connections["nodeDarkSpire"] = 3;
             nodeNorthernIsland.Connections["nodeForestValley"] = 4;
             nodeNorthernIsland.Activities.Add("Ancient Stone of Regret (reset stats to 5 for 150% hire value cost)");
             Nodes[nodeNorthernIsland.Id] = nodeNorthernIsland;
 
-            var nodeSouthernIsland = new WorldMapNode("nodeSouthernIsland", "Southern Island", "A tropical island dotted with fishing huts.");
+            var nodeSouthernIsland = new WorldMapNode("nodeSouthernIsland", "Southern Island", "A tropical island dotted with fishing huts. Dangerous foes roam at Lv45-50.")
+            {
+                MinEnemyPower = 45,
+                MaxEnemyPower = 50
+            };
+
             nodeSouthernIsland.Connections["nodeSmallVillage"] = 10;
             nodeSouthernIsland.Activities.Add("Fisherman work: assign party member for N minutes → earns 5 gp/min");
             nodeSouthernIsland.Activities.Add("Tavern: hire hostile NPC mercenaries (no exp/level/equipment/resurrection)");
@@ -63,35 +88,60 @@ namespace WinFormsApp2
             nodeRiverVillage.Activities.Add("Wizard Tower: teleport to any node for cost");
             Nodes[nodeRiverVillage.Id] = nodeRiverVillage;
 
-            var nodeSmallVillage = new WorldMapNode("nodeSmallVillage", "Small Village", "A quaint village surrounded by whispering woods.");
+            var nodeSmallVillage = new WorldMapNode("nodeSmallVillage", "Small Village", "A quaint village surrounded by whispering woods. Local enemies range from Lv1-10.")
+            {
+                MinEnemyPower = 1,
+                MaxEnemyPower = 10
+            };
+
             nodeSmallVillage.Connections["nodeSouthernIsland"] = 10;
             nodeSmallVillage.Connections["nodeRiverVillage"] = 1;
             nodeSmallVillage.Activities.Add("Shop");
             nodeSmallVillage.Activities.Add("Tavern (recruit DEX specialists)");
             Nodes[nodeSmallVillage.Id] = nodeSmallVillage;
 
-            var nodeDesert = new WorldMapNode("nodeDesert", "Desert", "An endless expanse of scorching sands.");
+            var nodeDesert = new WorldMapNode("nodeDesert", "Desert", "An endless expanse of scorching sands. Enemies range around Lv20-45.")
+            {
+                MinEnemyPower = 20,
+                MaxEnemyPower = 45
+            };
+
             nodeDesert.Connections["nodeForestValley"] = 4;
             nodeDesert.Connections["nodeFarCliffs"] = 5;
             nodeDesert.Connections["nodeForestPlains"] = 5;
             nodeDesert.Activities.Add("Wander the desert: spend 1 day, chance to encounter Lv45 giant worm raid boss");
             Nodes[nodeDesert.Id] = nodeDesert;
 
-            var nodeForestValley = new WorldMapNode("nodeForestValley", "Forest Valley", "A lush valley teeming with hidden wildlife.");
+            var nodeForestValley = new WorldMapNode("nodeForestValley", "Forest Valley", "A lush valley teeming with hidden wildlife. Expect enemies around Lv5-15.")
+            {
+                MinEnemyPower = 5,
+                MaxEnemyPower = 15
+            };
+
             nodeForestValley.Connections["nodeDarkSpire"] = 3;
             nodeForestValley.Connections["nodeRiverVillage"] = 4;
             nodeForestValley.Connections["nodeForestPlains"] = 3;
             nodeForestValley.Connections["nodeDesert"] = 4;
             Nodes[nodeForestValley.Id] = nodeForestValley;
 
-            var nodeForestPlains = new WorldMapNode("nodeForestPlains", "Forest Plains", "Open plains where the forest meets the sky.");
+            var nodeForestPlains = new WorldMapNode("nodeForestPlains", "Forest Plains", "Open plains where the forest meets the sky. Enemies generally Lv15-25.")
+            {
+                MinEnemyPower = 15,
+                MaxEnemyPower = 25
+            };
+
             nodeForestPlains.Connections["nodeFarCliffs"] = 1;
             nodeForestPlains.Connections["nodeDesert"] = 5;
             nodeForestPlains.Connections["nodeForestValley"] = 3;
             nodeForestPlains.Activities.Add("Commune with nature (receive raid-boss quest)");
             Nodes[nodeForestPlains.Id] = nodeForestPlains;
 
-            var nodeFarCliffs = new WorldMapNode("nodeFarCliffs", "Far Cliffs", "Sheer cliffs that overlook the restless sea.");
+            var nodeFarCliffs = new WorldMapNode("nodeFarCliffs", "Far Cliffs", "Sheer cliffs that overlook the restless sea. Local foes range around Lv30-40.")
+            {
+                MinEnemyPower = 30,
+                MaxEnemyPower = 40
+            };
+
             nodeFarCliffs.Connections["nodeForestPlains"] = 1;
             nodeFarCliffs.Connections["nodeDesert"] = 5;
             nodeFarCliffs.Activities.Add("Ancient Altar: does nothing unless holding 'Orb of Unknowable Evil'");
