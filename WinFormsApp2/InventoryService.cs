@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using MySql.Data.MySqlClient;
 
 namespace WinFormsApp2
@@ -15,6 +16,29 @@ namespace WinFormsApp2
     {
         private static readonly List<InventoryItem> _items = new();
         private static readonly Dictionary<string, Dictionary<EquipmentSlot, Item?>> _equipment = new();
+        private static readonly Dictionary<string, string> _specialWeaponTypes = new(StringComparer.OrdinalIgnoreCase);
+        static InventoryService()
+        {
+            foreach (var name in new[]
+            {
+                "Shadowstrike Dagger",
+                "Dragonfang Shortsword",
+                "Tempest Bow",
+                "Eternal Longsword",
+                "Mystic Staff",
+                "Sorcerer's Wand",
+                "Runebound Rod",
+                "Titan Greataxe",
+                "Reaper Scythe",
+                "Colossus Greatsword",
+                "Soulcrusher Mace",
+                "Earthshaker Maul"
+            })
+            {
+                if (SpecialWeaponGenerator.TryGetBaseType(name, out var type))
+                    _specialWeaponTypes[name.Replace(" ", "").ToLower()] = type;
+            }
+        }
         private static int _userId;
         private static bool _loaded;
 
@@ -75,6 +99,43 @@ namespace WinFormsApp2
         {
             if (name == "Arena Coin") return new ArenaCoin();
             if (name == "Healing Potion") return new HealingPotion();
+
+            string baseName = name;
+            string? abilityName = null;
+            var match = Regex.Match(name, @"^(.*) \((.+)\)$");
+            if (match.Success)
+            {
+                baseName = match.Groups[1].Value;
+                abilityName = match.Groups[2].Value;
+            }
+            string specialKey = baseName.Replace(" ", "").ToLower();
+            if (_specialWeaponTypes.TryGetValue(specialKey, out var weaponType) && WeaponFactory.TryCreate(weaponType, out var special))
+            {
+                special.Stackable = false;
+                special.Name = name;
+                special.ProcChance = 0.05;
+                special.NameColor = System.Drawing.Color.Purple;
+                if (abilityName != null)
+                {
+                    using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+                    conn.Open();
+                    using MySqlCommand cmd = new MySqlCommand("SELECT id, description, cost, cooldown FROM abilities WHERE name=@n", conn);
+                    cmd.Parameters.AddWithValue("@n", abilityName);
+                    using var r = cmd.ExecuteReader();
+                    if (r.Read())
+                    {
+                        special.ProcAbility = new Ability
+                        {
+                            Id = r.GetInt32("id"),
+                            Name = abilityName,
+                            Description = r.GetString("description"),
+                            Cost = r.GetInt32("cost"),
+                            Cooldown = r.GetInt32("cooldown")
+                        };
+                    }
+                }
+                return special;
+            }
             if (name.StartsWith("Tome: "))
             {
                 string abilityName = name[6..];

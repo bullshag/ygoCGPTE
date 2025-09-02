@@ -67,7 +67,21 @@ namespace WinFormsApp2
                     Item? item = InventoryService.CreateItem(kvp.Key);
                     if (item != null)
                     {
-                        if (item is Weapon || item is Armor)
+                        if (item is Weapon w && w.ProcChance > 0)
+                        {
+                            if (w.ProcAbility == null)
+                            {
+                                var ability = GetRandomDamageAbility();
+                                if (ability != null)
+                                {
+                                    w.ProcAbility = ability;
+                                    w.Name += $" ({ability.Name})";
+                                }
+                            }
+                            w.NameColor = System.Drawing.Color.Purple;
+                            w.Stackable = false;
+                        }
+                        else if (item is Weapon || item is Armor)
                         {
                             var rarity = RollRarity();
                             if (rarity != Rarity.None)
@@ -82,7 +96,42 @@ namespace WinFormsApp2
                     }
                 }
             }
+            if (_rng.NextDouble() <= 0.01)
+            {
+                string name = SpecialWeaponGenerator.GetRandomName();
+                if (InventoryService.CreateItem(name) is Weapon sw)
+                {
+                    var ability = GetRandomDamageAbility();
+                    if (ability != null)
+                    {
+                        sw.ProcAbility = ability;
+                        sw.Name = $"{name} ({ability.Name})";
+                    }
+                    drops[sw.Name] = drops.GetValueOrDefault(sw.Name) + 1;
+                    InventoryService.AddItem(sw);
+                }
+            }
             return drops;
+        }
+
+        private static Ability? GetRandomDamageAbility()
+        {
+            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            using MySqlCommand cmd = new MySqlCommand("SELECT id, name, description, cost, cooldown FROM abilities WHERE description LIKE '%damage%' ORDER BY RAND() LIMIT 1", conn);
+            using var r = cmd.ExecuteReader();
+            if (r.Read())
+            {
+                return new Ability
+                {
+                    Id = r.GetInt32("id"),
+                    Name = r.GetString("name"),
+                    Description = r.GetString("description"),
+                    Cost = r.GetInt32("cost"),
+                    Cooldown = r.GetInt32("cooldown")
+                };
+            }
+            return null;
         }
 
         private static string? GetRandomTrinket()
