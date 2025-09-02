@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using MySql.Data.MySqlClient;
 
 namespace WinFormsApp2
 {
     public static class PowerCalculator
     {
+
 
         public static int CalculateNpcPower(MySqlConnection conn, string npcName, int level)
         {
