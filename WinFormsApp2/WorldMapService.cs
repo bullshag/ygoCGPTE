@@ -78,7 +78,7 @@ namespace WinFormsApp2
             nodeSouthernIsland.Connections["nodeSmallVillage"] = 10;
             nodeSouthernIsland.Activities.Add("Fisherman work: assign party member for N minutes → earns 5 gp/min");
             nodeSouthernIsland.Activities.Add("Tavern: hire hostile NPC mercenaries (no exp/power/equipment/resurrection)");
-            nodeSouthernIsland.Activities.Add("Temple: blessing that reduces travel ≥2 days by 1
+            nodeSouthernIsland.Activities.Add("Temple: blessing that reduces travel ≥2 days by 1 day");
             nodeSouthernIsland.Activities.Add("Search for enemies (Party Power 45-50)");
             Nodes[nodeSouthernIsland.Id] = nodeSouthernIsland;
 
