@@ -1,9 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <UseWindowsForms>true</UseWindowsForms>
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
@@ -20,6 +25,19 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <ProjectReference Include="..\WinFormsApp2\BattleLands.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../WinFormsApp2/BattleLands.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\WinFormsApp2\LootService.Probability.cs" Link="LootService.Probability.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../WinFormsApp2/BattleLands.csproj" />
   </ItemGroup>
 
 </Project>

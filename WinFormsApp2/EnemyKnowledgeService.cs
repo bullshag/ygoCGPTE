@@ -40,22 +40,25 @@ ON DUPLICATE KEY UPDATE kill_count = kill_count + 1", conn);
             return result == null ? 0 : System.Convert.ToInt32(result);
         }
 
-        public static List<EnemyInfo> GetEnemiesForArea(int minLevel, int maxLevel)
+        public static List<EnemyInfo> GetEnemiesForArea(int minPower, int maxPower)
         {
             var list = new List<EnemyInfo>();
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using (var cmd = new MySqlCommand("SELECT name, level, role, targeting_style FROM npcs WHERE level BETWEEN @min AND @max ORDER BY level", conn))
+            using (var cmd = new MySqlCommand("SELECT name, role, targeting_style FROM npcs", conn))
             {
-                cmd.Parameters.AddWithValue("@min", minLevel);
-                cmd.Parameters.AddWithValue("@max", maxLevel);
+                cmd.Parameters.AddWithValue("@min", minPower);
+                cmd.Parameters.AddWithValue("@max", maxPower);
                 using var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
+                    string name = reader.GetString("name");
+                    int power = PowerCalculator.GetNpcPower(name);
+                    if (power < minPower || power > maxPower) continue;
                     var info = new EnemyInfo
                     {
-                        Name = reader.GetString("name"),
-                        Level = reader.GetInt32("level"),
+                        Name = name,
+                        Power = power,
                         Role = reader.GetString("role"),
                         TargetingStyle = reader.GetString("targeting_style")
                     };
@@ -87,7 +90,7 @@ ON DUPLICATE KEY UPDATE kill_count = kill_count + 1", conn);
     public class EnemyInfo
     {
         public string Name { get; set; } = string.Empty;
-        public int Level { get; set; }
+        public int Power { get; set; }
         public string Role { get; set; } = string.Empty;
         public string TargetingStyle { get; set; } = string.Empty;
         public List<Ability> Skills { get; } = new();

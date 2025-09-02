@@ -104,7 +104,7 @@ namespace WinFormsApp2
             btnShop.Enabled = activities.Any(a => a.StartsWith("Shop"));
             btnGraveyard.Enabled = activities.Any(a => a.StartsWith("Graveyard"));
             btnTavern.Enabled = activities.Any(a => a.Contains("Tavern"));
-            btnFindEnemies.Enabled = node.MinEnemyLevel.HasValue;
+            btnFindEnemies.Enabled = node.MinEnemyPower.HasValue;
             btnFindEnemies.Text = "Search for Enemies";
             if (id == "nodeDarkSpire")
             {
@@ -131,9 +131,9 @@ namespace WinFormsApp2
             knownEnemyList.Items.Clear();
             enemyInfo.Clear();
             var node = WorldMapService.GetNode(_currentNode);
-            if (!node.MinEnemyLevel.HasValue) return;
-            int min = node.MinEnemyLevel.Value;
-            int max = node.MaxEnemyLevel ?? int.MaxValue;
+            if (!node.MinEnemyPower.HasValue) return;
+            int min = node.MinEnemyPower.Value;
+            int max = node.MaxEnemyPower ?? int.MaxValue;
             if (_currentNode == "nodeDarkSpire")
             {
                 (min, max) = GetDarkSpireBracket();
@@ -154,7 +154,7 @@ namespace WinFormsApp2
                 {
                     var sb = new StringBuilder();
                     sb.AppendLine($"Name: {item.Info.Name}");
-                    sb.AppendLine($"Party Power: {item.Info.Level}");
+                    sb.AppendLine($"Power: {item.Info.Power}");
                     sb.AppendLine(item.Info.Description);
                     if (item.Info.Skills.Count > 0)
                     {
@@ -260,14 +260,14 @@ namespace WinFormsApp2
         private void BtnFindEnemies_Click(object? sender, EventArgs e)
         {
             var node = WorldMapService.GetNode(_currentNode);
-            int? min = node.MinEnemyLevel;
-            int? max = node.MaxEnemyLevel;
+            int? min = node.MinEnemyPower;
+            int? max = node.MaxEnemyPower;
             bool darkSpire = _currentNode == "nodeDarkSpire";
             if (darkSpire)
             {
                 (min, max) = GetDarkSpireBracket();
             }
-            var battle = new BattleForm(_accountId, areaMinLevel: min, areaMaxLevel: max, darkSpireBattle: darkSpire, areaId: _currentNode);
+            var battle = new BattleForm(_accountId, areaMinPower: min, areaMaxPower: max, darkSpireBattle: darkSpire, areaId: _currentNode);
             if (sender is Button btn) btn.Enabled = false;
             battle.FormClosed += (_, __) =>
             {
@@ -326,17 +326,17 @@ namespace WinFormsApp2
         {
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using var cmd = new MySqlCommand("SELECT current_min, current_max FROM dark_spire_state WHERE account_id=@id", conn);
+            using var cmd = new MySqlCommand("SELECT current_min_power, current_max_power FROM dark_spire_state WHERE account_id=@id", conn);
             cmd.Parameters.AddWithValue("@id", _accountId);
             using var reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                int min = reader.GetInt32("current_min");
-                int max = reader.GetInt32("current_max");
+                int min = reader.GetInt32("current_min_power");
+                int max = reader.GetInt32("current_max_power");
                 return (min, max);
             }
             reader.Close();
-            using var ins = new MySqlCommand("INSERT INTO dark_spire_state(account_id, current_min, current_max) VALUES (@id, 1, 5)", conn);
+            using var ins = new MySqlCommand("INSERT INTO dark_spire_state(account_id, current_min_power, current_max_power) VALUES (@id, 1, 5)", conn);
             ins.Parameters.AddWithValue("@id", _accountId);
             ins.ExecuteNonQuery();
             return (1, 5);
@@ -346,7 +346,7 @@ namespace WinFormsApp2
         {
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using var cmd = new MySqlCommand("UPDATE dark_spire_state SET current_min=1, current_max=5 WHERE account_id=@id", conn);
+            using var cmd = new MySqlCommand("UPDATE dark_spire_state SET current_min_power=1, current_max_power=5 WHERE account_id=@id", conn);
             cmd.Parameters.AddWithValue("@id", _accountId);
             cmd.ExecuteNonQuery();
         }
@@ -354,7 +354,14 @@ namespace WinFormsApp2
         private void TravelManager_AmbushEncounter()
         {
             lblTravelInfo.Text = "Ambushed by wild enemies!";
-            var battle = new BattleForm(_accountId, true, areaId: _currentNode);
+            var node = WorldMapService.GetNode(_currentNode);
+            int? min = node.MinEnemyPower;
+            int? max = node.MaxEnemyPower;
+            if (_currentNode == "nodeDarkSpire")
+            {
+                (min, max) = GetDarkSpireBracket();
+            }
+            var battle = new BattleForm(_accountId, true, areaMinPower: min, areaMaxPower: max, areaId: _currentNode);
             battle.FormClosed += (_, __) =>
             {
                 _refresh();

@@ -6,7 +6,7 @@ using MySql.Data.MySqlClient;
 
 namespace WinFormsApp2
 {
-    public static class LootService
+    public static partial class LootService
     {
         private static readonly Random _rng = new();
 
@@ -52,12 +52,15 @@ namespace WinFormsApp2
                     drops[trinket] = drops.GetValueOrDefault(trinket) + 1;
             }
 
-            // chance to drop additional loot from global pool
-            Item? bonusLoot = LootPool.GetEnemyLoot(areaId);
-            if (bonusLoot != null)
+            // 50% chance to drop additional loot from global pool
+            if (ShouldDropBonusLoot(_rng))
             {
-                drops[bonusLoot.Name] = drops.GetValueOrDefault(bonusLoot.Name) + 1;
-                InventoryService.AddItem(bonusLoot);
+                Item? bonusLoot = LootPool.GetEnemyLoot(areaId);
+                if (bonusLoot != null)
+                {
+                    drops[bonusLoot.Name] = drops.GetValueOrDefault(bonusLoot.Name) + 1;
+                    InventoryService.AddItem(bonusLoot);
+                }
             }
 
             foreach (var kvp in drops.Where(k => k.Key != "gold"))
@@ -169,7 +172,24 @@ namespace WinFormsApp2
             return rarity;
         }
 
-        private static void ApplyBonuses(Item item, int maxPoints, Rarity rarity)
+        public static Rarity RollRarityForLevel(int level)
+        {
+            double scale = Math.Clamp(level / 50.0, 0, 1);
+            double roll = _rng.NextDouble();
+            double threshold = 0.2 + 0.3 * scale; // Green
+            if (roll < threshold) return Rarity.Green;
+            threshold += 0.05 + 0.2 * scale; // Blue
+            if (roll < threshold) return Rarity.Blue;
+            threshold += 0.01 + 0.1 * scale; // Purple
+            if (roll < threshold) return Rarity.Purple;
+            threshold += 0.002 + 0.05 * scale; // Red
+            if (roll < threshold) return Rarity.Red;
+            threshold += 0.0005 + 0.02 * scale; // Rainbow
+            if (roll < threshold) return Rarity.Rainbow;
+            return Rarity.None;
+        }
+
+        public static void ApplyBonuses(Item item, int maxPoints, Rarity rarity)
         {
             int min = rarity switch
             {
