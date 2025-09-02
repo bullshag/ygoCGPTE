@@ -49,11 +49,12 @@ namespace WinFormsApp2
             _hiredMembers = PartyHireService.GetHiredMemberNames(_userId);
             _mercenaryMembers.Clear();
 
-            using MySqlCommand cmd = new MySqlCommand("SELECT name, experience_points, level, current_hp, max_hp, mana, intelligence, in_tavern, is_mercenary FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0", conn);
+            using MySqlCommand cmd = new MySqlCommand("SELECT name, experience_points, level, current_hp, max_hp, mana, strength, dex, intelligence, in_tavern, is_mercenary FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0", conn);
 
             cmd.Parameters.AddWithValue("@id", _userId);
             using MySqlDataReader reader = cmd.ExecuteReader();
             lstParty.Items.Clear();
+            pnlParty.SuspendLayout();
             pnlParty.Controls.Clear();
             int totalExp = 0;
             int totalLevel = 0;
@@ -73,8 +74,11 @@ namespace WinFormsApp2
                 int hp = reader.GetInt32("current_hp");
                 int maxHp = reader.GetInt32("max_hp");
                 int mana = reader.GetInt32("mana");
+                int str = reader.GetInt32("strength");
+                int dex = reader.GetInt32("dex");
                 int intel = reader.GetInt32("intelligence");
                 int maxMana = 10 + 5 * intel;
+                InventoryService.ApplyEquipmentBonuses(name, ref str, ref dex, ref intel, ref hp, ref maxHp, ref mana, ref maxMana);
                 int nextExp = ExperienceHelper.GetNextLevelRequirement(level);
                 string display = $"{name} - LVL {level} EXP {exp}/{nextExp}";
                 if (isMerc)
@@ -128,6 +132,7 @@ namespace WinFormsApp2
             lblGold.Text = $"Gold: {_playerGold}";
             btnInspect.Enabled = false;
             btnInspect.Text = "Inspect";
+            pnlParty.ResumeLayout();
         }
 
         private void lstParty_SelectedIndexChanged(object? sender, EventArgs e)

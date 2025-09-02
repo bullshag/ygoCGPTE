@@ -302,6 +302,85 @@ namespace WinFormsApp2
             }
         }
 
+        public static void ApplyEquipmentBonuses(string character, ref int strength, ref int dexterity,
+            ref int intelligence, ref int currentHp, ref int maxHp, ref int mana, ref int maxMana)
+        {
+            if (!_equipment.TryGetValue(character, out var dict)) return;
+            foreach (var item in dict.Values)
+            {
+                if (item == null) continue;
+                foreach (var kv in item.FlatBonuses)
+                {
+                    switch (kv.Key)
+                    {
+                        case "Strength":
+                            strength += kv.Value;
+                            break;
+                        case "Dexterity":
+                            dexterity += kv.Value;
+                            break;
+                        case "Intelligence":
+                            intelligence += kv.Value;
+                            maxMana += 5 * kv.Value;
+                            mana += 5 * kv.Value;
+                            break;
+                        case "HP":
+                            maxHp += kv.Value;
+                            currentHp += kv.Value;
+                            break;
+                        case "Mana":
+                            maxMana += kv.Value;
+                            mana += kv.Value;
+                            break;
+                    }
+                }
+                foreach (var kv in item.PercentBonuses)
+                {
+                    switch (kv.Key)
+                    {
+                        case "Strength":
+                            strength = (int)(strength * (1 + kv.Value / 100.0));
+                            break;
+                        case "Dexterity":
+                            dexterity = (int)(dexterity * (1 + kv.Value / 100.0));
+                            break;
+                        case "Intelligence":
+                            int oldInt = intelligence;
+                            intelligence = (int)(intelligence * (1 + kv.Value / 100.0));
+                            int delta = intelligence - oldInt;
+                            maxMana += 5 * delta;
+                            mana += 5 * delta;
+                            break;
+                        case "HP":
+                            maxHp = (int)(maxHp * (1 + kv.Value / 100.0));
+                            currentHp = (int)(currentHp * (1 + kv.Value / 100.0));
+                            break;
+                        case "Mana":
+                            maxMana = (int)(maxMana * (1 + kv.Value / 100.0));
+                            mana = (int)(mana * (1 + kv.Value / 100.0));
+                            break;
+                    }
+                }
+                if (item is Trinket tr)
+                {
+                    foreach (var ev in tr.Effects)
+                    {
+                        switch (ev.Key)
+                        {
+                            case "max_hp_pct":
+                                maxHp = (int)(maxHp * (1 + ev.Value / 100.0));
+                                currentHp = (int)(currentHp * (1 + ev.Value / 100.0));
+                                break;
+                            case "max_mana_pct":
+                                maxMana = (int)(maxMana * (1 + ev.Value / 100.0));
+                                mana = (int)(mana * (1 + ev.Value / 100.0));
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
         public static IEnumerable<Item> GetEquippableItems(EquipmentSlot slot, string character)
         {
             foreach (var inv in _items)
