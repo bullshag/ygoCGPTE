@@ -173,22 +173,16 @@ namespace WinFormsApp2
                 conn.Open();
                 foreach (var node in Nodes.Values)
                 {
-                    var npcs = new List<(string name, int level)>();
-                    using (var cmd = new MySqlCommand("SELECT n.name, n.level FROM npcs n JOIN npc_locations l ON n.name=l.npc_name WHERE l.node_id=@id", conn))
+                    int strongest = 0;
+                    using (var cmd = new MySqlCommand("SELECT n.power FROM npcs n JOIN npc_locations l ON n.name=l.npc_name WHERE l.node_id=@id", conn))
                     {
                         cmd.Parameters.AddWithValue("@id", node.Id);
                         using var reader = cmd.ExecuteReader();
                         while (reader.Read())
                         {
-                            npcs.Add((reader.GetString("name"), reader.GetInt32("level")));
+                            int power = reader.GetInt32("power");
+                            if (power > strongest) strongest = power;
                         }
-                    }
-
-                    int strongest = 0;
-                    foreach (var (name, level) in npcs)
-                    {
-                        int power = PowerCalculator.CalculateNpcPower(conn, name, level);
-                        if (power > strongest) strongest = power;
                     }
 
                     if (strongest > 0)
