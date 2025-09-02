@@ -25,7 +25,11 @@ namespace WinFormsApp2
             nodeMountain.Activities.Add("Search for enemies (Lv10-20)");
             Nodes[nodeMountain.Id] = nodeMountain;
 
-            var nodeMounttown = new WorldMapNode("nodeMounttown", "Mounttown", "A bustling town carved into the mountainside. Generally safe from wild enemies.");
+            var nodeMounttown = new WorldMapNode("nodeMounttown", "Mounttown", "A bustling town carved into the mountainside. Generally safe from wild enemies.")
+            {
+                MinEnemyLevel = 5,
+                MaxEnemyLevel = 15
+            };
             nodeMounttown.Connections["nodeMountain"] = 2;
             nodeMounttown.Connections["nodeDarkSpire"] = 1;
             nodeMounttown.Connections["nodeRiverVillage"] = 3;
@@ -33,6 +37,7 @@ namespace WinFormsApp2
             nodeMounttown.Activities.Add("Temple (30 min +10% HP buff)");
             nodeMounttown.Activities.Add("Graveyard (resurrect screen)");
             nodeMounttown.Activities.Add("Tavern (recruit Lv5 adventurers w/2 random passives)");
+            nodeMounttown.Activities.Add("Search for enemies (Lv5-15)");
             Nodes[nodeMounttown.Id] = nodeMounttown;
 
             var nodeDarkSpire = new WorldMapNode("nodeDarkSpire", "Dark Spire", "An ominous tower shrouded in eternal twilight. Foes start around Lv1-5 and grow stronger each floor.")
