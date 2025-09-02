@@ -15,11 +15,9 @@ namespace WinFormsApp2
         public Dictionary<string, int> Connections { get; } = new();
         public List<string> Activities { get; } = new();
         /// <summary>
-        /// Minimum power of enemies encountered at this node, if any.
         /// </summary>
         public int? MinEnemyPower { get; set; }
         /// <summary>
-        /// Maximum power of enemies encountered at this node, if any.
         /// </summary>
         public int? MaxEnemyPower { get; set; }
 
