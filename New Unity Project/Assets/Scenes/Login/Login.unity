@@ -314,12 +314,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5d195f8b7f795ff16ba1de95dba323c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  usernameField: {fileID: 0}
-  passwordField: {fileID: 0}
-  debugServerToggle: {fileID: 0}
-  kimServerToggle: {fileID: 0}
-  loginButton: {fileID: 0}
-  createAccountButton: {fileID: 0}
+  usernameField: {fileID: 107425644}
+  passwordField: {fileID: 580337193}
+  debugServerToggle: {fileID: 252316814}
+  kimServerToggle: {fileID: 578772367}
+  loginButton: {fileID: 538855909}
+  createAccountButton: {fileID: 632440798}
 --- !u!1 &49612713
 GameObject:
   m_ObjectHideFlags: 0
