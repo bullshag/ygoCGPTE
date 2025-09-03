@@ -144,7 +144,6 @@ namespace WinFormsApp2
             }
 
             int playerPower = _players.Sum(p => p.Power);
-            int avgPower = _players.Count > 0 ? (int)Math.Ceiling(playerPower / (double)_players.Count) : 1;
 
             int areaMin = _areaMinPower ?? 1;
             int areaMax = _areaMaxPower ?? int.MaxValue;
@@ -157,27 +156,9 @@ namespace WinFormsApp2
             int maxTotal = _wildEncounter ? (int)Math.Ceiling(effectivePlayerPower * 1.0)
                                           : (int)Math.Ceiling(effectivePlayerPower * 1.2);
 
-            int targetAvg = playerPower < areaMin && _areaMaxPower.HasValue ? areaMax : avgPower;
-
-            int avgLevel = _players.Count > 0 ? (int)Math.Ceiling(_players.Average(p => p.Level)) : 1;
-
-            // NPC party power ranges from roughly 60% to 100% of the party's average party power,
-            // while still respecting any area power restrictions.
-            int perNpcMin = (int)(avgLevel * 0.8);
-            int perNpcMax = (int)(avgLevel * 1.2);
-
-            if (_areaMinPower.HasValue)
-            {
-                perNpcMin = Math.Max(perNpcMin, areaMin);
-                perNpcMax = Math.Max(perNpcMax, areaMin);
-            }
-            if (_areaMaxPower.HasValue)
-            {
-                perNpcMin = Math.Min(perNpcMin, areaMax);
-                perNpcMax = Math.Min(perNpcMax, areaMax);
-            }
-            if (perNpcMin > perNpcMax)
-                perNpcMin = perNpcMax = Math.Min(areaMax, perNpcMin);
+            // Individual foes are chosen solely based on the area's enemy power range.
+            int perNpcMin = areaMin;
+            int perNpcMax = areaMax;
 
             int npcPower = 0;
 
@@ -194,13 +175,10 @@ namespace WinFormsApp2
 
                                                        WHERE n.power BETWEEN @min AND @max
                                                          AND (@area IS NULL OR l.node_id = @area)
-                                                         AND (@lvlMin IS NULL OR n.level BETWEEN @lvlMin AND @lvlMax)
                                                        ORDER BY RAND() LIMIT 1", conn);
                     npcCmd.Parameters.AddWithValue("@min", minPower);
                     npcCmd.Parameters.AddWithValue("@max", maxPower);
                     npcCmd.Parameters.AddWithValue("@area", (object?)_areaId ?? DBNull.Value);
-                    npcCmd.Parameters.AddWithValue("@lvlMin", (object?)_areaMinPower ?? DBNull.Value);
-                    npcCmd.Parameters.AddWithValue("@lvlMax", (object?)_areaMaxPower ?? DBNull.Value);
                     using var r2 = npcCmd.ExecuteReader();
                     if (!r2.Read())
                         return null;
@@ -282,7 +260,7 @@ namespace WinFormsApp2
             for (int i = 0; i < weakerCount && npcPower < maxTotal; i++)
             {
                 int remaining = maxTotal - npcPower;
-                int weakMax = Math.Min(targetAvg, remaining);
+                int weakMax = Math.Min(perNpcMax, remaining);
                 if (weakMax < perNpcMin) break;
                 if (AddNpc(perNpcMin, weakMax) == null)
                     break;
@@ -292,7 +270,7 @@ namespace WinFormsApp2
             {
                 int remaining = maxTotal - npcPower;
                 if (remaining < perNpcMin) break;
-                if (AddNpc(perNpcMin, Math.Min(targetAvg, remaining)) == null)
+                if (AddNpc(perNpcMin, Math.Min(perNpcMax, remaining)) == null)
                     break;
             }
 
