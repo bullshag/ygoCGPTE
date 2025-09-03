@@ -9,6 +9,7 @@ using TMPro;
 using WinFormsApp2;
 
 using UnityClient;
+using MySqlConnector;
 
 public class InventoryUI : MonoBehaviour
 {
