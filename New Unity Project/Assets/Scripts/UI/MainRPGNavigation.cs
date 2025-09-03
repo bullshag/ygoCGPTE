@@ -1,15 +1,15 @@
-using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Navigation controller for the main RPG interface.  Buttons in the main scene
+/// Navigation controller for the main RPG interface.  Buttons in any scene
 /// call these methods to load the matching sub-scenes.
 /// </summary>
-public class MainRPGNavigation : MonoBehaviour
+public static class MainRPGNavigation
 {
-    public void OpenShop() => SceneManager.LoadScene("Shop");
-    public void OpenTavern() => SceneManager.LoadScene("Tavern");
-    public void OpenArena() => SceneManager.LoadScene("Arena");
-    public void OpenMailbox() => SceneManager.LoadScene("Mailbox");
-    public void OpenBattle() => SceneManager.LoadScene("Battle");
+    public static void OpenMain() => SceneManager.LoadScene("MainRPG");
+    public static void OpenShop() => SceneManager.LoadScene("Shop");
+    public static void OpenTavern() => SceneManager.LoadScene("Tavern");
+    public static void OpenArena() => SceneManager.LoadScene("Arena");
+    public static void OpenMailbox() => SceneManager.LoadScene("Mailbox");
+    public static void OpenBattle() => SceneManager.LoadScene("Battle");
 }

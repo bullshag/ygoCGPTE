@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using WinFormsApp2;
 
 /// <summary>
@@ -41,5 +40,5 @@ public class ShopPanel : MonoBehaviour
         }
     }
 
-    public void BackToMain() => SceneManager.LoadScene("MainRPG");
+    public void BackToMain() => MainRPGNavigation.OpenMain();
 }

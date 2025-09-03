@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using WinFormsApp2;
 
 /// <summary>
@@ -17,5 +16,5 @@ public class ArenaPanel : MonoBehaviour
         // Placeholder: challenge logic that would invoke BattleForm
     }
 
-    public void BackToMain() => SceneManager.LoadScene("MainRPG");
+    public void BackToMain() => MainRPGNavigation.OpenMain();
 }
