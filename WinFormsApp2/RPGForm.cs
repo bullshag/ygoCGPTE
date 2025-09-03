@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Linq;
@@ -30,10 +31,10 @@ namespace WinFormsApp2
             InitializeComponent();
         }
 
-        private void RPGForm_Load(object? sender, EventArgs e)
+        private async void RPGForm_Load(object? sender, EventArgs e)
         {
-            InventoryService.Load(_userId);
-            LoadPartyData();
+            await InventoryService.LoadAsync(_userId);
+            await LoadPartyDataAsync();
             _chatTimer.Interval = 1000;
             _chatTimer.Tick += ChatTimer_Tick;
             _chatTimer.Start();
@@ -42,18 +43,17 @@ namespace WinFormsApp2
             _regenTimer.Start();
         }
 
-        private void LoadPartyData()
-        {
-            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
-            conn.Open();
+        private void LoadPartyData() => LoadPartyDataAsync().GetAwaiter().GetResult();
 
+        private async Task LoadPartyDataAsync()
+        {
             _hiredMembers = PartyHireService.GetHiredMemberNames(_userId);
             _mercenaryMembers.Clear();
 
-            using MySqlCommand cmd = new MySqlCommand("SELECT name, experience_points, level, current_hp, max_hp, mana, strength, dex, intelligence, in_tavern, is_mercenary FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0", conn);
+            var rows = await DatabaseClient.QueryAsync(
+                "SELECT name, experience_points, level, current_hp, max_hp, mana, strength, dex, intelligence, in_tavern, is_mercenary FROM characters WHERE account_id=@id AND is_dead=0 AND in_arena=0",
+                new Dictionary<string, object?> { ["@id"] = _userId });
 
-            cmd.Parameters.AddWithValue("@id", _userId);
-            using MySqlDataReader reader = cmd.ExecuteReader();
             lstParty.Items.Clear();
             pnlParty.SuspendLayout();
             foreach (Control c in pnlParty.Controls.Cast<Control>().ToArray())
@@ -65,23 +65,23 @@ namespace WinFormsApp2
             int totalLevel = 0;
             int totalEquipCost = 0;
             int index = 0;
-            while (reader.Read())
+            foreach (var row in rows)
             {
-                string name = reader.GetString("name");
-                bool inTavern = reader.GetBoolean("in_tavern");
-                bool isMerc = reader.GetBoolean("is_mercenary");
+                string name = Convert.ToString(row["name"]) ?? string.Empty;
+                bool inTavern = Convert.ToBoolean(row["in_tavern"]);
+                bool isMerc = Convert.ToBoolean(row["is_mercenary"]);
                 if (isMerc)
                     _mercenaryMembers.Add(name);
                 if (inTavern && !_hiredMembers.Contains(name))
                     continue;
-                int exp = reader.GetInt32("experience_points");
-                int level = reader.GetInt32("level");
-                int hp = reader.GetInt32("current_hp");
-                int maxHp = reader.GetInt32("max_hp");
-                int mana = reader.GetInt32("mana");
-                int str = reader.GetInt32("strength");
-                int dex = reader.GetInt32("dex");
-                int intel = reader.GetInt32("intelligence");
+                int exp = Convert.ToInt32(row["experience_points"]);
+                int level = Convert.ToInt32(row["level"]);
+                int hp = Convert.ToInt32(row["current_hp"]);
+                int maxHp = Convert.ToInt32(row["max_hp"]);
+                int mana = Convert.ToInt32(row["mana"]);
+                int str = Convert.ToInt32(row["strength"]);
+                int dex = Convert.ToInt32(row["dex"]);
+                int intel = Convert.ToInt32(row["intelligence"]);
                 int maxMana = 10 + 5 * intel;
                 InventoryService.ApplyEquipmentBonuses(name, ref str, ref dex, ref intel, ref hp, ref maxHp, ref mana, ref maxMana);
                 int nextExp = ExperienceHelper.GetNextLevelRequirement(level);
@@ -117,23 +117,19 @@ namespace WinFormsApp2
                 }
                 index++;
             }
-            reader.Close();
 
             lblTotalExp.Text = $"Party EXP: {totalExp}";
-            int totalSkills = 0;
-            using (var skillCmd = new MySqlCommand("SELECT COUNT(*) FROM character_abilities ca JOIN characters c ON ca.character_id=c.id WHERE c.account_id=@id AND c.is_dead=0 AND in_arena=0 AND in_tavern=0", conn))
-            {
-                skillCmd.Parameters.AddWithValue("@id", _userId);
-                object? sres = skillCmd.ExecuteScalar();
-                totalSkills = sres == null || sres == DBNull.Value ? 0 : Convert.ToInt32(sres);
-            }
+            var skillRows = await DatabaseClient.QueryAsync(
+                "SELECT COUNT(*) AS cnt FROM character_abilities ca JOIN characters c ON ca.character_id=c.id WHERE c.account_id=@id AND c.is_dead=0 AND in_arena=0 AND in_tavern=0",
+                new Dictionary<string, object?> { ["@id"] = _userId });
+            int totalSkills = skillRows.Count > 0 ? Convert.ToInt32(skillRows[0]["cnt"]) : 0;
             int partyPower = PowerCalculator.CalculatePartyPower(totalLevel, totalEquipCost, totalSkills);
             partyPowerLabel.Text = $"Party Power: {partyPower}";
 
-            using MySqlCommand goldCmd = new MySqlCommand("SELECT gold FROM users WHERE id=@id", conn);
-            goldCmd.Parameters.AddWithValue("@id", _userId);
-            object? goldResult = goldCmd.ExecuteScalar();
-            _playerGold = goldResult == null ? 0 : Convert.ToInt32(goldResult);
+            var goldRows = await DatabaseClient.QueryAsync(
+                "SELECT gold FROM users WHERE id=@id",
+                new Dictionary<string, object?> { ["@id"] = _userId });
+            _playerGold = goldRows.Count > 0 ? Convert.ToInt32(goldRows[0]["gold"]) : 0;
             lblGold.Text = $"Gold: {_playerGold}";
             btnInspect.Enabled = false;
             btnInspect.Text = "Inspect";

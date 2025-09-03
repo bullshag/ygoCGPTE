@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
 namespace WinFormsApp2
@@ -52,39 +54,39 @@ namespace WinFormsApp2
             Load(userId, true);
         }
 
-        public static void Load(int userId, bool forceReload = false)
+        public static void Load(int userId, bool forceReload = false) =>
+            LoadAsync(userId, forceReload).GetAwaiter().GetResult();
+
+        public static async Task LoadAsync(int userId, bool forceReload = false)
         {
             if (_loaded && _userId == userId && !forceReload) return;
             _loaded = true;
             _userId = userId;
             _items.Clear();
             _equipment.Clear();
-            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
-            conn.Open();
-            using MySqlCommand cmd = new MySqlCommand("SELECT item_name, quantity FROM user_items WHERE account_id=@id", conn);
-            cmd.Parameters.AddWithValue("@id", userId);
-            using (var r = cmd.ExecuteReader())
+
+            var itemRows = await DatabaseClient.QueryAsync(
+                "SELECT item_name, quantity FROM user_items WHERE account_id=@id",
+                new Dictionary<string, object?> { ["@id"] = userId });
+            foreach (var row in itemRows)
             {
-                while (r.Read())
+                string name = Convert.ToString(row["item_name"]) ?? string.Empty;
+                int qty = Convert.ToInt32(row["quantity"]);
+                Item? item = CreateItem(name);
+                if (item != null)
                 {
-                    string name = r.GetString("item_name");
-                    int qty = r.GetInt32("quantity");
-                    Item? item = CreateItem(name);
-                    if (item != null)
-                    {
-                        _items.Add(new InventoryItem { Item = item, Quantity = qty });
-                    }
+                    _items.Add(new InventoryItem { Item = item, Quantity = qty });
                 }
             }
 
-            using MySqlCommand eq = new MySqlCommand("SELECT character_name, slot, item_name FROM character_equipment WHERE account_id=@id", conn);
-            eq.Parameters.AddWithValue("@id", userId);
-            using var r2 = eq.ExecuteReader();
-            while (r2.Read())
+            var eqRows = await DatabaseClient.QueryAsync(
+                "SELECT character_name, slot, item_name FROM character_equipment WHERE account_id=@id",
+                new Dictionary<string, object?> { ["@id"] = userId });
+            foreach (var row in eqRows)
             {
-                string charName = r2.GetString("character_name");
-                string slot = r2.GetString("slot");
-                string itemName = r2.GetString("item_name");
+                string charName = Convert.ToString(row["character_name"]) ?? string.Empty;
+                string slot = Convert.ToString(row["slot"]) ?? string.Empty;
+                string itemName = Convert.ToString(row["item_name"]) ?? string.Empty;
                 Item? item = CreateItem(itemName);
                 if (item != null)
                 {

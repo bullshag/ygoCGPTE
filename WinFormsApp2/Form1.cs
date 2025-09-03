@@ -1,5 +1,5 @@
-using MySql.Data.MySqlClient;
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
@@ -13,33 +13,39 @@ namespace WinFormsApp2
             InitializeComponent();
         }
 
-        private void btnLogin_Click(object? sender, EventArgs e)
+        private async void btnLogin_Click(object? sender, EventArgs e)
         {
             DatabaseConfig.DebugMode = chkDebugMode.Checked;
             DatabaseConfig.UseKimServer = kimCheckbox.Checked;
-            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
-            conn.Open();
-            using MySqlCommand cmd = new MySqlCommand("SELECT id, nickname FROM Users WHERE Username=@u AND PasswordHash=@p", conn);
-            cmd.Parameters.AddWithValue("@u", txtUsername.Text);
-            cmd.Parameters.AddWithValue("@p", HashPassword(txtPassword.Text));
-            using var reader = cmd.ExecuteReader();
-            if (reader.Read())
+            try
             {
-                int userId = reader.GetInt32("id");
-                string nickname = reader.GetString("nickname");
-                reader.Close();
-                using MySqlCommand seen = new MySqlCommand("UPDATE users SET last_seen=NOW() WHERE id=@id", conn);
-                seen.Parameters.AddWithValue("@id", userId);
-                seen.ExecuteNonQuery();
-                InventoryService.Load(userId);
-                RPGForm rpg = new RPGForm(userId, nickname);
-                rpg.FormClosed += (s, args) => this.Close();
-                rpg.Show();
-                this.Hide();
+                var rows = await DatabaseClient.QueryAsync(
+                    "SELECT id, nickname FROM Users WHERE Username=@u AND PasswordHash=@p",
+                    new Dictionary<string, object?>
+                    {
+                        ["@u"] = txtUsername.Text,
+                        ["@p"] = HashPassword(txtPassword.Text)
+                    });
+                if (rows.Count > 0)
+                {
+                    int userId = Convert.ToInt32(rows[0]["id"]);
+                    string nickname = Convert.ToString(rows[0]["nickname"]) ?? string.Empty;
+                    await DatabaseClient.ExecuteAsync("UPDATE users SET last_seen=NOW() WHERE id=@id",
+                        new Dictionary<string, object?> { ["@id"] = userId });
+                    await InventoryService.LoadAsync(userId);
+                    RPGForm rpg = new RPGForm(userId, nickname);
+                    rpg.FormClosed += (s, args) => this.Close();
+                    rpg.Show();
+                    this.Hide();
+                }
+                else
+                {
+                    MessageBox.Show("Invalid username or password");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Invalid username or password");
+                MessageBox.Show($"Login failed: {ex.Message}");
             }
         }
 
