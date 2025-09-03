@@ -189,7 +189,9 @@ namespace WinFormsApp2
                                                               n.intelligence, n.action_speed, n.melee_defense, n.magic_defense,
                                                               n.role, n.targeting_style, n.power
                                                        FROM npcs n
-                                                       LEFT JOIN npc_locations l ON n.name = l.npc_name
+
+                                                       LEFT JOIN npc_locations l ON n.id = l.npc_id
+
                                                        WHERE n.power BETWEEN @min AND @max
                                                          AND (@area IS NULL OR l.node_id = @area)
                                                          AND (@lvlMin IS NULL OR n.level BETWEEN @lvlMin AND @lvlMax)
