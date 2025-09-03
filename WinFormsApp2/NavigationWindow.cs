@@ -104,7 +104,7 @@ namespace WinFormsApp2
             btnShop.Enabled = activities.Any(a => a.StartsWith("Shop"));
             btnGraveyard.Enabled = activities.Any(a => a.StartsWith("Graveyard"));
             btnTavern.Enabled = activities.Any(a => a.Contains("Tavern"));
-            btnFindEnemies.Enabled = node.MinEnemyPower.HasValue;
+            btnFindEnemies.Enabled = node.MinEnemyLevel.HasValue;
             btnFindEnemies.Text = "Search for Enemies";
             if (id == "nodeDarkSpire")
             {
@@ -131,9 +131,9 @@ namespace WinFormsApp2
             knownEnemyList.Items.Clear();
             enemyInfo.Clear();
             var node = WorldMapService.GetNode(_currentNode);
-            if (!node.MinEnemyPower.HasValue) return;
-            int min = node.MinEnemyPower.Value;
-            int max = node.MaxEnemyPower ?? int.MaxValue;
+            if (!node.MinEnemyLevel.HasValue) return;
+            int min = node.MinEnemyLevel.Value;
+            int max = node.MaxEnemyLevel ?? int.MaxValue;
             if (_currentNode == "nodeDarkSpire")
             {
                 (min, max) = GetDarkSpireBracket();
@@ -260,14 +260,14 @@ namespace WinFormsApp2
         private void BtnFindEnemies_Click(object? sender, EventArgs e)
         {
             var node = WorldMapService.GetNode(_currentNode);
-            int? min = node.MinEnemyPower;
-            int? max = node.MaxEnemyPower;
+            int? min = node.MinEnemyLevel;
+            int? max = node.MaxEnemyLevel;
             bool darkSpire = _currentNode == "nodeDarkSpire";
             if (darkSpire)
             {
                 (min, max) = GetDarkSpireBracket();
             }
-            var battle = new BattleForm(_accountId, areaMinPower: min, areaMaxPower: max, darkSpireBattle: darkSpire, areaId: _currentNode);
+            var battle = new BattleForm(_accountId, areaMinLevel: min, areaMaxLevel: max, darkSpireBattle: darkSpire, areaId: _currentNode);
             if (sender is Button btn) btn.Enabled = false;
             battle.FormClosed += (_, __) =>
             {
@@ -355,13 +355,13 @@ namespace WinFormsApp2
         {
             lblTravelInfo.Text = "Ambushed by wild enemies!";
             var node = WorldMapService.GetNode(_currentNode);
-            int? min = node.MinEnemyPower;
-            int? max = node.MaxEnemyPower;
+            int? min = node.MinEnemyLevel;
+            int? max = node.MaxEnemyLevel;
             if (_currentNode == "nodeDarkSpire")
             {
                 (min, max) = GetDarkSpireBracket();
             }
-            var battle = new BattleForm(_accountId, true, areaMinPower: min, areaMaxPower: max, areaId: _currentNode);
+            var battle = new BattleForm(_accountId, true, areaMinLevel: min, areaMaxLevel: max, areaId: _currentNode);
             battle.FormClosed += (_, __) =>
             {
                 _refresh();
