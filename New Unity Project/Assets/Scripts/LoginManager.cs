@@ -175,6 +175,6 @@ public class LoginManager : MonoBehaviour
 
     private void OnCreateAccountClicked()
     {
-        // Placeholder for create account workflow
+        SceneManager.LoadScene("Register");
     }
 }
