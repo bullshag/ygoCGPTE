@@ -11,5 +11,7 @@ namespace WinFormsApp2
         public static string ConnectionString =>
             $"Server={(UseKimServer ? KimHost : (DebugMode ? "127.0.0.1" : Host))};Database=accounts;User ID={Username};" +
             $"Password={Password};";
+        public static string ApiBaseUrl =>
+            $"http://{(UseKimServer ? KimHost : (DebugMode ? "127.0.0.1" : Host))}:5000/api";
     }
 }
