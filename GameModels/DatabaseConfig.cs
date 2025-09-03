@@ -1,6 +1,6 @@
 namespace WinFormsApp2
 {
-    internal static class DatabaseConfig
+    public static class DatabaseConfig
     {
         private const string Host = "76.134.86.9";
         private const string KimHost = "10.0.0.30";
