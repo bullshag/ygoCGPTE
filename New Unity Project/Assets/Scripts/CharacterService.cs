@@ -1,50 +1,63 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityClient;
+using WinFormsApp2;
 
 public static class CharacterService
 {
-    private static string BaseUrl => DatabaseConfigUnity.ApiBaseUrl;
-
-    [System.Serializable]
-    private class PartyResponse
-    {
-        public List<CharacterData> party;
-    }
-
-    [System.Serializable]
-    private class GoldResponse
-    {
-        public int gold;
-    }
-
     public static async Task<List<CharacterData>> GetPartyMembersAsync()
     {
-        using UnityWebRequest request = UnityWebRequest.Get($"{BaseUrl}/party");
-        await request.SendWebRequest();
-        if (request.result != UnityWebRequest.Result.Success)
+        try
         {
-            Debug.LogError($"Failed to fetch party members: {request.error}");
+            string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_get_party_members.sql");
+            Debug.Log("Executing party members query");
+            var rows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath));
+            Debug.Log($"Party members returned: {rows.Count}");
+
+            var members = new List<CharacterData>();
+            foreach (var row in rows)
+            {
+                members.Add(new CharacterData
+                {
+                    Name = Convert.ToString(row["name"]) ?? string.Empty,
+                    HP = Convert.ToInt32(row["hp"]),
+                    MaxHP = Convert.ToInt32(row["max_hp"]),
+                    Mana = Convert.ToInt32(row["mana"]),
+                    MaxMana = Convert.ToInt32(row["max_mana"])
+                });
+            }
+            return members;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Failed to fetch party members: {ex.Message}");
             return new List<CharacterData>();
         }
-        var json = request.downloadHandler.text;
-        PartyResponse resp = JsonUtility.FromJson<PartyResponse>(json);
-        return resp != null && resp.party != null ? resp.party : new List<CharacterData>();
     }
 
     public static async Task<int> GetGoldAsync()
     {
-        using UnityWebRequest request = UnityWebRequest.Get($"{BaseUrl}/gold");
-        await request.SendWebRequest();
-        if (request.result != UnityWebRequest.Result.Success)
+        try
         {
-            Debug.LogError($"Failed to fetch gold: {request.error}");
+            string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_get_gold.sql");
+            Debug.Log("Executing gold query");
+            var rows = await DatabaseClientUnity.QueryAsync(
+                File.ReadAllText(sqlPath),
+                new Dictionary<string, object?> { ["@id"] = InventoryServiceUnity.AccountId }
+            );
+            Debug.Log($"Gold rows returned: {rows.Count}");
+
+            return rows.Count > 0 && rows[0].TryGetValue("gold", out var g)
+                ? Convert.ToInt32(g)
+                : 0;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Failed to fetch gold: {ex.Message}");
             return 0;
         }
-        var json = request.downloadHandler.text;
-        GoldResponse resp = JsonUtility.FromJson<GoldResponse>(json);
-        return resp != null ? resp.gold : 0;
     }
 }
