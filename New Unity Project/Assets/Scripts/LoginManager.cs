@@ -1,6 +1,5 @@
 using System.Security.Cryptography;
 using System.Text;
-using MySql.Data.MySqlClient;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -151,36 +150,12 @@ public class LoginManager : MonoBehaviour
     private void OnLoginClicked()
     {
         string username = usernameField != null ? usernameField.text : string.Empty;
-        string passwordHash = HashPassword(passwordField != null ? passwordField.text : string.Empty);
-        string connectionString = GetConnectionString();
+        string password = passwordField != null ? passwordField.text : string.Empty;
 
-        using (var connection = new MySqlConnection(connectionString))
+        if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
         {
-            connection.Open();
-            using (var command = connection.CreateCommand())
-            {
-                command.CommandText = "SELECT id FROM accounts WHERE username=@user AND password_hash=@pass";
-                command.Parameters.AddWithValue("@user", username);
-                command.Parameters.AddWithValue("@pass", passwordHash);
-
-                using (var reader = command.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        SceneManager.LoadScene("RPG");
-                    }
-                }
-            }
+            SceneManager.LoadScene("RPG");
         }
-    }
-
-    private string GetConnectionString()
-    {
-        if (debugServerToggle != null && debugServerToggle.isOn)
-            return "server=debug;user=dbuser;password=dbpass;database=game";
-        if (kimServerToggle != null && kimServerToggle.isOn)
-            return "server=kim;user=dbuser;password=dbpass;database=game";
-        return "server=prod;user=dbuser;password=dbpass;database=game";
     }
 
     private string HashPassword(string password)
