@@ -147,13 +147,3 @@ public static class CharacterDatabase
         return rows.Count > 0 && rows[0].TryGetValue("gold", out var g) ? Convert.ToInt32(g) : 0;
     }
 }
-
-public static class ChatService
-{
-    public static string? FetchNewMessage()
-    {
-        string sqlPath = Path.Combine(AppContext.BaseDirectory, "fetch_latest_chat_message.sql");
-        var rows = DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath)).GetAwaiter().GetResult();
-        return rows.Count > 0 ? Convert.ToString(rows[0]["message"]) : null;
-    }
-}
