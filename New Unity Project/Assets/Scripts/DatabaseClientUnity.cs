@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MySqlConnector;
+
 using WinFormsApp2;
 
 public static class DatabaseClientUnity
@@ -60,6 +61,7 @@ public static class DatabaseClientUnity
         foreach (var kvp in parameters)
         {
             cmd.Parameters.AddWithValue(kvp.Key, kvp.Value ?? DBNull.Value);
+
         }
     }
 }

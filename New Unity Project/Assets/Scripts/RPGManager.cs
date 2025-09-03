@@ -1,5 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using UnityClient;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -113,5 +116,44 @@ public class CharacterData
     {
         HP = Mathf.Min(MaxHP, HP + 1);
         Mana = Mathf.Min(MaxMana, Mana + 1);
+    }
+}
+
+public static class CharacterDatabase
+{
+    public static List<CharacterData> GetPartyMembers()
+    {
+        string sqlPath = Path.Combine(AppContext.BaseDirectory, "get_party_members.sql");
+        var rows = DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath)).GetAwaiter().GetResult();
+        var members = new List<CharacterData>();
+        foreach (var row in rows)
+        {
+            members.Add(new CharacterData
+            {
+                Name = Convert.ToString(row["name"]) ?? string.Empty,
+                HP = Convert.ToInt32(row["hp"]),
+                MaxHP = Convert.ToInt32(row["max_hp"]),
+                Mana = Convert.ToInt32(row["mana"]),
+                MaxMana = Convert.ToInt32(row["max_mana"])
+            });
+        }
+        return members;
+    }
+
+    public static int GetGold()
+    {
+        string sqlPath = Path.Combine(AppContext.BaseDirectory, "get_gold.sql");
+        var rows = DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath), new Dictionary<string, object?> { ["@id"] = 1 }).GetAwaiter().GetResult();
+        return rows.Count > 0 && rows[0].TryGetValue("gold", out var g) ? Convert.ToInt32(g) : 0;
+    }
+}
+
+public static class ChatService
+{
+    public static string? FetchNewMessage()
+    {
+        string sqlPath = Path.Combine(AppContext.BaseDirectory, "fetch_latest_chat_message.sql");
+        var rows = DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath)).GetAwaiter().GetResult();
+        return rows.Count > 0 ? Convert.ToString(rows[0]["message"]) : null;
     }
 }
