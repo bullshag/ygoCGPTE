@@ -1,9 +1,12 @@
+using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using WinFormsApp2;
 
 public class LoginManager : MonoBehaviour
 {
@@ -147,14 +150,35 @@ public class LoginManager : MonoBehaviour
             createAccountButton.onClick.RemoveListener(OnCreateAccountClicked);
     }
 
-    private void OnLoginClicked()
+    private async void OnLoginClicked()
     {
         string username = usernameField != null ? usernameField.text : string.Empty;
         string password = passwordField != null ? passwordField.text : string.Empty;
 
         if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
         {
-            SceneManager.LoadScene("RPG");
+            DatabaseConfig.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
+            DatabaseConfig.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
+
+            string hashed = HashPassword(password);
+            string sql = "SELECT id, nickname FROM accounts WHERE username = @username AND password_hash = @passwordHash;";
+            var parameters = new Dictionary<string, object?>
+            {
+                ["@username"] = username,
+                ["@passwordHash"] = hashed
+            };
+
+            var results = await DatabaseClientUnity.QueryAsync(sql, parameters);
+            if (results.Count > 0)
+            {
+                var row = results[0];
+                int userId = Convert.ToInt32(row["id"]);
+                await DatabaseClientUnity.ExecuteAsync(
+                    "UPDATE accounts SET last_seen = NOW() WHERE id = @id",
+                    new Dictionary<string, object?> { ["@id"] = userId });
+                InventoryService.Load(userId);
+                SceneManager.LoadScene("RPG");
+            }
         }
     }
 
