@@ -1,0 +1,104 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &200000
+GameObject:
+  m_Name: PartyMemberItem
+  m_Component:
+  - component: {fileID: 22420000}
+  m_Layer: 5
+  m_IsActive: 1
+  m_Children:
+  - {fileID: 200010}
+  - {fileID: 200020}
+--- !u!224 &22420000
+RectTransform:
+  m_GameObject: {fileID: 200000}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+--- !u!1 &200010
+GameObject:
+  m_Name: NameText
+  m_Component:
+  - component: {fileID: 22420010}
+  - component: {fileID: 11420010}
+  m_Layer: 5
+  m_IsActive: 1
+--- !u!224 &22420010
+RectTransform:
+  m_GameObject: {fileID: 200010}
+  m_LocalPosition: {x: 0, y: 10, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+--- !u!114 &11420010
+MonoBehaviour:
+  m_GameObject: {fileID: 200010}
+  m_Script: {fileID: 11500000, guid: 0000000000000000e000000000000000, type: 3}
+  m_Text: Name
+--- !u!1 &200020
+GameObject:
+  m_Name: Bars
+  m_Component:
+  - component: {fileID: 22420020}
+  - component: {fileID: 11420001}
+  m_Layer: 5
+  m_IsActive: 1
+  m_Children:
+  - {fileID: 200030}
+  - {fileID: 200040}
+--- !u!224 &22420020
+RectTransform:
+  m_GameObject: {fileID: 200020}
+  m_LocalPosition: {x: 0, y: -5, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+--- !u!114 &11420001
+MonoBehaviour:
+  m_GameObject: {fileID: 200020}
+  m_Script: {fileID: 11500000, guid: cc074d1ce502472f96fb87e1be735f3d, type: 3}
+  hpFill: {fileID: 11420030}
+  manaFill: {fileID: 11420040}
+--- !u!1 &200030
+GameObject:
+  m_Name: HP
+  m_Component:
+  - component: {fileID: 22420030}
+  - component: {fileID: 11420030}
+  m_Layer: 5
+  m_IsActive: 1
+--- !u!224 &22420030
+RectTransform:
+  m_GameObject: {fileID: 200030}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+--- !u!114 &11420030
+MonoBehaviour:
+  m_GameObject: {fileID: 200030}
+  m_Script: {fileID: 11500000, guid: 0000000000000000e000000000000000, type: 3}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Type: 3
+  m_FillMethod: 0
+  m_FillAmount: 1
+--- !u!1 &200040
+GameObject:
+  m_Name: Mana
+  m_Component:
+  - component: {fileID: 22420040}
+  - component: {fileID: 11420040}
+  m_Layer: 5
+  m_IsActive: 1
+--- !u!224 &22420040
+RectTransform:
+  m_GameObject: {fileID: 200040}
+  m_LocalPosition: {x: 0, y: -10, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+--- !u!114 &11420040
+MonoBehaviour:
+  m_GameObject: {fileID: 200040}
+  m_Script: {fileID: 11500000, guid: 0000000000000000e000000000000000, type: 3}
+  m_Color: {r: 0, g: 0, b: 1, a: 1}
+  m_Type: 3
+  m_FillMethod: 0
+  m_FillAmount: 1
