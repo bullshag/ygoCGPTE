@@ -17,27 +17,27 @@ public class ShopPanel : MonoBehaviour
     {
         // Load stock using the existing loot pool service
         _shopItems = LootPool.GetShopStock("default");
-        InventoryService.Load(InventoryService.Items.Count); // ensure inventory ready
+        InventoryServiceUnity.Load(InventoryServiceUnity.Items.Count); // ensure inventory ready
     }
 
     public void OnBuy(int index)
     {
         if (index < 0 || index >= _shopItems.Count) return;
         var proto = _shopItems[index];
-        var item = InventoryService.CreateItem(proto.Name);
+        var item = InventoryServiceUnity.CreateItem(proto.Name);
         if (item != null)
         {
-            InventoryService.AddItem(item);
+            InventoryServiceUnity.AddItem(item);
         }
     }
 
     public void OnSell(string itemName)
     {
         // Placeholder: full selling logic would mirror ShopForm.BtnSell_Click
-        var inv = InventoryService.Items.FirstOrDefault(i => i.Item.Name == itemName);
+        var inv = InventoryServiceUnity.Items.FirstOrDefault(i => i.Item.Name == itemName);
         if (inv != null)
         {
-            InventoryService.RemoveItem(inv.Item, 1);
+            InventoryServiceUnity.RemoveItem(inv.Item, 1);
         }
     }
 

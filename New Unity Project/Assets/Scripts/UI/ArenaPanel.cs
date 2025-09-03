@@ -9,7 +9,7 @@ public class ArenaPanel : MonoBehaviour
 {
     public void OnDeposit()
     {
-        // Placeholder: deposit/withdraw team logic using InventoryService
+        // Placeholder: deposit/withdraw team logic using InventoryServiceUnity
     }
 
     public void OnChallenge()
