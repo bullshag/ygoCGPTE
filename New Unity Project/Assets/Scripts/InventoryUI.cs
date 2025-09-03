@@ -9,8 +9,7 @@ using MySql.Data.MySqlClient;
 
 public class InventoryUI : MonoBehaviour
 {
-    [SerializeField] private Transform itemListContent = null!;
-    [SerializeField] private GameObject itemEntryPrefab = null!;
+    [SerializeField] private List<GameObject> itemEntrySlots = new();
     [SerializeField] private Text descriptionText = null!;
     [SerializeField] private Dropdown targetDropdown = null!;
     [SerializeField] private Button useButton = null!;
@@ -30,27 +29,34 @@ public class InventoryUI : MonoBehaviour
 
     private void PopulateItems()
     {
-        foreach (Transform child in itemListContent)
+        for (int i = 0; i < itemEntrySlots.Count; i++)
         {
-            Destroy(child.gameObject);
-        }
-        foreach (var inv in InventoryServiceUnity.Items)
-        {
-            var go = Instantiate(itemEntryPrefab, itemListContent);
-            var label = go.GetComponentInChildren<Text>();
-            string suffix = inv.Item.Stackable ? $" x{inv.Quantity}" : string.Empty;
-            label.text = inv.Item.Name + suffix;
-            var button = go.GetComponent<Button>();
-            var current = inv;
-            button.onClick.AddListener(() => OnItemSelected(current));
+            var go = itemEntrySlots[i];
+            if (i < InventoryServiceUnity.Items.Count)
+            {
+                go.SetActive(true);
+                var inv = InventoryServiceUnity.Items[i];
+                var label = go.GetComponentInChildren<Text>();
+                string suffix = inv.Item.Stackable ? $" x{inv.Quantity}" : string.Empty;
+                label.text = inv.Item.Name + suffix;
+                var button = go.GetComponent<Button>();
+                var current = inv;
+                button.onClick.RemoveAllListeners();
+                button.onClick.AddListener(() => OnItemSelected(current));
 
-            var trigger = go.GetComponent<EventTrigger>() ?? go.AddComponent<EventTrigger>();
-            var enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
-            enter.callback.AddListener(_ => tooltipText.text = DescribeItem(current.Item));
-            trigger.triggers.Add(enter);
-            var exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
-            exit.callback.AddListener(_ => tooltipText.text = string.Empty);
-            trigger.triggers.Add(exit);
+                var trigger = go.GetComponent<EventTrigger>() ?? go.AddComponent<EventTrigger>();
+                trigger.triggers.Clear();
+                var enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+                enter.callback.AddListener(_ => tooltipText.text = DescribeItem(current.Item));
+                trigger.triggers.Add(enter);
+                var exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+                exit.callback.AddListener(_ => tooltipText.text = string.Empty);
+                trigger.triggers.Add(exit);
+            }
+            else
+            {
+                go.SetActive(false);
+            }
         }
         OnItemSelected(null);
     }

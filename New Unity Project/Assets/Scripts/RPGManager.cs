@@ -10,8 +10,7 @@ using UnityEngine.UI;
 public class RPGManager : MonoBehaviour
 {
     [Header("UI References")]
-    [SerializeField] private Transform partyListContent;
-    [SerializeField] private GameObject partyMemberPrefab;
+    [SerializeField] private List<GameObject> partyMemberEntries = new();
     [SerializeField] private Text goldText;
     [SerializeField] private Text chatText;
 
@@ -37,34 +36,38 @@ public class RPGManager : MonoBehaviour
 
     private void PopulatePartyList()
     {
-        if (partyListContent == null || partyMemberPrefab == null)
+        if (partyMemberEntries == null || partyMemberEntries.Count == 0)
         {
             return;
         }
 
-        foreach (Transform child in partyListContent)
+        for (int i = 0; i < partyMemberEntries.Count; i++)
         {
-            Destroy(child.gameObject);
-        }
-
-        foreach (var member in partyMembers)
-        {
-            var go = GameObject.Instantiate(partyMemberPrefab, partyListContent);
-            go.name = member.Name;
-
-            var texts = go.GetComponentsInChildren<Text>();
-            foreach (var t in texts)
+            var go = partyMemberEntries[i];
+            if (i < partyMembers.Count)
             {
-                if (t.gameObject.name == "NameText")
+                go.SetActive(true);
+                var member = partyMembers[i];
+                go.name = member.Name;
+
+                var texts = go.GetComponentsInChildren<Text>();
+                foreach (var t in texts)
                 {
-                    t.text = member.Name;
+                    if (t.gameObject.name == "NameText")
+                    {
+                        t.text = member.Name;
+                    }
+                }
+
+                var bar = go.GetComponentInChildren<ColoredProgressBar>();
+                if (bar != null)
+                {
+                    bar.SetValue(member.HP / (float)member.MaxHP, member.Mana / (float)member.MaxMana);
                 }
             }
-
-            var bar = go.GetComponentInChildren<ColoredProgressBar>();
-            if (bar != null)
+            else
             {
-                bar.SetValue(member.HP / (float)member.MaxHP, member.Mana / (float)member.MaxMana);
+                go.SetActive(false);
             }
         }
     }
