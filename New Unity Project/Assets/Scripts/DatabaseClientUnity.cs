@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MySqlConnector;
-
 using UnityClient;
 using UnityEngine;
 
@@ -17,7 +16,6 @@ public static class DatabaseClientUnity
         {
             try
             {
-                Debug.Log($"Attempting to open MySQL connection (Attempt {attempt + 1})");
                 var conn = new MySqlConnection(DatabaseConfigUnity.ConnectionString);
                 await conn.OpenAsync();
                 Debug.Log($"Database connection established on attempt {attempt + 1}");
