@@ -390,6 +390,7 @@
 "Assets/Scripts/RegisterManager.cs"
 "Assets/Scripts/RPGManager.cs"
 "Assets/Scripts/SceneSetup.cs"
+"Assets/Scripts/ServerConfig.cs"
 "Assets/Scripts/ShopManager.cs"
 "Assets/Scripts/TavernManager.cs"
 "Assets/Scripts/TavernServiceUnity.cs"
