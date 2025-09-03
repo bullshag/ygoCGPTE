@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MySqlConnector;
-
-using WinFormsApp2;
+using UnityClient;
 
 public static class DatabaseClientUnity
 {
@@ -16,7 +15,7 @@ public static class DatabaseClientUnity
         {
             try
             {
-                var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+                var conn = new MySqlConnection(DatabaseConfigUnity.ConnectionString);
                 await conn.OpenAsync();
                 return conn;
             }
