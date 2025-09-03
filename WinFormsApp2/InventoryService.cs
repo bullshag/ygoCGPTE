@@ -55,7 +55,7 @@ namespace WinFormsApp2
         }
 
         public static void Load(int userId, bool forceReload = false) =>
-            LoadAsync(userId, forceReload).GetAwaiter().GetResult();
+            LoadAsync(userId, forceReload).ConfigureAwait(false).GetAwaiter().GetResult();
 
         public static async Task LoadAsync(int userId, bool forceReload = false)
         {
@@ -67,7 +67,7 @@ namespace WinFormsApp2
 
             var itemRows = await DatabaseClient.QueryAsync(
                 "SELECT item_name, quantity FROM user_items WHERE account_id=@id",
-                new Dictionary<string, object?> { ["@id"] = userId });
+                new Dictionary<string, object?> { ["@id"] = userId }).ConfigureAwait(false);
             foreach (var row in itemRows)
             {
                 string name = Convert.ToString(row["item_name"]) ?? string.Empty;
@@ -81,7 +81,7 @@ namespace WinFormsApp2
 
             var eqRows = await DatabaseClient.QueryAsync(
                 "SELECT character_name, slot, item_name FROM character_equipment WHERE account_id=@id",
-                new Dictionary<string, object?> { ["@id"] = userId });
+                new Dictionary<string, object?> { ["@id"] = userId }).ConfigureAwait(false);
             foreach (var row in eqRows)
             {
                 string charName = Convert.ToString(row["character_name"]) ?? string.Empty;

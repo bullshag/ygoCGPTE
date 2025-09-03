@@ -43,8 +43,6 @@ namespace WinFormsApp2
             _regenTimer.Start();
         }
 
-        private void LoadPartyData() => LoadPartyDataAsync().GetAwaiter().GetResult();
-
         private async Task LoadPartyDataAsync()
         {
             _hiredMembers = PartyHireService.GetHiredMemberNames(_userId);
@@ -163,7 +161,7 @@ namespace WinFormsApp2
             }
         }
 
-        private void btnInspect_Click(object? sender, EventArgs e)
+        private async void btnInspect_Click(object? sender, EventArgs e)
         {
             if (lstParty.SelectedItem == null) return;
             string item = lstParty.SelectedItem.ToString() ?? string.Empty;
@@ -178,18 +176,17 @@ namespace WinFormsApp2
             cmd.Parameters.AddWithValue("@name", name);
             cmd.Parameters.AddWithValue("@m", isMerc ? 1 : 0);
             object? result = cmd.ExecuteScalar();
-                if (result != null)
-                {
-                    int charId = Convert.ToInt32(result);
-                    bool readOnly = _hiredMembers.Contains(name) || isMerc;
-                    using var inspect = new HeroInspectForm(_userId, charId, readOnly);
-                    inspect.ShowDialog(this);
-                    LoadPartyData();
-
-                }
+            if (result != null)
+            {
+                int charId = Convert.ToInt32(result);
+                bool readOnly = _hiredMembers.Contains(name) || isMerc;
+                using var inspect = new HeroInspectForm(_userId, charId, readOnly);
+                inspect.ShowDialog(this);
+                await LoadPartyDataAsync();
+            }
         }
 
-        private void ConfirmFire(string name, Action onConfirm)
+        private void ConfirmFire(string name, Func<Task> onConfirm)
         {
             var confirm = new Form
             {
@@ -203,7 +200,7 @@ namespace WinFormsApp2
             var lbl = new Label { Left = 10, Top = 10, Width = 260, Text = $"Type '{name}' to confirm firing:" };
             var txt = new TextBox { Left = 10, Top = 40, Width = 260 };
             var btn = new Button { Text = "Confirm", Left = 10, Top = 70, Width = 100, Enabled = false };
-            btn.Click += (s, e) => { confirm.Close(); onConfirm(); };
+            btn.Click += async (s, e) => { confirm.Close(); await onConfirm(); };
             txt.TextChanged += (s, e) => btn.Enabled = txt.Text == name;
 
             confirm.Controls.Add(lbl);
@@ -235,7 +232,7 @@ namespace WinFormsApp2
             ConfirmFire(name, () => FireHero(name));
         }
 
-        private void FireHero(string name)
+        private async Task FireHero(string name)
         {
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
@@ -251,7 +248,7 @@ namespace WinFormsApp2
             int hireCost = 10 + level * 10;
             int refund = (int)(hireCost * 0.4);
 
-            InventoryService.Load(_userId);
+            await InventoryService.LoadAsync(_userId);
             foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
             {
                 var eqItem = InventoryService.GetEquippedItem(name, slot);
@@ -291,7 +288,7 @@ namespace WinFormsApp2
             }
 
             MessageBox.Show($"{name} has been dismissed. You receive {refund} gold.");
-            LoadPartyData();
+            await LoadPartyDataAsync();
         }
 
         private void btnLogs_Click(object? sender, EventArgs e)
@@ -333,11 +330,11 @@ namespace WinFormsApp2
             }
 
             btnNavigate.Enabled = false;
-            _navigationWindow = new NavigationWindow(_userId, lstParty.Items.Count, hasBlessing, LoadPartyData);
-            _navigationWindow.FormClosed += (_, __) =>
+            _navigationWindow = new NavigationWindow(_userId, lstParty.Items.Count, hasBlessing, LoadPartyDataAsync);
+            _navigationWindow.FormClosed += async (_, __) =>
             {
                 btnNavigate.Enabled = true;
-                LoadPartyData();
+                await LoadPartyDataAsync();
                 _navigationWindow.Dispose();
                 _navigationWindow = null;
             };
@@ -375,17 +372,17 @@ namespace WinFormsApp2
 
             btnInventory.Enabled = false;
             _inventoryForm = new InventoryForm(_userId);
-            _inventoryForm.FormClosed += (_, __) =>
+            _inventoryForm.FormClosed += async (_, __) =>
             {
                 btnInventory.Enabled = true;
-                LoadPartyData();
+                await LoadPartyDataAsync();
                 _inventoryForm.Dispose();
                 _inventoryForm = null;
             };
             _inventoryForm.Show(this);
         }
 
-        private void Regenerate()
+        private async Task RegenerateAsync()
         {
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
@@ -399,16 +396,16 @@ namespace WinFormsApp2
             cmd.ExecuteNonQuery();
 
             int selectedIndex = lstParty.SelectedIndex;
-            LoadPartyData();
+            await LoadPartyDataAsync();
             if (selectedIndex >= 0 && selectedIndex < lstParty.Items.Count)
             {
                 lstParty.SelectedIndex = selectedIndex;
             }
         }
 
-        private void RegenTimer_Tick(object? sender, EventArgs e)
+        private async void RegenTimer_Tick(object? sender, EventArgs e)
         {
-            Regenerate();
+            await RegenerateAsync();
         }
 
         private void ChatTimer_Tick(object? sender, EventArgs e)

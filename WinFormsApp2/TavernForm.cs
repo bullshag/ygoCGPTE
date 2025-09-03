@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 
@@ -8,10 +9,10 @@ namespace WinFormsApp2
     public partial class TavernForm : Form
     {
         private readonly int _accountId;
-        private readonly Action _onUpdate;
+        private readonly Func<Task> _onUpdate;
         private int _searchCost;
 
-        public TavernForm(int accountId, Action onUpdate)
+        public TavernForm(int accountId, Func<Task> onUpdate)
         {
             _accountId = accountId;
             _onUpdate = onUpdate;
@@ -78,9 +79,9 @@ namespace WinFormsApp2
             window.Show(this);
         }
 
-        private void OnHire()
+        private async void OnHire()
         {
-            _onUpdate();
+            await _onUpdate();
             RefreshSearchCost();
         }
 
