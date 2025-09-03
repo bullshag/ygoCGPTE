@@ -11,7 +11,7 @@ namespace MySql.Data.MySqlClient
         public Task OpenAsync() => Task.CompletedTask;
         public void Close() { }
         public void Dispose() { }
-        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+        public ValueTask DisposeAsync() => default;
     }
 
     public class MySqlParameterCollection
@@ -30,14 +30,14 @@ namespace MySql.Data.MySqlClient
         public MySqlDataReader ExecuteReader() => new MySqlDataReader();
         public Task<MySqlDataReader> ExecuteReaderAsync() => Task.FromResult(new MySqlDataReader());
         public void Dispose() { }
-        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+        public ValueTask DisposeAsync() => default;
     }
 
     public class MySqlDataReader : IDisposable, IAsyncDisposable
     {
         public int FieldCount => 0;
         public void Dispose() { }
-        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+        public ValueTask DisposeAsync() => default;
         public bool Read() => false;
         public Task<bool> ReadAsync() => Task.FromResult(false);
         public string GetString(string name) => string.Empty;
