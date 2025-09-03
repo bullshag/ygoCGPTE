@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using WinFormsApp2;
 
 /// <summary>
@@ -23,5 +22,5 @@ public class MailboxPanel : MonoBehaviour
         _mail = MailService.GetUnread(0);
     }
 
-    public void BackToMain() => SceneManager.LoadScene("MainRPG");
+    public void BackToMain() => MainRPGNavigation.OpenMain();
 }
