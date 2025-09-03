@@ -44,15 +44,6 @@ public static class SceneSetup
             return;
 
         var canvases = Object.FindObjectsOfType<Canvas>();
-        if (canvases.Length == 0)
-        {
-            var canvasGO = GameObject.Find("Canvas") ?? new GameObject("Canvas");
-            var canvas = canvasGO.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceCamera;
-            canvas.worldCamera = mainCamera;
-            canvases = new[] { canvas };
-        }
-
         foreach (var canvas in canvases)
         {
             if ((canvas.renderMode == RenderMode.ScreenSpaceCamera ||

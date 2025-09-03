@@ -10,9 +10,9 @@ using UnityEngine.UI;
 public class RPGManager : MonoBehaviour
 {
     [Header("UI References")]
-    [SerializeField] private List<GameObject> partyMemberEntries = new();
-    [SerializeField] private Text goldText;
-    [SerializeField] private Text chatText;
+    public List<GameObject> partyMemberEntries = new();
+    public Text goldText;
+    public Text chatText;
 
     private List<CharacterData> partyMembers = new List<CharacterData>();
 

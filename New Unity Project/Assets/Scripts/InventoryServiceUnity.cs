@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MySql.Data.MySqlClient;
-using WinFormsApp2;
+using UnityEngine;
+using UnityEngine.Networking;
+using System.Text;
 
 namespace WinFormsApp2
 {
@@ -18,6 +19,12 @@ namespace WinFormsApp2
         private static bool _loaded;
         private static int _userId;
 
+        /// <summary>
+        /// Account identifier for the currently loaded inventory.
+        /// Exposed so other systems can reference the logged in account.
+        /// </summary>
+        public static int AccountId => _userId;
+
         public static void Load(int userId, bool forceReload = false) =>
             LoadAsync(userId, forceReload).ConfigureAwait(false).GetAwaiter().GetResult();
 
@@ -29,40 +36,31 @@ namespace WinFormsApp2
             Items.Clear();
             _equipment.Clear();
 
-            await using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
-            await conn.OpenAsync().ConfigureAwait(false);
+            using var req = UnityWebRequest.Get($"{DatabaseConfig.ApiBaseUrl}/inventory/{userId}");
+            await SendRequestAsync(req);
+            if (req.result != UnityWebRequest.Result.Success) return;
+            var data = JsonUtility.FromJson<InventoryPayload>(req.downloadHandler.text);
 
-            await using (MySqlCommand cmd = new MySqlCommand(
-                       "SELECT item_name, quantity FROM user_items WHERE account_id=@id", conn))
+            if (data.items != null)
             {
-                cmd.Parameters.AddWithValue("@id", userId);
-                await using var r = await cmd.ExecuteReaderAsync().ConfigureAwait(false);
-                while (await r.ReadAsync().ConfigureAwait(false))
+                foreach (var it in data.items)
                 {
-                    string name = r.GetString("item_name");
-                    int qty = r.GetInt32("quantity");
-                    Item? item = CreateItem(name);
+                    Item? item = CreateItem(it.item_name);
                     if (item != null)
-                        Items.Add(new InventoryItem { Item = item, Quantity = qty });
+                        Items.Add(new InventoryItem { Item = item, Quantity = it.quantity });
                 }
             }
 
-            await using (MySqlCommand cmd = new MySqlCommand(
-                       "SELECT character_name, slot, item_name FROM character_equipment WHERE account_id=@id", conn))
+            if (data.equipment != null)
             {
-                cmd.Parameters.AddWithValue("@id", userId);
-                await using var r = await cmd.ExecuteReaderAsync().ConfigureAwait(false);
-                while (await r.ReadAsync().ConfigureAwait(false))
+                foreach (var eq in data.equipment)
                 {
-                    string charName = r.GetString("character_name");
-                    string slot = r.GetString("slot");
-                    string itemName = r.GetString("item_name");
-                    Item? item = CreateItem(itemName);
+                    Item? item = CreateItem(eq.item_name);
                     if (item != null)
                     {
-                        if (!_equipment.ContainsKey(charName))
-                            _equipment[charName] = new Dictionary<EquipmentSlot, Item?>();
-                        _equipment[charName][Enum.Parse<EquipmentSlot>(slot)] = item;
+                        if (!_equipment.ContainsKey(eq.character_name))
+                            _equipment[eq.character_name] = new Dictionary<EquipmentSlot, Item?>();
+                        _equipment[eq.character_name][Enum.Parse<EquipmentSlot>(eq.slot)] = item;
                     }
                 }
             }
@@ -76,18 +74,14 @@ namespace WinFormsApp2
             if (name.StartsWith("Tome: "))
             {
                 string abilityName = name.Substring(6);
-                using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
-                conn.Open();
-                using MySqlCommand cmd = new MySqlCommand(
-                    "SELECT id, description FROM abilities WHERE name=@n", conn);
-                cmd.Parameters.AddWithValue("@n", abilityName);
-                using var r = cmd.ExecuteReader();
-                if (r.Read())
-                {
-                    int id = r.GetInt32("id");
-                    string desc = r.GetString("description");
-                    return new AbilityTome(id) { Name = name, Description = desc, Stackable = false };
-                }
+                var ability = GetAbilityAsync(abilityName).GetAwaiter().GetResult();
+                if (ability != null)
+                    return new AbilityTome(ability.Value.id)
+                    {
+                        Name = name,
+                        Description = ability.Value.description,
+                        Stackable = false
+                    };
             }
 
             return new Item { Name = name, Description = string.Empty, Stackable = true };
@@ -110,15 +104,9 @@ namespace WinFormsApp2
 
             if (_loaded)
             {
-                using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
-                conn.Open();
-                using MySqlCommand cmd = new MySqlCommand(
-                    "INSERT INTO user_items(account_id,item_name,quantity) VALUES(@id,@name,@qty) " +
-                    "ON DUPLICATE KEY UPDATE quantity=quantity+@qty", conn);
-                cmd.Parameters.AddWithValue("@id", _userId);
-                cmd.Parameters.AddWithValue("@name", item.Name);
-                cmd.Parameters.AddWithValue("@qty", qty);
-                cmd.ExecuteNonQuery();
+                PostJsonAsync($"{DatabaseConfig.ApiBaseUrl}/inventory/add",
+                    new InventoryUpdate { userId = _userId, itemName = item.Name, quantity = qty })
+                    .GetAwaiter().GetResult();
             }
         }
 
@@ -131,19 +119,9 @@ namespace WinFormsApp2
 
             if (_loaded)
             {
-                using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
-                conn.Open();
-                using MySqlCommand cmd = new MySqlCommand(
-                    "UPDATE user_items SET quantity=quantity-@qty WHERE account_id=@id AND item_name=@name", conn);
-                cmd.Parameters.AddWithValue("@qty", qty);
-                cmd.Parameters.AddWithValue("@id", _userId);
-                cmd.Parameters.AddWithValue("@name", item.Name);
-                cmd.ExecuteNonQuery();
-                using MySqlCommand del = new MySqlCommand(
-                    "DELETE FROM user_items WHERE account_id=@id AND item_name=@name AND quantity<=0", conn);
-                del.Parameters.AddWithValue("@id", _userId);
-                del.Parameters.AddWithValue("@name", item.Name);
-                del.ExecuteNonQuery();
+                PostJsonAsync($"{DatabaseConfig.ApiBaseUrl}/inventory/remove",
+                    new InventoryUpdate { userId = _userId, itemName = item.Name, quantity = qty })
+                    .GetAwaiter().GetResult();
             }
         }
 
@@ -172,28 +150,91 @@ namespace WinFormsApp2
         private static void SaveEquipment(string character, EquipmentSlot slot, Item? item)
         {
             if (!_loaded) return;
-            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
-            conn.Open();
-            if (item == null)
+            var payload = new EquipRequest
             {
-                using MySqlCommand cmd = new MySqlCommand(
-                    "DELETE FROM character_equipment WHERE account_id=@id AND character_name=@c AND slot=@s", conn);
-                cmd.Parameters.AddWithValue("@id", _userId);
-                cmd.Parameters.AddWithValue("@c", character);
-                cmd.Parameters.AddWithValue("@s", slot.ToString());
-                cmd.ExecuteNonQuery();
-            }
-            else
+                userId = _userId,
+                characterName = character,
+                slot = slot.ToString(),
+                itemName = item?.Name
+            };
+            PostJsonAsync($"{DatabaseConfig.ApiBaseUrl}/inventory/equip", payload)
+                .GetAwaiter().GetResult();
+        }
+
+        private static async Task SendRequestAsync(UnityWebRequest req)
+        {
+            var op = req.SendWebRequest();
+            while (!op.isDone)
+                await Task.Yield();
+        }
+
+        private static async Task PostJsonAsync(string url, object payload)
+        {
+            string json = JsonUtility.ToJson(payload);
+            using var req = new UnityWebRequest(url, "POST");
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+            req.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            req.downloadHandler = new DownloadHandlerBuffer();
+            req.SetRequestHeader("Content-Type", "application/json");
+            await SendRequestAsync(req);
+        }
+
+        private static async Task<(int id, string description)?> GetAbilityAsync(string abilityName)
+        {
+            using var req = UnityWebRequest.Get($"{DatabaseConfig.ApiBaseUrl}/ability/{UnityWebRequest.EscapeURL(abilityName)}");
+            await SendRequestAsync(req);
+            if (req.result == UnityWebRequest.Result.Success)
             {
-                using MySqlCommand cmd = new MySqlCommand(
-                    "REPLACE INTO character_equipment(account_id,character_name,slot,item_name) VALUES(@id,@c,@s,@n)", conn);
-                cmd.Parameters.AddWithValue("@id", _userId);
-                cmd.Parameters.AddWithValue("@c", character);
-                cmd.Parameters.AddWithValue("@s", slot.ToString());
-                cmd.Parameters.AddWithValue("@n", item.Name);
-                cmd.ExecuteNonQuery();
+                var resp = JsonUtility.FromJson<AbilityResponse>(req.downloadHandler.text);
+                return (resp.id, resp.description);
             }
+            return null;
+        }
+
+        [Serializable]
+        private class InventoryPayload
+        {
+            public List<ItemData> items = new();
+            public List<EquipData> equipment = new();
+        }
+
+        [Serializable]
+        private class ItemData
+        {
+            public string item_name = string.Empty;
+            public int quantity;
+        }
+
+        [Serializable]
+        private class EquipData
+        {
+            public string character_name = string.Empty;
+            public string slot = string.Empty;
+            public string item_name = string.Empty;
+        }
+
+        [Serializable]
+        private class InventoryUpdate
+        {
+            public int userId;
+            public string itemName = string.Empty;
+            public int quantity;
+        }
+
+        [Serializable]
+        private class EquipRequest
+        {
+            public int userId;
+            public string characterName = string.Empty;
+            public string slot = string.Empty;
+            public string? itemName;
+        }
+
+        [Serializable]
+        private class AbilityResponse
+        {
+            public int id;
+            public string description = string.Empty;
         }
     }
 }
-
