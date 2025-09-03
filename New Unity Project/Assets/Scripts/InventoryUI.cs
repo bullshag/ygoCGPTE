@@ -9,6 +9,7 @@ using TMPro;
 using WinFormsApp2;
 
 using UnityClient;
+using System.IO;
 using MySqlConnector;
 
 public class InventoryUI : MonoBehaviour
@@ -116,21 +117,27 @@ public class InventoryUI : MonoBehaviour
                 ["@uid"] = userId,
                 ["@name"] = target
             };
+
             int result = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(sqlPath), parameters);
+
             Debug.Log($"SQL rows affected: {result} for {item.Name} on {target}");
             InventoryServiceUnity.RemoveItem(item);
             PopulateItems();
         }
         else if (item is AbilityTome tome)
         {
+
             string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_inventory_use_tome.sql");
+
             var parameters = new Dictionary<string, object?>
             {
                 ["@aid"] = tome.AbilityId,
                 ["@uid"] = userId,
                 ["@name"] = target
             };
+
             int result = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(sqlPath), parameters);
+
             Debug.Log($"SQL rows affected: {result} for {item.Name} on {target}");
             InventoryServiceUnity.RemoveItem(item);
             PopulateItems();
