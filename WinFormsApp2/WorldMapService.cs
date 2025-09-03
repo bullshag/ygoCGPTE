@@ -175,7 +175,7 @@ namespace WinFormsApp2
                 {
                     int minLevel = int.MaxValue;
                     int maxLevel = 0;
-                    using (var cmd = new MySqlCommand("SELECT n.level FROM npcs n JOIN npc_locations l ON n.name=l.npc_name WHERE l.node_id=@id", conn))
+                    using (var cmd = new MySqlCommand("SELECT n.level FROM npcs n JOIN npc_locations l ON n.id=l.npc_id WHERE l.node_id=@id", conn))
                     {
                         cmd.Parameters.AddWithValue("@id", node.Id);
                         using var reader = cmd.ExecuteReader();

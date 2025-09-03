@@ -151,7 +151,7 @@ namespace WinFormsApp2
             var candidates = new List<(string Name, int Power, int Level)>();
             using (var listCmd = new MySqlCommand(@"SELECT n.name, n.power, n.level
                                                     FROM npcs n
-                                                    LEFT JOIN npc_locations l ON n.name = l.npc_name
+                                                    LEFT JOIN npc_locations l ON n.id = l.npc_id
                                                     WHERE n.level BETWEEN @min AND @max
                                                       AND (@area IS NULL OR l.node_id = @area)", conn))
             {
