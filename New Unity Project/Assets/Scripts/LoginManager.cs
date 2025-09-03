@@ -176,7 +176,7 @@ public class LoginManager : MonoBehaviour
                 await DatabaseClientUnity.ExecuteAsync(
                     "UPDATE accounts SET last_seen = NOW() WHERE id = @id",
                     new Dictionary<string, object?> { ["@id"] = userId });
-                InventoryService.Load(userId);
+                InventoryServiceUnity.Load(userId);
                 SceneManager.LoadScene("RPG");
             }
         }
