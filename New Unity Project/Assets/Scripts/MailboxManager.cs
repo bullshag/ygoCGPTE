@@ -1,26 +1,43 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityClient;
 
 /// <summary>
 /// Retrieves player mail and interacts with the server-side mailbox.
 /// </summary>
 public class MailboxManager : MonoBehaviour
 {
-    private string BaseUrl => DatabaseConfigUnity.ApiBaseUrl;
-
     /// <summary>
     /// Get unread mail for the given account.
     /// </summary>
     public async Task<List<MailMessage>> GetMailAsync(int accountId)
     {
-        using var req = UnityWebRequest.Get($"{BaseUrl}/mail/unread?accountId={accountId}");
-        await req.SendWebRequest();
-        if (req.result != UnityWebRequest.Result.Success)
+        try
+        {
+            string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_mailbox_unread.sql");
+            var rows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath),
+                new Dictionary<string, object?> { ["@accountId"] = accountId });
+            var messages = new List<MailMessage>();
+            foreach (var row in rows)
+            {
+                messages.Add(new MailMessage
+                {
+                    id = Convert.ToInt32(row["id"]),
+                    senderId = Convert.ToInt32(row["sender_id"]),
+                    subject = Convert.ToString(row["subject"]) ?? string.Empty,
+                    body = Convert.ToString(row["body"]) ?? string.Empty
+                });
+            }
+            Debug.Log($"Retrieved {messages.Count} messages for account {accountId}");
+            return messages;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error retrieving mail for account {accountId}: {ex.Message}");
             return new List<MailMessage>();
-        return JsonUtility.FromJson<MailList>(req.downloadHandler.text).mail;
+        }
     }
 
     /// <summary>
@@ -28,11 +45,19 @@ public class MailboxManager : MonoBehaviour
     /// </summary>
     public async Task<bool> MarkReadAsync(int messageId)
     {
-        var form = new WWWForm();
-        form.AddField("messageId", messageId);
-        using var req = UnityWebRequest.Post($"{BaseUrl}/mail/markRead", form);
-        await req.SendWebRequest();
-        return req.result == UnityWebRequest.Result.Success;
+        try
+        {
+            string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_mailbox_mark_read.sql");
+            int rows = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(sqlPath),
+                new Dictionary<string, object?> { ["@messageId"] = messageId });
+            Debug.Log($"Marked message {messageId} as read");
+            return rows > 0;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error marking message {messageId} as read: {ex.Message}");
+            return false;
+        }
     }
 
     [System.Serializable]
