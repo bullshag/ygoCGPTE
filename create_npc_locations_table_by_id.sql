@@ -1,7 +1,9 @@
+USE accounts;
+
 CREATE TABLE IF NOT EXISTS npc_locations (
-    npc_name VARCHAR(255) NOT NULL,
+    npc_id INT NOT NULL,
     node_id VARCHAR(50) NOT NULL,
-    PRIMARY KEY (npc_name, node_id),
-    FOREIGN KEY (npc_name) REFERENCES npcs(name),
+    PRIMARY KEY (npc_id, node_id),
+    FOREIGN KEY (npc_id) REFERENCES npcs(id),
     FOREIGN KEY (node_id) REFERENCES nodes(id)
 );

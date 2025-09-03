@@ -185,9 +185,20 @@ namespace WinFormsApp2
             {
                 for (int attempt = 0; attempt < 50; attempt++)
                 {
-                    using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style, power FROM npcs WHERE power BETWEEN @min AND @max ORDER BY RAND() LIMIT 1", conn);
+                    using var npcCmd = new MySqlCommand(@"SELECT n.name, n.level, n.current_hp, n.max_hp, n.mana, n.strength, n.dex,
+                                                              n.intelligence, n.action_speed, n.melee_defense, n.magic_defense,
+                                                              n.role, n.targeting_style, n.power
+                                                       FROM npcs n
+                                                       LEFT JOIN npc_locations l ON n.id = l.npc_id
+                                                       WHERE n.power BETWEEN @min AND @max
+                                                         AND (@area IS NULL OR l.node_id = @area)
+                                                         AND (@lvlMin IS NULL OR n.level BETWEEN @lvlMin AND @lvlMax)
+                                                       ORDER BY RAND() LIMIT 1", conn);
                     npcCmd.Parameters.AddWithValue("@min", minPower);
                     npcCmd.Parameters.AddWithValue("@max", maxPower);
+                    npcCmd.Parameters.AddWithValue("@area", (object?)_areaId ?? DBNull.Value);
+                    npcCmd.Parameters.AddWithValue("@lvlMin", (object?)_areaMinPower ?? DBNull.Value);
+                    npcCmd.Parameters.AddWithValue("@lvlMax", (object?)_areaMaxPower ?? DBNull.Value);
                     using var r2 = npcCmd.ExecuteReader();
                     if (!r2.Read())
                         return null;
