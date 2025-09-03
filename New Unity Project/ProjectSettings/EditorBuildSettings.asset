@@ -4,6 +4,30 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Login/Login.unity
+    guid: a8917ef87efd9b26172ed36b571c8877
+  - enabled: 1
+    path: Assets/Scenes/Register/Register.unity
+    guid: c17fac0fa24a44f79d6adc5fc071e256
+  - enabled: 1
+    path: Assets/Scenes/RPG/RPG.unity
+    guid: 9657dddb58b346c4b4e56be9e59b5d97
+  - enabled: 1
+    path: Assets/Scenes/Battle.unity
+    guid: 8c5baeb02a9251f43be36c08cef057ba
+  - enabled: 1
+    path: Assets/Scenes/Mailbox.unity
+    guid: 2c040be2e3d989e43967a58f1c273e63
+  - enabled: 1
+    path: Assets/Scenes/MainRPG.unity
+    guid: cef19d68bed42b046840865e9874cf70
+  - enabled: 1
+    path: Assets/Scenes/Shop.unity
+    guid: 01f6c2756fca03749851d663bc54799a
+  - enabled: 1
+    path: Assets/Scenes/Tavern.unity
+    guid: 6364bd779a6722547b2c175bbff37e6c
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

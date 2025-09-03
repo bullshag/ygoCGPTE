@@ -14,14 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PixelRect:
     serializedVersion: 2
-    x: 366
-    y: 60
-    width: 321
+    x: 1186
+    y: 157
+    width: 725
     height: 578
   m_ShowMode: 0
-  m_Title: NuGet For Unity
+  m_Title: Build Profiles
   m_RootView: {fileID: 4}
-  m_MinSize: {x: 50, y: 76}
+  m_MinSize: {x: 725, y: 426}
   m_MaxSize: {x: 4000, y: 4026}
   m_Maximized: 0
 --- !u!114 &2
@@ -44,7 +44,7 @@ MonoBehaviour:
     height: 989
   m_ShowMode: 4
   m_Title: Console
-  m_RootView: {fileID: 9}
+  m_RootView: {fileID: 5}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
   m_Maximized: 1
@@ -58,16 +58,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: NugetWindow
+  m_Name: BuildProfileWindow
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 321
+    width: 725
     height: 578
-  m_MinSize: {x: 50, y: 76}
+  m_MinSize: {x: 725, y: 426}
   m_MaxSize: {x: 4000, y: 4026}
   m_ActualView: {fileID: 15}
   m_Panes:
@@ -92,119 +92,14 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 321
+    width: 725
     height: 578
-  m_MinSize: {x: 50, y: 76}
+  m_MinSize: {x: 725, y: 426}
   m_MaxSize: {x: 4000, y: 4026}
   vertical: 0
-  controlID: 326
+  controlID: 284
   draggingID: 0
 --- !u!114 &5
-MonoBehaviour:
-  m_ObjectHideFlags: 52
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 1
-  m_Script: {fileID: 12010, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Children:
-  - {fileID: 12}
-  - {fileID: 6}
-  m_Position:
-    serializedVersion: 2
-    x: 0
-    y: 36
-    width: 1920
-    height: 933
-  m_MinSize: {x: 300, y: 100}
-  m_MaxSize: {x: 24288, y: 16192}
-  vertical: 0
-  controlID: 96
-  draggingID: 0
---- !u!114 &6
-MonoBehaviour:
-  m_ObjectHideFlags: 52
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 1
-  m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Children: []
-  m_Position:
-    serializedVersion: 2
-    x: 1465
-    y: 0
-    width: 455
-    height: 933
-  m_MinSize: {x: 276, y: 76}
-  m_MaxSize: {x: 4001, y: 4026}
-  m_ActualView: {fileID: 17}
-  m_Panes:
-  - {fileID: 17}
-  m_Selected: 0
-  m_LastSelected: 0
---- !u!114 &7
-MonoBehaviour:
-  m_ObjectHideFlags: 52
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 1
-  m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Children: []
-  m_Position:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 363
-    height: 554
-  m_MinSize: {x: 201, y: 226}
-  m_MaxSize: {x: 4001, y: 4026}
-  m_ActualView: {fileID: 18}
-  m_Panes:
-  - {fileID: 18}
-  m_Selected: 0
-  m_LastSelected: 0
---- !u!114 &8
-MonoBehaviour:
-  m_ObjectHideFlags: 52
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 1
-  m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: ConsoleWindow
-  m_EditorClassIdentifier: 
-  m_Children: []
-  m_Position:
-    serializedVersion: 2
-    x: 0
-    y: 554
-    width: 1465
-    height: 379
-  m_MinSize: {x: 101, y: 126}
-  m_MaxSize: {x: 4001, y: 4026}
-  m_ActualView: {fileID: 21}
-  m_Panes:
-  - {fileID: 16}
-  - {fileID: 21}
-  m_Selected: 1
-  m_LastSelected: 0
---- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
   m_CorrespondingSourceObject: {fileID: 0}
@@ -217,9 +112,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Children:
-  - {fileID: 10}
-  - {fileID: 5}
-  - {fileID: 11}
+  - {fileID: 6}
+  - {fileID: 8}
+  - {fileID: 7}
   m_Position:
     serializedVersion: 2
     x: 0
@@ -232,7 +127,7 @@ MonoBehaviour:
   m_TopViewHeight: 36
   m_UseBottomView: 1
   m_BottomViewHeight: 20
---- !u!114 &10
+--- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
   m_CorrespondingSourceObject: {fileID: 0}
@@ -254,7 +149,7 @@ MonoBehaviour:
   m_MinSize: {x: 0, y: 0}
   m_MaxSize: {x: 0, y: 0}
   m_LastLoadedLayoutName: 
---- !u!114 &11
+--- !u!114 &7
 MonoBehaviour:
   m_ObjectHideFlags: 52
   m_CorrespondingSourceObject: {fileID: 0}
@@ -275,7 +170,7 @@ MonoBehaviour:
     height: 20
   m_MinSize: {x: 0, y: 0}
   m_MaxSize: {x: 0, y: 0}
---- !u!114 &12
+--- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
   m_CorrespondingSourceObject: {fileID: 0}
@@ -288,8 +183,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Children:
+  - {fileID: 9}
+  - {fileID: 14}
+  m_Position:
+    serializedVersion: 2
+    x: 0
+    y: 36
+    width: 1920
+    height: 933
+  m_MinSize: {x: 300, y: 100}
+  m_MaxSize: {x: 24288, y: 16192}
+  vertical: 0
+  controlID: 999
+  draggingID: 0
+--- !u!114 &9
+MonoBehaviour:
+  m_ObjectHideFlags: 52
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 1
+  m_Script: {fileID: 12010, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Children:
+  - {fileID: 10}
   - {fileID: 13}
-  - {fileID: 8}
   m_Position:
     serializedVersion: 2
     x: 0
@@ -299,9 +220,9 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 38
+  controlID: 948
   draggingID: 0
---- !u!114 &13
+--- !u!114 &10
 MonoBehaviour:
   m_ObjectHideFlags: 52
   m_CorrespondingSourceObject: {fileID: 0}
@@ -314,8 +235,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Children:
-  - {fileID: 7}
-  - {fileID: 14}
+  - {fileID: 11}
+  - {fileID: 12}
   m_Position:
     serializedVersion: 2
     x: 0
@@ -325,9 +246,35 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 50}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 39
+  controlID: 949
   draggingID: 0
---- !u!114 &14
+--- !u!114 &11
+MonoBehaviour:
+  m_ObjectHideFlags: 52
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 1
+  m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Children: []
+  m_Position:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 363
+    height: 554
+  m_MinSize: {x: 201, y: 226}
+  m_MaxSize: {x: 4001, y: 4026}
+  m_ActualView: {fileID: 17}
+  m_Panes:
+  - {fileID: 17}
+  m_Selected: 0
+  m_LastSelected: 0
+--- !u!114 &12
 MonoBehaviour:
   m_ObjectHideFlags: 52
   m_CorrespondingSourceObject: {fileID: 0}
@@ -348,12 +295,65 @@ MonoBehaviour:
     height: 554
   m_MinSize: {x: 202, y: 226}
   m_MaxSize: {x: 4002, y: 4026}
-  m_ActualView: {fileID: 19}
+  m_ActualView: {fileID: 18}
   m_Panes:
+  - {fileID: 18}
   - {fileID: 19}
-  - {fileID: 20}
   m_Selected: 0
   m_LastSelected: 1
+--- !u!114 &13
+MonoBehaviour:
+  m_ObjectHideFlags: 52
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 1
+  m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: ConsoleWindow
+  m_EditorClassIdentifier: 
+  m_Children: []
+  m_Position:
+    serializedVersion: 2
+    x: 0
+    y: 554
+    width: 1465
+    height: 379
+  m_MinSize: {x: 101, y: 126}
+  m_MaxSize: {x: 4001, y: 4026}
+  m_ActualView: {fileID: 16}
+  m_Panes:
+  - {fileID: 20}
+  - {fileID: 16}
+  m_Selected: 1
+  m_LastSelected: 0
+--- !u!114 &14
+MonoBehaviour:
+  m_ObjectHideFlags: 52
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 1
+  m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Children: []
+  m_Position:
+    serializedVersion: 2
+    x: 1465
+    y: 0
+    width: 455
+    height: 933
+  m_MinSize: {x: 276, y: 76}
+  m_MaxSize: {x: 4001, y: 4026}
+  m_ActualView: {fileID: 21}
+  m_Panes:
+  - {fileID: 21}
+  m_Selected: 0
+  m_LastSelected: 0
 --- !u!114 &15
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -363,21 +363,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 38775846, guid: 8dc1be91775c4bb469f6b74cef450eaa, type: 3}
-  m_Name: NuGetForUnity
+  m_Script: {fileID: 15004, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
   m_EditorClassIdentifier: 
-  m_MinSize: {x: 50, y: 50}
+  m_MinSize: {x: 725, y: 400}
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
-    m_Text: NuGet For Unity
+    m_Text: Build Profiles
     m_Image: {fileID: 0}
     m_Tooltip: 
-    m_TextWithWhitespace: "NuGet For Unity\u200B"
+    m_TextWithWhitespace: "Build Profiles\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 366
-    y: 60
-    width: 321
+    x: 1186
+    y: 157
+    width: 725
     height: 552
   m_SerializedDataModeController:
     m_DataMode: 0
@@ -390,2666 +390,6 @@ MonoBehaviour:
     m_SaveData: []
     m_ContainerData: []
     m_OverlaysVisible: 1
-  defaultIcon: {fileID: 2800000, guid: eec19781926cd2248b7c9abfde8db555, type: 3}
-  hasRefreshed: 1
-  numberToSkip: 0
-  serializableAvailablePackages:
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: MySql.Data
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 9.4.0
-      <IsManuallyInstalled>k__BackingField: 0
-      dependencies:
-      - <TargetFramework>k__BackingField: .NETFramework4.6.2
-      - <TargetFramework>k__BackingField: .NETFramework4.8
-      - <TargetFramework>k__BackingField: net8.0
-      - <TargetFramework>k__BackingField: net9.0
-      - <TargetFramework>k__BackingField: .NETStandard2.0
-      - <TargetFramework>k__BackingField: .NETStandard2.1
-      dependenciesFetched: 1
-      icon: {fileID: 0}
-      iconUrl: https://api.nuget.org/v3-flatcontainer/mysql.data/9.4.0/icon
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 9.4.0
-      - <FullVersion>k__BackingField: 9.3.0
-      - <FullVersion>k__BackingField: 9.2.0
-      - <FullVersion>k__BackingField: 9.1.0
-      - <FullVersion>k__BackingField: 9.0.0
-      - <FullVersion>k__BackingField: 8.4.0
-      - <FullVersion>k__BackingField: 8.3.0
-      - <FullVersion>k__BackingField: 8.2.0
-      - <FullVersion>k__BackingField: 8.1.0
-      - <FullVersion>k__BackingField: 8.0.33
-      - <FullVersion>k__BackingField: 8.0.32.1
-      - <FullVersion>k__BackingField: 8.0.32
-      - <FullVersion>k__BackingField: 8.0.31
-      - <FullVersion>k__BackingField: 8.0.30
-      - <FullVersion>k__BackingField: 8.0.29
-      - <FullVersion>k__BackingField: 8.0.28
-      - <FullVersion>k__BackingField: 8.0.27
-      - <FullVersion>k__BackingField: 8.0.26
-      - <FullVersion>k__BackingField: 8.0.25
-      - <FullVersion>k__BackingField: 8.0.24
-      - <FullVersion>k__BackingField: 8.0.23
-      - <FullVersion>k__BackingField: 8.0.22
-      - <FullVersion>k__BackingField: 8.0.21
-      - <FullVersion>k__BackingField: 8.0.20
-      - <FullVersion>k__BackingField: 8.0.19
-      - <FullVersion>k__BackingField: 8.0.18
-      - <FullVersion>k__BackingField: 8.0.17
-      - <FullVersion>k__BackingField: 8.0.16
-      - <FullVersion>k__BackingField: 8.0.15
-      - <FullVersion>k__BackingField: 8.0.14
-      - <FullVersion>k__BackingField: 8.0.13
-      - <FullVersion>k__BackingField: 8.0.12
-      - <FullVersion>k__BackingField: 8.0.11
-      - <FullVersion>k__BackingField: 6.10.9
-      - <FullVersion>k__BackingField: 6.10.7
-      - <FullVersion>k__BackingField: 6.9.12
-      - <FullVersion>k__BackingField: 6.8.8
-      - <FullVersion>k__BackingField: 6.7.9
-      <Authors>k__BackingField:
-      - Oracle Corporation
-      <Description>k__BackingField: MySql.Data.MySqlClient .Net Core Class Library
-      <TotalDownloads>k__BackingField: 118596037
-      <LicenseUrl>k__BackingField: https://www.nuget.org/packages/MySql.Data/9.4.0/license
-      <ProjectUrl>k__BackingField: https://dev.mysql.com/downloads/
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: MySql.Data
-      <DownloadUrl>k__BackingField: 
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: Pomelo.EntityFrameworkCore.MySql
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 9.0.0
-      <IsManuallyInstalled>k__BackingField: 0
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: https://api.nuget.org/v3-flatcontainer/pomelo.entityframeworkcore.mysql/9.0.0/icon
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 9.0.0
-      - <FullVersion>k__BackingField: 9.0.0-rc.1.efcore.9.0.0
-      - <FullVersion>k__BackingField: 9.0.0-preview.3.efcore.9.0.0
-      - <FullVersion>k__BackingField: 9.0.0-preview.2.efcore.9.0.0
-      - <FullVersion>k__BackingField: 9.0.0-preview.1
-      - <FullVersion>k__BackingField: 8.0.3
-      - <FullVersion>k__BackingField: 8.0.2
-      - <FullVersion>k__BackingField: 8.0.1
-      - <FullVersion>k__BackingField: 8.0.0
-      - <FullVersion>k__BackingField: 8.0.0-beta.2
-      - <FullVersion>k__BackingField: 8.0.0-beta.1
-      - <FullVersion>k__BackingField: 7.0.0
-      - <FullVersion>k__BackingField: 7.0.0-silver.1
-      - <FullVersion>k__BackingField: 7.0.0-alpha.1
-      - <FullVersion>k__BackingField: 6.0.3
-      - <FullVersion>k__BackingField: 6.0.2
-      - <FullVersion>k__BackingField: 6.0.1
-      - <FullVersion>k__BackingField: 6.0.0
-      - <FullVersion>k__BackingField: 6.0.0-rc.2
-      - <FullVersion>k__BackingField: 6.0.0-rc.1
-      - <FullVersion>k__BackingField: 6.0.0-preview.7
-      - <FullVersion>k__BackingField: 6.0.0-preview.6
-      - <FullVersion>k__BackingField: 6.0.0-preview.5
-      - <FullVersion>k__BackingField: 6.0.0-preview.4
-      - <FullVersion>k__BackingField: 5.0.4
-      - <FullVersion>k__BackingField: 5.0.3
-      - <FullVersion>k__BackingField: 5.0.2
-      - <FullVersion>k__BackingField: 5.0.1
-      - <FullVersion>k__BackingField: 5.0.0
-      - <FullVersion>k__BackingField: 5.0.0-beta.2
-      - <FullVersion>k__BackingField: 5.0.0-beta.1
-      - <FullVersion>k__BackingField: 5.0.0-alpha.2
-      - <FullVersion>k__BackingField: 5.0.0-alpha.1
-      - <FullVersion>k__BackingField: 3.2.7
-      - <FullVersion>k__BackingField: 3.2.6
-      - <FullVersion>k__BackingField: 3.2.5
-      - <FullVersion>k__BackingField: 3.2.4
-      - <FullVersion>k__BackingField: 3.2.3
-      - <FullVersion>k__BackingField: 3.2.2
-      - <FullVersion>k__BackingField: 3.2.1
-      - <FullVersion>k__BackingField: 3.2.0
-      - <FullVersion>k__BackingField: 3.1.2
-      - <FullVersion>k__BackingField: 3.1.1
-      - <FullVersion>k__BackingField: 3.1.0
-      - <FullVersion>k__BackingField: 3.1.0-rc1.final
-      - <FullVersion>k__BackingField: 3.0.1
-      - <FullVersion>k__BackingField: 3.0.0
-      - <FullVersion>k__BackingField: 3.0.0-rc3.final
-      - <FullVersion>k__BackingField: 3.0.0-rc2.final
-      - <FullVersion>k__BackingField: 3.0.0-rc1.final
-      - <FullVersion>k__BackingField: 2.2.6
-      - <FullVersion>k__BackingField: 2.2.0
-      - <FullVersion>k__BackingField: 2.1.4
-      - <FullVersion>k__BackingField: 2.1.2
-      - <FullVersion>k__BackingField: 2.1.1
-      - <FullVersion>k__BackingField: 2.1.0
-      - <FullVersion>k__BackingField: 2.0.1
-      - <FullVersion>k__BackingField: 2.0.0.1
-      - <FullVersion>k__BackingField: 2.0.0
-      - <FullVersion>k__BackingField: 1.1.2
-      - <FullVersion>k__BackingField: 1.1.0
-      - <FullVersion>k__BackingField: 1.0.1
-      - <FullVersion>k__BackingField: 1.0.0
-      <Authors>k__BackingField:
-      - Laurents Meyer, Caleb Lloyd, Yuko Zheng
-      <Description>k__BackingField: Pomelo's MySQL database provider for Entity Framework
-        Core.
-      <TotalDownloads>k__BackingField: 99078811
-      <LicenseUrl>k__BackingField: https://www.nuget.org/packages/Pomelo.EntityFrameworkCore.MySql/9.0.0/license
-      <ProjectUrl>k__BackingField: https://github.com/PomeloFoundation/Pomelo.EntityFrameworkCore.MySql
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: Pomelo.EntityFrameworkCore.MySql
-      <DownloadUrl>k__BackingField: 
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: MySqlConnector
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 2.4.0
-      <IsManuallyInstalled>k__BackingField: 1
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: https://api.nuget.org/v3-flatcontainer/mysqlconnector/2.4.0/icon
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 2.4.0
-      - <FullVersion>k__BackingField: 2.4.0-beta.2
-      - <FullVersion>k__BackingField: 2.4.0-beta.1
-      - <FullVersion>k__BackingField: 2.3.7
-      - <FullVersion>k__BackingField: 2.3.6
-      - <FullVersion>k__BackingField: 2.3.5
-      - <FullVersion>k__BackingField: 2.3.4
-      - <FullVersion>k__BackingField: 2.3.3
-      - <FullVersion>k__BackingField: 2.3.2
-      - <FullVersion>k__BackingField: 2.3.1
-      - <FullVersion>k__BackingField: 2.3.0
-      - <FullVersion>k__BackingField: 2.2.7
-      - <FullVersion>k__BackingField: 2.2.6
-      - <FullVersion>k__BackingField: 2.2.5
-      - <FullVersion>k__BackingField: 2.2.4
-      - <FullVersion>k__BackingField: 2.2.3
-      - <FullVersion>k__BackingField: 2.2.2
-      - <FullVersion>k__BackingField: 2.2.1
-      - <FullVersion>k__BackingField: 2.2.0
-      - <FullVersion>k__BackingField: 2.1.13
-      - <FullVersion>k__BackingField: 2.1.12
-      - <FullVersion>k__BackingField: 2.1.11
-      - <FullVersion>k__BackingField: 2.1.10
-      - <FullVersion>k__BackingField: 2.1.9
-      - <FullVersion>k__BackingField: 2.1.8
-      - <FullVersion>k__BackingField: 2.1.7
-      - <FullVersion>k__BackingField: 2.1.6
-      - <FullVersion>k__BackingField: 2.1.5
-      - <FullVersion>k__BackingField: 2.1.4
-      - <FullVersion>k__BackingField: 2.1.3
-      - <FullVersion>k__BackingField: 2.1.2
-      - <FullVersion>k__BackingField: 2.1.1
-      - <FullVersion>k__BackingField: 2.1.0
-      - <FullVersion>k__BackingField: 2.0.0
-      - <FullVersion>k__BackingField: 1.3.14
-      - <FullVersion>k__BackingField: 1.3.13
-      - <FullVersion>k__BackingField: 1.3.12
-      - <FullVersion>k__BackingField: 1.3.11
-      - <FullVersion>k__BackingField: 1.3.10
-      - <FullVersion>k__BackingField: 1.3.9
-      - <FullVersion>k__BackingField: 1.3.8
-      - <FullVersion>k__BackingField: 1.3.7
-      - <FullVersion>k__BackingField: 1.3.6
-      - <FullVersion>k__BackingField: 1.3.5
-      - <FullVersion>k__BackingField: 1.3.4
-      - <FullVersion>k__BackingField: 1.3.3
-      - <FullVersion>k__BackingField: 1.3.2
-      - <FullVersion>k__BackingField: 1.3.1
-      - <FullVersion>k__BackingField: 1.3.0
-      - <FullVersion>k__BackingField: 1.2.1
-      - <FullVersion>k__BackingField: 1.2.0
-      - <FullVersion>k__BackingField: 1.1.0
-      - <FullVersion>k__BackingField: 1.0.1
-      - <FullVersion>k__BackingField: 1.0.0
-      - <FullVersion>k__BackingField: 0.69.10
-      - <FullVersion>k__BackingField: 0.69.9
-      - <FullVersion>k__BackingField: 0.69.8
-      - <FullVersion>k__BackingField: 0.69.7
-      - <FullVersion>k__BackingField: 0.69.6
-      - <FullVersion>k__BackingField: 0.69.5
-      - <FullVersion>k__BackingField: 0.69.4
-      - <FullVersion>k__BackingField: 0.69.3
-      - <FullVersion>k__BackingField: 0.69.2
-      - <FullVersion>k__BackingField: 0.69.1
-      - <FullVersion>k__BackingField: 0.69.0
-      - <FullVersion>k__BackingField: 0.68.1
-      - <FullVersion>k__BackingField: 0.68.0
-      - <FullVersion>k__BackingField: 0.67.0
-      - <FullVersion>k__BackingField: 0.66.0
-      - <FullVersion>k__BackingField: 0.65.0
-      - <FullVersion>k__BackingField: 0.64.2
-      - <FullVersion>k__BackingField: 0.64.1
-      - <FullVersion>k__BackingField: 0.64.0
-      - <FullVersion>k__BackingField: 0.63.2
-      - <FullVersion>k__BackingField: 0.63.1
-      - <FullVersion>k__BackingField: 0.63.0
-      - <FullVersion>k__BackingField: 0.62.0
-      - <FullVersion>k__BackingField: 0.61.0
-      - <FullVersion>k__BackingField: 0.60.4
-      - <FullVersion>k__BackingField: 0.60.3
-      - <FullVersion>k__BackingField: 0.60.2
-      - <FullVersion>k__BackingField: 0.60.1
-      - <FullVersion>k__BackingField: 0.60.0
-      - <FullVersion>k__BackingField: 0.59.2
-      - <FullVersion>k__BackingField: 0.59.1
-      - <FullVersion>k__BackingField: 0.59.0
-      - <FullVersion>k__BackingField: 0.58.0
-      - <FullVersion>k__BackingField: 0.57.0
-      - <FullVersion>k__BackingField: 0.56.0
-      - <FullVersion>k__BackingField: 0.55.0
-      - <FullVersion>k__BackingField: 0.54.0
-      - <FullVersion>k__BackingField: 0.53.0
-      - <FullVersion>k__BackingField: 0.52.0
-      - <FullVersion>k__BackingField: 0.51.1
-      - <FullVersion>k__BackingField: 0.51.0
-      - <FullVersion>k__BackingField: 0.50.0
-      - <FullVersion>k__BackingField: 0.49.3
-      - <FullVersion>k__BackingField: 0.49.2
-      - <FullVersion>k__BackingField: 0.49.0
-      - <FullVersion>k__BackingField: 0.48.2
-      - <FullVersion>k__BackingField: 0.48.1
-      - <FullVersion>k__BackingField: 0.48.0
-      - <FullVersion>k__BackingField: 0.47.1
-      - <FullVersion>k__BackingField: 0.47.0
-      - <FullVersion>k__BackingField: 0.46.2
-      - <FullVersion>k__BackingField: 0.46.1
-      - <FullVersion>k__BackingField: 0.46.0
-      - <FullVersion>k__BackingField: 0.45.1
-      - <FullVersion>k__BackingField: 0.45.0
-      - <FullVersion>k__BackingField: 0.44.1
-      - <FullVersion>k__BackingField: 0.44.0
-      - <FullVersion>k__BackingField: 0.43.0
-      - <FullVersion>k__BackingField: 0.42.3
-      - <FullVersion>k__BackingField: 0.42.2
-      - <FullVersion>k__BackingField: 0.42.1
-      - <FullVersion>k__BackingField: 0.42.0
-      - <FullVersion>k__BackingField: 0.41.0
-      - <FullVersion>k__BackingField: 0.40.4
-      - <FullVersion>k__BackingField: 0.40.3
-      - <FullVersion>k__BackingField: 0.40.2
-      - <FullVersion>k__BackingField: 0.36.0
-      - <FullVersion>k__BackingField: 0.35.0
-      - <FullVersion>k__BackingField: 0.32.0
-      - <FullVersion>k__BackingField: 0.30.0
-      - <FullVersion>k__BackingField: 0.29.4
-      - <FullVersion>k__BackingField: 0.29.2
-      - <FullVersion>k__BackingField: 0.26.5
-      - <FullVersion>k__BackingField: 0.26.4
-      - <FullVersion>k__BackingField: 0.26.3
-      - <FullVersion>k__BackingField: 0.26.2
-      - <FullVersion>k__BackingField: 0.26.1
-      - <FullVersion>k__BackingField: 0.26.0
-      - <FullVersion>k__BackingField: 0.25.1
-      - <FullVersion>k__BackingField: 0.25.0
-      - <FullVersion>k__BackingField: 0.20.0
-      - <FullVersion>k__BackingField: 0.19.5
-      - <FullVersion>k__BackingField: 0.19.4
-      - <FullVersion>k__BackingField: 0.19.3
-      - <FullVersion>k__BackingField: 0.19.2
-      - <FullVersion>k__BackingField: 0.16.2
-      - <FullVersion>k__BackingField: 0.10.0
-      - <FullVersion>k__BackingField: 0.9.0
-      - <FullVersion>k__BackingField: 0.8.0
-      - <FullVersion>k__BackingField: 0.7.4
-      - <FullVersion>k__BackingField: 0.7.3
-      - <FullVersion>k__BackingField: 0.7.2
-      - <FullVersion>k__BackingField: 0.7.1
-      - <FullVersion>k__BackingField: 0.7.0
-      - <FullVersion>k__BackingField: 0.6.2
-      - <FullVersion>k__BackingField: 0.6.1
-      - <FullVersion>k__BackingField: 0.6.0
-      - <FullVersion>k__BackingField: 0.5.0
-      - <FullVersion>k__BackingField: 0.4.0
-      - <FullVersion>k__BackingField: 0.3.0
-      - <FullVersion>k__BackingField: 0.2.1
-      - <FullVersion>k__BackingField: 0.2.0
-      - <FullVersion>k__BackingField: 0.1.0
-      <Authors>k__BackingField:
-      - Bradley Grainger
-      <Description>k__BackingField: A truly async MySQL ADO.NET provider, supporting
-        MySQL Server, MariaDB, Amazon Aurora, Azure Database for MySQL, Google Cloud
-        SQL, and more.
-      <TotalDownloads>k__BackingField: 167228790
-      <LicenseUrl>k__BackingField: https://www.nuget.org/packages/MySqlConnector/2.4.0/license
-      <ProjectUrl>k__BackingField: https://mysqlconnector.net/
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: MySqlConnector
-      <DownloadUrl>k__BackingField: 
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: FluentMigrator.Runner.MySql
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 7.1.0
-      <IsManuallyInstalled>k__BackingField: 0
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: https://api.nuget.org/v3-flatcontainer/fluentmigrator.runner.mysql/7.1.0/icon
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 7.1.0
-      - <FullVersion>k__BackingField: 7.0.0
-      - <FullVersion>k__BackingField: 6.2.0
-      - <FullVersion>k__BackingField: 6.1.4
-      - <FullVersion>k__BackingField: 6.1.1
-      - <FullVersion>k__BackingField: 6.1.0
-      - <FullVersion>k__BackingField: 6.0.0
-      - <FullVersion>k__BackingField: 5.2.0
-      - <FullVersion>k__BackingField: 5.1.0
-      - <FullVersion>k__BackingField: 5.0.0
-      - <FullVersion>k__BackingField: 3.3.2
-      - <FullVersion>k__BackingField: 3.3.1
-      - <FullVersion>k__BackingField: 3.3.0
-      - <FullVersion>k__BackingField: 3.2.17
-      - <FullVersion>k__BackingField: 3.2.16
-      - <FullVersion>k__BackingField: 3.2.15
-      - <FullVersion>k__BackingField: 3.2.14
-      - <FullVersion>k__BackingField: 3.2.11
-      - <FullVersion>k__BackingField: 3.2.10
-      - <FullVersion>k__BackingField: 3.2.9
-      - <FullVersion>k__BackingField: 3.2.8
-      - <FullVersion>k__BackingField: 3.2.7
-      - <FullVersion>k__BackingField: 3.2.6
-      - <FullVersion>k__BackingField: 3.2.1
-      - <FullVersion>k__BackingField: 3.2.0
-      - <FullVersion>k__BackingField: 3.1.3
-      - <FullVersion>k__BackingField: 3.1.2
-      - <FullVersion>k__BackingField: 3.1.1
-      - <FullVersion>k__BackingField: 3.1.0
-      - <FullVersion>k__BackingField: 3.0.0
-      - <FullVersion>k__BackingField: 2.0.7
-      - <FullVersion>k__BackingField: 2.0.6
-      - <FullVersion>k__BackingField: 2.0.5
-      - <FullVersion>k__BackingField: 2.0.4
-      - <FullVersion>k__BackingField: 2.0.3
-      - <FullVersion>k__BackingField: 2.0.2
-      - <FullVersion>k__BackingField: 2.0.1
-      - <FullVersion>k__BackingField: 2.0.0
-      <Authors>k__BackingField:
-      - Sean Chambers, Josh Coffman, Tom Marien, Mark Junker, John Zabroski
-      <Description>k__BackingField: FluentMigrator is a database migration framework
-        for .NET written in C#. The basic idea is that you can create migrations
-        which are simply classes that derive from the Migration base class and have
-        a Migration attribute with a unique version number attached to them. Upon
-        executing FluentMigrator, you tell it which version to migrate to and it
-        will run all necessary migrations in order to bring your database up to that
-        version. In addition to forward migration support, FluentMigrator also supports
-        different ways to execute the migrations along with selective migrations
-        called profiles and executing arbitrary SQL.
-      <TotalDownloads>k__BackingField: 28040341
-      <LicenseUrl>k__BackingField: https://www.nuget.org/packages/FluentMigrator.Runner.MySql/7.1.0/license
-      <ProjectUrl>k__BackingField: https://github.com/fluentmigrator/fluentmigrator/wiki
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: FluentMigrator.Runner.MySql
-      <DownloadUrl>k__BackingField: 
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: MySql.EntityFrameworkCore
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 10.0.0-preview+MySQL9.4.0
-      <IsManuallyInstalled>k__BackingField: 0
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: https://api.nuget.org/v3-flatcontainer/mysql.entityframeworkcore/10.0.0-preview/icon
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 10.0.0-preview+MySQL9.4.0
-      - <FullVersion>k__BackingField: 9.0.6+MySQL9.4.0
-      - <FullVersion>k__BackingField: 9.0.3+MySQL9.3.0
-      - <FullVersion>k__BackingField: 9.0.0+MySQL9.2.0
-      - <FullVersion>k__BackingField: 9.0.0-preview+MySQL9.1.0
-      - <FullVersion>k__BackingField: 8.0.17+MySQL9.4.0
-      - <FullVersion>k__BackingField: 8.0.14+MySQL9.3.0
-      - <FullVersion>k__BackingField: 8.0.11+MySQL9.2.0
-      - <FullVersion>k__BackingField: 8.0.8+MySQL9.1.0
-      - <FullVersion>k__BackingField: 8.0.5+MySQL9.0.0
-      - <FullVersion>k__BackingField: 8.0.2+MySQL8.4.0
-      - <FullVersion>k__BackingField: 8.0.0+MySQL8.3.0
-      - <FullVersion>k__BackingField: 8.0.0-preview+MySQL8.2.0
-      - <FullVersion>k__BackingField: 7.0.16+MySQL8.4.0
-      - <FullVersion>k__BackingField: 7.0.14+MySQL8.3.0
-      - <FullVersion>k__BackingField: 7.0.10+MySQL8.2.0
-      - <FullVersion>k__BackingField: 7.0.5+MySQL8.1.0
-      - <FullVersion>k__BackingField: 7.0.2+MySQL8.0.33
-      - <FullVersion>k__BackingField: 7.0.0+MySQL8.0.32
-      - <FullVersion>k__BackingField: 7.0.0-preview5+MySQL8.0.31
-      - <FullVersion>k__BackingField: 6.0.33+MySQL9.1.0
-      - <FullVersion>k__BackingField: 6.0.30+MySQL9.0.0
-      - <FullVersion>k__BackingField: 6.0.27+MySQL8.4.0
-      - <FullVersion>k__BackingField: 6.0.25+MySQL8.3.0
-      - <FullVersion>k__BackingField: 6.0.21+MySQL8.2.0
-      - <FullVersion>k__BackingField: 6.0.16+MySQL8.1.0
-      - <FullVersion>k__BackingField: 6.0.13+MySQL8.0.33
-      - <FullVersion>k__BackingField: 6.0.10+MySQL8.0.32
-      - <FullVersion>k__BackingField: 6.0.7+MySQL8.0.31
-      - <FullVersion>k__BackingField: 6.0.4+MySQL8.0.30
-      - <FullVersion>k__BackingField: 6.0.1+MySQL8.0.29
-      - <FullVersion>k__BackingField: 6.0.0+MySQL8.0.28
-      - <FullVersion>k__BackingField: 6.0.0-preview3.1+MySQL8.0.27
-      - <FullVersion>k__BackingField: 6.0.0-preview3+MySQL8.0.26
-      - <FullVersion>k__BackingField: 5.0.17.2+MySQL8.0.33
-      - <FullVersion>k__BackingField: 5.0.17.1+MySQL8.0.32
-      - <FullVersion>k__BackingField: 5.0.17+MySQL8.0.31
-      - <FullVersion>k__BackingField: 5.0.16+MySQL8.0.30
-      - <FullVersion>k__BackingField: 5.0.13+MySQL8.0.29
-      - <FullVersion>k__BackingField: 5.0.10+MySQL8.0.28
-      - <FullVersion>k__BackingField: 5.0.8+MySQL8.0.27
-      - <FullVersion>k__BackingField: 5.0.5+MySQL8.0.26
-      - <FullVersion>k__BackingField: 5.0.3.1+MySQL8.0.25
-      - <FullVersion>k__BackingField: 5.0.3+MySQL8.0.24
-      - <FullVersion>k__BackingField: 5.0.0+MySQL8.0.23
-      - <FullVersion>k__BackingField: 3.1.32+MySQL8.0.33
-      - <FullVersion>k__BackingField: 3.1.30+MySQL8.0.32
-      - <FullVersion>k__BackingField: 3.1.27+MySQL8.0.31
-      - <FullVersion>k__BackingField: 3.1.24+MySQL8.0.30
-      - <FullVersion>k__BackingField: 3.1.22+MySQL8.0.29
-      - <FullVersion>k__BackingField: 3.1.19+MySQL8.0.28
-      - <FullVersion>k__BackingField: 3.1.17+MySQL8.0.27
-      - <FullVersion>k__BackingField: 3.1.14+MySQL8.0.26
-      - <FullVersion>k__BackingField: 3.1.12.1+MySQL8.0.25
-      - <FullVersion>k__BackingField: 3.1.12+MySQL8.0.24
-      - <FullVersion>k__BackingField: 3.1.10+MySQL8.0.23
-      <Authors>k__BackingField:
-      - Oracle Corporation
-      <Description>k__BackingField: MySql.EntityFrameworkCore adds support for Microsoft
-        Entity Framework Core.
-      <TotalDownloads>k__BackingField: 10164971
-      <LicenseUrl>k__BackingField: https://www.nuget.org/packages/MySql.EntityFrameworkCore/10.0.0-preview/license
-      <ProjectUrl>k__BackingField: https://github.com/mysql/mysql-connector-net
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: MySql.EntityFrameworkCore
-      <DownloadUrl>k__BackingField: 
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: MySql.Data.EntityFrameworkCore
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 8.0.22
-      <IsManuallyInstalled>k__BackingField: 0
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: https://api.nuget.org/v3-flatcontainer/mysql.data.entityframeworkcore/8.0.22/icon
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 8.0.22
-      - <FullVersion>k__BackingField: 8.0.21
-      - <FullVersion>k__BackingField: 8.0.20
-      - <FullVersion>k__BackingField: 8.0.19
-      - <FullVersion>k__BackingField: 8.0.18
-      - <FullVersion>k__BackingField: 8.0.17
-      - <FullVersion>k__BackingField: 8.0.16
-      - <FullVersion>k__BackingField: 8.0.15
-      - <FullVersion>k__BackingField: 8.0.14
-      - <FullVersion>k__BackingField: 8.0.13
-      - <FullVersion>k__BackingField: 8.0.12
-      - <FullVersion>k__BackingField: 8.0.11
-      - <FullVersion>k__BackingField: 6.10.9
-      - <FullVersion>k__BackingField: 6.10.7
-      <Authors>k__BackingField:
-      - Oracle
-      <Description>k__BackingField: MySql.Data.EntityFrameworkCore for Entity Framework.
-      <TotalDownloads>k__BackingField: 7315022
-      <LicenseUrl>k__BackingField: https://downloads.mysql.com/docs/licenses/connector-net-8.0-gpl-en.pdf
-      <ProjectUrl>k__BackingField: https://dev.mysql.com/downloads/
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: MySql.Data.EntityFrameworkCore
-      <DownloadUrl>k__BackingField: 
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: AspNetCore.HealthChecks.MySql
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 9.0.0
-      <IsManuallyInstalled>k__BackingField: 0
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: https://api.nuget.org/v3-flatcontainer/aspnetcore.healthchecks.mysql/9.0.0/icon
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 9.0.0
-      - <FullVersion>k__BackingField: 8.0.1
-      - <FullVersion>k__BackingField: 8.0.0
-      - <FullVersion>k__BackingField: 7.0.0
-      - <FullVersion>k__BackingField: 7.0.0-rc2.5
-      - <FullVersion>k__BackingField: 7.0.0-rc2.4
-      - <FullVersion>k__BackingField: 7.0.0-rc2.3
-      - <FullVersion>k__BackingField: 7.0.0-rc2.2
-      - <FullVersion>k__BackingField: 6.0.2
-      - <FullVersion>k__BackingField: 6.0.1
-      - <FullVersion>k__BackingField: 6.0.1-rc1.1
-      - <FullVersion>k__BackingField: 6.0.0
-      - <FullVersion>k__BackingField: 5.0.1
-      - <FullVersion>k__BackingField: 5.0.0
-      - <FullVersion>k__BackingField: 5.0.0-preview1
-      - <FullVersion>k__BackingField: 3.2.0
-      - <FullVersion>k__BackingField: 3.1.1
-      - <FullVersion>k__BackingField: 3.1.0
-      - <FullVersion>k__BackingField: 3.0.0
-      - <FullVersion>k__BackingField: 2.2.0
-      <Authors>k__BackingField:
-      - Xabaril Contributors
-      <Description>k__BackingField: HealthChecks.MySql is the health check package
-        for MySQL.
-      <TotalDownloads>k__BackingField: 8071305
-      <LicenseUrl>k__BackingField: https://www.nuget.org/packages/AspNetCore.HealthChecks.MySql/9.0.0/license
-      <ProjectUrl>k__BackingField: https://github.com/Xabaril/AspNetCore.Diagnostics.HealthChecks
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: AspNetCore.HealthChecks.MySql
-      <DownloadUrl>k__BackingField: 
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: MySql.Data.EntityFramework
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 9.4.0
-      <IsManuallyInstalled>k__BackingField: 0
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: https://api.nuget.org/v3-flatcontainer/mysql.data.entityframework/9.4.0/icon
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 9.4.0
-      - <FullVersion>k__BackingField: 9.3.0
-      - <FullVersion>k__BackingField: 9.2.0
-      - <FullVersion>k__BackingField: 9.1.0
-      - <FullVersion>k__BackingField: 9.0.0
-      - <FullVersion>k__BackingField: 8.4.0
-      - <FullVersion>k__BackingField: 8.3.0
-      - <FullVersion>k__BackingField: 8.2.0
-      - <FullVersion>k__BackingField: 8.1.0
-      - <FullVersion>k__BackingField: 8.0.33
-      - <FullVersion>k__BackingField: 8.0.32
-      - <FullVersion>k__BackingField: 8.0.31
-      - <FullVersion>k__BackingField: 8.0.30
-      - <FullVersion>k__BackingField: 8.0.29
-      - <FullVersion>k__BackingField: 8.0.28
-      - <FullVersion>k__BackingField: 8.0.27
-      - <FullVersion>k__BackingField: 8.0.26
-      - <FullVersion>k__BackingField: 8.0.25
-      - <FullVersion>k__BackingField: 8.0.24
-      - <FullVersion>k__BackingField: 8.0.23
-      - <FullVersion>k__BackingField: 8.0.22
-      - <FullVersion>k__BackingField: 8.0.21
-      - <FullVersion>k__BackingField: 8.0.20
-      - <FullVersion>k__BackingField: 8.0.19
-      - <FullVersion>k__BackingField: 8.0.18
-      - <FullVersion>k__BackingField: 8.0.17
-      - <FullVersion>k__BackingField: 8.0.16
-      - <FullVersion>k__BackingField: 8.0.15
-      - <FullVersion>k__BackingField: 8.0.14
-      - <FullVersion>k__BackingField: 8.0.13
-      - <FullVersion>k__BackingField: 8.0.12
-      - <FullVersion>k__BackingField: 8.0.11
-      <Authors>k__BackingField:
-      - Oracle Corporation
-      <Description>k__BackingField: MySql.Data.EntityFramework
-      <TotalDownloads>k__BackingField: 2218533
-      <LicenseUrl>k__BackingField: https://www.nuget.org/packages/MySql.Data.EntityFramework/9.4.0/license
-      <ProjectUrl>k__BackingField: https://dev.mysql.com/downloads/
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: MySql.Data.EntityFramework
-      <DownloadUrl>k__BackingField: 
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: EFCore.BulkExtensions.MySql
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 9.0.0-rc.1
-      <IsManuallyInstalled>k__BackingField: 0
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: https://api.nuget.org/v3-flatcontainer/efcore.bulkextensions.mysql/9.0.0-rc.1/icon
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 9.0.0-rc.1
-      - <FullVersion>k__BackingField: 8.1.3
-      - <FullVersion>k__BackingField: 8.1.2
-      - <FullVersion>k__BackingField: 8.1.1
-      - <FullVersion>k__BackingField: 8.1.0
-      - <FullVersion>k__BackingField: 8.0.4
-      - <FullVersion>k__BackingField: 8.0.3
-      - <FullVersion>k__BackingField: 8.0.2
-      - <FullVersion>k__BackingField: 8.0.1-beta.1
-      - <FullVersion>k__BackingField: 8.0.0-beta.1
-      - <FullVersion>k__BackingField: 7.8.1
-      - <FullVersion>k__BackingField: 7.1.6
-      - <FullVersion>k__BackingField: 7.1.5
-      - <FullVersion>k__BackingField: 7.1.4
-      - <FullVersion>k__BackingField: 7.1.3
-      - <FullVersion>k__BackingField: 7.1.2
-      - <FullVersion>k__BackingField: 7.1.1
-      - <FullVersion>k__BackingField: 7.1.0
-      - <FullVersion>k__BackingField: 7.0.4
-      - <FullVersion>k__BackingField: 7.0.3
-      - <FullVersion>k__BackingField: 7.0.2
-      - <FullVersion>k__BackingField: 7.0.1
-      - <FullVersion>k__BackingField: 7.0.0
-      - <FullVersion>k__BackingField: 6.8.1
-      - <FullVersion>k__BackingField: 6.7.16
-      - <FullVersion>k__BackingField: 6.7.15
-      - <FullVersion>k__BackingField: 6.7.14
-      - <FullVersion>k__BackingField: 6.7.13
-      - <FullVersion>k__BackingField: 6.7.12
-      - <FullVersion>k__BackingField: 6.7.11
-      - <FullVersion>k__BackingField: 6.7.1
-      - <FullVersion>k__BackingField: 6.7.0
-      - <FullVersion>k__BackingField: 6.6.5
-      - <FullVersion>k__BackingField: 6.6.4
-      - <FullVersion>k__BackingField: 6.6.3
-      - <FullVersion>k__BackingField: 6.6.2
-      - <FullVersion>k__BackingField: 6.6.1
-      - <FullVersion>k__BackingField: 6.6.0
-      <Authors>k__BackingField:
-      - borisdj
-      <Description>k__BackingField: EntityFramework .Net EFCore EF Core Bulk Batch
-        Extensions for Insert Update Delete Read (CRUD) operations on MySQL
-      <TotalDownloads>k__BackingField: 4102237
-      <LicenseUrl>k__BackingField: https://www.nuget.org/packages/EFCore.BulkExtensions.MySql/9.0.0-rc.1/license
-      <ProjectUrl>k__BackingField: https://github.com/borisdj/EFCore.BulkExtensions
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: EFCore.BulkExtensions.MySQL
-      <DownloadUrl>k__BackingField: 
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: DistributedLock.MySql
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 1.0.2
-      <IsManuallyInstalled>k__BackingField: 0
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: 
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 1.0.2
-      - <FullVersion>k__BackingField: 1.0.1
-      - <FullVersion>k__BackingField: 1.0.0
-      - <FullVersion>k__BackingField: 1.0.0-rc01
-      <Authors>k__BackingField:
-      - Michael Adelson
-      <Description>k__BackingField: Provides a distributed lock implementation based
-        on MySql
-      <TotalDownloads>k__BackingField: 2540989
-      <LicenseUrl>k__BackingField: https://www.nuget.org/packages/DistributedLock.MySql/1.0.2/license
-      <ProjectUrl>k__BackingField: https://github.com/madelson/DistributedLock
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: DistributedLock.MySql
-      <DownloadUrl>k__BackingField: 
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: Pomelo.JsonObject
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 2.2.1
-      <IsManuallyInstalled>k__BackingField: 0
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: https://api.nuget.org/v3-flatcontainer/pomelo.jsonobject/2.2.1/icon
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 2.2.1
-      - <FullVersion>k__BackingField: 2.2.0
-      - <FullVersion>k__BackingField: 2.0.0
-      - <FullVersion>k__BackingField: 1.1.1
-      - <FullVersion>k__BackingField: 1.1.0
-      - <FullVersion>k__BackingField: 1.0.0
-      <Authors>k__BackingField:
-      - Pomelo.JsonObject
-      <Description>k__BackingField: MySQL provider for Entity Framework Core
-      <TotalDownloads>k__BackingField: 26143010
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: https://github.com/PomeloFoundation/Pomelo.JsonObject
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: Pomelo.JsonObject
-      <DownloadUrl>k__BackingField: 
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: Pomelo.EntityFrameworkCore.MySql.Design
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 1.1.2
-      <IsManuallyInstalled>k__BackingField: 0
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: https://api.nuget.org/v3-flatcontainer/pomelo.entityframeworkcore.mysql.design/1.1.2/icon
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 1.1.2
-      - <FullVersion>k__BackingField: 1.1.0
-      <Authors>k__BackingField:
-      - Pomelo.EntityFrameworkCore.MySql.Design
-      <Description>k__BackingField: Package Description
-      <TotalDownloads>k__BackingField: 3213298
-      <LicenseUrl>k__BackingField: https://github.com/PomeloFoundation/Pomelo.EntityFrameworkCore.MySql/blob/master/LICENSE
-      <ProjectUrl>k__BackingField: https://github.com/PomeloFoundation/Pomelo.EntityFrameworkCore.MySql
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: Pomelo.EntityFrameworkCore.MySql.Design
-      <DownloadUrl>k__BackingField: 
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: dbup-mysql
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 6.0.4
-      <IsManuallyInstalled>k__BackingField: 0
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: https://api.nuget.org/v3-flatcontainer/dbup-mysql/6.0.4/icon
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 6.0.4
-      - <FullVersion>k__BackingField: 6.0.1-beta.41
-      - <FullVersion>k__BackingField: 6.0.1-beta.25
-      - <FullVersion>k__BackingField: 5.0.44
-      - <FullVersion>k__BackingField: 5.0.43
-      - <FullVersion>k__BackingField: 5.0.41
-      - <FullVersion>k__BackingField: 5.0.40
-      - <FullVersion>k__BackingField: 5.0.39
-      - <FullVersion>k__BackingField: 5.0.38
-      - <FullVersion>k__BackingField: 5.0.37
-      - <FullVersion>k__BackingField: 5.0.10
-      - <FullVersion>k__BackingField: 5.0.8
-      - <FullVersion>k__BackingField: 4.6.0
-      - <FullVersion>k__BackingField: 4.5.0
-      - <FullVersion>k__BackingField: 4.4.0
-      - <FullVersion>k__BackingField: 4.3.0
-      - <FullVersion>k__BackingField: 4.2.0
-      - <FullVersion>k__BackingField: 4.1.1
-      - <FullVersion>k__BackingField: 4.1.0
-      - <FullVersion>k__BackingField: 4.0.1
-      - <FullVersion>k__BackingField: 4.0.0-beta0005
-      - <FullVersion>k__BackingField: 4.0.0-beta0004
-      - <FullVersion>k__BackingField: 4.0.0-beta0003
-      - <FullVersion>k__BackingField: 4.0.0-beta0002
-      - <FullVersion>k__BackingField: 3.3.5
-      - <FullVersion>k__BackingField: 3.3.4
-      - <FullVersion>k__BackingField: 3.3.3
-      - <FullVersion>k__BackingField: 3.3.2
-      - <FullVersion>k__BackingField: 3.3.1
-      - <FullVersion>k__BackingField: 3.3.0
-      - <FullVersion>k__BackingField: 3.2.1
-      <Authors>k__BackingField:
-      - https://github.com/orgs/DbUp/people
-      <Description>k__BackingField: DbUp makes it easy to deploy and upgrade SQL
-        Server databases. This package adds MySql support.
-      <TotalDownloads>k__BackingField: 3306859
-      <LicenseUrl>k__BackingField: https://www.nuget.org/packages/dbup-mysql/6.0.4/license
-      <ProjectUrl>k__BackingField: https://dbup.github.io/
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: DbUp MySql Support
-      <DownloadUrl>k__BackingField: 
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: FluentMigrator.Extensions.MySql
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 7.1.0
-      <IsManuallyInstalled>k__BackingField: 0
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: https://api.nuget.org/v3-flatcontainer/fluentmigrator.extensions.mysql/7.1.0/icon
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 7.1.0
-      - <FullVersion>k__BackingField: 7.0.0
-      - <FullVersion>k__BackingField: 6.2.0
-      - <FullVersion>k__BackingField: 6.1.4
-      - <FullVersion>k__BackingField: 6.1.1
-      - <FullVersion>k__BackingField: 6.1.0
-      - <FullVersion>k__BackingField: 6.0.0
-      - <FullVersion>k__BackingField: 5.2.0
-      - <FullVersion>k__BackingField: 5.1.0
-      - <FullVersion>k__BackingField: 5.0.0
-      <Authors>k__BackingField:
-      - Sean Chambers, Josh Coffman, Tom Marien, Mark Junker, John Zabroski
-      <Description>k__BackingField: FluentMigrator is a database migration framework
-        for .NET written in C#. The basic idea is that you can create migrations
-        which are simply classes that derive from the Migration base class and have
-        a Migration attribute with a unique version number attached to them. Upon
-        executing FluentMigrator, you tell it which version to migrate to and it
-        will run all necessary migrations in order to bring your database up to that
-        version. In addition to forward migration support, FluentMigrator also supports
-        different ways to execute the migrations along with selective migrations
-        called profiles and executing arbitrary SQL.
-      <TotalDownloads>k__BackingField: 5607862
-      <LicenseUrl>k__BackingField: https://www.nuget.org/packages/FluentMigrator.Extensions.MySql/7.1.0/license
-      <ProjectUrl>k__BackingField: https://github.com/fluentmigrator/fluentmigrator/wiki
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: FluentMigrator.Extensions.MySql
-      <DownloadUrl>k__BackingField: 
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: MySql.Data.OpenTelemetry
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 9.4.0
-      <IsManuallyInstalled>k__BackingField: 0
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: https://api.nuget.org/v3-flatcontainer/mysql.data.opentelemetry/9.4.0/icon
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 9.4.0
-      - <FullVersion>k__BackingField: 9.3.0
-      - <FullVersion>k__BackingField: 9.2.0
-      - <FullVersion>k__BackingField: 9.1.0
-      - <FullVersion>k__BackingField: 9.0.0
-      - <FullVersion>k__BackingField: 8.4.0
-      - <FullVersion>k__BackingField: 8.3.0
-      - <FullVersion>k__BackingField: 8.2.0
-      - <FullVersion>k__BackingField: 8.1.0
-      <Authors>k__BackingField:
-      - Oracle Corporation
-      <Description>k__BackingField: MySql.Data.OpenTelemetry
-      <TotalDownloads>k__BackingField: 1886573
-      <LicenseUrl>k__BackingField: https://www.nuget.org/packages/MySql.Data.OpenTelemetry/9.4.0/license
-      <ProjectUrl>k__BackingField: https://dev.mysql.com/downloads/
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: MySql.Data.OpenTelemetry
-      <DownloadUrl>k__BackingField: 
-  serializableToInstallPackages: []
-  serializableUpdatePackages:
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: Microsoft.Extensions.DependencyInjection.Abstractions
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 9.0.8
-      <IsManuallyInstalled>k__BackingField: 0
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection.abstractions/9.0.8/icon
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 9.0.8
-      - <FullVersion>k__BackingField: 9.0.7
-      - <FullVersion>k__BackingField: 9.0.6
-      - <FullVersion>k__BackingField: 9.0.5
-      - <FullVersion>k__BackingField: 9.0.4
-      - <FullVersion>k__BackingField: 9.0.3
-      - <FullVersion>k__BackingField: 9.0.2
-      - <FullVersion>k__BackingField: 9.0.1
-      - <FullVersion>k__BackingField: 9.0.0
-      - <FullVersion>k__BackingField: 8.0.2
-      - <FullVersion>k__BackingField: 8.0.1
-      - <FullVersion>k__BackingField: 8.0.0
-      - <FullVersion>k__BackingField: 7.0.0
-      - <FullVersion>k__BackingField: 6.0.0
-      - <FullVersion>k__BackingField: 5.0.0
-      - <FullVersion>k__BackingField: 3.1.32
-      - <FullVersion>k__BackingField: 3.1.31
-      - <FullVersion>k__BackingField: 3.1.30
-      - <FullVersion>k__BackingField: 3.1.29
-      - <FullVersion>k__BackingField: 3.1.28
-      - <FullVersion>k__BackingField: 3.1.27
-      - <FullVersion>k__BackingField: 3.1.26
-      - <FullVersion>k__BackingField: 3.1.25
-      - <FullVersion>k__BackingField: 3.1.24
-      - <FullVersion>k__BackingField: 3.1.23
-      - <FullVersion>k__BackingField: 3.1.22
-      - <FullVersion>k__BackingField: 3.1.21
-      - <FullVersion>k__BackingField: 3.1.20
-      - <FullVersion>k__BackingField: 3.1.19
-      - <FullVersion>k__BackingField: 3.1.18
-      - <FullVersion>k__BackingField: 3.1.17
-      - <FullVersion>k__BackingField: 3.1.16
-      - <FullVersion>k__BackingField: 3.1.15
-      - <FullVersion>k__BackingField: 3.1.14
-      - <FullVersion>k__BackingField: 3.1.13
-      - <FullVersion>k__BackingField: 3.1.12
-      - <FullVersion>k__BackingField: 3.1.11
-      - <FullVersion>k__BackingField: 3.1.10
-      - <FullVersion>k__BackingField: 3.1.9
-      - <FullVersion>k__BackingField: 3.1.8
-      - <FullVersion>k__BackingField: 3.1.7
-      - <FullVersion>k__BackingField: 3.1.6
-      - <FullVersion>k__BackingField: 3.1.5
-      - <FullVersion>k__BackingField: 3.1.4
-      - <FullVersion>k__BackingField: 3.1.3
-      - <FullVersion>k__BackingField: 3.1.2
-      - <FullVersion>k__BackingField: 3.1.1
-      - <FullVersion>k__BackingField: 3.1.0
-      - <FullVersion>k__BackingField: 3.0.3
-      - <FullVersion>k__BackingField: 3.0.2
-      - <FullVersion>k__BackingField: 3.0.1
-      - <FullVersion>k__BackingField: 3.0.0
-      - <FullVersion>k__BackingField: 2.2.0
-      - <FullVersion>k__BackingField: 2.1.1
-      - <FullVersion>k__BackingField: 2.1.0
-      - <FullVersion>k__BackingField: 2.0.0
-      - <FullVersion>k__BackingField: 1.1.1
-      - <FullVersion>k__BackingField: 1.1.0
-      - <FullVersion>k__BackingField: 1.0.2
-      - <FullVersion>k__BackingField: 1.0.1
-      - <FullVersion>k__BackingField: 1.0.0
-      <Authors>k__BackingField:
-      - Microsoft
-      <Description>k__BackingField: 'Abstractions for dependency injection.
-
-
-        Commonly
-        Used Types:
-
-        Microsoft.Extensions.DependencyInjection.IServiceCollection'
-      <TotalDownloads>k__BackingField: 8372381184
-      <LicenseUrl>k__BackingField: https://www.nuget.org/packages/Microsoft.Extensions.DependencyInjection.Abstractions/9.0.8/license
-      <ProjectUrl>k__BackingField: https://dot.net/
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: Microsoft.Extensions.DependencyInjection.Abstractions
-      <DownloadUrl>k__BackingField: 
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: Microsoft.Extensions.Logging.Abstractions
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 9.0.8
-      <IsManuallyInstalled>k__BackingField: 0
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging.abstractions/9.0.8/icon
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 9.0.8
-      - <FullVersion>k__BackingField: 9.0.7
-      - <FullVersion>k__BackingField: 9.0.6
-      - <FullVersion>k__BackingField: 9.0.5
-      - <FullVersion>k__BackingField: 9.0.4
-      - <FullVersion>k__BackingField: 9.0.3
-      - <FullVersion>k__BackingField: 9.0.2
-      - <FullVersion>k__BackingField: 9.0.1
-      - <FullVersion>k__BackingField: 9.0.0
-      - <FullVersion>k__BackingField: 8.0.3
-      - <FullVersion>k__BackingField: 8.0.2
-      - <FullVersion>k__BackingField: 8.0.1
-      - <FullVersion>k__BackingField: 8.0.0
-      - <FullVersion>k__BackingField: 7.0.1
-      - <FullVersion>k__BackingField: 7.0.0
-      - <FullVersion>k__BackingField: 6.0.4
-      - <FullVersion>k__BackingField: 6.0.3
-      - <FullVersion>k__BackingField: 6.0.2
-      - <FullVersion>k__BackingField: 6.0.1
-      - <FullVersion>k__BackingField: 6.0.0
-      - <FullVersion>k__BackingField: 5.0.0
-      - <FullVersion>k__BackingField: 3.1.32
-      - <FullVersion>k__BackingField: 3.1.31
-      - <FullVersion>k__BackingField: 3.1.30
-      - <FullVersion>k__BackingField: 3.1.29
-      - <FullVersion>k__BackingField: 3.1.28
-      - <FullVersion>k__BackingField: 3.1.27
-      - <FullVersion>k__BackingField: 3.1.26
-      - <FullVersion>k__BackingField: 3.1.25
-      - <FullVersion>k__BackingField: 3.1.24
-      - <FullVersion>k__BackingField: 3.1.23
-      - <FullVersion>k__BackingField: 3.1.22
-      - <FullVersion>k__BackingField: 3.1.21
-      - <FullVersion>k__BackingField: 3.1.20
-      - <FullVersion>k__BackingField: 3.1.19
-      - <FullVersion>k__BackingField: 3.1.18
-      - <FullVersion>k__BackingField: 3.1.17
-      - <FullVersion>k__BackingField: 3.1.16
-      - <FullVersion>k__BackingField: 3.1.15
-      - <FullVersion>k__BackingField: 3.1.14
-      - <FullVersion>k__BackingField: 3.1.13
-      - <FullVersion>k__BackingField: 3.1.12
-      - <FullVersion>k__BackingField: 3.1.11
-      - <FullVersion>k__BackingField: 3.1.10
-      - <FullVersion>k__BackingField: 3.1.9
-      - <FullVersion>k__BackingField: 3.1.8
-      - <FullVersion>k__BackingField: 3.1.7
-      - <FullVersion>k__BackingField: 3.1.6
-      - <FullVersion>k__BackingField: 3.1.5
-      - <FullVersion>k__BackingField: 3.1.4
-      - <FullVersion>k__BackingField: 3.1.3
-      - <FullVersion>k__BackingField: 3.1.2
-      - <FullVersion>k__BackingField: 3.1.1
-      - <FullVersion>k__BackingField: 3.1.0
-      - <FullVersion>k__BackingField: 3.0.3
-      - <FullVersion>k__BackingField: 3.0.2
-      - <FullVersion>k__BackingField: 3.0.1
-      - <FullVersion>k__BackingField: 3.0.0
-      - <FullVersion>k__BackingField: 2.2.0
-      - <FullVersion>k__BackingField: 2.1.1
-      - <FullVersion>k__BackingField: 2.1.0
-      - <FullVersion>k__BackingField: 2.0.2
-      - <FullVersion>k__BackingField: 2.0.1
-      - <FullVersion>k__BackingField: 2.0.0
-      - <FullVersion>k__BackingField: 1.1.2
-      - <FullVersion>k__BackingField: 1.1.1
-      - <FullVersion>k__BackingField: 1.1.0
-      - <FullVersion>k__BackingField: 1.0.2
-      - <FullVersion>k__BackingField: 1.0.1
-      - <FullVersion>k__BackingField: 1.0.0
-      <Authors>k__BackingField:
-      - Microsoft
-      <Description>k__BackingField: 'Logging abstractions for Microsoft.Extensions.Logging.
-
-
-        Commonly
-        Used Types:
-
-        Microsoft.Extensions.Logging.ILogger
-
-        Microsoft.Extensions.Logging.ILoggerFactory
-
-        Microsoft.Extensions.Logging.ILogger<TCategoryName>
-
-        Microsoft.Extensions.Logging.LogLevel
-
-        Microsoft.Extensions.Logging.Logger<T>
-
-        Microsoft.Extensions.Logging.LoggerMessage
-
-        Microsoft.Extensions.Logging.Abstractions.NullLogger'
-      <TotalDownloads>k__BackingField: 7734055100
-      <LicenseUrl>k__BackingField: https://www.nuget.org/packages/Microsoft.Extensions.Logging.Abstractions/9.0.8/license
-      <ProjectUrl>k__BackingField: https://dot.net/
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: Microsoft.Extensions.Logging.Abstractions
-      <DownloadUrl>k__BackingField: 
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: MySqlConnector
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 2.4.0
-      <IsManuallyInstalled>k__BackingField: 1
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: https://api.nuget.org/v3-flatcontainer/mysqlconnector/2.4.0/icon
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 2.4.0
-      - <FullVersion>k__BackingField: 2.3.7
-      - <FullVersion>k__BackingField: 2.3.6
-      - <FullVersion>k__BackingField: 2.3.5
-      - <FullVersion>k__BackingField: 2.3.4
-      - <FullVersion>k__BackingField: 2.3.3
-      - <FullVersion>k__BackingField: 2.3.2
-      - <FullVersion>k__BackingField: 2.3.1
-      - <FullVersion>k__BackingField: 2.3.0
-      - <FullVersion>k__BackingField: 2.2.7
-      - <FullVersion>k__BackingField: 2.2.6
-      - <FullVersion>k__BackingField: 2.2.5
-      - <FullVersion>k__BackingField: 2.2.4
-      - <FullVersion>k__BackingField: 2.2.3
-      - <FullVersion>k__BackingField: 2.2.2
-      - <FullVersion>k__BackingField: 2.2.1
-      - <FullVersion>k__BackingField: 2.2.0
-      - <FullVersion>k__BackingField: 2.1.13
-      - <FullVersion>k__BackingField: 2.1.12
-      - <FullVersion>k__BackingField: 2.1.11
-      - <FullVersion>k__BackingField: 2.1.10
-      - <FullVersion>k__BackingField: 2.1.9
-      - <FullVersion>k__BackingField: 2.1.8
-      - <FullVersion>k__BackingField: 2.1.7
-      - <FullVersion>k__BackingField: 2.1.6
-      - <FullVersion>k__BackingField: 2.1.5
-      - <FullVersion>k__BackingField: 2.1.4
-      - <FullVersion>k__BackingField: 2.1.3
-      - <FullVersion>k__BackingField: 2.1.2
-      - <FullVersion>k__BackingField: 2.1.1
-      - <FullVersion>k__BackingField: 2.1.0
-      - <FullVersion>k__BackingField: 2.0.0
-      - <FullVersion>k__BackingField: 1.3.14
-      - <FullVersion>k__BackingField: 1.3.13
-      - <FullVersion>k__BackingField: 1.3.12
-      - <FullVersion>k__BackingField: 1.3.11
-      - <FullVersion>k__BackingField: 1.3.10
-      - <FullVersion>k__BackingField: 1.3.9
-      - <FullVersion>k__BackingField: 1.3.8
-      - <FullVersion>k__BackingField: 1.3.7
-      - <FullVersion>k__BackingField: 1.3.6
-      - <FullVersion>k__BackingField: 1.3.5
-      - <FullVersion>k__BackingField: 1.3.4
-      - <FullVersion>k__BackingField: 1.3.3
-      - <FullVersion>k__BackingField: 1.3.2
-      - <FullVersion>k__BackingField: 1.3.1
-      - <FullVersion>k__BackingField: 1.3.0
-      - <FullVersion>k__BackingField: 1.2.1
-      - <FullVersion>k__BackingField: 1.2.0
-      - <FullVersion>k__BackingField: 1.1.0
-      - <FullVersion>k__BackingField: 1.0.1
-      - <FullVersion>k__BackingField: 1.0.0
-      - <FullVersion>k__BackingField: 0.69.10
-      - <FullVersion>k__BackingField: 0.69.9
-      - <FullVersion>k__BackingField: 0.69.8
-      - <FullVersion>k__BackingField: 0.69.7
-      - <FullVersion>k__BackingField: 0.69.6
-      - <FullVersion>k__BackingField: 0.69.5
-      - <FullVersion>k__BackingField: 0.69.4
-      - <FullVersion>k__BackingField: 0.69.3
-      - <FullVersion>k__BackingField: 0.69.2
-      - <FullVersion>k__BackingField: 0.69.1
-      - <FullVersion>k__BackingField: 0.69.0
-      - <FullVersion>k__BackingField: 0.68.1
-      - <FullVersion>k__BackingField: 0.68.0
-      - <FullVersion>k__BackingField: 0.67.0
-      - <FullVersion>k__BackingField: 0.66.0
-      - <FullVersion>k__BackingField: 0.65.0
-      - <FullVersion>k__BackingField: 0.64.2
-      - <FullVersion>k__BackingField: 0.64.1
-      - <FullVersion>k__BackingField: 0.64.0
-      - <FullVersion>k__BackingField: 0.63.2
-      - <FullVersion>k__BackingField: 0.63.1
-      - <FullVersion>k__BackingField: 0.63.0
-      - <FullVersion>k__BackingField: 0.62.0
-      - <FullVersion>k__BackingField: 0.61.0
-      - <FullVersion>k__BackingField: 0.60.4
-      - <FullVersion>k__BackingField: 0.60.3
-      - <FullVersion>k__BackingField: 0.60.2
-      - <FullVersion>k__BackingField: 0.60.1
-      - <FullVersion>k__BackingField: 0.60.0
-      - <FullVersion>k__BackingField: 0.59.2
-      - <FullVersion>k__BackingField: 0.59.1
-      - <FullVersion>k__BackingField: 0.59.0
-      - <FullVersion>k__BackingField: 0.58.0
-      - <FullVersion>k__BackingField: 0.57.0
-      - <FullVersion>k__BackingField: 0.56.0
-      - <FullVersion>k__BackingField: 0.55.0
-      - <FullVersion>k__BackingField: 0.54.0
-      - <FullVersion>k__BackingField: 0.53.0
-      - <FullVersion>k__BackingField: 0.52.0
-      - <FullVersion>k__BackingField: 0.51.1
-      - <FullVersion>k__BackingField: 0.51.0
-      - <FullVersion>k__BackingField: 0.50.0
-      - <FullVersion>k__BackingField: 0.49.3
-      - <FullVersion>k__BackingField: 0.49.2
-      - <FullVersion>k__BackingField: 0.49.0
-      - <FullVersion>k__BackingField: 0.48.2
-      - <FullVersion>k__BackingField: 0.48.1
-      - <FullVersion>k__BackingField: 0.48.0
-      - <FullVersion>k__BackingField: 0.47.1
-      - <FullVersion>k__BackingField: 0.47.0
-      - <FullVersion>k__BackingField: 0.46.2
-      - <FullVersion>k__BackingField: 0.46.1
-      - <FullVersion>k__BackingField: 0.46.0
-      - <FullVersion>k__BackingField: 0.45.1
-      - <FullVersion>k__BackingField: 0.45.0
-      - <FullVersion>k__BackingField: 0.44.1
-      - <FullVersion>k__BackingField: 0.44.0
-      - <FullVersion>k__BackingField: 0.43.0
-      - <FullVersion>k__BackingField: 0.42.3
-      - <FullVersion>k__BackingField: 0.42.2
-      - <FullVersion>k__BackingField: 0.42.1
-      - <FullVersion>k__BackingField: 0.42.0
-      - <FullVersion>k__BackingField: 0.41.0
-      - <FullVersion>k__BackingField: 0.40.4
-      - <FullVersion>k__BackingField: 0.40.3
-      - <FullVersion>k__BackingField: 0.40.2
-      - <FullVersion>k__BackingField: 0.36.0
-      - <FullVersion>k__BackingField: 0.35.0
-      - <FullVersion>k__BackingField: 0.32.0
-      - <FullVersion>k__BackingField: 0.30.0
-      - <FullVersion>k__BackingField: 0.29.4
-      - <FullVersion>k__BackingField: 0.29.2
-      - <FullVersion>k__BackingField: 0.26.5
-      - <FullVersion>k__BackingField: 0.26.4
-      - <FullVersion>k__BackingField: 0.26.3
-      - <FullVersion>k__BackingField: 0.26.2
-      - <FullVersion>k__BackingField: 0.26.1
-      - <FullVersion>k__BackingField: 0.26.0
-      - <FullVersion>k__BackingField: 0.25.1
-      - <FullVersion>k__BackingField: 0.25.0
-      - <FullVersion>k__BackingField: 0.20.0
-      - <FullVersion>k__BackingField: 0.19.5
-      - <FullVersion>k__BackingField: 0.19.4
-      - <FullVersion>k__BackingField: 0.19.3
-      - <FullVersion>k__BackingField: 0.19.2
-      - <FullVersion>k__BackingField: 0.16.2
-      - <FullVersion>k__BackingField: 0.10.0
-      - <FullVersion>k__BackingField: 0.9.0
-      - <FullVersion>k__BackingField: 0.8.0
-      - <FullVersion>k__BackingField: 0.7.4
-      - <FullVersion>k__BackingField: 0.7.3
-      - <FullVersion>k__BackingField: 0.7.2
-      - <FullVersion>k__BackingField: 0.7.1
-      - <FullVersion>k__BackingField: 0.7.0
-      - <FullVersion>k__BackingField: 0.6.2
-      - <FullVersion>k__BackingField: 0.6.1
-      - <FullVersion>k__BackingField: 0.6.0
-      - <FullVersion>k__BackingField: 0.5.0
-      - <FullVersion>k__BackingField: 0.4.0
-      - <FullVersion>k__BackingField: 0.3.0
-      - <FullVersion>k__BackingField: 0.2.1
-      - <FullVersion>k__BackingField: 0.2.0
-      - <FullVersion>k__BackingField: 0.1.0
-      <Authors>k__BackingField:
-      - Bradley Grainger
-      <Description>k__BackingField: A truly async MySQL ADO.NET provider, supporting
-        MySQL Server, MariaDB, Amazon Aurora, Azure Database for MySQL, Google Cloud
-        SQL, and more.
-      <TotalDownloads>k__BackingField: 167228790
-      <LicenseUrl>k__BackingField: https://www.nuget.org/packages/MySqlConnector/2.4.0/license
-      <ProjectUrl>k__BackingField: https://mysqlconnector.net/
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: MySqlConnector
-      <DownloadUrl>k__BackingField: 
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: System.Diagnostics.DiagnosticSource
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 9.0.8
-      <IsManuallyInstalled>k__BackingField: 0
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: https://api.nuget.org/v3-flatcontainer/system.diagnostics.diagnosticsource/9.0.8/icon
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 9.0.8
-      - <FullVersion>k__BackingField: 9.0.7
-      - <FullVersion>k__BackingField: 9.0.6
-      - <FullVersion>k__BackingField: 9.0.5
-      - <FullVersion>k__BackingField: 9.0.4
-      - <FullVersion>k__BackingField: 9.0.3
-      - <FullVersion>k__BackingField: 9.0.2
-      - <FullVersion>k__BackingField: 9.0.1
-      - <FullVersion>k__BackingField: 9.0.0
-      - <FullVersion>k__BackingField: 8.0.1
-      - <FullVersion>k__BackingField: 8.0.0
-      - <FullVersion>k__BackingField: 7.0.2
-      - <FullVersion>k__BackingField: 7.0.1
-      - <FullVersion>k__BackingField: 7.0.0
-      - <FullVersion>k__BackingField: 6.0.2
-      - <FullVersion>k__BackingField: 6.0.1
-      - <FullVersion>k__BackingField: 6.0.0
-      - <FullVersion>k__BackingField: 5.0.1
-      - <FullVersion>k__BackingField: 5.0.0
-      - <FullVersion>k__BackingField: 4.7.1
-      - <FullVersion>k__BackingField: 4.7.0
-      - <FullVersion>k__BackingField: 4.6.0
-      - <FullVersion>k__BackingField: 4.5.1
-      - <FullVersion>k__BackingField: 4.5.0
-      - <FullVersion>k__BackingField: 4.4.1
-      - <FullVersion>k__BackingField: 4.4.0
-      - <FullVersion>k__BackingField: 4.3.1
-      - <FullVersion>k__BackingField: 4.3.0
-      - <FullVersion>k__BackingField: 4.0.0
-      <Authors>k__BackingField:
-      - Microsoft
-      <Description>k__BackingField: 'Provides Classes that allow you to decouple
-        code logging rich (unserializable) diagnostics/telemetry (e.g. framework)
-        from code that consumes it (e.g. tools)
-
-
-        Commonly Used Types:
-
-        System.Diagnostics.DiagnosticListener
-
-        System.Diagnostics.DiagnosticSource'
-      <TotalDownloads>k__BackingField: 7333249968
-      <LicenseUrl>k__BackingField: https://www.nuget.org/packages/System.Diagnostics.DiagnosticSource/9.0.8/license
-      <ProjectUrl>k__BackingField: https://dot.net/
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: System.Diagnostics.DiagnosticSource
-      <DownloadUrl>k__BackingField: 
-  - packageLocal:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSource:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageType: 2
-    packageV2:
-      <Id>k__BackingField: 
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 
-      <IsManuallyInstalled>k__BackingField: 0
-      icon: {fileID: 0}
-      <DownloadUrl>k__BackingField: 
-      <IconUrl>k__BackingField: 
-      <RepositoryBranch>k__BackingField: 
-      <Dependencies>k__BackingField: []
-      <Authors>k__BackingField: []
-      <Description>k__BackingField: 
-      <TotalDownloads>k__BackingField: 0
-      <LicenseUrl>k__BackingField: 
-      <ProjectUrl>k__BackingField: 
-      <ReleaseNotes>k__BackingField: 
-      <RepositoryCommit>k__BackingField: 
-      <RepositoryType>k__BackingField: 0
-      <RepositoryUrl>k__BackingField: 
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: 
-      packageSourceV2:
-        <Name>k__BackingField: 
-        <SavedPath>k__BackingField: 
-        <SavedProtocolVersion>k__BackingField: 
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 0
-        <IsEnabled>k__BackingField: 0
-      versions: []
-    packageV3:
-      <Id>k__BackingField: System.Runtime.CompilerServices.Unsafe
-      <PackageVersion>k__BackingField:
-        <FullVersion>k__BackingField: 6.1.2
-      <IsManuallyInstalled>k__BackingField: 0
-      dependencies: []
-      dependenciesFetched: 0
-      icon: {fileID: 0}
-      iconUrl: https://api.nuget.org/v3-flatcontainer/system.runtime.compilerservices.unsafe/6.1.2/icon
-      packageSource:
-        <Name>k__BackingField: nuget.org
-        <SavedPath>k__BackingField: https://api.nuget.org/v3/index.json
-        <SavedProtocolVersion>k__BackingField: 
-        <UpdateSearchBatchSize>k__BackingField: 20
-        <SavedUserName>k__BackingField: 
-        <SavedPassword>k__BackingField: 
-        <CredentialsStoredInExternalFile>k__BackingField: 0
-        <EnableCredentialProvider>k__BackingField: 1
-        <IsEnabled>k__BackingField: 1
-      <Versions>k__BackingField:
-      - <FullVersion>k__BackingField: 6.1.2
-      - <FullVersion>k__BackingField: 6.1.1
-      - <FullVersion>k__BackingField: 6.1.0
-      - <FullVersion>k__BackingField: 6.0.0
-      - <FullVersion>k__BackingField: 5.0.0
-      - <FullVersion>k__BackingField: 4.7.1
-      - <FullVersion>k__BackingField: 4.7.0
-      - <FullVersion>k__BackingField: 4.6.0
-      - <FullVersion>k__BackingField: 4.5.3
-      - <FullVersion>k__BackingField: 4.5.2
-      - <FullVersion>k__BackingField: 4.5.1
-      - <FullVersion>k__BackingField: 4.5.0
-      - <FullVersion>k__BackingField: 4.4.0
-      - <FullVersion>k__BackingField: 4.3.0
-      - <FullVersion>k__BackingField: 4.0.0
-      <Authors>k__BackingField:
-      - Microsoft
-      <Description>k__BackingField: Provides the System.Runtime.CompilerServices.Unsafe
-        class, which provides generic, low-level functionality for manipulating pointers.
-      <TotalDownloads>k__BackingField: 6642074267
-      <LicenseUrl>k__BackingField: https://www.nuget.org/packages/System.Runtime.CompilerServices.Unsafe/6.1.2/license
-      <ProjectUrl>k__BackingField: https://github.com/dotnet/maintenance-packages
-      <Summary>k__BackingField: 
-      <Title>k__BackingField: System.Runtime.CompilerServices.Unsafe
-      <DownloadUrl>k__BackingField: 
 --- !u!114 &16
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -3059,16 +399,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 1
-  m_Script: {fileID: 12014, guid: 0000000000000000e000000000000000, type: 0}
+  m_Script: {fileID: 12003, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_MinSize: {x: 230, y: 250}
-  m_MaxSize: {x: 10000, y: 10000}
+  m_MinSize: {x: 100, y: 100}
+  m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
-    m_Text: Project
-    m_Image: {fileID: -5467254957812901981, guid: 0000000000000000d000000000000000, type: 0}
+    m_Text: Console
+    m_Image: {fileID: -4327648978806127646, guid: 0000000000000000d000000000000000, type: 0}
     m_Tooltip: 
-    m_TextWithWhitespace: "Project\u200B"
+    m_TextWithWhitespace: "Console\u200B"
   m_Pos:
     serializedVersion: 2
     x: 0
@@ -3086,173 +426,7 @@ MonoBehaviour:
     m_SaveData: []
     m_ContainerData: []
     m_OverlaysVisible: 1
-  m_SearchFilter:
-    m_NameFilter: 
-    m_ClassNames: []
-    m_AssetLabels: []
-    m_AssetBundleNames: []
-    m_ReferencingInstanceIDs: 
-    m_SceneHandles: 
-    m_ShowAllHits: 0
-    m_SkipHidden: 0
-    m_SearchArea: 1
-    m_Folders:
-    - Assets
-    m_Globs: []
-    m_ProductIds: 
-    m_AnyWithAssetOrigin: 0
-    m_OriginalText: 
-    m_ImportLogFlags: 0
-    m_FilterByTypeIntersection: 0
-  m_ViewMode: 1
-  m_StartGridSize: 64
-  m_LastFolders:
-  - Assets
-  m_LastFoldersGridSize: -1
-  m_LastProjectPath: C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\New Unity Project
-  m_LockTracker:
-    m_IsLocked: 0
-  m_FolderTreeState:
-    scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 42750000
-    m_LastClickedID: 30018
-    m_ExpandedIDs: 00000000f0740000427500004675000000ca9a3b
-    m_RenameOverlay:
-      m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
-      m_EditFieldRect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 0
-        height: 0
-      m_UserData: 0
-      m_IsWaitingForDelay: 0
-      m_IsRenaming: 0
-      m_OriginalEventType: 11
-      m_IsRenamingFilename: 1
-      m_TrimLeadingAndTrailingWhitespace: 0
-      m_ClientGUIView: {fileID: 0}
-    m_SearchString: 
-    m_CreateAssetUtility:
-      m_EndAction: {fileID: 0}
-      m_InstanceID: 0
-      m_Path: 
-      m_Icon: {fileID: 0}
-      m_ResourceFile: 
-  m_AssetTreeState:
-    scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 
-    m_LastClickedID: 0
-    m_ExpandedIDs: 00000000f0740000
-    m_RenameOverlay:
-      m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
-      m_EditFieldRect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 0
-        height: 0
-      m_UserData: 0
-      m_IsWaitingForDelay: 0
-      m_IsRenaming: 0
-      m_OriginalEventType: 11
-      m_IsRenamingFilename: 1
-      m_TrimLeadingAndTrailingWhitespace: 0
-      m_ClientGUIView: {fileID: 0}
-    m_SearchString: 
-    m_CreateAssetUtility:
-      m_EndAction: {fileID: 0}
-      m_InstanceID: 0
-      m_Path: 
-      m_Icon: {fileID: 0}
-      m_ResourceFile: 
-  m_ListAreaState:
-    m_SelectedInstanceIDs: 
-    m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 1
-    m_ExpandedInstanceIDs: c623000000000000
-    m_RenameOverlay:
-      m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
-      m_EditFieldRect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 0
-        height: 0
-      m_UserData: 0
-      m_IsWaitingForDelay: 0
-      m_IsRenaming: 0
-      m_OriginalEventType: 11
-      m_IsRenamingFilename: 1
-      m_TrimLeadingAndTrailingWhitespace: 0
-      m_ClientGUIView: {fileID: 8}
-    m_CreateAssetUtility:
-      m_EndAction: {fileID: 0}
-      m_InstanceID: 0
-      m_Path: 
-      m_Icon: {fileID: 0}
-      m_ResourceFile: 
-    m_NewAssetIndexInList: -1
-    m_ScrollPosition: {x: 0, y: 0}
-    m_GridSize: 64
-  m_SkipHiddenPackages: 0
-  m_DirectoriesAreaWidth: 207
 --- !u!114 &17
-MonoBehaviour:
-  m_ObjectHideFlags: 52
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 1
-  m_Script: {fileID: 12019, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_MinSize: {x: 275, y: 50}
-  m_MaxSize: {x: 4000, y: 4000}
-  m_TitleContent:
-    m_Text: Inspector
-    m_Image: {fileID: -2667387946076563598, guid: 0000000000000000d000000000000000, type: 0}
-    m_Tooltip: 
-    m_TextWithWhitespace: "Inspector\u200B"
-  m_Pos:
-    serializedVersion: 2
-    x: 1465
-    y: 79
-    width: 454
-    height: 907
-  m_SerializedDataModeController:
-    m_DataMode: 0
-    m_PreferredDataMode: 0
-    m_SupportedDataModes: 
-    isAutomatic: 1
-  m_ViewDataDictionary: {fileID: 0}
-  m_OverlayCanvas:
-    m_LastAppliedPresetName: Default
-    m_SaveData: []
-    m_ContainerData: []
-    m_OverlaysVisible: 1
-  m_ObjectsLockedBeforeSerialization: []
-  m_InstanceIDsLockedBeforeSerialization: 
-  m_PreviewResizer:
-    m_CachedPref: 160
-    m_ControlHash: -371814159
-    m_PrefName: Preview_InspectorPreview
-  m_LastInspectedObjectInstanceID: -1
-  m_LastVerticalScrollValue: 0
-  m_GlobalObjectId: 
-  m_InspectorMode: 0
-  m_LockTracker:
-    m_IsLocked: 0
-  m_PreviewWindow: {fileID: 0}
---- !u!114 &18
 MonoBehaviour:
   m_ObjectHideFlags: 52
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3291,9 +465,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 
+      m_SelectedIDs: 66770000
       m_LastClickedID: 0
-      m_ExpandedIDs: 06fbffff
+      m_ExpandedIDs: c4f1ffff70f3ffffecf3ffff68f4ffffe4f4ffff60f5ffffdcf5ffff60f6ffff14fbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -3310,7 +484,7 @@ MonoBehaviour:
         m_OriginalEventType: 11
         m_IsRenamingFilename: 0
         m_TrimLeadingAndTrailingWhitespace: 0
-        m_ClientGUIView: {fileID: 7}
+        m_ClientGUIView: {fileID: 11}
       m_SearchString: 
     m_ExpandedScenes: []
     m_CurrenRootInstanceID: 0
@@ -3318,7 +492,7 @@ MonoBehaviour:
       m_IsLocked: 0
     m_CurrentSortingName: TransformSorting
   m_WindowGUID: 4c969a2b90040154d917609493e03593
---- !u!114 &19
+--- !u!114 &18
 MonoBehaviour:
   m_ObjectHideFlags: 52
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3888,7 +1062,7 @@ MonoBehaviour:
   m_LastSceneViewRotation: {x: -0.08717229, y: 0.89959055, z: -0.21045254, w: -0.3726226}
   m_LastSceneViewOrtho: 0
   m_Viewpoint:
-    m_SceneView: {fileID: 19}
+    m_SceneView: {fileID: 18}
     m_CameraOverscanSettings:
       m_Opacity: 50
       m_Scale: 1
@@ -3901,7 +1075,7 @@ MonoBehaviour:
     name: Contributors / Receivers
     section: Lighting
   m_ViewIsLockedToObject: 0
---- !u!114 &20
+--- !u!114 &19
 MonoBehaviour:
   m_ObjectHideFlags: 52
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3924,8 +1098,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: 363
     y: 79
-    width: 1101
-    height: 527
+    width: 1100
+    height: 528
   m_SerializedDataModeController:
     m_DataMode: 0
     m_PreferredDataMode: 0
@@ -3943,7 +1117,7 @@ MonoBehaviour:
   m_ShowGizmos: 0
   m_TargetDisplay: 0
   m_ClearColor: {r: 0, g: 0, b: 0, a: 0}
-  m_TargetSize: {x: 1101, y: 506}
+  m_TargetSize: {x: 1100, y: 507}
   m_TextureFilterMode: 0
   m_TextureHideFlags: 61
   m_RenderIMGUI: 1
@@ -3958,10 +1132,10 @@ MonoBehaviour:
     m_VRangeLocked: 0
     hZoomLockedByDefault: 0
     vZoomLockedByDefault: 0
-    m_HBaseRangeMin: -550.5
-    m_HBaseRangeMax: 550.5
-    m_VBaseRangeMin: -253
-    m_VBaseRangeMax: 253
+    m_HBaseRangeMin: -550
+    m_HBaseRangeMax: 550
+    m_VBaseRangeMin: -253.5
+    m_VBaseRangeMax: 253.5
     m_HAllowExceedBaseRangeMin: 1
     m_HAllowExceedBaseRangeMax: 1
     m_VAllowExceedBaseRangeMin: 1
@@ -3979,30 +1153,30 @@ MonoBehaviour:
       serializedVersion: 2
       x: 0
       y: 21
-      width: 1101
-      height: 506
+      width: 1100
+      height: 507
     m_Scale: {x: 1, y: 1}
-    m_Translation: {x: 550.5, y: 253}
+    m_Translation: {x: 550, y: 253.5}
     m_MarginLeft: 0
     m_MarginRight: 0
     m_MarginTop: 0
     m_MarginBottom: 0
     m_LastShownAreaInsideMargins:
       serializedVersion: 2
-      x: -550.5
-      y: -253
-      width: 1101
-      height: 506
+      x: -550
+      y: -253.5
+      width: 1100
+      height: 507
     m_MinimalGUI: 1
   m_defaultScale: 1
-  m_LastWindowPixelSize: {x: 1101, y: 527}
+  m_LastWindowPixelSize: {x: 1100, y: 528}
   m_ClearInEditMode: 1
   m_NoCameraWarning: 1
   m_LowResolutionForAspectRatios: 01000000000000000000
   m_XRRenderMode: 0
   m_RenderTexture: {fileID: 0}
   m_showToolbar: 1
---- !u!114 &21
+--- !u!114 &20
 MonoBehaviour:
   m_ObjectHideFlags: 52
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4011,16 +1185,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 1
-  m_Script: {fileID: 12003, guid: 0000000000000000e000000000000000, type: 0}
+  m_Script: {fileID: 12014, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_MinSize: {x: 100, y: 100}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 230, y: 250}
+  m_MaxSize: {x: 10000, y: 10000}
   m_TitleContent:
-    m_Text: Console
-    m_Image: {fileID: -4327648978806127646, guid: 0000000000000000d000000000000000, type: 0}
+    m_Text: Project
+    m_Image: {fileID: -5467254957812901981, guid: 0000000000000000d000000000000000, type: 0}
     m_Tooltip: 
-    m_TextWithWhitespace: "Console\u200B"
+    m_TextWithWhitespace: "Project\u200B"
   m_Pos:
     serializedVersion: 2
     x: 0
@@ -4038,3 +1212,169 @@ MonoBehaviour:
     m_SaveData: []
     m_ContainerData: []
     m_OverlaysVisible: 1
+  m_SearchFilter:
+    m_NameFilter: 
+    m_ClassNames: []
+    m_AssetLabels: []
+    m_AssetBundleNames: []
+    m_ReferencingInstanceIDs: 
+    m_SceneHandles: 
+    m_ShowAllHits: 0
+    m_SkipHidden: 0
+    m_SearchArea: 1
+    m_Folders:
+    - Assets/Scenes/Login
+    m_Globs: []
+    m_ProductIds: 
+    m_AnyWithAssetOrigin: 0
+    m_OriginalText: 
+    m_ImportLogFlags: 0
+    m_FilterByTypeIntersection: 0
+  m_ViewMode: 1
+  m_StartGridSize: 64
+  m_LastFolders:
+  - Assets/Scenes/Login
+  m_LastFoldersGridSize: -1
+  m_LastProjectPath: C:\Users\derek\OneDrive\Desktop\tcgAI\ygoCGPTE\New Unity Project
+  m_LockTracker:
+    m_IsLocked: 0
+  m_FolderTreeState:
+    scrollPos: {x: 0, y: 0}
+    m_SelectedIDs: f6750000
+    m_LastClickedID: 30198
+    m_ExpandedIDs: 000000005275000000ca9a3b
+    m_RenameOverlay:
+      m_UserAcceptedRename: 0
+      m_Name: 
+      m_OriginalName: 
+      m_EditFieldRect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0
+        height: 0
+      m_UserData: 0
+      m_IsWaitingForDelay: 0
+      m_IsRenaming: 0
+      m_OriginalEventType: 11
+      m_IsRenamingFilename: 1
+      m_TrimLeadingAndTrailingWhitespace: 0
+      m_ClientGUIView: {fileID: 0}
+    m_SearchString: 
+    m_CreateAssetUtility:
+      m_EndAction: {fileID: 0}
+      m_InstanceID: 0
+      m_Path: 
+      m_Icon: {fileID: 0}
+      m_ResourceFile: 
+  m_AssetTreeState:
+    scrollPos: {x: 0, y: 0}
+    m_SelectedIDs: 
+    m_LastClickedID: 0
+    m_ExpandedIDs: 000000005275000000ca9a3b
+    m_RenameOverlay:
+      m_UserAcceptedRename: 0
+      m_Name: 
+      m_OriginalName: 
+      m_EditFieldRect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0
+        height: 0
+      m_UserData: 0
+      m_IsWaitingForDelay: 0
+      m_IsRenaming: 0
+      m_OriginalEventType: 11
+      m_IsRenamingFilename: 1
+      m_TrimLeadingAndTrailingWhitespace: 0
+      m_ClientGUIView: {fileID: 0}
+    m_SearchString: 
+    m_CreateAssetUtility:
+      m_EndAction: {fileID: 0}
+      m_InstanceID: 0
+      m_Path: 
+      m_Icon: {fileID: 0}
+      m_ResourceFile: 
+  m_ListAreaState:
+    m_SelectedInstanceIDs: 66770000
+    m_LastClickedInstanceID: 30566
+    m_HadKeyboardFocusLastEvent: 1
+    m_ExpandedInstanceIDs: c623000000000000
+    m_RenameOverlay:
+      m_UserAcceptedRename: 0
+      m_Name: 
+      m_OriginalName: 
+      m_EditFieldRect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0
+        height: 0
+      m_UserData: 0
+      m_IsWaitingForDelay: 0
+      m_IsRenaming: 0
+      m_OriginalEventType: 11
+      m_IsRenamingFilename: 1
+      m_TrimLeadingAndTrailingWhitespace: 0
+      m_ClientGUIView: {fileID: 13}
+    m_CreateAssetUtility:
+      m_EndAction: {fileID: 0}
+      m_InstanceID: 0
+      m_Path: 
+      m_Icon: {fileID: 0}
+      m_ResourceFile: 
+    m_NewAssetIndexInList: -1
+    m_ScrollPosition: {x: 0, y: 0}
+    m_GridSize: 64
+  m_SkipHiddenPackages: 0
+  m_DirectoriesAreaWidth: 207
+--- !u!114 &21
+MonoBehaviour:
+  m_ObjectHideFlags: 52
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 1
+  m_Script: {fileID: 12019, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_MinSize: {x: 275, y: 50}
+  m_MaxSize: {x: 4000, y: 4000}
+  m_TitleContent:
+    m_Text: Inspector
+    m_Image: {fileID: -2667387946076563598, guid: 0000000000000000d000000000000000, type: 0}
+    m_Tooltip: 
+    m_TextWithWhitespace: "Inspector\u200B"
+  m_Pos:
+    serializedVersion: 2
+    x: 1465
+    y: 79
+    width: 454
+    height: 907
+  m_SerializedDataModeController:
+    m_DataMode: 0
+    m_PreferredDataMode: 0
+    m_SupportedDataModes: 
+    isAutomatic: 1
+  m_ViewDataDictionary: {fileID: 0}
+  m_OverlayCanvas:
+    m_LastAppliedPresetName: Default
+    m_SaveData: []
+    m_ContainerData: []
+    m_OverlaysVisible: 1
+  m_ObjectsLockedBeforeSerialization: []
+  m_InstanceIDsLockedBeforeSerialization: 
+  m_PreviewResizer:
+    m_CachedPref: 160
+    m_ControlHash: -371814159
+    m_PrefName: Preview_InspectorPreview
+  m_LastInspectedObjectInstanceID: -1
+  m_LastVerticalScrollValue: 0
+  m_GlobalObjectId: 
+  m_InspectorMode: 0
+  m_LockTracker:
+    m_IsLocked: 0
+  m_PreviewWindow: {fileID: 0}
