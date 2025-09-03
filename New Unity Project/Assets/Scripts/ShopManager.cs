@@ -1,8 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityClient;
 
 /// <summary>
 /// Handles server-backed shop interactions for the Unity client.
@@ -10,18 +10,30 @@ using UnityClient;
 /// </summary>
 public class ShopManager : MonoBehaviour
 {
-    private string BaseUrl => DatabaseConfigUnity.ApiBaseUrl;
+    private readonly Dictionary<int, int> _itemPrices = new();
 
     /// <summary>
     /// Fetch the list of items for sale at a given node.
     /// </summary>
     public async Task<List<ShopItem>> GetStockAsync(string nodeId)
     {
-        using var req = UnityWebRequest.Get($"{BaseUrl}/shop/stock?nodeId={nodeId}");
-        await req.SendWebRequest();
-        if (req.result != UnityWebRequest.Result.Success)
-            return new List<ShopItem>();
-        return JsonUtility.FromJson<ShopItemList>(req.downloadHandler.text).items;
+        string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_shop_stock.sql");
+        var rows = await DatabaseClientUnity.QueryAsync(
+            File.ReadAllText(sqlPath),
+            new Dictionary<string, object?> { ["@nodeId"] = nodeId });
+
+        var items = new List<ShopItem>();
+        _itemPrices.Clear();
+        foreach (var row in rows)
+        {
+            int id = Convert.ToInt32(row["id"]);
+            string name = Convert.ToString(row["name"]) ?? string.Empty;
+            int price = Convert.ToInt32(row["price"]);
+            Debug.Log($"Stock item {id} price {price}");
+            items.Add(new ShopItem { id = id, name = name, price = price });
+            _itemPrices[id] = price;
+        }
+        return items;
     }
 
     /// <summary>
@@ -29,12 +41,21 @@ public class ShopManager : MonoBehaviour
     /// </summary>
     public async Task<bool> PurchaseAsync(int userId, int itemId)
     {
-        var form = new WWWForm();
-        form.AddField("userId", userId);
-        form.AddField("itemId", itemId);
-        using var req = UnityWebRequest.Post($"{BaseUrl}/shop/purchase", form);
-        await req.SendWebRequest();
-        return req.result == UnityWebRequest.Result.Success;
+        _itemPrices.TryGetValue(itemId, out var price);
+        Debug.Log($"Attempting purchase of item {itemId} for {price}");
+
+        string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_shop_purchase.sql");
+        var affected = await DatabaseClientUnity.ExecuteAsync(
+            File.ReadAllText(sqlPath),
+            new Dictionary<string, object?>
+            {
+                ["@userId"] = userId,
+                ["@itemId"] = itemId,
+                ["@price"] = price
+            });
+        bool success = affected > 0;
+        Debug.Log($"Purchase {(success ? "succeeded" : "failed")} for item {itemId} at {price}");
+        return success;
     }
 
     /// <summary>
@@ -42,13 +63,22 @@ public class ShopManager : MonoBehaviour
     /// </summary>
     public async Task<bool> SellAsync(int userId, int itemId, int quantity)
     {
-        var form = new WWWForm();
-        form.AddField("userId", userId);
-        form.AddField("itemId", itemId);
-        form.AddField("quantity", quantity);
-        using var req = UnityWebRequest.Post($"{BaseUrl}/shop/sell", form);
-        await req.SendWebRequest();
-        return req.result == UnityWebRequest.Result.Success;
+        _itemPrices.TryGetValue(itemId, out var price);
+        Debug.Log($"Attempting sell of item {itemId} x{quantity} for {price}");
+
+        string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_shop_sell.sql");
+        var affected = await DatabaseClientUnity.ExecuteAsync(
+            File.ReadAllText(sqlPath),
+            new Dictionary<string, object?>
+            {
+                ["@userId"] = userId,
+                ["@itemId"] = itemId,
+                ["@price"] = price,
+                ["@quantity"] = quantity
+            });
+        bool success = affected > 0;
+        Debug.Log($"Sell {(success ? "succeeded" : "failed")} for item {itemId} at {price} x{quantity}");
+        return success;
     }
 
     [System.Serializable]
@@ -59,9 +89,4 @@ public class ShopManager : MonoBehaviour
         public int price;
     }
 
-    [System.Serializable]
-    private class ShopItemList
-    {
-        public List<ShopItem> items;
-    }
 }
