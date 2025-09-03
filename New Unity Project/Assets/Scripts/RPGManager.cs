@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,20 +14,21 @@ public class RPGManager : MonoBehaviour
 
     private List<CharacterData> partyMembers = new List<CharacterData>();
 
-    private void Start()
+    private async void Start()
     {
-        LoadPartyMembers();
+        await LoadPartyMembersAsync();
         PopulatePartyList();
         StartCoroutine(ChatLoop());
         StartCoroutine(RegenLoop());
     }
 
-    private void LoadPartyMembers()
+    private async Task LoadPartyMembersAsync()
     {
-        partyMembers = CharacterDatabase.GetPartyMembers();
+        partyMembers = await CharacterService.GetPartyMembersAsync();
         if (goldText != null)
         {
-            goldText.text = $"Gold: {CharacterDatabase.GetGold()}";
+            int gold = await CharacterService.GetGoldAsync();
+            goldText.text = $"Gold: {gold}";
         }
     }
 
@@ -68,10 +70,17 @@ public class RPGManager : MonoBehaviour
     {
         while (true)
         {
-            string msg = ChatService.FetchNewMessage();
-            if (!string.IsNullOrEmpty(msg) && chatText != null)
+            var task = ChatService.FetchMessagesAsync();
+            yield return new WaitUntil(() => task.IsCompleted);
+            if (chatText != null)
             {
-                chatText.text += "\n" + msg;
+                foreach (var msg in task.Result)
+                {
+                    if (!string.IsNullOrEmpty(msg))
+                    {
+                        chatText.text += "\n" + msg;
+                    }
+                }
             }
             yield return new WaitForSeconds(2f);
         }
@@ -91,6 +100,7 @@ public class RPGManager : MonoBehaviour
     }
 }
 
+[System.Serializable]
 public class CharacterData
 {
     public string Name;
@@ -103,36 +113,5 @@ public class CharacterData
     {
         HP = Mathf.Min(MaxHP, HP + 1);
         Mana = Mathf.Min(MaxMana, Mana + 1);
-    }
-}
-
-public static class CharacterDatabase
-{
-    public static List<CharacterData> GetPartyMembers()
-    {
-        return new List<CharacterData>
-        {
-            new CharacterData { Name = "Hero", HP = 50, MaxHP = 100, Mana = 30, MaxMana = 50 },
-            new CharacterData { Name = "Mage", HP = 40, MaxHP = 60, Mana = 80, MaxMana = 100 }
-        };
-    }
-
-    public static int GetGold()
-    {
-        return 123;
-    }
-}
-
-public static class ChatService
-{
-    private static Queue<string> messages = new Queue<string>(new[] { "Welcome to the world!" });
-
-    public static string FetchNewMessage()
-    {
-        if (messages.Count > 0)
-        {
-            return messages.Dequeue();
-        }
-        return null;
     }
 }
