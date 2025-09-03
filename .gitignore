@@ -23,3 +23,13 @@ obj/
 /New\ Unity\ Project/MemoryCaptures/
 /New\ Unity\ Project/*.dwlt
 /New\ Unity\ Project/UnityLockfile
+/New\ Unity\ Project/Packages/packages-lock.json
+/New\ Unity\ Project/ProjectSettings/ProjectVersion.txt
+/New\ Unity\ Project/*.csproj
+/New\ Unity\ Project/*.sln
+/New\ Unity\ Project/*.user
+/New\ Unity\ Project/*.userprefs
+/New\ Unity\ Project/*.pidb
+/New\ Unity\ Project/*.booproj
+/New\ Unity\ Project/*.svd
+/New\ Unity\ Project/.vs/
