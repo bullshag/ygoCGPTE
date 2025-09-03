@@ -23,8 +23,8 @@ namespace WinFormsApp2
         private readonly bool _wildEncounter;
         private readonly bool _arenaBattle;
         private readonly int? _arenaOpponentId;
-        private readonly int? _areaMinPower;
-        private readonly int? _areaMaxPower;
+        private readonly int? _areaMinLevel;
+        private readonly int? _areaMaxLevel;
         private readonly bool _darkSpireBattle;
         private readonly string? _areaId;
         private int _opponentAccountId;
@@ -56,14 +56,14 @@ namespace WinFormsApp2
             lstLog.SelectedIndex = lstLog.Items.Count - 1;
         }
 
-        public BattleForm(int userId, bool wildEncounter = false, bool arenaBattle = false, int? arenaOpponentId = null, int? areaMinPower = null, int? areaMaxPower = null, bool darkSpireBattle = false, string? areaId = null)
+        public BattleForm(int userId, bool wildEncounter = false, bool arenaBattle = false, int? arenaOpponentId = null, int? areaMinLevel = null, int? areaMaxLevel = null, bool darkSpireBattle = false, string? areaId = null)
         {
             _userId = userId;
             _wildEncounter = wildEncounter;
             _arenaBattle = arenaBattle;
             _arenaOpponentId = arenaOpponentId;
-            _areaMinPower = areaMinPower;
-            _areaMaxPower = areaMaxPower;
+            _areaMinLevel = areaMinLevel;
+            _areaMaxLevel = areaMaxLevel;
             _darkSpireBattle = darkSpireBattle;
             _areaId = areaId;
             InitializeComponent();
@@ -145,138 +145,127 @@ namespace WinFormsApp2
 
             int playerPower = _players.Sum(p => p.Power);
 
-            int areaMin = _areaMinPower ?? 1;
-            int areaMax = _areaMaxPower ?? int.MaxValue;
+            int minLevel = _areaMinLevel ?? 1;
+            int maxLevel = _areaMaxLevel ?? int.MaxValue;
 
-            int effectivePlayerPower = playerPower;
-            if (playerPower < areaMin && _areaMaxPower.HasValue)
-                effectivePlayerPower = areaMax;
-
-            int minTotal = (int)Math.Ceiling(effectivePlayerPower * 0.8);
-            int maxTotal = _wildEncounter ? (int)Math.Ceiling(effectivePlayerPower * 1.0)
-                                          : (int)Math.Ceiling(effectivePlayerPower * 1.2);
-
-            // Individual foes are chosen solely based on the area's enemy power range.
-            int perNpcMin = areaMin;
-            int perNpcMax = areaMax;
-
-            int npcPower = 0;
-
-            Creature? AddNpc(int minPower, int maxPower)
+            var candidates = new List<(string Name, int Power, int Level)>();
+            using (var listCmd = new MySqlCommand(@"SELECT n.name, n.power, n.level
+                                                    FROM npcs n
+                                                    LEFT JOIN npc_locations l ON n.name = l.npc_name
+                                                    WHERE n.level BETWEEN @min AND @max
+                                                      AND (@area IS NULL OR l.node_id = @area)", conn))
             {
-                for (int attempt = 0; attempt < 50; attempt++)
+                listCmd.Parameters.AddWithValue("@min", minLevel);
+                listCmd.Parameters.AddWithValue("@max", maxLevel);
+                listCmd.Parameters.AddWithValue("@area", (object?)_areaId ?? DBNull.Value);
+                using var reader = listCmd.ExecuteReader();
+                while (reader.Read())
                 {
-                    using var npcCmd = new MySqlCommand(@"SELECT n.name, n.level, n.current_hp, n.max_hp, n.mana, n.strength, n.dex,
-                                                              n.intelligence, n.action_speed, n.melee_defense, n.magic_defense,
-                                                              n.role, n.targeting_style, n.power
-                                                       FROM npcs n
+                    candidates.Add((reader.GetString("name"), reader.GetInt32("power"), reader.GetInt32("level")));
+                }
+            }
 
-                                                       LEFT JOIN npc_locations l ON n.id = l.npc_id
+            var remaining = new List<(string Name, int Power, int Level)>(candidates);
+            var selected = new List<(string Name, int Power, int Level)>();
+            int currentPower = 0;
+            int targetPower = playerPower;
 
-                                                       WHERE n.power BETWEEN @min AND @max
-                                                         AND (@area IS NULL OR l.node_id = @area)
-                                                       ORDER BY RAND() LIMIT 1", conn);
-                    npcCmd.Parameters.AddWithValue("@min", minPower);
-                    npcCmd.Parameters.AddWithValue("@max", maxPower);
-                    npcCmd.Parameters.AddWithValue("@area", (object?)_areaId ?? DBNull.Value);
-                    using var r2 = npcCmd.ExecuteReader();
-                    if (!r2.Read())
-                        return null;
+            while (remaining.Count > 0)
+            {
+                var best = remaining.OrderBy(c => Math.Abs(targetPower - (currentPower + c.Power))).First();
+                int newTotal = currentPower + best.Power;
+                if (Math.Abs(targetPower - newTotal) >= Math.Abs(targetPower - currentPower) && currentPower > 0)
+                    break;
+                selected.Add(best);
+                currentPower = newTotal;
+                remaining.Remove(best);
+                if (currentPower >= targetPower) break;
+            }
 
-                    string name = r2.GetString("name");
-                    int level = r2.GetInt32("level");
-                    int currentHp = r2.GetInt32("current_hp");
-                    int maxHp = r2.GetInt32("max_hp");
-                    int mana = r2.GetInt32("mana");
-                    int strength = r2.GetInt32("strength");
-                    int dex = r2.GetInt32("dex");
-                    int intelligence = r2.GetInt32("intelligence");
-                    int action = r2.GetInt32("action_speed");
-                    int meleeDef = r2.GetInt32("melee_defense");
-                    int magicDef = r2.GetInt32("magic_defense");
-                    string role = r2.GetString("role");
-                    string style = r2.GetString("targeting_style");
-                    int power = r2.GetInt32("power");
-                    r2.Close();
+            if (selected.Count == 0 && candidates.Count > 0)
+            {
+                selected.Add(candidates[_rng.Next(candidates.Count)]);
+            }
 
-                    var npc = new Creature
-                    {
-                        Name = name,
-                        Level = level,
-                        CurrentHp = currentHp,
-                        MaxHp = maxHp,
-                        Mana = mana,
-                        MaxMana = 10 + 5 * intelligence,
-                        Strength = strength,
-                        Dex = dex,
-                        Intelligence = intelligence,
-                        ActionSpeed = action,
-                        MeleeDefense = meleeDef,
-                        MagicDefense = magicDef,
-                        Role = role,
-                        TargetingStyle = style
-                    };
+            foreach (var sel in selected)
+            {
+                using var npcCmd = new MySqlCommand(@"SELECT n.name, n.level, n.current_hp, n.max_hp, n.mana, n.strength, n.dex,
+                                                               n.intelligence, n.action_speed, n.melee_defense, n.magic_defense,
+                                                               n.role, n.targeting_style, n.power
+                                                        FROM npcs n
+                                                        WHERE n.name=@n", conn);
+                npcCmd.Parameters.AddWithValue("@n", sel.Name);
+                using var r2 = npcCmd.ExecuteReader();
+                if (!r2.Read()) continue;
 
-                    foreach (var kv in InventoryService.GetNpcEquipment(name, level))
-                        npc.Equipment[kv.Key] = kv.Value;
-                    ApplyEquipmentBonuses(npc);
+                string name = r2.GetString("name");
+                int level = r2.GetInt32("level");
+                int currentHp = r2.GetInt32("current_hp");
+                int maxHp = r2.GetInt32("max_hp");
+                int mana = r2.GetInt32("mana");
+                int strength = r2.GetInt32("strength");
+                int dex = r2.GetInt32("dex");
+                int intelligence = r2.GetInt32("intelligence");
+                int action = r2.GetInt32("action_speed");
+                int meleeDef = r2.GetInt32("melee_defense");
+                int magicDef = r2.GetInt32("magic_defense");
+                string role = r2.GetString("role");
+                string style = r2.GetString("targeting_style");
+                int power = r2.GetInt32("power");
+                r2.Close();
 
-                    using var abilCmd = new MySqlCommand(@"SELECT slot, priority, a.id, a.name, a.description, a.cost, a.cooldown
+                var npc = new Creature
+                {
+                    Name = name,
+                    Level = level,
+                    CurrentHp = currentHp,
+                    MaxHp = maxHp,
+                    Mana = mana,
+                    MaxMana = 10 + 5 * intelligence,
+                    Strength = strength,
+                    Dex = dex,
+                    Intelligence = intelligence,
+                    ActionSpeed = action,
+                    MeleeDefense = meleeDef,
+                    MagicDefense = magicDef,
+                    Role = role,
+                    TargetingStyle = style
+                };
+
+                foreach (var kv in InventoryService.GetNpcEquipment(name, level))
+                    npc.Equipment[kv.Key] = kv.Value;
+                ApplyEquipmentBonuses(npc);
+
+                using var abilCmd = new MySqlCommand(@"SELECT slot, priority, a.id, a.name, a.description, a.cost, a.cooldown
                                                       FROM npc_abilities na
                                                       JOIN abilities a ON na.ability_id = a.id
                                                       WHERE na.npc_name=@n", conn);
-                    abilCmd.Parameters.AddWithValue("@n", name);
-                    using var abilR = abilCmd.ExecuteReader();
-                    while (abilR.Read())
+                abilCmd.Parameters.AddWithValue("@n", name);
+                using var abilR = abilCmd.ExecuteReader();
+                while (abilR.Read())
+                {
+                    npc.Abilities.Add(new Ability
                     {
-                        npc.Abilities.Add(new Ability
-                        {
-                            Slot = abilR.GetInt32("slot"),
-                            Priority = abilR.GetInt32("priority"),
-                            Id = abilR.GetInt32("id"),
-                            Name = abilR.GetString("name"),
-                            Description = abilR.GetString("description"),
-                            Cost = abilR.GetInt32("cost"),
-                            Cooldown = abilR.GetInt32("cooldown")
-                        });
-                    }
-                    if (!npc.Abilities.Any())
-                        npc.Abilities.Add(new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0, Slot = 1 });
-
-                    npc.Power = power;
-                    _npcs.Add(npc);
-                    npcPower += power;
-                    return npc;
+                        Slot = abilR.GetInt32("slot"),
+                        Priority = abilR.GetInt32("priority"),
+                        Id = abilR.GetInt32("id"),
+                        Name = abilR.GetString("name"),
+                        Description = abilR.GetString("description"),
+                        Cost = abilR.GetInt32("cost"),
+                        Cooldown = abilR.GetInt32("cooldown")
+                    });
                 }
-                return null;
-            }
+                if (!npc.Abilities.Any())
+                    npc.Abilities.Add(new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0, Slot = 1 });
 
-            // Start with a foe at the upper end of the allowed range.
-            int strongMin = perNpcMax;
-            int strongMax = perNpcMax;
-            AddNpc(strongMin, strongMax);
-
-            int weakerCount = _rng.Next(1, 3);
-            for (int i = 0; i < weakerCount && npcPower < maxTotal; i++)
-            {
-                int remaining = maxTotal - npcPower;
-                int weakMax = Math.Min(perNpcMax, remaining);
-                if (weakMax < perNpcMin) break;
-                if (AddNpc(perNpcMin, weakMax) == null)
-                    break;
-            }
-
-            while (npcPower < minTotal)
-            {
-                int remaining = maxTotal - npcPower;
-                if (remaining < perNpcMin) break;
-                if (AddNpc(perNpcMin, Math.Min(perNpcMax, remaining)) == null)
-                    break;
+                npc.Power = power;
+                _npcs.Add(npc);
             }
 
             if (_npcs.Count == 0)
             {
-                AddNpc(perNpcMin, perNpcMax);
+                _cancelled = true;
+                return;
             }
         }
 
