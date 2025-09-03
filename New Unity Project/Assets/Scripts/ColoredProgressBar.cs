@@ -3,8 +3,8 @@ using UnityEngine.UI;
 
 public class ColoredProgressBar : MonoBehaviour
 {
-    [SerializeField] private Image hpFill;
-    [SerializeField] private Image manaFill;
+    public Image hpFill;
+    public Image manaFill;
 
     public void SetValue(float hpPercent, float manaPercent)
     {
