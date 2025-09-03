@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityClient;
 
 /// <summary>
 /// Handles recruiting and tavern interactions via server calls.
@@ -9,14 +10,14 @@ using UnityEngine.Networking;
 /// </summary>
 public class TavernManager : MonoBehaviour
 {
-    [SerializeField] private string baseUrl = "https://localhost:5001";
+    private string BaseUrl => DatabaseConfigUnity.ApiBaseUrl;
 
     /// <summary>
     /// Fetch recruit candidates for the account.
     /// </summary>
     public async Task<List<Recruit>> GetCandidatesAsync(int accountId)
     {
-        using var req = UnityWebRequest.Get($"{baseUrl}/tavern/candidates?accountId={accountId}");
+        using var req = UnityWebRequest.Get($"{BaseUrl}/tavern/candidates?accountId={accountId}");
         await req.SendWebRequest();
         if (req.result != UnityWebRequest.Result.Success)
             return new List<Recruit>();
@@ -31,7 +32,7 @@ public class TavernManager : MonoBehaviour
         var form = new WWWForm();
         form.AddField("accountId", accountId);
         form.AddField("recruitId", recruitId);
-        using var req = UnityWebRequest.Post($"{baseUrl}/tavern/hire", form);
+        using var req = UnityWebRequest.Post($"{BaseUrl}/tavern/hire", form);
         await req.SendWebRequest();
         return req.result == UnityWebRequest.Result.Success;
     }

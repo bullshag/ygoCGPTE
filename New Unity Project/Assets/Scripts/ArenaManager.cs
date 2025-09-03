@@ -1,13 +1,14 @@
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityClient;
 
 /// <summary>
 /// Handles arena battle flow against the server.
 /// </summary>
 public class ArenaManager : MonoBehaviour
 {
-    [SerializeField] private string baseUrl = "https://localhost:5001";
+    private string BaseUrl => DatabaseConfigUnity.ApiBaseUrl;
 
     /// <summary>
     /// Initiates a battle and returns the server provided result payload.
@@ -16,7 +17,7 @@ public class ArenaManager : MonoBehaviour
     {
         var form = new WWWForm();
         form.AddField("accountId", accountId);
-        using var req = UnityWebRequest.Post($"{baseUrl}/arena/challenge", form);
+        using var req = UnityWebRequest.Post($"{BaseUrl}/arena/challenge", form);
         await req.SendWebRequest();
         if (req.result != UnityWebRequest.Result.Success)
             return null;

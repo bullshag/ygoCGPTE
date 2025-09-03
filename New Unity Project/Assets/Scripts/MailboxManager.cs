@@ -2,20 +2,21 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityClient;
 
 /// <summary>
 /// Retrieves player mail and interacts with the server-side mailbox.
 /// </summary>
 public class MailboxManager : MonoBehaviour
 {
-    [SerializeField] private string baseUrl = "https://localhost:5001";
+    private string BaseUrl => DatabaseConfigUnity.ApiBaseUrl;
 
     /// <summary>
     /// Get unread mail for the given account.
     /// </summary>
     public async Task<List<MailMessage>> GetMailAsync(int accountId)
     {
-        using var req = UnityWebRequest.Get($"{baseUrl}/mail/unread?accountId={accountId}");
+        using var req = UnityWebRequest.Get($"{BaseUrl}/mail/unread?accountId={accountId}");
         await req.SendWebRequest();
         if (req.result != UnityWebRequest.Result.Success)
             return new List<MailMessage>();
@@ -29,7 +30,7 @@ public class MailboxManager : MonoBehaviour
     {
         var form = new WWWForm();
         form.AddField("messageId", messageId);
-        using var req = UnityWebRequest.Post($"{baseUrl}/mail/markRead", form);
+        using var req = UnityWebRequest.Post($"{BaseUrl}/mail/markRead", form);
         await req.SendWebRequest();
         return req.result == UnityWebRequest.Result.Success;
     }
@@ -38,6 +39,7 @@ public class MailboxManager : MonoBehaviour
     public class MailMessage
     {
         public int id;
+        public int senderId;
         public string subject;
         public string body;
     }

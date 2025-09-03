@@ -2,10 +2,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityClient;
 
 public static class ChatService
 {
-    private const string BaseUrl = "http://localhost:8080";
+    private static string BaseUrl => DatabaseConfigUnity.ApiBaseUrl;
 
     [System.Serializable]
     private class ChatResponse

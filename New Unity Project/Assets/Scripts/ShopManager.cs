@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityClient;
 
 /// <summary>
 /// Handles server-backed shop interactions for the Unity client.
@@ -9,14 +10,14 @@ using UnityEngine.Networking;
 /// </summary>
 public class ShopManager : MonoBehaviour
 {
-    [SerializeField] private string baseUrl = "https://localhost:5001";
+    private string BaseUrl => DatabaseConfigUnity.ApiBaseUrl;
 
     /// <summary>
     /// Fetch the list of items for sale at a given node.
     /// </summary>
     public async Task<List<ShopItem>> GetStockAsync(string nodeId)
     {
-        using var req = UnityWebRequest.Get($"{baseUrl}/shop/stock?nodeId={nodeId}");
+        using var req = UnityWebRequest.Get($"{BaseUrl}/shop/stock?nodeId={nodeId}");
         await req.SendWebRequest();
         if (req.result != UnityWebRequest.Result.Success)
             return new List<ShopItem>();
@@ -31,7 +32,7 @@ public class ShopManager : MonoBehaviour
         var form = new WWWForm();
         form.AddField("userId", userId);
         form.AddField("itemId", itemId);
-        using var req = UnityWebRequest.Post($"{baseUrl}/shop/purchase", form);
+        using var req = UnityWebRequest.Post($"{BaseUrl}/shop/purchase", form);
         await req.SendWebRequest();
         return req.result == UnityWebRequest.Result.Success;
     }
@@ -45,7 +46,7 @@ public class ShopManager : MonoBehaviour
         form.AddField("userId", userId);
         form.AddField("itemId", itemId);
         form.AddField("quantity", quantity);
-        using var req = UnityWebRequest.Post($"{baseUrl}/shop/sell", form);
+        using var req = UnityWebRequest.Post($"{BaseUrl}/shop/sell", form);
         await req.SendWebRequest();
         return req.result == UnityWebRequest.Result.Success;
     }
