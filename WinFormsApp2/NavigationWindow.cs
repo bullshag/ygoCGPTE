@@ -18,7 +18,7 @@ namespace WinFormsApp2
         private bool _hasBlessing;
         private string _currentNode = "nodeMounttown";
         private readonly TravelManager _travelManager;
-        private readonly Action _refresh;
+        private readonly Func<Task> _refresh;
 
         private class ConnectionItem
         {
@@ -44,7 +44,7 @@ namespace WinFormsApp2
             public override string ToString() => _display;
         }
 
-        public NavigationWindow(int accountId, int partySize, bool hasBlessing, Action refresh)
+        public NavigationWindow(int accountId, int partySize, bool hasBlessing, Func<Task> refresh)
         {
             _accountId = accountId;
             _partySize = partySize;
@@ -79,7 +79,7 @@ namespace WinFormsApp2
             }
         }
 
-        public NavigationWindow() : this(0, 0, false, () => { }) { }
+        public NavigationWindow() : this(0, 0, false, () => Task.CompletedTask) { }
 
         private string GetCurrentNode()
         {
@@ -223,9 +223,9 @@ namespace WinFormsApp2
         {
             var shop = new ShopForm(_accountId, _currentNode);
             if (sender is Button btn) btn.Enabled = false;
-            shop.FormClosed += (_, __) =>
+            shop.FormClosed += async (_, __) =>
             {
-                _refresh();
+                await _refresh();
                 UpdatePartySize();
                 if (sender is Button b) b.Enabled = true;
                 shop.Dispose();
@@ -235,7 +235,7 @@ namespace WinFormsApp2
 
         private void BtnGraveyard_Click(object? sender, EventArgs e)
         {
-            var grave = new GraveyardForm(_accountId, () => { _refresh(); UpdatePartySize(); });
+            var grave = new GraveyardForm(_accountId, async () => { await _refresh(); UpdatePartySize(); });
             if (sender is Button btn) btn.Enabled = false;
             grave.FormClosed += (_, __) =>
             {
@@ -247,7 +247,7 @@ namespace WinFormsApp2
 
         private void BtnTavern_Click(object? sender, EventArgs e)
         {
-            var tavern = new TavernForm(_accountId, () => { _refresh(); UpdatePartySize(); });
+            var tavern = new TavernForm(_accountId, async () => { await _refresh(); UpdatePartySize(); });
             if (sender is Button btn) btn.Enabled = false;
             tavern.FormClosed += (_, __) =>
             {
@@ -269,9 +269,9 @@ namespace WinFormsApp2
             }
             var battle = new BattleForm(_accountId, areaMinLevel: min, areaMaxLevel: max, darkSpireBattle: darkSpire, areaId: _currentNode);
             if (sender is Button btn) btn.Enabled = false;
-            battle.FormClosed += (_, __) =>
+            battle.FormClosed += async (_, __) =>
             {
-                _refresh();
+                await _refresh();
                 UpdatePartySize();
                 LoadNode(_currentNode);
                 if (sender is Button b) b.Enabled = true;
@@ -362,9 +362,9 @@ namespace WinFormsApp2
                 (min, max) = GetDarkSpireBracket();
             }
             var battle = new BattleForm(_accountId, true, areaMinLevel: min, areaMaxLevel: max, areaId: _currentNode);
-            battle.FormClosed += (_, __) =>
+            battle.FormClosed += async (_, __) =>
             {
-                _refresh();
+                await _refresh();
                 UpdatePartySize();
                 LoadNode(_currentNode);
                 _travelManager.ResumeAfterEncounter();
