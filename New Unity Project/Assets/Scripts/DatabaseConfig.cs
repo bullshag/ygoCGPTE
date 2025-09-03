@@ -9,6 +9,7 @@ namespace WinFormsApp2
         public static bool DebugMode { get; set; }
         public static bool UseKimServer { get; set; }
         public static string ConnectionString =>
-            $"Server={(UseKimServer ? KimHost : (DebugMode ? "127.0.0.1" : Host))};Database=accounts;User ID={Username};Password={Password};";
+            $"Server={(UseKimServer ? KimHost : (DebugMode ? \"127.0.0.1\" : Host))};Database=accounts;User ID={Username};Password={Password};";
+
     }
 }

@@ -1,35 +1,41 @@
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using MySql.Data.MySqlClient;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using WinFormsApp2;
 
-public class LoginManager : MonoBehaviour
+public class RegisterManager : MonoBehaviour
 {
     public InputField usernameField;
+    public InputField nicknameField;
     public InputField passwordField;
+    public InputField confirmPasswordField;
     public Toggle debugServerToggle;
     public Toggle kimServerToggle;
-    public Button loginButton;
-    public Button createAccountButton;
+    public Button registerButton;
 
     private void Start()
     {
-        if (usernameField == null || passwordField == null ||
-            debugServerToggle == null || kimServerToggle == null ||
-            loginButton == null || createAccountButton == null)
+        if (usernameField == null || nicknameField == null || passwordField == null ||
+            confirmPasswordField == null || debugServerToggle == null || kimServerToggle == null ||
+            registerButton == null)
         {
             CreateDefaultUI();
         }
 
-        if (loginButton != null)
-            loginButton.onClick.AddListener(OnLoginClicked);
-        if (createAccountButton != null)
-            createAccountButton.onClick.AddListener(OnCreateAccountClicked);
+        if (registerButton != null)
+            registerButton.onClick.AddListener(OnRegisterClicked);
+    }
+
+    private void OnDestroy()
+    {
+        if (registerButton != null)
+            registerButton.onClick.RemoveListener(OnRegisterClicked);
     }
 
     private void CreateDefaultUI()
@@ -43,12 +49,15 @@ public class LoginManager : MonoBehaviour
             new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
         }
 
-        usernameField = CreateInputField(canvas.transform, "Username", new Vector2(0, 60));
-        passwordField = CreateInputField(canvas.transform, "Password", new Vector2(0, 0));
-        debugServerToggle = CreateToggle(canvas.transform, "Debug Server", new Vector2(-80, -60));
-        kimServerToggle = CreateToggle(canvas.transform, "Kim Server", new Vector2(80, -60));
-        loginButton = CreateButton(canvas.transform, "Login", new Vector2(-60, -120));
-        createAccountButton = CreateButton(canvas.transform, "Create Account", new Vector2(60, -120));
+        usernameField = CreateInputField(canvas.transform, "Username", new Vector2(0, 90));
+        nicknameField = CreateInputField(canvas.transform, "Nickname", new Vector2(0, 50));
+        passwordField = CreateInputField(canvas.transform, "Password", new Vector2(0, 10));
+        passwordField.contentType = InputField.ContentType.Password;
+        confirmPasswordField = CreateInputField(canvas.transform, "Confirm Password", new Vector2(0, -30));
+        confirmPasswordField.contentType = InputField.ContentType.Password;
+        debugServerToggle = CreateToggle(canvas.transform, "Debug Server", new Vector2(-80, -70));
+        kimServerToggle = CreateToggle(canvas.transform, "Kim Server", new Vector2(80, -70));
+        registerButton = CreateButton(canvas.transform, "Register", new Vector2(0, -120));
     }
 
     private InputField CreateInputField(Transform parent, string placeholder, Vector2 position)
@@ -56,7 +65,7 @@ public class LoginManager : MonoBehaviour
         var go = new GameObject(placeholder + "Input", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(InputField));
         var rt = go.GetComponent<RectTransform>();
         rt.SetParent(parent);
-        rt.sizeDelta = new Vector2(160, 30);
+        rt.sizeDelta = new Vector2(200, 30);
         rt.anchoredPosition = position;
 
         var textGO = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
@@ -142,63 +151,88 @@ public class LoginManager : MonoBehaviour
         return go.GetComponent<Button>();
     }
 
-    private void OnDestroy()
+    private void OnRegisterClicked()
     {
-        if (loginButton != null)
-            loginButton.onClick.RemoveListener(OnLoginClicked);
-        if (createAccountButton != null)
-            createAccountButton.onClick.RemoveListener(OnCreateAccountClicked);
-    }
+        string user = usernameField != null ? usernameField.text : string.Empty;
+        string nick = nicknameField != null ? nicknameField.text : string.Empty;
+        string pass = passwordField != null ? passwordField.text : string.Empty;
+        string confirm = confirmPasswordField != null ? confirmPasswordField.text : string.Empty;
 
-    private async void OnLoginClicked()
-    {
-        string username = usernameField != null ? usernameField.text : string.Empty;
-        string password = passwordField != null ? passwordField.text : string.Empty;
-
-        if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
+        if (user.Contains(" ") || pass.Contains(" ") || nick.Contains(" "))
         {
-            DatabaseConfig.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
-            DatabaseConfig.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
-
-            string hashed = HashPassword(password);
-            string sql = "SELECT id, nickname FROM accounts WHERE username = @username AND password_hash = @passwordHash;";
-            var parameters = new Dictionary<string, object?>
-            {
-                ["@username"] = username,
-                ["@passwordHash"] = hashed
-            };
-
-            var results = await DatabaseClientUnity.QueryAsync(sql, parameters);
-            if (results.Count > 0)
-            {
-                var row = results[0];
-                int userId = Convert.ToInt32(row["id"]);
-                await DatabaseClientUnity.ExecuteAsync(
-                    "UPDATE accounts SET last_seen = NOW() WHERE id = @id",
-                    new Dictionary<string, object?> { ["@id"] = userId });
-                InventoryService.Load(userId);
-                SceneManager.LoadScene("RPG");
-            }
+            Debug.Log("No spaces allowed in username, nickname or password");
+            return;
         }
+        if (user.Length < 3 || user.Length > 12 || pass.Length < 3 || pass.Length > 12 || nick.Length < 3 || nick.Length > 12)
+        {
+            Debug.Log("Username, nickname and password must be 3-12 characters");
+            return;
+        }
+        if (pass != confirm)
+        {
+            Debug.Log("Passwords do not match");
+            return;
+        }
+
+        DatabaseConfig.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
+        DatabaseConfig.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
+
+        using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+        conn.Open();
+
+        using var checkUser = new MySqlCommand("SELECT COUNT(1) FROM Users WHERE Username=@u", conn);
+        checkUser.Parameters.AddWithValue("@u", user);
+        int existsUser = Convert.ToInt32(checkUser.ExecuteScalar());
+        if (existsUser > 0)
+        {
+            Debug.Log("Username already exists");
+            return;
+        }
+
+        using var checkNick = new MySqlCommand("SELECT COUNT(1) FROM Users WHERE Nickname=@n", conn);
+        checkNick.Parameters.AddWithValue("@n", nick);
+        int existsNick = Convert.ToInt32(checkNick.ExecuteScalar());
+        if (existsNick > 0)
+        {
+            Debug.Log("Nickname already exists");
+            return;
+        }
+
+        string insertSql = File.ReadAllText(Path.Combine(Application.dataPath, "../create_user.sql"));
+        using var insert = new MySqlCommand(insertSql, conn);
+        insert.Parameters.AddWithValue("@u", user);
+        insert.Parameters.AddWithValue("@n", nick);
+        insert.Parameters.AddWithValue("@p", HashPassword(pass));
+        insert.ExecuteNonQuery();
+        long newId = insert.LastInsertedId;
+
+        using (var ensureNode = new MySqlCommand("INSERT IGNORE INTO nodes (id, name) VALUES (@node, @name)", conn))
+        {
+            ensureNode.Parameters.AddWithValue("@node", "nodeRiverVillage");
+            ensureNode.Parameters.AddWithValue("@name", "River Village");
+            ensureNode.ExecuteNonQuery();
+        }
+
+        string travelSql = File.ReadAllText(Path.Combine(Application.dataPath, "../init_travel_state.sql"));
+        using var initTravel = new MySqlCommand(travelSql, conn);
+        initTravel.Parameters.AddWithValue("@a", newId);
+        initTravel.Parameters.AddWithValue("@node", "nodeRiverVillage");
+        initTravel.ExecuteNonQuery();
+
+        Debug.Log("Account created");
+        SceneManager.LoadScene("Login");
     }
 
     private string HashPassword(string password)
     {
-        using (var sha = SHA256.Create())
+        using var sha = SHA256.Create();
+        byte[] bytes = Encoding.UTF8.GetBytes(password);
+        byte[] hash = sha.ComputeHash(bytes);
+        var builder = new StringBuilder();
+        foreach (byte b in hash)
         {
-            byte[] bytes = Encoding.UTF8.GetBytes(password);
-            byte[] hash = sha.ComputeHash(bytes);
-            var builder = new StringBuilder();
-            foreach (byte b in hash)
-            {
-                builder.Append(b.ToString("x2"));
-            }
-            return builder.ToString();
+            builder.Append(b.ToString("x2"));
         }
-    }
-
-    private void OnCreateAccountClicked()
-    {
-        SceneManager.LoadScene("Register");
+        return builder.ToString();
     }
 }
