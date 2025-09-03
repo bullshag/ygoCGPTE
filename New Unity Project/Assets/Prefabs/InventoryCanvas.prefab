@@ -23,7 +23,7 @@ Canvas:
 --- !u!114 &1140
 MonoBehaviour:
   m_GameObject: {fileID: 1000}
-  m_Script: {fileID: 11500000, guid: 00000000000000000000000000000000, type: 3}
+  m_Script: {fileID: 11500000, guid: 3218747909e641a3bd156916f24b91b5, type: 3}
   itemListContent: {fileID: 0}
   itemEntryPrefab: {fileID: 0}
   descriptionText: {fileID: 0}
