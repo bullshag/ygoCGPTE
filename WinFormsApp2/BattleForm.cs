@@ -185,7 +185,9 @@ namespace WinFormsApp2
             {
                 for (int attempt = 0; attempt < 50; attempt++)
                 {
-                    using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style FROM npcs ORDER BY RAND() LIMIT 1", conn);
+                    using var npcCmd = new MySqlCommand("SELECT name, level, current_hp, max_hp, mana, strength, dex, intelligence, action_speed, melee_defense, magic_defense, role, targeting_style, power FROM npcs WHERE power BETWEEN @min AND @max ORDER BY RAND() LIMIT 1", conn);
+                    npcCmd.Parameters.AddWithValue("@min", minPower);
+                    npcCmd.Parameters.AddWithValue("@max", maxPower);
                     using var r2 = npcCmd.ExecuteReader();
                     if (!r2.Read())
                         return null;
@@ -203,6 +205,7 @@ namespace WinFormsApp2
                     int magicDef = r2.GetInt32("magic_defense");
                     string role = r2.GetString("role");
                     string style = r2.GetString("targeting_style");
+                    int power = r2.GetInt32("power");
                     r2.Close();
 
                     var npc = new Creature
@@ -249,10 +252,6 @@ namespace WinFormsApp2
                     if (!npc.Abilities.Any())
                         npc.Abilities.Add(new Ability { Id = 0, Name = "-basic attack-", Priority = 1, Cost = 0, Slot = 1 });
 
-                    int eqCostNpc = npc.Equipment.Values.Sum(i => i?.Price ?? 0);
-                    int power = PowerCalculator.CalculatePower(npc.Level, eqCostNpc, npc.Abilities.Count);
-                    if (power < minPower || power > maxPower)
-                        continue;
                     npc.Power = power;
                     _npcs.Add(npc);
                     npcPower += power;

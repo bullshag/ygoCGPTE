@@ -45,20 +45,17 @@ ON DUPLICATE KEY UPDATE kill_count = kill_count + 1", conn);
             var list = new List<EnemyInfo>();
             using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using (var cmd = new MySqlCommand("SELECT name, role, targeting_style FROM npcs", conn))
+            using (var cmd = new MySqlCommand("SELECT name, role, targeting_style, power FROM npcs WHERE power BETWEEN @min AND @max", conn))
             {
                 cmd.Parameters.AddWithValue("@min", minPower);
                 cmd.Parameters.AddWithValue("@max", maxPower);
                 using var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    string name = reader.GetString("name");
-                    int power = PowerCalculator.GetNpcPower(name);
-                    if (power < minPower || power > maxPower) continue;
                     var info = new EnemyInfo
                     {
-                        Name = name,
-                        Power = power,
+                        Name = reader.GetString("name"),
+                        Power = reader.GetInt32("power"),
                         Role = reader.GetString("role"),
                         TargetingStyle = reader.GetString("targeting_style")
                     };
