@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityClient;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,20 +17,21 @@ public class RPGManager : MonoBehaviour
 
     private List<CharacterData> partyMembers = new List<CharacterData>();
 
-    private void Start()
+    private async void Start()
     {
-        LoadPartyMembers();
+        await LoadPartyMembersAsync();
         PopulatePartyList();
         StartCoroutine(ChatLoop());
         StartCoroutine(RegenLoop());
     }
 
-    private void LoadPartyMembers()
+    private async Task LoadPartyMembersAsync()
     {
-        partyMembers = CharacterDatabase.GetPartyMembers();
+        partyMembers = await CharacterService.GetPartyMembersAsync();
         if (goldText != null)
         {
-            goldText.text = $"Gold: {CharacterDatabase.GetGold()}";
+            int gold = await CharacterService.GetGoldAsync();
+            goldText.text = $"Gold: {gold}";
         }
     }
 
@@ -71,10 +73,17 @@ public class RPGManager : MonoBehaviour
     {
         while (true)
         {
-            string msg = ChatService.FetchNewMessage();
-            if (!string.IsNullOrEmpty(msg) && chatText != null)
+            var task = ChatService.FetchMessagesAsync();
+            yield return new WaitUntil(() => task.IsCompleted);
+            if (chatText != null)
             {
-                chatText.text += "\n" + msg;
+                foreach (var msg in task.Result)
+                {
+                    if (!string.IsNullOrEmpty(msg))
+                    {
+                        chatText.text += "\n" + msg;
+                    }
+                }
             }
             yield return new WaitForSeconds(2f);
         }
@@ -94,6 +103,7 @@ public class RPGManager : MonoBehaviour
     }
 }
 
+[System.Serializable]
 public class CharacterData
 {
     public string Name;
