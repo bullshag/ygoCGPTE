@@ -4,16 +4,17 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using TMPro;
 using WinFormsApp2;
 using MySql.Data.MySqlClient;
 
 public class InventoryUI : MonoBehaviour
 {
     public List<GameObject> itemEntrySlots = new();
-    public Text descriptionText = null!;
-    public Dropdown targetDropdown = null!;
+    public TextMeshProUGUI descriptionText = null!;
+    public TMP_Dropdown targetDropdown = null!;
     public Button useButton = null!;
-    public Text tooltipText = null!;
+    public TextMeshProUGUI tooltipText = null!;
     public int userId;
 
     private InventoryItem? selectedItem;
@@ -36,7 +37,7 @@ public class InventoryUI : MonoBehaviour
             {
                 go.SetActive(true);
                 var inv = InventoryServiceUnity.Items[i];
-                var label = go.GetComponentInChildren<Text>();
+                var label = go.GetComponentInChildren<TextMeshProUGUI>();
                 string suffix = inv.Item.Stackable ? $" x{inv.Quantity}" : string.Empty;
                 label.text = inv.Item.Name + suffix;
                 var button = go.GetComponent<Button>();
@@ -68,13 +69,13 @@ public class InventoryUI : MonoBehaviour
         {
             descriptionText.text = string.Empty;
             useButton.interactable = false;
-            useButton.GetComponentInChildren<Text>().text = "Use";
+            useButton.GetComponentInChildren<TextMeshProUGUI>().text = "Use";
         }
         else
         {
             descriptionText.text = DescribeItem(inv.Item);
             bool isEquipment = inv.Item is Weapon || inv.Item is Armor || inv.Item is Trinket;
-            useButton.GetComponentInChildren<Text>().text = isEquipment ? "Equip" : "Use";
+            useButton.GetComponentInChildren<TextMeshProUGUI>().text = isEquipment ? "Equip" : "Use";
             useButton.interactable = targetDropdown.options.Count > 0 && targetDropdown.value >= 0 &&
                                     (isEquipment || inv.Item is HealingPotion || inv.Item is AbilityTome);
         }
@@ -92,7 +93,7 @@ public class InventoryUI : MonoBehaviour
     {
         var item = selectedItem?.Item;
         bool isEquipment = item is Weapon || item is Armor || item is Trinket;
-        useButton.GetComponentInChildren<Text>().text = isEquipment ? "Equip" : "Use";
+        useButton.GetComponentInChildren<TextMeshProUGUI>().text = isEquipment ? "Equip" : "Use";
         useButton.interactable = targetDropdown.options.Count > 0 && targetDropdown.value >= 0 &&
                                 (isEquipment || item is HealingPotion || item is AbilityTome);
     }

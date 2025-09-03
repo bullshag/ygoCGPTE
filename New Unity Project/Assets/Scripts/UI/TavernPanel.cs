@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using WinFormsApp2;
+using TMPro;
 
 /// <summary>
 /// Unity UI wrapper for TavernManager interactions.
@@ -45,11 +46,11 @@ public class TavernPanel : MonoBehaviour
             var entry = new GameObject($"Candidate_{c.id}", typeof(RectTransform));
             entry.transform.SetParent(candidateListParent, false);
 
-            var nameGO = new GameObject("Name", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+            var nameGO = new GameObject("Name", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
             var nameRT = nameGO.GetComponent<RectTransform>();
             nameRT.SetParent(entry.transform);
             nameRT.sizeDelta = new Vector2(200, 30);
-            var label = nameGO.GetComponent<Text>();
+            var label = nameGO.GetComponent<TextMeshProUGUI>();
             label.text = $"{c.name} (Lv {c.level})";
             label.color = Color.black;
 
@@ -77,16 +78,16 @@ public class TavernPanel : MonoBehaviour
         rt.sizeDelta = new Vector2(90, 30);
         rt.anchoredPosition = position;
 
-        var textGO = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+        var textGO = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
         var textRT = textGO.GetComponent<RectTransform>();
         textRT.SetParent(go.transform);
         textRT.anchorMin = Vector2.zero;
         textRT.anchorMax = Vector2.one;
         textRT.offsetMin = Vector2.zero;
         textRT.offsetMax = Vector2.zero;
-        var text = textGO.GetComponent<Text>();
+        var text = textGO.GetComponent<TextMeshProUGUI>();
         text.text = label;
-        text.alignment = TextAnchor.MiddleCenter;
+        text.alignment = TextAlignmentOptions.Center;
         text.color = Color.black;
 
         return go.GetComponent<Button>();
