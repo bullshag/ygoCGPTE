@@ -153,7 +153,8 @@ namespace WinFormsApp2
                                                     FROM npcs n
                                                     LEFT JOIN npc_locations l ON n.id = l.npc_id
                                                     WHERE n.level BETWEEN @min AND @max
-                                                      AND (@area IS NULL OR l.node_id = @area)", conn))
+                                                      AND (@area IS NULL OR l.node_id = @area)
+                                                    ORDER BY RAND()", conn))
             {
                 listCmd.Parameters.AddWithValue("@min", minLevel);
                 listCmd.Parameters.AddWithValue("@max", maxLevel);
@@ -169,7 +170,8 @@ namespace WinFormsApp2
             {
                 using (var fallbackCmd = new MySqlCommand(@"SELECT n.name, n.power, n.level
                                                         FROM npcs n
-                                                        WHERE n.level BETWEEN @min AND @max", conn))
+                                                        WHERE n.level BETWEEN @min AND @max
+                                                        ORDER BY RAND()", conn))
                 {
                     fallbackCmd.Parameters.AddWithValue("@min", minLevel);
                     fallbackCmd.Parameters.AddWithValue("@max", maxLevel);
@@ -181,6 +183,8 @@ namespace WinFormsApp2
                 }
             }
 
+            // Shuffle the candidate list to provide varied encounter sets
+            candidates = candidates.OrderBy(_ => _rng.Next()).ToList();
             var remaining = new List<(string Name, int Power, int Level)>(candidates);
             var selected = new List<(string Name, int Power, int Level)>();
             int currentPower = 0;
@@ -188,7 +192,9 @@ namespace WinFormsApp2
 
             while (remaining.Count > 0)
             {
-                var best = remaining.OrderBy(c => Math.Abs(targetPower - (currentPower + c.Power))).First();
+                int bestDiff = remaining.Min(c => Math.Abs(targetPower - (currentPower + c.Power)));
+                var bestOptions = remaining.Where(c => Math.Abs(targetPower - (currentPower + c.Power)) == bestDiff).ToList();
+                var best = bestOptions[_rng.Next(bestOptions.Count)];
                 int newTotal = currentPower + best.Power;
                 if (Math.Abs(targetPower - newTotal) >= Math.Abs(targetPower - currentPower) && currentPower > 0)
                     break;
