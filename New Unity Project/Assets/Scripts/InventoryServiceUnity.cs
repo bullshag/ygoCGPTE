@@ -76,15 +76,10 @@ namespace WinFormsApp2
                 string abilityName = name.Substring(6);
                 var ability = GetAbilityAsync(abilityName).GetAwaiter().GetResult();
                 if (ability != null)
-                    return new AbilityTome(ability.Value.id)
-                    {
-                        Name = name,
-                        Description = ability.Value.description,
-                        Stackable = false
-                    };
+                    return new AbilityTome(ability.Value.id, abilityName, ability.Value.description);
             }
 
-            return new Item { Name = name, Description = string.Empty, Stackable = true };
+            return new GenericItem { Name = name, Description = string.Empty, Stackable = true };
         }
 
         public static void AddItem(Item item, int qty = 1)
@@ -236,5 +231,7 @@ namespace WinFormsApp2
             public int id;
             public string description = string.Empty;
         }
+
+        private class GenericItem : Item { }
     }
 }

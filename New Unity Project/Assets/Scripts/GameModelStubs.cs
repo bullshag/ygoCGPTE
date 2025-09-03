@@ -100,6 +100,17 @@ namespace WinFormsApp2
         }
     }
 
+    public class ArenaCoin : Item
+    {
+        public ArenaCoin()
+        {
+            Name = "Arena Coin";
+            Description = "A token earned in the battle arena. Sell for 200 gold.";
+            Stackable = true;
+            Price = 200;
+        }
+    }
+
     public class AbilityTome : Item
     {
         public int AbilityId { get; }
