@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using WinFormsApp2;
+using MySql.Data.MySqlClient;
 
 public class InventoryUI : MonoBehaviour
 {
@@ -20,7 +21,7 @@ public class InventoryUI : MonoBehaviour
 
     private void Start()
     {
-        InventoryService.Load(userId);
+        InventoryServiceUnity.Load(userId);
         PopulateItems();
         LoadTargets();
         useButton.onClick.AddListener(OnUseClicked);
@@ -33,7 +34,7 @@ public class InventoryUI : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
-        foreach (var inv in InventoryService.Items)
+        foreach (var inv in InventoryServiceUnity.Items)
         {
             var go = Instantiate(itemEntryPrefab, itemListContent);
             var label = go.GetComponentInChildren<Text>();
@@ -95,21 +96,39 @@ public class InventoryUI : MonoBehaviour
         if (selectedItem == null || targetDropdown.value < 0) return;
         string target = targetDropdown.options[targetDropdown.value].text;
         Item item = selectedItem.Item;
-        if (item is HealingPotion)
+        if (item is HealingPotion potion)
         {
-            InventoryService.RemoveItem(item);
+            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            using MySqlCommand cmd = new MySqlCommand(
+                "UPDATE characters SET current_hp = LEAST(max_hp, current_hp + @heal) " +
+                "WHERE account_id=@uid AND name=@name AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn);
+            cmd.Parameters.AddWithValue("@heal", potion.HealAmount);
+            cmd.Parameters.AddWithValue("@uid", userId);
+            cmd.Parameters.AddWithValue("@name", target);
+            cmd.ExecuteNonQuery();
+            InventoryServiceUnity.RemoveItem(item);
             PopulateItems();
         }
-        else if (item is AbilityTome)
+        else if (item is AbilityTome tome)
         {
-            InventoryService.RemoveItem(item);
+            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            conn.Open();
+            using MySqlCommand cmd = new MySqlCommand(
+                "INSERT IGNORE INTO character_abilities(character_id, ability_id) " +
+                "SELECT id, @aid FROM characters WHERE account_id=@uid AND name=@name", conn);
+            cmd.Parameters.AddWithValue("@aid", tome.AbilityId);
+            cmd.Parameters.AddWithValue("@uid", userId);
+            cmd.Parameters.AddWithValue("@name", target);
+            cmd.ExecuteNonQuery();
+            InventoryServiceUnity.RemoveItem(item);
             PopulateItems();
         }
         else if (item is Weapon || item is Armor || item is Trinket)
         {
             var slot = item.Slot ?? EquipmentSlot.Weapon;
-            InventoryService.Equip(target, slot, item);
-            InventoryService.RemoveItem(item);
+            InventoryServiceUnity.Equip(target, slot, item);
+            InventoryServiceUnity.RemoveItem(item);
             PopulateItems();
         }
     }
