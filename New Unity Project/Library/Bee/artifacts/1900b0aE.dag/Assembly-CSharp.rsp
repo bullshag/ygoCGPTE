@@ -384,6 +384,7 @@
 "Assets/Scripts/GameModelStubs.cs"
 "Assets/Scripts/InventoryServiceUnity.cs"
 "Assets/Scripts/InventoryUI.cs"
+"Assets/Scripts/IsExternalInit.cs"
 "Assets/Scripts/LoginManager.cs"
 "Assets/Scripts/MailboxManager.cs"
 "Assets/Scripts/MySqlStubs.cs"
