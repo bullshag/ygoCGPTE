@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
@@ -6,7 +8,6 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
-using UnityEngine.Networking;
 using WinFormsApp2;
 
 public class LoginManager : MonoBehaviour
@@ -41,50 +42,29 @@ public class LoginManager : MonoBehaviour
 
         if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
         {
+            Debug.Log($"Login attempt for '{username}'");
             DatabaseConfig.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
             DatabaseConfig.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
 
             string hashed = HashPassword(password);
-            var request = new LoginRequest { username = username, passwordHash = hashed };
-            string json = JsonUtility.ToJson(request);
-            using var req = new UnityWebRequest($"{DatabaseConfig.ApiBaseUrl}/login", "POST");
-            byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
-            req.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            req.downloadHandler = new DownloadHandlerBuffer();
-            req.SetRequestHeader("Content-Type", "application/json");
-            await SendRequest(req);
-            if (req.result == UnityWebRequest.Result.Success)
+            string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_direct_login.sql");
+            Debug.Log("Executing login query");
+            var rows = await DatabaseClientUnity.QueryAsync(
+                File.ReadAllText(sqlPath),
+                new Dictionary<string, object?> { ["@username"] = username, ["@passwordHash"] = hashed });
+
+            if (rows.Count > 0)
             {
-                var resp = JsonUtility.FromJson<LoginResponse>(req.downloadHandler.text);
-                if (resp.success)
-                {
-                    InventoryServiceUnity.Load(resp.userId);
-                    SceneManager.LoadScene("RPG");
-                }
+                Debug.Log("Login successful");
+                int userId = Convert.ToInt32(rows[0]["id"]);
+                InventoryServiceUnity.Load(userId);
+                SceneManager.LoadScene("RPG");
+            }
+            else
+            {
+                Debug.Log("Login failed");
             }
         }
-    }
-
-    private static async System.Threading.Tasks.Task SendRequest(UnityWebRequest req)
-    {
-        var op = req.SendWebRequest();
-        while (!op.isDone)
-            await System.Threading.Tasks.Task.Yield();
-    }
-
-    [System.Serializable]
-    private class LoginRequest
-    {
-        public string username = string.Empty;
-        public string passwordHash = string.Empty;
-    }
-
-    [System.Serializable]
-    private class LoginResponse
-    {
-        public bool success;
-        public int userId;
-        public string nickname = string.Empty;
     }
 
     private string HashPassword(string password)
