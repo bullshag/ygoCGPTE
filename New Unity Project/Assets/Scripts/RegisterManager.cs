@@ -6,14 +6,15 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using UnityEngine.EventSystems;
+using TMPro;
 using WinFormsApp2;
 
 public class RegisterManager : MonoBehaviour
 {
-    public InputField usernameField;
-    public InputField nicknameField;
-    public InputField passwordField;
-    public InputField confirmPasswordField;
+    public TMP_InputField usernameField;
+    public TMP_InputField nicknameField;
+    public TMP_InputField passwordField;
+    public TMP_InputField confirmPasswordField;
     public Toggle debugServerToggle;
     public Toggle kimServerToggle;
     public Button registerButton;
@@ -44,45 +45,45 @@ public class RegisterManager : MonoBehaviour
         usernameField = CreateInputField(canvas.transform, "Username", new Vector2(0, 90));
         nicknameField = CreateInputField(canvas.transform, "Nickname", new Vector2(0, 50));
         passwordField = CreateInputField(canvas.transform, "Password", new Vector2(0, 10));
-        passwordField.contentType = InputField.ContentType.Password;
+        passwordField.contentType = TMP_InputField.ContentType.Password;
         confirmPasswordField = CreateInputField(canvas.transform, "Confirm Password", new Vector2(0, -30));
-        confirmPasswordField.contentType = InputField.ContentType.Password;
+        confirmPasswordField.contentType = TMP_InputField.ContentType.Password;
         debugServerToggle = CreateToggle(canvas.transform, "Debug Server", new Vector2(-80, -70));
         kimServerToggle = CreateToggle(canvas.transform, "Kim Server", new Vector2(80, -70));
         registerButton = CreateButton(canvas.transform, "Register", new Vector2(0, -120));
     }
 
-    private InputField CreateInputField(Transform parent, string placeholder, Vector2 position)
+    private TMP_InputField CreateInputField(Transform parent, string placeholder, Vector2 position)
     {
-        var go = new GameObject(placeholder + "Input", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(InputField));
+        var go = new GameObject(placeholder + "Input", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(TMP_InputField));
         var rt = go.GetComponent<RectTransform>();
         rt.SetParent(parent);
         rt.sizeDelta = new Vector2(200, 30);
         rt.anchoredPosition = position;
 
-        var textGO = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+        var textGO = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
         var textRT = textGO.GetComponent<RectTransform>();
         textRT.SetParent(go.transform);
         textRT.anchorMin = new Vector2(0, 0);
         textRT.anchorMax = new Vector2(1, 1);
         textRT.offsetMin = Vector2.zero;
         textRT.offsetMax = Vector2.zero;
-        var text = textGO.GetComponent<Text>();
+        var text = textGO.GetComponent<TextMeshProUGUI>();
         text.text = "";
         text.color = Color.black;
 
-        var placeholderGO = new GameObject("Placeholder", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+        var placeholderGO = new GameObject("Placeholder", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
         var placeholderRT = placeholderGO.GetComponent<RectTransform>();
         placeholderRT.SetParent(go.transform);
         placeholderRT.anchorMin = new Vector2(0, 0);
         placeholderRT.anchorMax = new Vector2(1, 1);
         placeholderRT.offsetMin = Vector2.zero;
         placeholderRT.offsetMax = Vector2.zero;
-        var placeholderText = placeholderGO.GetComponent<Text>();
+        var placeholderText = placeholderGO.GetComponent<TextMeshProUGUI>();
         placeholderText.text = placeholder;
         placeholderText.color = new Color(0.5f, 0.5f, 0.5f);
 
-        var input = go.GetComponent<InputField>();
+        var input = go.GetComponent<TMP_InputField>();
         input.textComponent = text;
         input.placeholder = placeholderText;
         return input;
@@ -106,11 +107,11 @@ public class RegisterManager : MonoBehaviour
         cmRT.SetParent(bg.transform);
         cmRT.sizeDelta = new Vector2(20, 20);
 
-        var textGO = new GameObject("Label", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+        var textGO = new GameObject("Label", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
         var textRT = textGO.GetComponent<RectTransform>();
         textRT.SetParent(go.transform);
         textRT.anchoredPosition = new Vector2(10, 0);
-        var text = textGO.GetComponent<Text>();
+        var text = textGO.GetComponent<TextMeshProUGUI>();
         text.text = label;
         text.color = Color.black;
 
@@ -128,16 +129,16 @@ public class RegisterManager : MonoBehaviour
         rt.sizeDelta = new Vector2(120, 30);
         rt.anchoredPosition = position;
 
-        var textGO = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+        var textGO = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
         var textRT = textGO.GetComponent<RectTransform>();
         textRT.SetParent(go.transform);
         textRT.anchorMin = new Vector2(0, 0);
         textRT.anchorMax = new Vector2(1, 1);
         textRT.offsetMin = Vector2.zero;
         textRT.offsetMax = Vector2.zero;
-        var text = textGO.GetComponent<Text>();
+        var text = textGO.GetComponent<TextMeshProUGUI>();
         text.text = label;
-        text.alignment = TextAnchor.MiddleCenter;
+        text.alignment = TextAlignmentOptions.Center;
         text.color = Color.black;
 
         return go.GetComponent<Button>();

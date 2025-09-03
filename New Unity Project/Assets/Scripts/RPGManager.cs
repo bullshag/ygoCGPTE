@@ -5,14 +5,14 @@ using System.IO;
 using UnityClient;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.UI;
+using TMPro;
 
 public class RPGManager : MonoBehaviour
 {
     [Header("UI References")]
     public List<GameObject> partyMemberEntries = new();
-    public Text goldText;
-    public Text chatText;
+    public TextMeshProUGUI goldText;
+    public TextMeshProUGUI chatText;
 
     private List<CharacterData> partyMembers = new List<CharacterData>();
 
@@ -50,7 +50,7 @@ public class RPGManager : MonoBehaviour
                 var member = partyMembers[i];
                 go.name = member.Name;
 
-                var texts = go.GetComponentsInChildren<Text>();
+                var texts = go.GetComponentsInChildren<TextMeshProUGUI>();
                 foreach (var t in texts)
                 {
                     if (t.gameObject.name == "NameText")

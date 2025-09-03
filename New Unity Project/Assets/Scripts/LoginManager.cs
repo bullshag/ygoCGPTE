@@ -4,14 +4,15 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 using WinFormsApp2;
 
 public class LoginManager : MonoBehaviour
 {
-    public InputField usernameField;
-    public InputField passwordField;
+    public TMP_InputField usernameField;
+    public TMP_InputField passwordField;
     public Toggle debugServerToggle;
     public Toggle kimServerToggle;
     public Button loginButton;

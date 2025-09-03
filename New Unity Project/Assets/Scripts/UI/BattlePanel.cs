@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
 /// Simplified Unity wrapper for battle interactions.
@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class BattlePanel : MonoBehaviour
 {
     [SerializeField] private ArenaManager arenaManager;
-    [SerializeField] private Text summaryText;
+    [SerializeField] private TextMeshProUGUI summaryText;
 
     [Serializable]
     private class ChallengeResponse

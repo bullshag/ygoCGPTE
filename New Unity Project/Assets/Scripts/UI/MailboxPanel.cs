@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
 /// Unity UI wrapper for viewing mail messages.
@@ -38,7 +39,7 @@ public class MailboxPanel : MonoBehaviour
         foreach (var msg in _mail)
         {
             var entry = Instantiate(messageEntryPrefab, messageContainer);
-            var label = entry.GetComponentInChildren<Text>();
+            var label = entry.GetComponentInChildren<TextMeshProUGUI>();
             if (label != null)
                 label.text = msg.subject;
             var button = entry.GetComponentInChildren<Button>();
