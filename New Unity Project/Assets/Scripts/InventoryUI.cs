@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -8,7 +9,6 @@ using TMPro;
 using WinFormsApp2;
 
 using UnityClient;
-using MySql.Data.MySqlClient;
 
 public class InventoryUI : MonoBehaviour
 {
@@ -100,7 +100,7 @@ public class InventoryUI : MonoBehaviour
                                 (isEquipment || item is HealingPotion || item is AbilityTome);
     }
 
-    private void OnUseClicked()
+    private async void OnUseClicked()
     {
         if (selectedItem == null || targetDropdown.value < 0) return;
         string target = targetDropdown.options[targetDropdown.value].text;
@@ -108,30 +108,28 @@ public class InventoryUI : MonoBehaviour
         Debug.Log($"Using {item.Name} on {target}");
         if (item is HealingPotion potion)
         {
-            using MySqlConnection conn = new MySqlConnection(DatabaseConfigUnity.ConnectionString);
-            conn.Open();
-            using MySqlCommand cmd = new MySqlCommand(
-                "UPDATE characters SET current_hp = LEAST(max_hp, current_hp + @heal) " +
-                "WHERE account_id=@uid AND name=@name AND is_dead=0 AND in_arena=0 AND in_tavern=0", conn);
-            cmd.Parameters.AddWithValue("@heal", potion.HealAmount);
-            cmd.Parameters.AddWithValue("@uid", userId);
-            cmd.Parameters.AddWithValue("@name", target);
-            int result = cmd.ExecuteNonQuery();
+            string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_inventory_use_potion.sql");
+            var parameters = new Dictionary<string, object?>
+            {
+                ["@heal"] = potion.HealAmount,
+                ["@uid"] = userId,
+                ["@name"] = target
+            };
+            int result = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(sqlPath), parameters);
             Debug.Log($"SQL rows affected: {result} for {item.Name} on {target}");
             InventoryServiceUnity.RemoveItem(item);
             PopulateItems();
         }
         else if (item is AbilityTome tome)
         {
-            using MySqlConnection conn = new MySqlConnection(DatabaseConfigUnity.ConnectionString);
-            conn.Open();
-            using MySqlCommand cmd = new MySqlCommand(
-                "INSERT IGNORE INTO character_abilities(character_id, ability_id) " +
-                "SELECT id, @aid FROM characters WHERE account_id=@uid AND name=@name", conn);
-            cmd.Parameters.AddWithValue("@aid", tome.AbilityId);
-            cmd.Parameters.AddWithValue("@uid", userId);
-            cmd.Parameters.AddWithValue("@name", target);
-            int result = cmd.ExecuteNonQuery();
+            string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_inventory_use_tome.sql");
+            var parameters = new Dictionary<string, object?>
+            {
+                ["@aid"] = tome.AbilityId,
+                ["@uid"] = userId,
+                ["@name"] = target
+            };
+            int result = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(sqlPath), parameters);
             Debug.Log($"SQL rows affected: {result} for {item.Name} on {target}");
             InventoryServiceUnity.RemoveItem(item);
             PopulateItems();
