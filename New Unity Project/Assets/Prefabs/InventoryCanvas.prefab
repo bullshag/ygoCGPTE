@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1000
+GameObject:
+  m_Name: InventoryCanvas
+  m_IsActive: 1
+  m_Layer: 5
+  m_Component:
+  - component: {fileID: 2240}
+  - component: {fileID: 2230}
+  - component: {fileID: 1140}
+--- !u!224 &2240
+RectTransform:
+  m_GameObject: {fileID: 1000}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!223 &2230
+Canvas:
+  m_GameObject: {fileID: 1000}
+  m_RenderMode: 0
+--- !u!114 &1140
+MonoBehaviour:
+  m_GameObject: {fileID: 1000}
+  m_Script: {fileID: 11500000, guid: 00000000000000000000000000000000, type: 3}
+  itemListContent: {fileID: 0}
+  itemEntryPrefab: {fileID: 0}
+  descriptionText: {fileID: 0}
+  targetDropdown: {fileID: 0}
+  useButton: {fileID: 0}
+  tooltipText: {fileID: 0}
+--- !u!1 &1001
+GameObject:
+  m_Name: ItemList
+  m_IsActive: 1
+  m_Layer: 5
+  m_Component:
+  - component: {fileID: 2241}
+  - component: {fileID: 1141}
+--- !u!224 &2241
+RectTransform:
+  m_GameObject: {fileID: 1001}
+  m_Father: {fileID: 2240}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+--- !u!114 &1141
+ScrollRect:
+  m_GameObject: {fileID: 1001}
+  m_Horizontal: 0
+--- !u!1 &1002
+GameObject:
+  m_Name: Description
+  m_IsActive: 1
+  m_Layer: 5
+  m_Component:
+  - component: {fileID: 2242}
+  - component: {fileID: 1142}
+--- !u!224 &2242
+RectTransform:
+  m_GameObject: {fileID: 1002}
+  m_Father: {fileID: 2240}
+--- !u!114 &1142
+Text:
+  m_GameObject: {fileID: 1002}
+  m_Text: 
+--- !u!1 &1003
+GameObject:
+  m_Name: TargetDropdown
+  m_IsActive: 1
+  m_Layer: 5
+  m_Component:
+  - component: {fileID: 2243}
+  - component: {fileID: 1143}
+--- !u!224 &2243
+RectTransform:
+  m_GameObject: {fileID: 1003}
+  m_Father: {fileID: 2240}
+--- !u!114 &1143
+Dropdown:
+  m_GameObject: {fileID: 1003}
+--- !u!1 &1004
+GameObject:
+  m_Name: UseButton
+  m_IsActive: 1
+  m_Layer: 5
+  m_Component:
+  - component: {fileID: 2244}
+  - component: {fileID: 1144}
+--- !u!224 &2244
+RectTransform:
+  m_GameObject: {fileID: 1004}
+  m_Father: {fileID: 2240}
+--- !u!114 &1144
+Button:
+  m_GameObject: {fileID: 1004}
+--- !u!1 &1005
+GameObject:
+  m_Name: Tooltip
+  m_IsActive: 1
+  m_Layer: 5
+  m_Component:
+  - component: {fileID: 2245}
+  - component: {fileID: 1145}
+--- !u!224 &2245
+RectTransform:
+  m_GameObject: {fileID: 1005}
+  m_Father: {fileID: 2240}
+--- !u!114 &1145
+Text:
+  m_GameObject: {fileID: 1005}
+  m_Text: 
