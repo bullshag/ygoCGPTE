@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using WinFormsApp2;
 
 /// <summary>
@@ -18,5 +17,5 @@ public class TavernPanel : MonoBehaviour
         // Placeholder: open join party flow
     }
 
-    public void BackToMain() => SceneManager.LoadScene("MainRPG");
+    public void BackToMain() => MainRPGNavigation.OpenMain();
 }

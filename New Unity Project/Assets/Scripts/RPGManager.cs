@@ -1,5 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using UnityClient;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,20 +17,21 @@ public class RPGManager : MonoBehaviour
 
     private List<CharacterData> partyMembers = new List<CharacterData>();
 
-    private void Start()
+    private async void Start()
     {
-        LoadPartyMembers();
+        await LoadPartyMembersAsync();
         PopulatePartyList();
         StartCoroutine(ChatLoop());
         StartCoroutine(RegenLoop());
     }
 
-    private void LoadPartyMembers()
+    private async Task LoadPartyMembersAsync()
     {
-        partyMembers = CharacterDatabase.GetPartyMembers();
+        partyMembers = await CharacterService.GetPartyMembersAsync();
         if (goldText != null)
         {
-            goldText.text = $"Gold: {CharacterDatabase.GetGold()}";
+            int gold = await CharacterService.GetGoldAsync();
+            goldText.text = $"Gold: {gold}";
         }
     }
 
@@ -68,10 +73,17 @@ public class RPGManager : MonoBehaviour
     {
         while (true)
         {
-            string msg = ChatService.FetchNewMessage();
-            if (!string.IsNullOrEmpty(msg) && chatText != null)
+            var task = ChatService.FetchMessagesAsync();
+            yield return new WaitUntil(() => task.IsCompleted);
+            if (chatText != null)
             {
-                chatText.text += "\n" + msg;
+                foreach (var msg in task.Result)
+                {
+                    if (!string.IsNullOrEmpty(msg))
+                    {
+                        chatText.text += "\n" + msg;
+                    }
+                }
             }
             yield return new WaitForSeconds(2f);
         }
@@ -91,6 +103,7 @@ public class RPGManager : MonoBehaviour
     }
 }
 
+[System.Serializable]
 public class CharacterData
 {
     public string Name;
@@ -110,29 +123,37 @@ public static class CharacterDatabase
 {
     public static List<CharacterData> GetPartyMembers()
     {
-        return new List<CharacterData>
+        string sqlPath = Path.Combine(AppContext.BaseDirectory, "get_party_members.sql");
+        var rows = DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath)).GetAwaiter().GetResult();
+        var members = new List<CharacterData>();
+        foreach (var row in rows)
         {
-            new CharacterData { Name = "Hero", HP = 50, MaxHP = 100, Mana = 30, MaxMana = 50 },
-            new CharacterData { Name = "Mage", HP = 40, MaxHP = 60, Mana = 80, MaxMana = 100 }
-        };
+            members.Add(new CharacterData
+            {
+                Name = Convert.ToString(row["name"]) ?? string.Empty,
+                HP = Convert.ToInt32(row["hp"]),
+                MaxHP = Convert.ToInt32(row["max_hp"]),
+                Mana = Convert.ToInt32(row["mana"]),
+                MaxMana = Convert.ToInt32(row["max_mana"])
+            });
+        }
+        return members;
     }
 
     public static int GetGold()
     {
-        return 123;
+        string sqlPath = Path.Combine(AppContext.BaseDirectory, "get_gold.sql");
+        var rows = DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath), new Dictionary<string, object?> { ["@id"] = 1 }).GetAwaiter().GetResult();
+        return rows.Count > 0 && rows[0].TryGetValue("gold", out var g) ? Convert.ToInt32(g) : 0;
     }
 }
 
 public static class ChatService
 {
-    private static Queue<string> messages = new Queue<string>(new[] { "Welcome to the world!" });
-
-    public static string FetchNewMessage()
+    public static string? FetchNewMessage()
     {
-        if (messages.Count > 0)
-        {
-            return messages.Dequeue();
-        }
-        return null;
+        string sqlPath = Path.Combine(AppContext.BaseDirectory, "fetch_latest_chat_message.sql");
+        var rows = DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath)).GetAwaiter().GetResult();
+        return rows.Count > 0 ? Convert.ToString(rows[0]["message"]) : null;
     }
 }

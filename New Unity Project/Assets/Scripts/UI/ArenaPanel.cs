@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using WinFormsApp2;
 
 /// <summary>
@@ -9,7 +8,7 @@ public class ArenaPanel : MonoBehaviour
 {
     public void OnDeposit()
     {
-        // Placeholder: deposit/withdraw team logic using InventoryService
+        // Placeholder: deposit/withdraw team logic using InventoryServiceUnity
     }
 
     public void OnChallenge()
@@ -17,5 +16,5 @@ public class ArenaPanel : MonoBehaviour
         // Placeholder: challenge logic that would invoke BattleForm
     }
 
-    public void BackToMain() => SceneManager.LoadScene("MainRPG");
+    public void BackToMain() => MainRPGNavigation.OpenMain();
 }

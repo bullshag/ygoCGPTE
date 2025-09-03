@@ -9,6 +9,9 @@
 bin/
 obj/
 
+# Ignore binary assemblies
+*.dll
+
 # Unity generated files
 /New\ Unity\ Project/Library/
 /New\ Unity\ Project/Logs/
