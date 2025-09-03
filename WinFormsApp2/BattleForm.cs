@@ -217,6 +217,23 @@ namespace WinFormsApp2
                 return;
             }
 
+            // Randomly add up to 5 additional low-level enemies within 10 levels of the area's minimum
+            int additionalCount = _rng.Next(0, 6);
+            if (additionalCount > 0)
+            {
+                int additionalMaxLevel = Math.Min(maxLevel, minLevel + 10);
+                var extraCandidates = candidates
+                    .Where(c => c.Level >= minLevel && c.Level <= additionalMaxLevel && !selected.Any(s => s.Name == c.Name))
+                    .ToList();
+
+                for (int i = 0; i < additionalCount && extraCandidates.Count > 0; i++)
+                {
+                    var pick = extraCandidates[_rng.Next(extraCandidates.Count)];
+                    selected.Add(pick);
+                    extraCandidates.Remove(pick);
+                }
+            }
+
             foreach (var sel in selected)
             {
                 using var npcCmd = new MySqlCommand(@"SELECT n.name, n.level, n.current_hp, n.max_hp, n.mana, n.strength, n.dex,
