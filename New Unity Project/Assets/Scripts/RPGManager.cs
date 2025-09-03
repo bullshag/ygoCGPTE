@@ -1,5 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using UnityClient;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -110,29 +113,37 @@ public static class CharacterDatabase
 {
     public static List<CharacterData> GetPartyMembers()
     {
-        return new List<CharacterData>
+        string sqlPath = Path.Combine(AppContext.BaseDirectory, "get_party_members.sql");
+        var rows = DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath)).GetAwaiter().GetResult();
+        var members = new List<CharacterData>();
+        foreach (var row in rows)
         {
-            new CharacterData { Name = "Hero", HP = 50, MaxHP = 100, Mana = 30, MaxMana = 50 },
-            new CharacterData { Name = "Mage", HP = 40, MaxHP = 60, Mana = 80, MaxMana = 100 }
-        };
+            members.Add(new CharacterData
+            {
+                Name = Convert.ToString(row["name"]) ?? string.Empty,
+                HP = Convert.ToInt32(row["hp"]),
+                MaxHP = Convert.ToInt32(row["max_hp"]),
+                Mana = Convert.ToInt32(row["mana"]),
+                MaxMana = Convert.ToInt32(row["max_mana"])
+            });
+        }
+        return members;
     }
 
     public static int GetGold()
     {
-        return 123;
+        string sqlPath = Path.Combine(AppContext.BaseDirectory, "get_gold.sql");
+        var rows = DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath), new Dictionary<string, object?> { ["@id"] = 1 }).GetAwaiter().GetResult();
+        return rows.Count > 0 && rows[0].TryGetValue("gold", out var g) ? Convert.ToInt32(g) : 0;
     }
 }
 
 public static class ChatService
 {
-    private static Queue<string> messages = new Queue<string>(new[] { "Welcome to the world!" });
-
-    public static string FetchNewMessage()
+    public static string? FetchNewMessage()
     {
-        if (messages.Count > 0)
-        {
-            return messages.Dequeue();
-        }
-        return null;
+        string sqlPath = Path.Combine(AppContext.BaseDirectory, "fetch_latest_chat_message.sql");
+        var rows = DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath)).GetAwaiter().GetResult();
+        return rows.Count > 0 ? Convert.ToString(rows[0]["message"]) : null;
     }
 }
