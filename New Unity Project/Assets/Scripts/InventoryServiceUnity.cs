@@ -19,6 +19,12 @@ namespace WinFormsApp2
         private static bool _loaded;
         private static int _userId;
 
+        /// <summary>
+        /// Account identifier for the currently loaded inventory.
+        /// Exposed so other systems can reference the logged in account.
+        /// </summary>
+        public static int AccountId => _userId;
+
         public static void Load(int userId, bool forceReload = false) =>
             LoadAsync(userId, forceReload).ConfigureAwait(false).GetAwaiter().GetResult();
 

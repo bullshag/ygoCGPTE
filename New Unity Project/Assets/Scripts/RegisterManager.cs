@@ -2,7 +2,6 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Networking;
@@ -20,13 +19,6 @@ public class RegisterManager : MonoBehaviour
 
     private void Start()
     {
-        if (usernameField == null || nicknameField == null || passwordField == null ||
-            confirmPasswordField == null || debugServerToggle == null || kimServerToggle == null ||
-            registerButton == null)
-        {
-            CreateDefaultUI();
-        }
-
         if (registerButton != null)
             registerButton.onClick.AddListener(OnRegisterClicked);
     }
@@ -151,6 +143,7 @@ public class RegisterManager : MonoBehaviour
     }
 
     private async void OnRegisterClicked()
+
     {
         string user = usernameField != null ? usernameField.text : string.Empty;
         string nick = nicknameField != null ? nicknameField.text : string.Empty;

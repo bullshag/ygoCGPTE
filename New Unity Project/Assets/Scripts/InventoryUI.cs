@@ -9,12 +9,12 @@ using MySql.Data.MySqlClient;
 
 public class InventoryUI : MonoBehaviour
 {
-    [SerializeField] private List<GameObject> itemEntrySlots = new();
-    [SerializeField] private Text descriptionText = null!;
-    [SerializeField] private Dropdown targetDropdown = null!;
-    [SerializeField] private Button useButton = null!;
-    [SerializeField] private Text tooltipText = null!;
-    [SerializeField] private int userId;
+    public List<GameObject> itemEntrySlots = new();
+    public Text descriptionText = null!;
+    public Dropdown targetDropdown = null!;
+    public Button useButton = null!;
+    public Text tooltipText = null!;
+    public int userId;
 
     private InventoryItem? selectedItem;
 

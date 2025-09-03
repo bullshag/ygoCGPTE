@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using WinFormsApp2;
 
@@ -10,33 +11,56 @@ using WinFormsApp2;
 /// </summary>
 public class ShopPanel : MonoBehaviour
 {
-    private List<Item> _shopItems = new();
+    [SerializeField] private int userId;
+    [SerializeField] private string nodeId = "default";
 
-    void Start()
+    private List<ShopManager.ShopItem> _stock = new();
+    private ShopManager? _shopManager;
+
+    private async void Start()
     {
-        // Load stock using the existing loot pool service
-        _shopItems = LootPool.GetShopStock("default");
-        InventoryServiceUnity.Load(InventoryServiceUnity.Items.Count); // ensure inventory ready
+        _shopManager = FindObjectOfType<ShopManager>();
+        InventoryServiceUnity.Load(userId);
+        await Refresh();
     }
 
-    public void OnBuy(int index)
+    public async Task Refresh()
     {
-        if (index < 0 || index >= _shopItems.Count) return;
-        var proto = _shopItems[index];
-        var item = InventoryServiceUnity.CreateItem(proto.Name);
-        if (item != null)
+        if (_shopManager == null)
+            _shopManager = FindObjectOfType<ShopManager>();
+
+        _stock = await _shopManager.GetStockAsync(nodeId);
+        RefreshUI();
+    }
+
+    private void RefreshUI()
+    {
+        // Update visual elements to reflect _stock contents as needed by the scene.
+    }
+
+    public async void OnBuy(int index)
+    {
+        if (index < 0 || index >= _stock.Count) return;
+        var itemData = _stock[index];
+        if (await _shopManager!.PurchaseAsync(userId, itemData.id))
         {
-            InventoryServiceUnity.AddItem(item);
+            var item = InventoryServiceUnity.CreateItem(itemData.name);
+            if (item != null)
+                InventoryServiceUnity.AddItem(item);
+            await Refresh();
         }
     }
 
-    public void OnSell(string itemName)
+    public async void OnSell(string itemName, int quantity = 1)
     {
-        // Placeholder: full selling logic would mirror ShopForm.BtnSell_Click
         var inv = InventoryServiceUnity.Items.FirstOrDefault(i => i.Item.Name == itemName);
-        if (inv != null)
+        if (inv == null) return;
+
+        int itemId = _stock.FirstOrDefault(s => s.name == itemName)?.id ?? 0;
+        if (await _shopManager!.SellAsync(userId, itemId, quantity))
         {
-            InventoryServiceUnity.RemoveItem(inv.Item, 1);
+            InventoryServiceUnity.RemoveItem(inv.Item, quantity);
+            await Refresh();
         }
     }
 
