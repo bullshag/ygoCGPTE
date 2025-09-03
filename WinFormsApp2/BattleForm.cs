@@ -183,25 +183,33 @@ namespace WinFormsApp2
                 }
             }
 
-            // Shuffle the candidate list to provide varied encounter sets
+            // Shuffle the candidate list to provide varied encounter sets and determine enemy count
             candidates = candidates.OrderBy(_ => _rng.Next()).ToList();
+            int enemyCount = _rng.Next(1, 8);
             var remaining = new List<(string Name, int Power, int Level)>(candidates);
             var selected = new List<(string Name, int Power, int Level)>();
             int currentPower = 0;
             int targetPower = playerPower;
 
-            while (remaining.Count > 0)
+            while (remaining.Count > 0 && selected.Count < enemyCount)
             {
                 int bestDiff = remaining.Min(c => Math.Abs(targetPower - (currentPower + c.Power)));
                 var bestOptions = remaining.Where(c => Math.Abs(targetPower - (currentPower + c.Power)) == bestDiff).ToList();
                 var best = bestOptions[_rng.Next(bestOptions.Count)];
-                int newTotal = currentPower + best.Power;
-                if (Math.Abs(targetPower - newTotal) >= Math.Abs(targetPower - currentPower) && currentPower > 0)
-                    break;
                 selected.Add(best);
-                currentPower = newTotal;
+                currentPower += best.Power;
                 remaining.Remove(best);
-                if (currentPower >= targetPower) break;
+            }
+
+            if (selected.Count < enemyCount)
+            {
+                var extraPool = candidates.Where(c => !selected.Any(s => s.Name == c.Name)).ToList();
+                while (selected.Count < enemyCount && extraPool.Count > 0)
+                {
+                    var pick = extraPool[_rng.Next(extraPool.Count)];
+                    selected.Add(pick);
+                    extraPool.Remove(pick);
+                }
             }
 
             if (selected.Count == 0 && candidates.Count > 0)
@@ -215,23 +223,6 @@ namespace WinFormsApp2
                 _cancelled = true;
                 Close();
                 return;
-            }
-
-            // Randomly add up to 5 additional low-level enemies within 10 levels of the area's minimum
-            int additionalCount = _rng.Next(0, 6);
-            if (additionalCount > 0)
-            {
-                int additionalMaxLevel = Math.Min(maxLevel, minLevel + 10);
-                var extraCandidates = candidates
-                    .Where(c => c.Level >= minLevel && c.Level <= additionalMaxLevel && !selected.Any(s => s.Name == c.Name))
-                    .ToList();
-
-                for (int i = 0; i < additionalCount && extraCandidates.Count > 0; i++)
-                {
-                    var pick = extraCandidates[_rng.Next(extraCandidates.Count)];
-                    selected.Add(pick);
-                    extraCandidates.Remove(pick);
-                }
             }
 
             foreach (var sel in selected)
