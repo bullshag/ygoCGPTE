@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 
@@ -8,7 +9,7 @@ namespace WinFormsApp2
     public partial class GraveyardForm : Form
     {
         private readonly int _userId;
-        private readonly Action _refresh;
+        private readonly Func<Task> _refresh;
         private readonly List<DeadChar> _dead = new();
 
         private class DeadChar
@@ -19,7 +20,7 @@ namespace WinFormsApp2
             public string Cause = string.Empty;
         }
 
-        public GraveyardForm(int userId, Action refresh)
+        public GraveyardForm(int userId, Func<Task> refresh)
         {
             _userId = userId;
             _refresh = refresh;
@@ -70,7 +71,7 @@ namespace WinFormsApp2
             }
         }
 
-        private void btnResurrect_Click(object? sender, EventArgs e)
+        private async void btnResurrect_Click(object? sender, EventArgs e)
         {
             if (lstDead.SelectedIndex < 0) return;
             var d = _dead[lstDead.SelectedIndex];
@@ -94,7 +95,7 @@ namespace WinFormsApp2
             res.ExecuteNonQuery();
             MessageBox.Show($"{d.Name} has been resurrected!");
             LoadDead();
-            _refresh();
+            await _refresh();
         }
 
         private int CalculateResCost(int level) => 2 * (10 + level * 10);
