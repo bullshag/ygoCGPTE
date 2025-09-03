@@ -1,10 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.Networking;
 using UnityEngine.EventSystems;
 using TMPro;
 using WinFormsApp2;
@@ -171,54 +172,34 @@ public class RegisterManager : MonoBehaviour
         DatabaseConfig.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
         DatabaseConfig.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
 
-        var request = new RegisterRequest
+        string passwordHash = HashPassword(pass);
+        var parameters = new Dictionary<string, object?>
         {
-            username = user,
-            nickname = nick,
-            passwordHash = HashPassword(pass)
+            ["@username"] = user,
+            ["@nickname"] = nick,
+            ["@passwordHash"] = passwordHash
         };
-        string json = JsonUtility.ToJson(request);
-        using var req = new UnityWebRequest($"{DatabaseConfig.ApiBaseUrl}/register", "POST");
-        byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
-        req.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        req.downloadHandler = new DownloadHandlerBuffer();
-        req.SetRequestHeader("Content-Type", "application/json");
-        await SendRequest(req);
-        if (req.result == UnityWebRequest.Result.Success)
+        Debug.Log($"Register params - username: {user}, nickname: {nick}, hash: {passwordHash}");
+
+        string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_register_user.sql");
+        try
         {
-            var resp = JsonUtility.FromJson<RegisterResponse>(req.downloadHandler.text);
-            if (resp.success)
+            int rows = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(sqlPath), parameters);
+            Debug.Log($"Insert result: {rows}");
+            if (rows > 0)
             {
                 Debug.Log("Account created");
                 SceneManager.LoadScene("Login");
             }
-            else if (!string.IsNullOrEmpty(resp.message))
+            else
             {
-                Debug.Log(resp.message);
+                Debug.Log("No account created");
             }
         }
-    }
-
-    private static async System.Threading.Tasks.Task SendRequest(UnityWebRequest req)
-    {
-        var op = req.SendWebRequest();
-        while (!op.isDone)
-            await System.Threading.Tasks.Task.Yield();
-    }
-
-    [System.Serializable]
-    private class RegisterRequest
-    {
-        public string username = string.Empty;
-        public string nickname = string.Empty;
-        public string passwordHash = string.Empty;
-    }
-
-    [System.Serializable]
-    private class RegisterResponse
-    {
-        public bool success;
-        public string message = string.Empty;
+        catch (Exception ex)
+        {
+            Debug.LogError($"Registration failed: {ex.Message}");
+        }
     }
 
     private string HashPassword(string password)
