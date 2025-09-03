@@ -16,7 +16,7 @@ public class MailboxManager : MonoBehaviour
     {
         try
         {
-            string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_mailbox_unread.sql");
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_mailbox_unread.sql");
             var rows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath),
                 new Dictionary<string, object?> { ["@accountId"] = accountId });
             var messages = new List<MailMessage>();
@@ -47,7 +47,7 @@ public class MailboxManager : MonoBehaviour
     {
         try
         {
-            string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_mailbox_mark_read.sql");
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_mailbox_mark_read.sql");
             int rows = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(sqlPath),
                 new Dictionary<string, object?> { ["@messageId"] = messageId });
             Debug.Log($"Marked message {messageId} as read");

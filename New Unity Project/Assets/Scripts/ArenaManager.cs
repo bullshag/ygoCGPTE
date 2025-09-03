@@ -33,7 +33,7 @@ public class ArenaManager : MonoBehaviour
             summary = opponentId > 0 ? $"Opponent {opponentId} found." : "No opponents available."
         });
 
-        var sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_arena_challenge.sql");
+        var sqlPath = Path.Combine(Application.dataPath, "sql", "unity_arena_challenge.sql");
         string sql = File.ReadAllText(sqlPath);
         foreach (var statement in sql.Split(';'))
         {

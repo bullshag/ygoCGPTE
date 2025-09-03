@@ -15,7 +15,7 @@ public class TavernManager : MonoBehaviour
     /// </summary>
     public async Task<List<Recruit>> GetCandidatesAsync(int accountId)
     {
-        string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_tavern_candidates.sql");
+        string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_tavern_candidates.sql");
         var rows = await DatabaseClientUnity.QueryAsync(
             File.ReadAllText(sqlPath),
             new Dictionary<string, object?> { ["@accountId"] = accountId });
@@ -40,7 +40,7 @@ public class TavernManager : MonoBehaviour
     /// </summary>
     public async Task<bool> HireAsync(int accountId, int recruitId)
     {
-        string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_tavern_hire.sql");
+        string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_tavern_hire.sql");
         int affected = await DatabaseClientUnity.ExecuteAsync(
             File.ReadAllText(sqlPath),
             new Dictionary<string, object?>

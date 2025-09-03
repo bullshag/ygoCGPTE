@@ -126,7 +126,7 @@ public static class CharacterDatabase
 {
     public static List<CharacterData> GetPartyMembers()
     {
-        string sqlPath = Path.Combine(AppContext.BaseDirectory, "get_party_members.sql");
+        string sqlPath = Path.Combine(Application.dataPath, "sql", "get_party_members.sql");
         var rows = DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath)).GetAwaiter().GetResult();
         var members = new List<CharacterData>();
         foreach (var row in rows)
@@ -145,7 +145,7 @@ public static class CharacterDatabase
 
     public static int GetGold()
     {
-        string sqlPath = Path.Combine(AppContext.BaseDirectory, "get_gold.sql");
+        string sqlPath = Path.Combine(Application.dataPath, "sql", "get_gold.sql");
         var rows = DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath), new Dictionary<string, object?> { ["@id"] = 1 }).GetAwaiter().GetResult();
         return rows.Count > 0 && rows[0].TryGetValue("gold", out var g) ? Convert.ToInt32(g) : 0;
     }

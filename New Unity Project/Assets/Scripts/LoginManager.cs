@@ -47,7 +47,7 @@ public class LoginManager : MonoBehaviour
             DatabaseConfig.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
 
             string hashed = HashPassword(password);
-            string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_direct_login.sql");
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_direct_login.sql");
             Debug.Log("Executing login query");
             var rows = await DatabaseClientUnity.QueryAsync(
                 File.ReadAllText(sqlPath),
