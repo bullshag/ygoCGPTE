@@ -392,6 +392,7 @@
 "Assets/Scripts/SceneSetup.cs"
 "Assets/Scripts/ShopManager.cs"
 "Assets/Scripts/TavernManager.cs"
+"Assets/Scripts/TavernServiceUnity.cs"
 "Assets/Scripts/UI/ArenaPanel.cs"
 "Assets/Scripts/UI/BattlePanel.cs"
 "Assets/Scripts/UI/MailboxPanel.cs"
