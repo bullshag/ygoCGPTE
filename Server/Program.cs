@@ -1,6 +1,6 @@
 using System;
 using System.Text.Json;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
