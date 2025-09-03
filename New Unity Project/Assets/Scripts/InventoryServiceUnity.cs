@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
-using System.Text;
+using System.IO;
 
 namespace WinFormsApp2
 {
@@ -36,32 +36,36 @@ namespace WinFormsApp2
             Items.Clear();
             _equipment.Clear();
 
-            using var req = UnityWebRequest.Get($"{DatabaseConfig.ApiBaseUrl}/inventory/{userId}");
-            await SendRequestAsync(req);
-            if (req.result != UnityWebRequest.Result.Success) return;
-            var data = JsonUtility.FromJson<InventoryPayload>(req.downloadHandler.text);
+            string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_inventory_load.sql");
+            string[] queries = File.ReadAllText(sqlPath).Split(';', StringSplitOptions.RemoveEmptyEntries);
 
-            if (data.items != null)
+            var parameters = new Dictionary<string, object?> { ["@id"] = userId };
+
+            Debug.Log($"Loading inventory items for user {userId}");
+            var itemRows = await DatabaseClientUnity.QueryAsync(queries[0], parameters);
+            Debug.Log($"Loaded {itemRows.Count} items for user {userId}");
+            foreach (var row in itemRows)
             {
-                foreach (var it in data.items)
-                {
-                    Item? item = CreateItem(it.item_name);
-                    if (item != null)
-                        Items.Add(new InventoryItem { Item = item, Quantity = it.quantity });
-                }
+                string name = Convert.ToString(row["item_name"]) ?? string.Empty;
+                Item? item = CreateItem(name);
+                if (item != null)
+                    Items.Add(new InventoryItem { Item = item, Quantity = Convert.ToInt32(row["quantity"]) });
             }
 
-            if (data.equipment != null)
+            Debug.Log($"Loading equipment for user {userId}");
+            var equipRows = await DatabaseClientUnity.QueryAsync(queries[1], parameters);
+            Debug.Log($"Loaded {equipRows.Count} equipment records for user {userId}");
+            foreach (var row in equipRows)
             {
-                foreach (var eq in data.equipment)
+                string characterName = Convert.ToString(row["character_name"]) ?? string.Empty;
+                string slotName = Convert.ToString(row["slot"]) ?? string.Empty;
+                string itemName = Convert.ToString(row["item_name"]) ?? string.Empty;
+                Item? item = CreateItem(itemName);
+                if (item != null)
                 {
-                    Item? item = CreateItem(eq.item_name);
-                    if (item != null)
-                    {
-                        if (!_equipment.ContainsKey(eq.character_name))
-                            _equipment[eq.character_name] = new Dictionary<EquipmentSlot, Item?>();
-                        _equipment[eq.character_name][Enum.Parse<EquipmentSlot>(eq.slot)] = item;
-                    }
+                    if (!_equipment.ContainsKey(characterName))
+                        _equipment[characterName] = new Dictionary<EquipmentSlot, Item?>();
+                    _equipment[characterName][Enum.Parse<EquipmentSlot>(slotName)] = item;
                 }
             }
         }
@@ -99,9 +103,11 @@ namespace WinFormsApp2
 
             if (_loaded)
             {
-                PostJsonAsync($"{DatabaseConfig.ApiBaseUrl}/inventory/add",
-                    new InventoryUpdate { userId = _userId, itemName = item.Name, quantity = qty })
-                    .GetAwaiter().GetResult();
+                string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_inventory_add.sql");
+                var parameters = new Dictionary<string, object?> { ["@id"] = _userId, ["@name"] = item.Name, ["@qty"] = qty };
+                Debug.Log($"Adding item {item.Name} x{qty} for user {_userId}");
+                DatabaseClientUnity.ExecuteAsync(File.ReadAllText(sqlPath), parameters).GetAwaiter().GetResult();
+                Debug.Log($"Added item {item.Name} x{qty} for user {_userId}");
             }
         }
 
@@ -114,9 +120,17 @@ namespace WinFormsApp2
 
             if (_loaded)
             {
-                PostJsonAsync($"{DatabaseConfig.ApiBaseUrl}/inventory/remove",
-                    new InventoryUpdate { userId = _userId, itemName = item.Name, quantity = qty })
-                    .GetAwaiter().GetResult();
+                string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_inventory_remove.sql");
+                var parameters = new Dictionary<string, object?> { ["@id"] = _userId, ["@name"] = item.Name, ["@qty"] = qty };
+                string[] statements = File.ReadAllText(sqlPath).Split(';', StringSplitOptions.RemoveEmptyEntries);
+                foreach (var stmt in statements)
+                {
+                    var sql = stmt.Trim();
+                    if (string.IsNullOrWhiteSpace(sql)) continue;
+                    Debug.Log($"Executing inventory removal for {item.Name} x{qty} on user {_userId}");
+                    DatabaseClientUnity.ExecuteAsync(sql, parameters).GetAwaiter().GetResult();
+                    Debug.Log($"Executed inventory removal for {item.Name} x{qty} on user {_userId}");
+                }
             }
         }
 
@@ -145,15 +159,23 @@ namespace WinFormsApp2
         private static void SaveEquipment(string character, EquipmentSlot slot, Item? item)
         {
             if (!_loaded) return;
-            var payload = new EquipRequest
+            var parameters = new Dictionary<string, object?>
             {
-                userId = _userId,
-                characterName = character,
-                slot = slot.ToString(),
-                itemName = item?.Name
+                ["@id"] = _userId,
+                ["@character"] = character,
+                ["@slot"] = slot.ToString(),
+                ["@name"] = item?.Name
             };
-            PostJsonAsync($"{DatabaseConfig.ApiBaseUrl}/inventory/equip", payload)
-                .GetAwaiter().GetResult();
+            string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_inventory_equip.sql");
+            var statements = File.ReadAllText(sqlPath).Split(';', StringSplitOptions.RemoveEmptyEntries);
+            foreach (var stmt in statements)
+            {
+                var sql = stmt.Trim();
+                if (string.IsNullOrWhiteSpace(sql)) continue;
+                Debug.Log($"Saving equipment for {character} slot {slot} with item {(item?.Name ?? "none")}");
+                DatabaseClientUnity.ExecuteAsync(sql, parameters).GetAwaiter().GetResult();
+                Debug.Log($"Saved equipment for {character} slot {slot}");
+            }
         }
 
         private static async Task SendRequestAsync(UnityWebRequest req)
@@ -161,17 +183,6 @@ namespace WinFormsApp2
             var op = req.SendWebRequest();
             while (!op.isDone)
                 await Task.Yield();
-        }
-
-        private static async Task PostJsonAsync(string url, object payload)
-        {
-            string json = JsonUtility.ToJson(payload);
-            using var req = new UnityWebRequest(url, "POST");
-            byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
-            req.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            req.downloadHandler = new DownloadHandlerBuffer();
-            req.SetRequestHeader("Content-Type", "application/json");
-            await SendRequestAsync(req);
         }
 
         private static async Task<(int id, string description)?> GetAbilityAsync(string abilityName)
@@ -184,45 +195,6 @@ namespace WinFormsApp2
                 return (resp.id, resp.description);
             }
             return null;
-        }
-
-        [Serializable]
-        private class InventoryPayload
-        {
-            public List<ItemData> items = new();
-            public List<EquipData> equipment = new();
-        }
-
-        [Serializable]
-        private class ItemData
-        {
-            public string item_name = string.Empty;
-            public int quantity;
-        }
-
-        [Serializable]
-        private class EquipData
-        {
-            public string character_name = string.Empty;
-            public string slot = string.Empty;
-            public string item_name = string.Empty;
-        }
-
-        [Serializable]
-        private class InventoryUpdate
-        {
-            public int userId;
-            public string itemName = string.Empty;
-            public int quantity;
-        }
-
-        [Serializable]
-        private class EquipRequest
-        {
-            public int userId;
-            public string characterName = string.Empty;
-            public string slot = string.Empty;
-            public string? itemName;
         }
 
         [Serializable]
