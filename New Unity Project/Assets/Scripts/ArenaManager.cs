@@ -1,26 +1,53 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityClient;
 
 /// <summary>
-/// Handles arena battle flow against the server.
+/// Handles arena battle flow against the database.
 /// </summary>
 public class ArenaManager : MonoBehaviour
 {
-    private string BaseUrl => DatabaseConfigUnity.ApiBaseUrl;
-
     /// <summary>
-    /// Initiates a battle and returns the server provided result payload.
+    /// Initiates a battle and returns the result payload.
     /// </summary>
     public async Task<string> ChallengeAsync(int accountId)
     {
-        var form = new WWWForm();
-        form.AddField("accountId", accountId);
-        using var req = UnityWebRequest.Post($"{BaseUrl}/arena/challenge", form);
-        await req.SendWebRequest();
-        if (req.result != UnityWebRequest.Result.Success)
-            return null;
-        return req.downloadHandler.text;
+        Debug.Log($"Starting arena challenge for account {accountId}.");
+
+        var opponentRows = await DatabaseClientUnity.QueryAsync(
+            "SELECT account_id FROM arena_teams WHERE account_id<>@id ORDER BY RAND() LIMIT 1",
+            new Dictionary<string, object?> { ["@id"] = accountId });
+
+        int opponentId = opponentRows.Count > 0
+            ? Convert.ToInt32(opponentRows[0]["account_id"])
+            : 0;
+
+        Debug.Log($"Selected opponent {opponentId}.");
+
+        var resultPayload = JsonUtility.ToJson(new
+        {
+            battleReady = opponentId > 0,
+            summary = opponentId > 0 ? $"Opponent {opponentId} found." : "No opponents available."
+        });
+
+        var sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_arena_challenge.sql");
+        string sql = File.ReadAllText(sqlPath);
+        foreach (var statement in sql.Split(';'))
+        {
+            var trimmed = statement.Trim();
+            if (trimmed.Length == 0) continue;
+            await DatabaseClientUnity.ExecuteAsync(trimmed, new Dictionary<string, object?>
+            {
+                ["@accountId"] = accountId,
+                ["@opponentId"] = opponentId,
+                ["@log"] = resultPayload
+            });
+        }
+
+        Debug.Log($"Result payload: {resultPayload}");
+        return resultPayload;
     }
 }
