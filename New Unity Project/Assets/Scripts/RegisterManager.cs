@@ -181,7 +181,7 @@ public class RegisterManager : MonoBehaviour
         };
         Debug.Log($"Register params - username: {user}, nickname: {nick}, hash: {passwordHash}");
 
-        string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_register_user.sql");
+        string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_register_user.sql");
         try
         {
             int rows = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(sqlPath), parameters);

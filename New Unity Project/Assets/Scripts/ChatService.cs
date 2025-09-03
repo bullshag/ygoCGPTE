@@ -8,7 +8,7 @@ public static class ChatService
 {
     public static async Task<List<string>> FetchMessagesAsync()
     {
-        string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_chat_messages.sql");
+        string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_chat_messages.sql");
         try
         {
             var rows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath));

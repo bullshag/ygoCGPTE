@@ -36,7 +36,7 @@ namespace WinFormsApp2
             Items.Clear();
             _equipment.Clear();
 
-            string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_inventory_load.sql");
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_inventory_load.sql");
             string[] queries = File.ReadAllText(sqlPath).Split(';', StringSplitOptions.RemoveEmptyEntries);
 
             var parameters = new Dictionary<string, object?> { ["@id"] = userId };
@@ -103,7 +103,7 @@ namespace WinFormsApp2
 
             if (_loaded)
             {
-                string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_inventory_add.sql");
+                string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_inventory_add.sql");
                 var parameters = new Dictionary<string, object?> { ["@id"] = _userId, ["@name"] = item.Name, ["@qty"] = qty };
                 Debug.Log($"Adding item {item.Name} x{qty} for user {_userId}");
                 DatabaseClientUnity.ExecuteAsync(File.ReadAllText(sqlPath), parameters).GetAwaiter().GetResult();
@@ -120,7 +120,7 @@ namespace WinFormsApp2
 
             if (_loaded)
             {
-                string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_inventory_remove.sql");
+                string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_inventory_remove.sql");
                 var parameters = new Dictionary<string, object?> { ["@id"] = _userId, ["@name"] = item.Name, ["@qty"] = qty };
                 string[] statements = File.ReadAllText(sqlPath).Split(';', StringSplitOptions.RemoveEmptyEntries);
                 foreach (var stmt in statements)
@@ -166,7 +166,7 @@ namespace WinFormsApp2
                 ["@slot"] = slot.ToString(),
                 ["@name"] = item?.Name
             };
-            string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_inventory_equip.sql");
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_inventory_equip.sql");
             var statements = File.ReadAllText(sqlPath).Split(';', StringSplitOptions.RemoveEmptyEntries);
             foreach (var stmt in statements)
             {

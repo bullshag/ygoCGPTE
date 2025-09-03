@@ -110,7 +110,7 @@ public class InventoryUI : MonoBehaviour
         Debug.Log($"Using {item.Name} on {target}");
         if (item is HealingPotion potion)
         {
-            string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_inventory_use_potion.sql");
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_inventory_use_potion.sql");
             var parameters = new Dictionary<string, object?>
             {
                 ["@heal"] = potion.HealAmount,
@@ -127,7 +127,7 @@ public class InventoryUI : MonoBehaviour
         else if (item is AbilityTome tome)
         {
 
-            string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_inventory_use_tome.sql");
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_inventory_use_tome.sql");
 
             var parameters = new Dictionary<string, object?>
             {

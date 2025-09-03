@@ -17,7 +17,7 @@ public class ShopManager : MonoBehaviour
     /// </summary>
     public async Task<List<ShopItem>> GetStockAsync(string nodeId)
     {
-        string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_shop_stock.sql");
+        string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_shop_stock.sql");
         var rows = await DatabaseClientUnity.QueryAsync(
             File.ReadAllText(sqlPath),
             new Dictionary<string, object?> { ["@nodeId"] = nodeId });
@@ -44,7 +44,7 @@ public class ShopManager : MonoBehaviour
         _itemPrices.TryGetValue(itemId, out var price);
         Debug.Log($"Attempting purchase of item {itemId} for {price}");
 
-        string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_shop_purchase.sql");
+        string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_shop_purchase.sql");
         var affected = await DatabaseClientUnity.ExecuteAsync(
             File.ReadAllText(sqlPath),
             new Dictionary<string, object?>
@@ -66,7 +66,7 @@ public class ShopManager : MonoBehaviour
         _itemPrices.TryGetValue(itemId, out var price);
         Debug.Log($"Attempting sell of item {itemId} x{quantity} for {price}");
 
-        string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_shop_sell.sql");
+        string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_shop_sell.sql");
         var affected = await DatabaseClientUnity.ExecuteAsync(
             File.ReadAllText(sqlPath),
             new Dictionary<string, object?>
