@@ -19,6 +19,16 @@
       "source": "builtin",
       "testable": false
     },
+    "com.unity.ugui@2.0.0": {
+      "name": "com.unity.ugui",
+      "displayName": "Unity UI",
+      "resolvedPath": "C:\\Users\\derek\\OneDrive\\Desktop\\tcgAI\\ygoCGPTE\\New Unity Project\\Library\\PackageCache\\com.unity.ugui@fd678869c0d5",
+      "fingerprint": "fd678869c0d53d7599a2f51b4195515d16de27da",
+      "editorCompatibility": "2019.2.0a1",
+      "version": "2.0.0",
+      "source": "builtin",
+      "testable": false
+    },
     "com.unity.modules.accessibility@1.0.0": {
       "name": "com.unity.modules.accessibility",
       "displayName": "Accessibility",
