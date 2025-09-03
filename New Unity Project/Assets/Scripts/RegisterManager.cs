@@ -1,12 +1,11 @@
 using System;
-using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using MySql.Data.MySqlClient;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 using WinFormsApp2;
 
 public class RegisterManager : MonoBehaviour
@@ -151,7 +150,7 @@ public class RegisterManager : MonoBehaviour
         return go.GetComponent<Button>();
     }
 
-    private void OnRegisterClicked()
+    private async void OnRegisterClicked()
     {
         string user = usernameField != null ? usernameField.text : string.Empty;
         string nick = nicknameField != null ? nicknameField.text : string.Empty;
@@ -177,50 +176,54 @@ public class RegisterManager : MonoBehaviour
         DatabaseConfig.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
         DatabaseConfig.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
 
-        using var conn = new MySqlConnection(DatabaseConfig.ConnectionString);
-        conn.Open();
-
-        using var checkUser = new MySqlCommand("SELECT COUNT(1) FROM Users WHERE Username=@u", conn);
-        checkUser.Parameters.AddWithValue("@u", user);
-        int existsUser = Convert.ToInt32(checkUser.ExecuteScalar());
-        if (existsUser > 0)
+        var request = new RegisterRequest
         {
-            Debug.Log("Username already exists");
-            return;
-        }
-
-        using var checkNick = new MySqlCommand("SELECT COUNT(1) FROM Users WHERE Nickname=@n", conn);
-        checkNick.Parameters.AddWithValue("@n", nick);
-        int existsNick = Convert.ToInt32(checkNick.ExecuteScalar());
-        if (existsNick > 0)
+            username = user,
+            nickname = nick,
+            passwordHash = HashPassword(pass)
+        };
+        string json = JsonUtility.ToJson(request);
+        using var req = new UnityWebRequest($"{DatabaseConfig.ApiBaseUrl}/register", "POST");
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+        req.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        req.downloadHandler = new DownloadHandlerBuffer();
+        req.SetRequestHeader("Content-Type", "application/json");
+        await SendRequest(req);
+        if (req.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("Nickname already exists");
-            return;
+            var resp = JsonUtility.FromJson<RegisterResponse>(req.downloadHandler.text);
+            if (resp.success)
+            {
+                Debug.Log("Account created");
+                SceneManager.LoadScene("Login");
+            }
+            else if (!string.IsNullOrEmpty(resp.message))
+            {
+                Debug.Log(resp.message);
+            }
         }
+    }
 
-        string insertSql = File.ReadAllText(Path.Combine(Application.dataPath, "../create_user.sql"));
-        using var insert = new MySqlCommand(insertSql, conn);
-        insert.Parameters.AddWithValue("@u", user);
-        insert.Parameters.AddWithValue("@n", nick);
-        insert.Parameters.AddWithValue("@p", HashPassword(pass));
-        insert.ExecuteNonQuery();
-        long newId = insert.LastInsertedId;
+    private static async System.Threading.Tasks.Task SendRequest(UnityWebRequest req)
+    {
+        var op = req.SendWebRequest();
+        while (!op.isDone)
+            await System.Threading.Tasks.Task.Yield();
+    }
 
-        using (var ensureNode = new MySqlCommand("INSERT IGNORE INTO nodes (id, name) VALUES (@node, @name)", conn))
-        {
-            ensureNode.Parameters.AddWithValue("@node", "nodeRiverVillage");
-            ensureNode.Parameters.AddWithValue("@name", "River Village");
-            ensureNode.ExecuteNonQuery();
-        }
+    [System.Serializable]
+    private class RegisterRequest
+    {
+        public string username = string.Empty;
+        public string nickname = string.Empty;
+        public string passwordHash = string.Empty;
+    }
 
-        string travelSql = File.ReadAllText(Path.Combine(Application.dataPath, "../init_travel_state.sql"));
-        using var initTravel = new MySqlCommand(travelSql, conn);
-        initTravel.Parameters.AddWithValue("@a", newId);
-        initTravel.Parameters.AddWithValue("@node", "nodeRiverVillage");
-        initTravel.ExecuteNonQuery();
-
-        Debug.Log("Account created");
-        SceneManager.LoadScene("Login");
+    [System.Serializable]
+    private class RegisterResponse
+    {
+        public bool success;
+        public string message = string.Empty;
     }
 
     private string HashPassword(string password)

@@ -1,11 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.Networking;
 using WinFormsApp2;
 
 public class LoginManager : MonoBehaviour
@@ -161,25 +161,46 @@ public class LoginManager : MonoBehaviour
             DatabaseConfig.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
 
             string hashed = HashPassword(password);
-            string sql = "SELECT id, nickname FROM accounts WHERE username = @username AND password_hash = @passwordHash;";
-            var parameters = new Dictionary<string, object?>
+            var request = new LoginRequest { username = username, passwordHash = hashed };
+            string json = JsonUtility.ToJson(request);
+            using var req = new UnityWebRequest($"{DatabaseConfig.ApiBaseUrl}/login", "POST");
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+            req.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            req.downloadHandler = new DownloadHandlerBuffer();
+            req.SetRequestHeader("Content-Type", "application/json");
+            await SendRequest(req);
+            if (req.result == UnityWebRequest.Result.Success)
             {
-                ["@username"] = username,
-                ["@passwordHash"] = hashed
-            };
-
-            var results = await DatabaseClientUnity.QueryAsync(sql, parameters);
-            if (results.Count > 0)
-            {
-                var row = results[0];
-                int userId = Convert.ToInt32(row["id"]);
-                await DatabaseClientUnity.ExecuteAsync(
-                    "UPDATE accounts SET last_seen = NOW() WHERE id = @id",
-                    new Dictionary<string, object?> { ["@id"] = userId });
-                InventoryServiceUnity.Load(userId);
-                SceneManager.LoadScene("RPG");
+                var resp = JsonUtility.FromJson<LoginResponse>(req.downloadHandler.text);
+                if (resp.success)
+                {
+                    InventoryServiceUnity.Load(resp.userId);
+                    SceneManager.LoadScene("RPG");
+                }
             }
         }
+    }
+
+    private static async System.Threading.Tasks.Task SendRequest(UnityWebRequest req)
+    {
+        var op = req.SendWebRequest();
+        while (!op.isDone)
+            await System.Threading.Tasks.Task.Yield();
+    }
+
+    [System.Serializable]
+    private class LoginRequest
+    {
+        public string username = string.Empty;
+        public string passwordHash = string.Empty;
+    }
+
+    [System.Serializable]
+    private class LoginResponse
+    {
+        public bool success;
+        public int userId;
+        public string nickname = string.Empty;
     }
 
     private string HashPassword(string password)
