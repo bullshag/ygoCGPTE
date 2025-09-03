@@ -165,6 +165,22 @@ namespace WinFormsApp2
                 }
             }
 
+            if (candidates.Count == 0)
+            {
+                using (var fallbackCmd = new MySqlCommand(@"SELECT n.name, n.power, n.level
+                                                        FROM npcs n
+                                                        WHERE n.level BETWEEN @min AND @max", conn))
+                {
+                    fallbackCmd.Parameters.AddWithValue("@min", minLevel);
+                    fallbackCmd.Parameters.AddWithValue("@max", maxLevel);
+                    using var reader = fallbackCmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        candidates.Add((reader.GetString("name"), reader.GetInt32("power"), reader.GetInt32("level")));
+                    }
+                }
+            }
+
             var remaining = new List<(string Name, int Power, int Level)>(candidates);
             var selected = new List<(string Name, int Power, int Level)>();
             int currentPower = 0;
@@ -185,6 +201,14 @@ namespace WinFormsApp2
             if (selected.Count == 0 && candidates.Count > 0)
             {
                 selected.Add(candidates[_rng.Next(candidates.Count)]);
+            }
+
+            if (selected.Count == 0)
+            {
+                MessageBox.Show("No enemies found for this area.", "No Encounter", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                _cancelled = true;
+                Close();
+                return;
             }
 
             foreach (var sel in selected)
