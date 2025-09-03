@@ -93,7 +93,7 @@ namespace WinFormsApp2
 
         private static void ApplyRandomBonuses(Armor armor)
         {
-            var rng = System.Random.Shared;
+            var rng = new Random();
             switch (armor.Name)
             {
                 case "Cloth Robe":
@@ -125,7 +125,7 @@ namespace WinFormsApp2
 
         private static void ApplyTemplateBonuses(Armor armor, string template)
         {
-            var rng = System.Random.Shared;
+            var rng = new Random();
             switch (template)
             {
                 case "cloth":
