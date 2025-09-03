@@ -6,7 +6,9 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
 using WinFormsApp2;
-using MySqlConnector;
+
+using UnityClient;
+using MySql.Data.MySqlClient;
 
 public class InventoryUI : MonoBehaviour
 {
@@ -103,9 +105,10 @@ public class InventoryUI : MonoBehaviour
         if (selectedItem == null || targetDropdown.value < 0) return;
         string target = targetDropdown.options[targetDropdown.value].text;
         Item item = selectedItem.Item;
+        Debug.Log($"Using {item.Name} on {target}");
         if (item is HealingPotion potion)
         {
-            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            using MySqlConnection conn = new MySqlConnection(DatabaseConfigUnity.ConnectionString);
             conn.Open();
             using MySqlCommand cmd = new MySqlCommand(
                 "UPDATE characters SET current_hp = LEAST(max_hp, current_hp + @heal) " +
@@ -113,13 +116,14 @@ public class InventoryUI : MonoBehaviour
             cmd.Parameters.AddWithValue("@heal", potion.HealAmount);
             cmd.Parameters.AddWithValue("@uid", userId);
             cmd.Parameters.AddWithValue("@name", target);
-            cmd.ExecuteNonQuery();
+            int result = cmd.ExecuteNonQuery();
+            Debug.Log($"SQL rows affected: {result} for {item.Name} on {target}");
             InventoryServiceUnity.RemoveItem(item);
             PopulateItems();
         }
         else if (item is AbilityTome tome)
         {
-            using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
+            using MySqlConnection conn = new MySqlConnection(DatabaseConfigUnity.ConnectionString);
             conn.Open();
             using MySqlCommand cmd = new MySqlCommand(
                 "INSERT IGNORE INTO character_abilities(character_id, ability_id) " +
@@ -127,7 +131,8 @@ public class InventoryUI : MonoBehaviour
             cmd.Parameters.AddWithValue("@aid", tome.AbilityId);
             cmd.Parameters.AddWithValue("@uid", userId);
             cmd.Parameters.AddWithValue("@name", target);
-            cmd.ExecuteNonQuery();
+            int result = cmd.ExecuteNonQuery();
+            Debug.Log($"SQL rows affected: {result} for {item.Name} on {target}");
             InventoryServiceUnity.RemoveItem(item);
             PopulateItems();
         }

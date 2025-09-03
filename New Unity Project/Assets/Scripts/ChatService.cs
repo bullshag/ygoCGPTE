@@ -1,30 +1,36 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityClient;
 
 public static class ChatService
 {
-    private static string BaseUrl => DatabaseConfigUnity.ApiBaseUrl;
-
-    [System.Serializable]
-    private class ChatResponse
-    {
-        public List<string> messages;
-    }
-
     public static async Task<List<string>> FetchMessagesAsync()
     {
-        using UnityWebRequest request = UnityWebRequest.Get($"{BaseUrl}/chat/messages");
-        await request.SendWebRequest();
-        if (request.result != UnityWebRequest.Result.Success)
+        string sqlPath = Path.Combine(AppContext.BaseDirectory, "unity_chat_messages.sql");
+        try
         {
-            Debug.LogError($"Failed to fetch chat messages: {request.error}");
+            var rows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath));
+            var messages = new List<string>();
+            foreach (var row in rows)
+            {
+                if (row.TryGetValue("message", out var value))
+                {
+                    var msg = Convert.ToString(value);
+                    if (!string.IsNullOrEmpty(msg))
+                    {
+                        messages.Add(msg);
+                    }
+                }
+            }
+            Debug.Log($"Fetched {messages.Count} chat messages");
+            return messages;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Failed to fetch chat messages: {ex.Message}");
             return new List<string>();
         }
-        var json = request.downloadHandler.text;
-        ChatResponse resp = JsonUtility.FromJson<ChatResponse>(json);
-        return resp != null && resp.messages != null ? resp.messages : new List<string>();
     }
 }
