@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -46,7 +44,7 @@ public class LoginManager : MonoBehaviour
             DatabaseConfigUnity.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
             DatabaseConfigUnity.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
 
-            string hashed = HashPassword(password);
+            string hashed = PasswordHasher.HashPassword(password);
             string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_direct_login.sql");
             Debug.Log("Executing login query");
             try
@@ -74,20 +72,6 @@ public class LoginManager : MonoBehaviour
         }
     }
 
-    private string HashPassword(string password)
-    {
-        using (var sha = SHA256.Create())
-        {
-            byte[] bytes = Encoding.UTF8.GetBytes(password);
-            byte[] hash = sha.ComputeHash(bytes);
-            var builder = new StringBuilder();
-            foreach (byte b in hash)
-            {
-                builder.Append(b.ToString("x2"));
-            }
-            return builder.ToString();
-        }
-    }
 
     private void OnCreateAccountClicked()
     {
