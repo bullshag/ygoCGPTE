@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace UnityClient
 {
-    internal static class DatabaseConfigUnity
+    public static class DatabaseConfigUnity
     {
         private const string DatabaseName = "accounts";
         private static ServerConfig _config;

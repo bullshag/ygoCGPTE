@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
-using WinFormsApp2;
+using UnityClient;
 
 public class RegisterManager : MonoBehaviour
 {
@@ -169,8 +169,8 @@ public class RegisterManager : MonoBehaviour
             return;
         }
 
-        DatabaseConfig.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
-        DatabaseConfig.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
+        DatabaseConfigUnity.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
+        DatabaseConfigUnity.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
 
         string passwordHash = HashPassword(pass);
         var parameters = new Dictionary<string, object?>
