@@ -21,7 +21,7 @@ public static class DatabaseClientUnity
                 Debug.Log($"Database connection established on attempt {attempt + 1}");
                 return conn;
             }
-            catch (MySql.Data.MySqlClient.MySqlException) when (attempt < MaxRetries)
+            catch (MySqlException) when (attempt < MaxRetries)
             {
                 await Task.Delay(200 * (int)Math.Pow(2, attempt));
                 attempt++;
