@@ -1,6 +1,8 @@
 # Database Connection Usage
 
-The Unity client uses direct MySQL access through the `MySqlConnector` library. Connection settings, including database hosts and API endpoints, are stored in a `ServerConfig` ScriptableObject located in the `Assets/Resources` folder. Different builds can provide environment-specific copies of this asset.
+The Unity client uses direct MySQL access through the `MySql.Data` library, the MySQL official .NET connector. Connection settings, including database hosts and API endpoints, are stored in a `ServerConfig` ScriptableObject located in the `Assets/Resources` folder. Different builds can provide environment-specific copies of this asset.
+
+Compared to the previously used `MySqlConnector` library, `MySql.Data` relies on synchronous disposal. Wrap `MySqlConnection`, `MySqlCommand`, and `MySqlDataReader` instances in `using` blocks to ensure connections are returned to the pool. `IAsyncDisposable` is not implemented, so `await using` patterns are unavailable and readers remain open until explicitly disposed.
 
 Database credentials are supplied at runtime via the `DB_USERNAME` and `DB_PASSWORD` environment variables. This keeps secrets out of source control while allowing secure configuration in deployment environments.
 
