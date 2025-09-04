@@ -170,7 +170,24 @@ public class RegisterManager : MonoBehaviour
         DatabaseConfigUnity.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
         DatabaseConfigUnity.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
 
-        string passwordHash = PasswordHasher.HashPassword(pass);
+        string checkUserPath = Path.Combine(Application.dataPath, "sql", "unity_register_check_username.sql");
+        var checkUserRows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(checkUserPath), new Dictionary<string, object?> { ["@username"] = user });
+        if (Convert.ToInt32(checkUserRows[0]["cnt"]) > 0)
+        {
+            Debug.Log("Username already exists");
+            return;
+        }
+
+        string checkNickPath = Path.Combine(Application.dataPath, "sql", "unity_register_check_nickname.sql");
+        var checkNickRows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(checkNickPath), new Dictionary<string, object?> { ["@nickname"] = nick });
+        if (Convert.ToInt32(checkNickRows[0]["cnt"]) > 0)
+        {
+            Debug.Log("Nickname already exists");
+            return;
+        }
+
+        string passwordHash = HashPassword(pass);
+
         var parameters = new Dictionary<string, object?>
         {
             ["@username"] = user,
@@ -186,6 +203,24 @@ public class RegisterManager : MonoBehaviour
             Debug.Log($"Insert result: {rows}");
             if (rows > 0)
             {
+                string idPath = Path.Combine(Application.dataPath, "sql", "unity_register_get_id.sql");
+                var idRows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(idPath), new Dictionary<string, object?> { ["@username"] = user });
+                long accountId = Convert.ToInt64(idRows[0]["id"]);
+
+                string ensureNodePath = Path.Combine(Application.dataPath, "sql", "unity_register_ensure_node.sql");
+                await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(ensureNodePath), new Dictionary<string, object?>
+                {
+                    ["@node"] = "nodeRiverVillage",
+                    ["@name"] = "River Village"
+                });
+
+                string initTravelPath = Path.Combine(Application.dataPath, "sql", "unity_register_init_travel.sql");
+                await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(initTravelPath), new Dictionary<string, object?>
+                {
+                    ["@accountId"] = accountId,
+                    ["@node"] = "nodeRiverVillage"
+                });
+
                 Debug.Log("Account created");
                 SceneManager.LoadScene("Login");
             }
