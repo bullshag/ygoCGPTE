@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
-using WinFormsApp2;
+using UnityClient;
 
 public class RegisterManager : MonoBehaviour
 {
@@ -169,8 +167,8 @@ public class RegisterManager : MonoBehaviour
             return;
         }
 
-        DatabaseConfig.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
-        DatabaseConfig.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
+        DatabaseConfigUnity.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
+        DatabaseConfigUnity.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
 
         string checkUserPath = Path.Combine(Application.dataPath, "sql", "unity_register_check_username.sql");
         var checkUserRows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(checkUserPath), new Dictionary<string, object?> { ["@username"] = user });
@@ -189,6 +187,7 @@ public class RegisterManager : MonoBehaviour
         }
 
         string passwordHash = HashPassword(pass);
+
         var parameters = new Dictionary<string, object?>
         {
             ["@username"] = user,
@@ -236,16 +235,4 @@ public class RegisterManager : MonoBehaviour
         }
     }
 
-    private string HashPassword(string password)
-    {
-        using var sha = SHA256.Create();
-        byte[] bytes = Encoding.UTF8.GetBytes(password);
-        byte[] hash = sha.ComputeHash(bytes);
-        var builder = new StringBuilder();
-        foreach (byte b in hash)
-        {
-            builder.Append(b.ToString("x2"));
-        }
-        return builder.ToString();
-    }
 }
