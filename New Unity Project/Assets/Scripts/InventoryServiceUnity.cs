@@ -162,11 +162,11 @@ namespace WinFormsApp2
             var parameters = new Dictionary<string, object?>
             {
                 ["@id"] = _userId,
-                ["@character"] = character,
-                ["@slot"] = slot.ToString(),
-                ["@name"] = item?.Name
+                ["@c"] = character,
+                ["@s"] = slot.ToString(),
+                ["@n"] = item?.Name
             };
-            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_inventory_equip.sql");
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_inventory_save_equipment.sql");
             var statements = File.ReadAllText(sqlPath).Split(';', StringSplitOptions.RemoveEmptyEntries);
             foreach (var stmt in statements)
             {
