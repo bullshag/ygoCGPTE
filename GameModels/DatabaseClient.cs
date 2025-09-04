@@ -20,7 +20,7 @@ namespace WinFormsApp2
                     await conn.OpenAsync();
                     return conn;
                 }
-                catch (MySqlException) when (attempt < MaxRetries)
+                catch (MySql.Data.MySqlClient.MySqlException) when (attempt < MaxRetries)
                 {
                     await Task.Delay(200 * (int)Math.Pow(2, attempt));
                     attempt++;
@@ -30,11 +30,11 @@ namespace WinFormsApp2
 
         public static async Task<List<Dictionary<string, object?>>> QueryAsync(string sql, Dictionary<string, object?>? parameters = null)
         {
-            await using var conn = await OpenConnectionAsync();
-            await using var cmd = new MySqlCommand(sql, conn);
+            using var conn = await OpenConnectionAsync();
+            using var cmd = new MySqlCommand(sql, conn);
             AddParameters(cmd, parameters);
             var results = new List<Dictionary<string, object?>>();
-            await using var reader = await cmd.ExecuteReaderAsync();
+            using var reader = await cmd.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
                 var row = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
@@ -49,8 +49,8 @@ namespace WinFormsApp2
 
         public static async Task<int> ExecuteAsync(string sql, Dictionary<string, object?>? parameters = null)
         {
-            await using var conn = await OpenConnectionAsync();
-            await using var cmd = new MySqlCommand(sql, conn);
+            using var conn = await OpenConnectionAsync();
+            using var cmd = new MySqlCommand(sql, conn);
             AddParameters(cmd, parameters);
             return await cmd.ExecuteNonQueryAsync();
         }
