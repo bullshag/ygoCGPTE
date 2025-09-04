@@ -49,20 +49,27 @@ public class LoginManager : MonoBehaviour
             string hashed = HashPassword(password);
             string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_direct_login.sql");
             Debug.Log("Executing login query");
-            var rows = await DatabaseClientUnity.QueryAsync(
-                File.ReadAllText(sqlPath),
-                new Dictionary<string, object?> { ["@username"] = username, ["@passwordHash"] = hashed });
+            try
+            {
+                var rows = await DatabaseClientUnity.QueryAsync(
+                    File.ReadAllText(sqlPath),
+                    new Dictionary<string, object?> { ["@username"] = username, ["@passwordHash"] = hashed });
 
-            if (rows.Count > 0)
-            {
-                Debug.Log("Login successful");
-                int userId = Convert.ToInt32(rows[0]["id"]);
-                InventoryServiceUnity.Load(userId);
-                SceneManager.LoadScene("RPG");
+                if (rows.Count > 0)
+                {
+                    Debug.Log("Login successful");
+                    int userId = Convert.ToInt32(rows[0]["id"]);
+                    InventoryServiceUnity.Load(userId);
+                    SceneManager.LoadScene("RPG");
+                }
+                else
+                {
+                    Debug.Log("Login failed");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Debug.Log("Login failed");
+                Debug.LogError($"Login error: {ex.Message}");
             }
         }
     }
