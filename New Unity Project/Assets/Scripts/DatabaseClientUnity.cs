@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MySqlConnector;
+using MySql.Data.MySqlClient;
 using UnityClient;
 using UnityEngine;
 
@@ -21,7 +21,7 @@ public static class DatabaseClientUnity
                 Debug.Log($"Database connection established on attempt {attempt + 1}");
                 return conn;
             }
-            catch (MySqlException) when (attempt < MaxRetries)
+            catch (MySql.Data.MySqlClient.MySqlException) when (attempt < MaxRetries)
             {
                 await Task.Delay(200 * (int)Math.Pow(2, attempt));
                 attempt++;
@@ -31,12 +31,12 @@ public static class DatabaseClientUnity
 
     public static async Task<List<Dictionary<string, object?>>> QueryAsync(string sql, Dictionary<string, object?>? parameters = null)
     {
-        await using var conn = await OpenConnectionAsync();
+        using var conn = await OpenConnectionAsync();
         Debug.Log($"Executing SQL query: {sql}");
-        await using var cmd = new MySqlCommand(sql, conn);
+        using var cmd = new MySqlCommand(sql, conn);
         AddParameters(cmd, parameters);
         var results = new List<Dictionary<string, object?>>();
-        await using var reader = await cmd.ExecuteReaderAsync();
+        using var reader = await cmd.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
             var row = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
@@ -52,9 +52,9 @@ public static class DatabaseClientUnity
 
     public static async Task<int> ExecuteAsync(string sql, Dictionary<string, object?>? parameters = null)
     {
-        await using var conn = await OpenConnectionAsync();
+        using var conn = await OpenConnectionAsync();
         Debug.Log($"Executing SQL command: {sql}");
-        await using var cmd = new MySqlCommand(sql, conn);
+        using var cmd = new MySqlCommand(sql, conn);
         AddParameters(cmd, parameters);
         var rows = await cmd.ExecuteNonQueryAsync();
         Debug.Log($"Command affected {rows} rows.");
