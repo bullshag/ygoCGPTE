@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
-using WinFormsApp2;
+using UnityClient;
 
 public class LoginManager : MonoBehaviour
 {
@@ -43,8 +41,8 @@ public class LoginManager : MonoBehaviour
         if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
         {
             Debug.Log($"Login attempt for '{username}'");
-            DatabaseConfig.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
-            DatabaseConfig.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
+            DatabaseConfigUnity.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
+            DatabaseConfigUnity.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
 
             string hashed = HashPassword(password);
             string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_login_users.sql");
@@ -75,20 +73,6 @@ public class LoginManager : MonoBehaviour
         }
     }
 
-    private string HashPassword(string password)
-    {
-        using (var sha = SHA256.Create())
-        {
-            byte[] bytes = Encoding.UTF8.GetBytes(password);
-            byte[] hash = sha.ComputeHash(bytes);
-            var builder = new StringBuilder();
-            foreach (byte b in hash)
-            {
-                builder.Append(b.ToString("x2"));
-            }
-            return builder.ToString();
-        }
-    }
 
     private void OnCreateAccountClicked()
     {
