@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MySqlConnector;
+using MySql.Data.MySqlClient;
 
 namespace WinFormsApp2
 {
