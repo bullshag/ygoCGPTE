@@ -44,8 +44,9 @@ public class LoginManager : MonoBehaviour
             DatabaseConfigUnity.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
             DatabaseConfigUnity.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
 
-            string hashed = PasswordHasher.HashPassword(password);
-            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_direct_login.sql");
+            string hashed = HashPassword(password);
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_login_users.sql");
+            // Previous login query (unity_direct_login.sql) used the legacy accounts schema
             Debug.Log("Executing login query");
             try
             {
