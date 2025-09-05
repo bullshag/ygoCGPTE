@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -188,17 +186,15 @@ public class RegisterManager : MonoBehaviour
             return;
         }
 
-        string passwordHash = HashPassword(pass);
-
         var parameters = new Dictionary<string, object?>
         {
             ["@username"] = user,
             ["@nickname"] = nick,
-            ["@passwordHash"] = passwordHash
+            ["@password"] = pass
         };
-        Debug.Log($"Register params - username: {user}, nickname: {nick}, hash: {passwordHash}");
+        Debug.Log($"Register params - username: {user}, nickname: {nick}");
 
-        string insertPath = Path.Combine(Application.dataPath, "sql", "unity_register_insert.sql");
+        string insertPath = Path.Combine(Application.dataPath, "sql", "unity_register_insert_plain.sql");
         int rows = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(insertPath), parameters);
         Debug.Log($"Insert result: {rows}");
         if (rows > 0)
@@ -222,11 +218,4 @@ public class RegisterManager : MonoBehaviour
         }
     }
 
-    private string HashPassword(string password)
-    {
-        using var sha = SHA256.Create();
-        byte[] bytes = Encoding.UTF8.GetBytes(password);
-        byte[] hash = sha.ComputeHash(bytes);
-        return Convert.ToBase64String(hash);
-    }
 }

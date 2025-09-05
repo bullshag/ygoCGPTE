@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
 using UnityClient;
-using WinFormsApp2;
 
 public class LoginManager : MonoBehaviour
 {
@@ -47,14 +44,13 @@ public class LoginManager : MonoBehaviour
             DatabaseConfigUnity.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
             DatabaseConfigUnity.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
 
-            string hashed = HashPassword(password);
-            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_login_select_user.sql");
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_login_select_user_plain.sql");
             Debug.Log("Executing login query");
             try
             {
                 var rows = await DatabaseClientUnity.QueryAsync(
                     File.ReadAllText(sqlPath),
-                    new Dictionary<string, object?> { ["@username"] = username, ["@passwordHash"] = hashed });
+                    new Dictionary<string, object?> { ["@username"] = username, ["@password"] = password });
 
                 if (rows.Count > 0)
                 {
@@ -77,15 +73,6 @@ public class LoginManager : MonoBehaviour
         }
     }
 
-    private string HashPassword(string password)
-    {
-        using (var sha = SHA256.Create())
-        {
-            byte[] bytes = Encoding.UTF8.GetBytes(password);
-            byte[] hash = sha.ComputeHash(bytes);
-            return Convert.ToBase64String(hash);
-        }
-    }
     private void OnCreateAccountClicked()
     {
         SceneManager.LoadScene("Register");
