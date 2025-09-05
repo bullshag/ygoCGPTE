@@ -1,1 +1,1 @@
-SELECT id, nickname FROM users WHERE username = @username AND password_hash = @passwordHash;
+SELECT id, nickname FROM users WHERE username = @username AND passwordhash = @passwordHash;
