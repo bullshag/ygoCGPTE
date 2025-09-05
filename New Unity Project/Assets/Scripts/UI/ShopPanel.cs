@@ -20,7 +20,7 @@ public class ShopPanel : MonoBehaviour
     private async void Start()
     {
         _shopManager = FindObjectOfType<ShopManager>();
-        InventoryServiceUnity.Load(userId);
+        await InventoryServiceUnity.LoadAsync(userId);
         await Refresh();
     }
 
