@@ -234,15 +234,6 @@ public class RegisterManager : MonoBehaviour
             }
         }
 
-        string checkNickPath = Path.Combine(Application.dataPath, "sql", "unity_register_check_nickname.sql");
-        var nickRows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(checkNickPath),
-            new Dictionary<string, object?> { ["@nickname"] = nick });
-        if (nickRows.Count > 0 && Convert.ToInt32(nickRows[0]["cnt"]) > 0)
-        {
-            Debug.Log("Nickname already exists");
-            return;
-        }
-
         string insertPath = Path.Combine(Application.dataPath, "sql", "unity_register_insert.sql");
         int rows = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(insertPath), parameters);
         Debug.Log($"Insert result: {rows}");
