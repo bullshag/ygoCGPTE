@@ -198,47 +198,8 @@ public class RegisterManager : MonoBehaviour
         };
         Debug.Log($"Register params - username: {user}, nickname: {nick}, hash: {passwordHash}");
 
-        string checkUserPath = Path.Combine(Application.dataPath, "sql", "unity_register_check_username.sql");
-        var userRows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(checkUserPath),
-            new Dictionary<string, object?> { ["@username"] = user });
-        if (userRows.Count > 0 && Convert.ToInt32(userRows[0]["cnt"]) > 0)
-        {
-            Debug.Log("Username already exists");
-            return;
-            int rows = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(sqlPath), parameters);
-            Debug.Log($"Insert result: {rows}");
-            if (rows > 0)
-            {
-                string idPath = Path.Combine(Application.dataPath, "sql", "unity_register_get_id.sql");
-                var idRows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(idPath), new Dictionary<string, object?> { ["@username"] = user });
-                long accountId = Convert.ToInt64(idRows[0]["id"]);
-
-                string ensureNodePath = Path.Combine(Application.dataPath, "sql", "unity_register_ensure_node.sql");
-                await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(ensureNodePath), new Dictionary<string, object?>
-                {
-                    ["@node"] = "nodeRiverVillage",
-                    ["@name"] = "River Village"
-                });
-
-                string initTravelPath = Path.Combine(Application.dataPath, "sql", "unity_register_init_travel.sql");
-                await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(initTravelPath), new Dictionary<string, object?>
-                {
-                    ["@accountId"] = accountId,
-                    ["@node"] = "nodeRiverVillage"
-                });
-
-                Debug.Log("Account created");
-                SceneManager.LoadScene("Login");
-            }
-            else
-            {
-                Debug.Log("No account created");
-            }
-        }
-
         string insertPath = Path.Combine(Application.dataPath, "sql", "unity_register_insert.sql");
-        int rows;
-        rows = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(insertPath), parameters);
+        int rows = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(insertPath), parameters);
         Debug.Log($"Insert result: {rows}");
         if (rows > 0)
         {
