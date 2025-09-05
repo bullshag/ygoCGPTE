@@ -33,3 +33,10 @@ obj/
 /New\ Unity\ Project/*.booproj
 /New\ Unity\ Project/*.svd
 /New\ Unity\ Project/.vs/
+*.dwlt
+New Unity Project/Library/ArtifactDB
+New Unity Project/Library/ilpp.pid
+New Unity Project/Library/SceneVisibilityState.asset
+New Unity Project/Library/Search/transactions.db
+New Unity Project/Library/SourceAssetDB
+New Unity Project/UserSettings/Layouts/default-6000.dwlt
