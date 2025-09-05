@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace UnityClient
@@ -14,10 +13,8 @@ namespace UnityClient
         public static bool DebugMode { get; set; }
         public static bool UseKimServer { get; set; }
 
-        private static string Username =>
-            Environment.GetEnvironmentVariable("DB_USERNAME") ?? string.Empty;
-        private static string Password =>
-            Environment.GetEnvironmentVariable("DB_PASSWORD") ?? string.Empty;
+        private const string Username = "userclient";
+        private const string Password = "123321";
 
         public static string ConnectionString =>
             $"Server={(UseKimServer ? Config.kimHost : (DebugMode ? "127.0.0.1" : Config.host))};" +
