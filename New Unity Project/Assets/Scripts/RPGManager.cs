@@ -6,6 +6,7 @@ using UnityClient;
 using System.Threading.Tasks;
 using UnityEngine;
 using TMPro;
+using WinFormsApp2;
 
 public class RPGManager : MonoBehaviour
 {
