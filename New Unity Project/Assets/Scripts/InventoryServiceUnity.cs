@@ -25,9 +25,6 @@ namespace WinFormsApp2
         /// </summary>
         public static int AccountId => _userId;
 
-        public static void Load(int userId, bool forceReload = false) =>
-            LoadAsync(userId, forceReload).ConfigureAwait(false).GetAwaiter().GetResult();
-
         public static async Task LoadAsync(int userId, bool forceReload = false)
         {
             if (_loaded && _userId == userId && !forceReload) return;

@@ -9,11 +9,11 @@ public class ArenaPanel : MonoBehaviour
 {
     private bool _deposited;
 
-    public void OnDeposit()
+    public async void OnDeposit()
     {
         // Simple deposit/withdraw logic using the shared inventory service.
         // Depositing will consume an "Arena Coin" if present, withdrawing will add one back.
-        InventoryServiceUnity.Load(1); // ensure inventory is loaded
+        await InventoryServiceUnity.LoadAsync(1); // ensure inventory is loaded
         if (_deposited)
         {
             // Withdraw: return a coin to the player's inventory.

@@ -21,9 +21,9 @@ public class InventoryUI : MonoBehaviour
 
     private InventoryItem? selectedItem;
 
-    private void Start()
+    private async void Start()
     {
-        InventoryServiceUnity.Load(userId);
+        await InventoryServiceUnity.LoadAsync(userId);
         PopulateItems();
         LoadTargets();
         useButton.onClick.AddListener(OnUseClicked);
