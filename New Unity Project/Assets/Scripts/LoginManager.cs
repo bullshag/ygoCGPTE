@@ -47,7 +47,7 @@ public class LoginManager : MonoBehaviour
             DatabaseConfig.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
 
             string hashed = HashPassword(password);
-            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_direct_login.sql");
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_login_select_user.sql");
             Debug.Log("Executing login query");
             try
             {
@@ -59,6 +59,8 @@ public class LoginManager : MonoBehaviour
                 {
                     Debug.Log("Login successful");
                     int userId = Convert.ToInt32(rows[0]["id"]);
+                    string updatePath = Path.Combine(Application.dataPath, "sql", "unity_login_update_last_seen.sql");
+                    await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(updatePath), new Dictionary<string, object?> { ["@id"] = userId });
                     InventoryServiceUnity.Load(userId);
                     SceneManager.LoadScene("RPG");
                 }
@@ -80,12 +82,7 @@ public class LoginManager : MonoBehaviour
         {
             byte[] bytes = Encoding.UTF8.GetBytes(password);
             byte[] hash = sha.ComputeHash(bytes);
-            var builder = new StringBuilder();
-            foreach (byte b in hash)
-            {
-                builder.Append(b.ToString("x2"));
-            }
-            return builder.ToString();
+            return Convert.ToBase64String(hash);
         }
     }
 

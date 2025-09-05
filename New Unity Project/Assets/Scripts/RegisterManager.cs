@@ -181,24 +181,45 @@ public class RegisterManager : MonoBehaviour
         };
         Debug.Log($"Register params - username: {user}, nickname: {nick}, hash: {passwordHash}");
 
-        string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_register_user.sql");
-        try
+        string checkUserPath = Path.Combine(Application.dataPath, "sql", "unity_register_check_username.sql");
+        var userRows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(checkUserPath),
+            new Dictionary<string, object?> { ["@username"] = user });
+        if (userRows.Count > 0 && Convert.ToInt32(userRows[0]["cnt"]) > 0)
         {
-            int rows = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(sqlPath), parameters);
-            Debug.Log($"Insert result: {rows}");
-            if (rows > 0)
-            {
-                Debug.Log("Account created");
-                SceneManager.LoadScene("Login");
-            }
-            else
-            {
-                Debug.Log("No account created");
-            }
+            Debug.Log("Username already exists");
+            return;
         }
-        catch (Exception ex)
+
+        string checkNickPath = Path.Combine(Application.dataPath, "sql", "unity_register_check_nickname.sql");
+        var nickRows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(checkNickPath),
+            new Dictionary<string, object?> { ["@nickname"] = nick });
+        if (nickRows.Count > 0 && Convert.ToInt32(nickRows[0]["cnt"]) > 0)
         {
-            Debug.LogError($"Registration failed: {ex.Message}");
+            Debug.Log("Nickname already exists");
+            return;
+        }
+
+        string insertPath = Path.Combine(Application.dataPath, "sql", "unity_register_insert.sql");
+        int rows = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(insertPath), parameters);
+        Debug.Log($"Insert result: {rows}");
+        if (rows > 0)
+        {
+            string idPath = Path.Combine(Application.dataPath, "sql", "unity_register_get_id.sql");
+            var idRows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(idPath), new Dictionary<string, object?> { ["@username"] = user });
+            int newId = Convert.ToInt32(idRows[0]["id"]);
+
+            string ensureNodePath = Path.Combine(Application.dataPath, "sql", "unity_register_ensure_node.sql");
+            await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(ensureNodePath), new Dictionary<string, object?> { ["@node"] = "nodeRiverVillage", ["@name"] = "River Village" });
+
+            string initTravelPath = Path.Combine(Application.dataPath, "sql", "unity_register_init_travel.sql");
+            await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(initTravelPath), new Dictionary<string, object?> { ["@accountId"] = newId, ["@node"] = "nodeRiverVillage" });
+
+            Debug.Log("Account created");
+            SceneManager.LoadScene("Login");
+        }
+        else
+        {
+            Debug.Log("No account created");
         }
     }
 
@@ -207,11 +228,6 @@ public class RegisterManager : MonoBehaviour
         using var sha = SHA256.Create();
         byte[] bytes = Encoding.UTF8.GetBytes(password);
         byte[] hash = sha.ComputeHash(bytes);
-        var builder = new StringBuilder();
-        foreach (byte b in hash)
-        {
-            builder.Append(b.ToString("x2"));
-        }
-        return builder.ToString();
+        return Convert.ToBase64String(hash);
     }
 }

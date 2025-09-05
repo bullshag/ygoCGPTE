@@ -15,6 +15,7 @@ public class RPGManager : MonoBehaviour
     public TextMeshProUGUI chatText;
 
     private List<CharacterData> partyMembers = new List<CharacterData>();
+    private DateTime _lastChatFetch = DateTime.UtcNow.AddMinutes(-5);
 
     private async void Start()
     {
@@ -76,18 +77,16 @@ public class RPGManager : MonoBehaviour
     {
         while (true)
         {
-            var task = ChatService.FetchMessagesAsync();
+            var task = ChatService.GetMessagesAsync(_lastChatFetch, InventoryServiceUnity.AccountId);
             yield return new WaitUntil(() => task.IsCompleted);
             if (chatText != null)
             {
                 foreach (var msg in task.Result)
                 {
-                    if (!string.IsNullOrEmpty(msg))
-                    {
-                        chatText.text += "\n" + msg;
-                    }
+                    chatText.text += $"\n{msg.Sender}: {msg.Message}";
                 }
             }
+            _lastChatFetch = DateTime.UtcNow;
             yield return new WaitForSeconds(2f);
         }
     }
