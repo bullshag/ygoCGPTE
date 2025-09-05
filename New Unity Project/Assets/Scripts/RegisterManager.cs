@@ -235,7 +235,8 @@ public class RegisterManager : MonoBehaviour
         }
 
         string insertPath = Path.Combine(Application.dataPath, "sql", "unity_register_insert.sql");
-        int rows = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(insertPath), parameters);
+        int rows;
+        rows = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(insertPath), parameters);
         Debug.Log($"Insert result: {rows}");
         if (rows > 0)
         {
