@@ -57,7 +57,9 @@ public class LoginManager : MonoBehaviour
                     Debug.Log("Login successful");
                     int userId = Convert.ToInt32(rows[0]["id"]);
                     string updatePath = Path.Combine(Application.dataPath, "sql", "unity_login_update_last_seen.sql");
-                    await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(updatePath), new Dictionary<string, object?> { ["@id"] = userId });
+                    await DatabaseClientUnity.ExecuteAsync(
+                        File.ReadAllText(updatePath),
+                        new Dictionary<string, object?> { ["@id"] = userId });
                     InventoryServiceUnity.Load(userId);
                     SceneManager.LoadScene("RPG");
                 }
