@@ -12,9 +12,9 @@ public static class CharacterService
     {
         try
         {
-            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_get_party_members.sql");
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_party_members.sql");
             Debug.Log("Executing party members query");
-            var rows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath));
+            var rows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath), new Dictionary<string, object?> { ["@id"] = InventoryServiceUnity.AccountId });
             Debug.Log($"Party members returned: {rows.Count}");
 
             var members = new List<CharacterData>();
@@ -42,7 +42,7 @@ public static class CharacterService
     {
         try
         {
-            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_get_gold.sql");
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_get_gold_users.sql");
             Debug.Log("Executing gold query");
             var rows = await DatabaseClientUnity.QueryAsync(
                 File.ReadAllText(sqlPath),

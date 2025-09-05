@@ -17,8 +17,9 @@ public class ArenaManager : MonoBehaviour
     {
         Debug.Log($"Starting arena challenge for account {accountId}.");
 
+        var opponentSqlPath = Path.Combine(Application.dataPath, "sql", "unity_arena_select_opponent.sql");
         var opponentRows = await DatabaseClientUnity.QueryAsync(
-            "SELECT account_id FROM arena_teams WHERE account_id<>@id ORDER BY RAND() LIMIT 1",
+            File.ReadAllText(opponentSqlPath),
             new Dictionary<string, object?> { ["@id"] = accountId });
 
         int opponentId = opponentRows.Count > 0

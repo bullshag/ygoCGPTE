@@ -1,2 +1,3 @@
--- Retrieves account id by username for Unity RegisterManager
-SELECT id FROM accounts WHERE username=@username;
+
+SELECT id FROM users WHERE username = @username;
+

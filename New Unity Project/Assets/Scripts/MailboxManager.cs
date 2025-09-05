@@ -16,7 +16,7 @@ public class MailboxManager : MonoBehaviour
     {
         try
         {
-            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_mailbox_unread.sql");
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_mail_messages_unread.sql");
             var rows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath),
                 new Dictionary<string, object?> { ["@accountId"] = accountId });
             var messages = new List<MailMessage>();
@@ -27,7 +27,8 @@ public class MailboxManager : MonoBehaviour
                     id = Convert.ToInt32(row["id"]),
                     senderId = Convert.ToInt32(row["sender_id"]),
                     subject = Convert.ToString(row["subject"]) ?? string.Empty,
-                    body = Convert.ToString(row["body"]) ?? string.Empty
+                    body = Convert.ToString(row["body"]) ?? string.Empty,
+                    sentAt = Convert.ToDateTime(row["sent_at"])
                 });
             }
             Debug.Log($"Retrieved {messages.Count} messages for account {accountId}");
@@ -47,7 +48,7 @@ public class MailboxManager : MonoBehaviour
     {
         try
         {
-            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_mailbox_mark_read.sql");
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_mail_messages_mark_read.sql");
             int rows = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(sqlPath),
                 new Dictionary<string, object?> { ["@messageId"] = messageId });
             Debug.Log($"Marked message {messageId} as read");
@@ -67,6 +68,7 @@ public class MailboxManager : MonoBehaviour
         public int senderId;
         public string subject;
         public string body;
+        public DateTime sentAt;
     }
 
     [System.Serializable]

@@ -45,8 +45,7 @@ public class LoginManager : MonoBehaviour
             DatabaseConfigUnity.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
 
             string hashed = HashPassword(password);
-            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_login_users.sql");
-            // Previous login query (unity_direct_login.sql) used the legacy accounts schema
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_login_select_user.sql");
             Debug.Log("Executing login query");
             try
             {
@@ -58,6 +57,8 @@ public class LoginManager : MonoBehaviour
                 {
                     Debug.Log("Login successful");
                     int userId = Convert.ToInt32(rows[0]["id"]);
+                    string updatePath = Path.Combine(Application.dataPath, "sql", "unity_login_update_last_seen.sql");
+                    await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(updatePath), new Dictionary<string, object?> { ["@id"] = userId });
                     InventoryServiceUnity.Load(userId);
                     SceneManager.LoadScene("RPG");
                 }
@@ -73,7 +74,15 @@ public class LoginManager : MonoBehaviour
         }
     }
 
-
+    private string HashPassword(string password)
+    {
+        using (var sha = SHA256.Create())
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(password);
+            byte[] hash = sha.ComputeHash(bytes);
+            return Convert.ToBase64String(hash);
+        }
+    }
     private void OnCreateAccountClicked()
     {
         SceneManager.LoadScene("Register");
