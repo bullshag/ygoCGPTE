@@ -6,6 +6,7 @@ using UnityClient;
 using System.Threading.Tasks;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 using WinFormsApp2;
 
 public class RPGManager : MonoBehaviour
@@ -14,6 +15,12 @@ public class RPGManager : MonoBehaviour
     public List<GameObject> partyMemberEntries = new();
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI chatText;
+    [SerializeField] private Image worldMapImage;
+    [SerializeField] private TMP_InputField chatInput;
+    [SerializeField] private Button sendButton;
+    [SerializeField] private TMP_InputField friendInput;
+    [SerializeField] private TMP_Text friendListText;
+    [SerializeField] private List<GameObject> mercenaryUIContainers = new();
 
     private List<CharacterData> partyMembers = new List<CharacterData>();
     private DateTime _lastChatFetch = DateTime.UtcNow.AddMinutes(-5);
