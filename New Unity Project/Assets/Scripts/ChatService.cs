@@ -45,4 +45,26 @@ public static class ChatService
             return new List<ChatMessage>();
         }
     }
+
+    public static async Task<int?> GetUserIdByNicknameAsync(string nickname)
+    {
+        string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_chat_get_user_id.sql");
+        try
+        {
+            var rows = await DatabaseClientUnity.QueryAsync(
+                File.ReadAllText(sqlPath),
+                new Dictionary<string, object?> { ["@nick"] = nickname }
+            );
+            if (rows.Count > 0 && rows[0].TryGetValue("id", out var id))
+            {
+                return Convert.ToInt32(id);
+            }
+            return null;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Failed to get user id for nickname {nickname}: {ex.Message}");
+            return null;
+        }
+    }
 }

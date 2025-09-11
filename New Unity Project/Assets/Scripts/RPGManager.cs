@@ -14,6 +14,8 @@ public class RPGManager : MonoBehaviour
     public List<GameObject> partyMemberEntries = new();
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI chatText;
+    public TextMeshProUGUI friendListText;
+    public TMP_InputField friendInput;
 
     private List<CharacterData> partyMembers = new List<CharacterData>();
     private DateTime _lastChatFetch = DateTime.UtcNow.AddMinutes(-5);
@@ -24,6 +26,11 @@ public class RPGManager : MonoBehaviour
         PopulatePartyList();
         StartCoroutine(ChatLoop());
         StartCoroutine(RegenLoop());
+        StartCoroutine(FriendLoop());
+        if (friendInput != null)
+        {
+            friendInput.onSubmit.AddListener(OnFriendInputSubmit);
+        }
     }
 
     private async Task LoadPartyMembersAsync()
@@ -103,6 +110,32 @@ public class RPGManager : MonoBehaviour
             PopulatePartyList();
             yield return new WaitForSeconds(1f);
         }
+    }
+
+    private IEnumerator FriendLoop()
+    {
+        while (true)
+        {
+            var friendsTask = FriendServiceUnity.GetFriendsAsync(InventoryServiceUnity.AccountId);
+            var requestsTask = FriendServiceUnity.GetFriendRequestsAsync(InventoryServiceUnity.AccountId);
+            yield return new WaitUntil(() => friendsTask.IsCompleted && requestsTask.IsCompleted);
+            if (friendListText != null)
+            {
+                string friends = string.Join("\n", friendsTask.Result);
+                string requests = string.Join("\n", requestsTask.Result);
+                friendListText.text = $"Friends:\n{friends}\nRequests:\n{requests}";
+            }
+            yield return new WaitForSeconds(5f);
+        }
+    }
+
+    private async void OnFriendInputSubmit(string text)
+    {
+        string nick = text.Trim();
+        if (nick.Length == 0) return;
+        await FriendServiceUnity.SendFriendRequestAsync(InventoryServiceUnity.AccountId, nick);
+        if (friendInput != null)
+            friendInput.text = string.Empty;
     }
 }
 
