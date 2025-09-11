@@ -8,7 +8,6 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using WinFormsApp2;
-using UnityEngine.UI;
 
 public class RPGManager : MonoBehaviour
 {
