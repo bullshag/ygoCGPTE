@@ -12,9 +12,12 @@ public static class CharacterService
     {
         try
         {
-            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_party_members.sql");
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_get_main_party_members.sql");
             Debug.Log("Executing party members query");
-            var rows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath), new Dictionary<string, object?> { ["@id"] = InventoryServiceUnity.AccountId });
+            var rows = await DatabaseClientUnity.QueryAsync(
+                File.ReadAllText(sqlPath),
+                new Dictionary<string, object?> { ["@id"] = InventoryServiceUnity.AccountId }
+            );
             Debug.Log($"Party members returned: {rows.Count}");
 
             var members = new List<CharacterData>();
@@ -58,6 +61,39 @@ public static class CharacterService
         {
             Debug.LogError($"Failed to fetch gold: {ex.Message}");
             return 0;
+        }
+    }
+
+    public static async Task<List<CharacterData>> GetHiredCompanionsAsync()
+    {
+        try
+        {
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_get_hired_companions.sql");
+            Debug.Log("Executing hired companions query");
+            var rows = await DatabaseClientUnity.QueryAsync(
+                File.ReadAllText(sqlPath),
+                new Dictionary<string, object?> { ["@id"] = InventoryServiceUnity.AccountId }
+            );
+            Debug.Log($"Hired companions returned: {rows.Count}");
+
+            var members = new List<CharacterData>();
+            foreach (var row in rows)
+            {
+                members.Add(new CharacterData
+                {
+                    Name = Convert.ToString(row["name"]) ?? string.Empty,
+                    HP = Convert.ToInt32(row["hp"]),
+                    MaxHP = Convert.ToInt32(row["max_hp"]),
+                    Mana = Convert.ToInt32(row["mana"]),
+                    MaxMana = Convert.ToInt32(row["max_mana"])
+                });
+            }
+            return members;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Failed to fetch hired companions: {ex.Message}");
+            return new List<CharacterData>();
         }
     }
 }

@@ -14,6 +14,7 @@ public class RPGManager : MonoBehaviour
 {
     [Header("UI References")]
     public List<GameObject> partyMemberEntries = new();
+    public List<GameObject> mercBacks = new();
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI chatText;
     public TextMeshProUGUI friendListText;
@@ -28,6 +29,7 @@ public class RPGManager : MonoBehaviour
     [SerializeField] private List<GameObject> mercenaryUIContainers = new();
 
     private List<CharacterData> partyMembers = new List<CharacterData>();
+    private List<CharacterData> hiredCompanions = new List<CharacterData>();
     private DateTime _lastChatFetch = DateTime.UtcNow.AddMinutes(-5);
     private GameObject _selectedBlock;
 
@@ -56,6 +58,7 @@ public class RPGManager : MonoBehaviour
     private async Task LoadPartyMembersAsync()
     {
         partyMembers = await CharacterService.GetPartyMembersAsync();
+        hiredCompanions = await CharacterService.GetHiredCompanionsAsync();
         if (goldText != null)
         {
             int gold = await CharacterService.GetGoldAsync();
@@ -65,7 +68,8 @@ public class RPGManager : MonoBehaviour
 
     private void PopulatePartyList()
     {
-        if (partyMemberEntries == null || partyMemberEntries.Count == 0)
+        if ((partyMemberEntries == null || partyMemberEntries.Count == 0) &&
+            (mercBacks == null || mercBacks.Count == 0))
         {
             return;
         }
@@ -98,6 +102,36 @@ public class RPGManager : MonoBehaviour
                 if (img != null && go != _selectedBlock)
                 {
                     img.color = Color.yellow;
+                }
+            }
+            else
+            {
+                go.SetActive(false);
+            }
+        }
+
+        for (int i = 0; i < mercBacks.Count; i++)
+        {
+            var go = mercBacks[i];
+            if (i < hiredCompanions.Count)
+            {
+                go.SetActive(true);
+                var member = hiredCompanions[i];
+                go.name = member.Name;
+
+                var texts = go.GetComponentsInChildren<TextMeshProUGUI>();
+                foreach (var t in texts)
+                {
+                    if (t.gameObject.name == "NameText")
+                    {
+                        t.text = member.Name;
+                    }
+                }
+
+                var bar = go.GetComponentInChildren<ColoredProgressBar>();
+                if (bar != null)
+                {
+                    bar.SetValue(member.HP / (float)member.MaxHP, member.Mana / (float)member.MaxMana);
                 }
             }
             else
@@ -196,6 +230,10 @@ public class RPGManager : MonoBehaviour
             foreach (var member in partyMembers)
             {
                 member.RegenTick();
+            }
+            foreach (var merc in hiredCompanions)
+            {
+                merc.RegenTick();
             }
             PopulatePartyList();
             yield return new WaitForSeconds(1f);
