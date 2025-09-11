@@ -184,14 +184,10 @@ public class RPGManager : MonoBehaviour
     {
         while (true)
         {
-            try
+            var task = ChatService.GetMessagesAsync(_lastChatFetch, InventoryServiceUnity.AccountId);
+            yield return new WaitUntil(() => task.IsCompleted);
+            if (task.Exception == null)
             {
-                var task = ChatService.GetMessagesAsync(_lastChatFetch, InventoryServiceUnity.AccountId);
-                yield return new WaitUntil(() => task.IsCompleted);
-                if (task.Exception != null)
-                {
-                    throw task.Exception;
-                }
                 if (chatText != null)
                 {
                     foreach (var msg in task.Result)
@@ -201,9 +197,9 @@ public class RPGManager : MonoBehaviour
                 }
                 _lastChatFetch = DateTime.UtcNow;
             }
-            catch (Exception ex)
+            else
             {
-                Debug.LogError($"Failed to fetch chat messages: {ex}");
+                Debug.LogError($"Failed to fetch chat messages: {task.Exception}");
             }
             yield return new WaitForSeconds(2f);
         }
