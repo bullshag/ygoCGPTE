@@ -8,7 +8,6 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using WinFormsApp2;
-using UnityEngine.UI;
 
 public class RPGManager : MonoBehaviour
 {
@@ -185,16 +184,27 @@ public class RPGManager : MonoBehaviour
     {
         while (true)
         {
-            var task = ChatService.GetMessagesAsync(_lastChatFetch, InventoryServiceUnity.AccountId);
-            yield return new WaitUntil(() => task.IsCompleted);
-            if (chatText != null)
+            try
             {
-                foreach (var msg in task.Result)
+                var task = ChatService.GetMessagesAsync(_lastChatFetch, InventoryServiceUnity.AccountId);
+                yield return new WaitUntil(() => task.IsCompleted);
+                if (task.Exception != null)
                 {
-                    chatText.text += $"\n{msg.Sender}: {msg.Message}";
+                    throw task.Exception;
                 }
+                if (chatText != null)
+                {
+                    foreach (var msg in task.Result)
+                    {
+                        chatText.text += $"\n{msg.Sender}: {msg.Message}";
+                    }
+                }
+                _lastChatFetch = DateTime.UtcNow;
             }
-            _lastChatFetch = DateTime.UtcNow;
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to fetch chat messages: {ex}");
+            }
             yield return new WaitForSeconds(2f);
         }
     }
