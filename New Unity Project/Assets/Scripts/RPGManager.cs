@@ -6,6 +6,7 @@ using UnityClient;
 using System.Threading.Tasks;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 using WinFormsApp2;
 using UnityEngine.UI;
 
@@ -17,9 +18,16 @@ public class RPGManager : MonoBehaviour
     public TextMeshProUGUI chatText;
     public TMP_InputField chatInput;
     public Button sendButton;
+    [SerializeField] private Image worldMapImage;
+    [SerializeField] private TMP_InputField chatInput;
+    [SerializeField] private Button sendButton;
+    [SerializeField] private TMP_InputField friendInput;
+    [SerializeField] private TMP_Text friendListText;
+    [SerializeField] private List<GameObject> mercenaryUIContainers = new();
 
     private List<CharacterData> partyMembers = new List<CharacterData>();
     private DateTime _lastChatFetch = DateTime.UtcNow.AddMinutes(-5);
+    private GameObject _selectedBlock;
 
     private async void Start()
     {
@@ -33,6 +41,7 @@ public class RPGManager : MonoBehaviour
         {
             sendButton.onClick.AddListener(SendChatMessage);
         }
+        InitializeCharacterBlocks();
         StartCoroutine(ChatLoop());
         StartCoroutine(RegenLoop());
     }
@@ -77,11 +86,61 @@ public class RPGManager : MonoBehaviour
                 {
                     bar.SetValue(member.HP / (float)member.MaxHP, member.Mana / (float)member.MaxMana);
                 }
+
+                var img = go.GetComponent<Image>();
+                if (img != null && go != _selectedBlock)
+                {
+                    img.color = Color.yellow;
+                }
             }
             else
             {
                 go.SetActive(false);
             }
+        }
+    }
+
+    private void InitializeCharacterBlocks()
+    {
+        foreach (var characterBlock in partyMemberEntries)
+        {
+            if (characterBlock == null)
+            {
+                continue;
+            }
+
+            var image = characterBlock.GetComponent<Image>();
+            if (image != null)
+            {
+                image.color = Color.yellow;
+            }
+
+            var button = characterBlock.GetComponent<Button>();
+            if (button != null)
+            {
+                button.onClick.RemoveAllListeners();
+                button.onClick.AddListener(() => OnCharacterBlockClicked(characterBlock));
+            }
+        }
+    }
+
+    private void OnCharacterBlockClicked(GameObject block)
+    {
+        if (_selectedBlock != null)
+        {
+            var previousImage = _selectedBlock.GetComponent<Image>();
+            if (previousImage != null)
+            {
+                previousImage.color = Color.yellow;
+            }
+        }
+
+        _selectedBlock = block;
+
+        var currentImage = block.GetComponent<Image>();
+        if (currentImage != null)
+        {
+            currentImage.color = Color.red;
         }
     }
 
