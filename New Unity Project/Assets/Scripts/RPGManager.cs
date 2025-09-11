@@ -17,10 +17,6 @@ public class RPGManager : MonoBehaviour
     public List<GameObject> mercBacks = new();
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI chatText;
-    public TextMeshProUGUI friendListText;
-    public TMP_InputField friendInput;
-    public TMP_InputField chatInput;
-    public Button sendButton;
     [SerializeField] private Image worldMapImage;
     [SerializeField] private TMP_InputField chatInput;
     [SerializeField] private Button sendButton;
