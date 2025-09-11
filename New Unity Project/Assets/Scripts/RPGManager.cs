@@ -16,6 +16,8 @@ public class RPGManager : MonoBehaviour
     public List<GameObject> partyMemberEntries = new();
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI chatText;
+    public TMP_InputField chatInput;
+    public Button sendButton;
     [SerializeField] private Image worldMapImage;
     [SerializeField] private TMP_InputField chatInput;
     [SerializeField] private Button sendButton;
@@ -31,6 +33,14 @@ public class RPGManager : MonoBehaviour
     {
         await LoadPartyMembersAsync();
         PopulatePartyList();
+        if (chatInput != null)
+        {
+            chatInput.onSubmit.AddListener(_ => SendChatMessage());
+        }
+        if (sendButton != null)
+        {
+            sendButton.onClick.AddListener(SendChatMessage);
+        }
         InitializeCharacterBlocks();
         StartCoroutine(ChatLoop());
         StartCoroutine(RegenLoop());
@@ -150,6 +160,26 @@ public class RPGManager : MonoBehaviour
             _lastChatFetch = DateTime.UtcNow;
             yield return new WaitForSeconds(2f);
         }
+    }
+
+    public async void SendChatMessage()
+    {
+        if (chatInput == null) return;
+        string message = chatInput.text.Trim();
+        if (string.IsNullOrEmpty(message)) return;
+
+        await ChatService.SendMessageAsync(InventoryServiceUnity.AccountId, null, message);
+        chatInput.text = string.Empty;
+
+        var messages = await ChatService.GetMessagesAsync(_lastChatFetch, InventoryServiceUnity.AccountId);
+        if (chatText != null)
+        {
+            foreach (var msg in messages)
+            {
+                chatText.text += $"\n{msg.Sender}: {msg.Message}";
+            }
+        }
+        _lastChatFetch = DateTime.UtcNow;
     }
 
     private IEnumerator RegenLoop()
