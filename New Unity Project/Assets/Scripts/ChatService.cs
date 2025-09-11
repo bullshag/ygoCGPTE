@@ -67,7 +67,7 @@ public static class ChatService
             return null;
         } }
 
-    private static async Task SendMessageAsync(int senderId, int? recipientId, string message)
+    public static async Task SendMessageAsync(int senderId, int? recipientId, string message)
     {
         string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_chat_send_message.sql");
         try
