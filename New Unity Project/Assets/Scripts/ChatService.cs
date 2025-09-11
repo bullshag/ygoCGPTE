@@ -65,6 +65,23 @@ public static class ChatService
         {
             Debug.LogError($"Failed to get user id for nickname {nickname}: {ex.Message}");
             return null;
+    public static async Task SendMessageAsync(int senderId, int? recipientId, string message)
+    {
+        string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_chat_send_message.sql");
+        try
+        {
+            var parameters = new Dictionary<string, object?>
+            {
+                ["@sender"] = senderId,
+                ["@recipient"] = recipientId,
+                ["@message"] = message
+            };
+            await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(sqlPath), parameters);
+            Debug.Log("Chat message sent");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Failed to send chat message: {ex.Message}");
         }
     }
 }
