@@ -18,7 +18,7 @@ namespace UnityClient
 
         public static async Task<List<ChatMessage>> GetMessagesAsync(DateTime since, int userId)
         {
-            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_chat_fetch_messages.sql");
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_chat_fetch_visible_messages.sql");
             try
             {
                 var parameters = new Dictionary<string, object?>
