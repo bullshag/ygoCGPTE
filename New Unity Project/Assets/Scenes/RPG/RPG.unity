@@ -163,9 +163,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8f4ea4cadae47c1a9b4aa7ad034eb5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  partyMemberEntries: []
+  partyMemberEntries:
+  - {fileID: 793978331}
+  - {fileID: 168601980}
+  - {fileID: 1668254263}
+  - {fileID: 1348090691}
+  - {fileID: 809546070}
+  mercBacks:
+  - {fileID: 927658437}
   goldText: {fileID: 0}
-  chatText: {fileID: 0}
+  chatText: {fileID: 807365676}
+  worldMapImage: {fileID: 0}
+  chatInput: {fileID: 1679264076}
+  sendButton: {fileID: 128321793}
+  friendInput: {fileID: 826305274}
+  friendListText: {fileID: 1665685158}
+  mercenaryUIContainers:
+  - {fileID: 441060909}
+  - {fileID: 516720944}
+  - {fileID: 64861354}
+  - {fileID: 1899887267}
+  - {fileID: 315276777}
 --- !u!1 &36333857
 GameObject:
   m_ObjectHideFlags: 0
@@ -3798,7 +3816,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 640454742}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.99999315
+  m_Size: 0.99922127
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -11304,7 +11322,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.00023746857}
+  m_AnchoredPosition: {x: 0, y: 0.00031670617}
   m_SizeDelta: {x: 0, y: 182.46}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1922977547
