@@ -16,17 +16,12 @@ namespace UnityClient
             public DateTime SentAt { get; set; }
         }
 
-        public static async Task<List<ChatMessage>> GetMessagesAsync(DateTime since, int userId)
+        public static async Task<List<ChatMessage>> GetMessagesAsync()
         {
-            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_chat_fetch_visible_messages.sql");
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_chat_fetch_all_messages.sql");
             try
             {
-                var parameters = new Dictionary<string, object?>
-                {
-                    ["@since"] = since,
-                    ["@uid"] = userId
-                };
-                var rows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath), parameters);
+                var rows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath));
                 var messages = new List<ChatMessage>();
                 foreach (var row in rows)
                 {

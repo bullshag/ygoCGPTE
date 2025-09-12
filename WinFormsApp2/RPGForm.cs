@@ -16,7 +16,6 @@ namespace WinFormsApp2
         private int _playerGold;
         private readonly System.Windows.Forms.Timer _chatTimer = new System.Windows.Forms.Timer();
         private readonly System.Windows.Forms.Timer _regenTimer = new System.Windows.Forms.Timer();
-        private DateTime _lastMessage = DateTime.UtcNow.AddMinutes(-5);
         private HashSet<string> _hiredMembers = new();
         private HashSet<string> _mercenaryMembers = new();
         private NavigationWindow? _navigationWindow;
@@ -412,12 +411,11 @@ namespace WinFormsApp2
         private void ChatTimer_Tick(object? sender, EventArgs e)
         {
             ChatService.UpdateLastSeen(_userId);
-            var messages = ChatService.GetMessages(_lastMessage, _userId);
+            var messages = ChatService.GetMessages();
             foreach (var m in messages)
             {
                 string prefix = m.Recipient == null ? string.Empty : $"[PM to {m.Recipient}] ";
                 txtChatDisplay.AppendText($"[{m.SentAt:HH:mm:ss}] {m.Sender}: {prefix}{m.Message}\r\n");
-                _lastMessage = m.SentAt;
             }
             lstOnline.DataSource = ChatService.GetOnlinePlayers();
             lstFriends.DataSource = FriendService.GetFriends(_userId);

@@ -25,7 +25,6 @@ public class RPGManager : MonoBehaviour
 
     private List<CharacterData> partyMembers = new List<CharacterData>();
     private List<CharacterData> hiredCompanions = new List<CharacterData>();
-    private DateTime _lastChatFetch = DateTime.UtcNow.AddMinutes(-5);
     private GameObject _selectedBlock;
 
     private async void Start()
@@ -184,7 +183,7 @@ public class RPGManager : MonoBehaviour
     {
         while (true)
         {
-            var task = ChatService.GetMessagesAsync(_lastChatFetch, InventoryServiceUnity.AccountId);
+            var task = ChatService.GetMessagesAsync();
             yield return new WaitUntil(() => task.IsCompleted);
             if (task.Exception == null)
             {
@@ -195,7 +194,6 @@ public class RPGManager : MonoBehaviour
                         chatText.text += $"\n{msg.Sender}: {msg.Message}";
                     }
                 }
-                _lastChatFetch = DateTime.UtcNow;
             }
             else
             {
@@ -214,7 +212,7 @@ public class RPGManager : MonoBehaviour
         await ChatService.SendMessageAsync(InventoryServiceUnity.AccountId, null, message);
         chatInput.text = string.Empty;
 
-        var messages = await ChatService.GetMessagesAsync(_lastChatFetch, InventoryServiceUnity.AccountId);
+        var messages = await ChatService.GetMessagesAsync();
         if (chatText != null)
         {
             foreach (var msg in messages)
@@ -222,7 +220,6 @@ public class RPGManager : MonoBehaviour
                 chatText.text += $"\n{msg.Sender}: {msg.Message}";
             }
         }
-        _lastChatFetch = DateTime.UtcNow;
     }
 
     private IEnumerator RegenLoop()

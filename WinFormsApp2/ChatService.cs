@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using MySql.Data.MySqlClient;
 
 namespace WinFormsApp2
@@ -14,19 +15,13 @@ namespace WinFormsApp2
 
     public static class ChatService
     {
-        public static List<ChatMessage> GetMessages(DateTime since, int userId)
+        public static List<ChatMessage> GetMessages()
         {
             var list = new List<ChatMessage>();
             using MySqlConnection conn = new MySqlConnection(DatabaseConfig.ConnectionString);
             conn.Open();
-            using MySqlCommand cmd = new MySqlCommand(@"SELECT c.sender_id, u.nickname sender, c.message, c.sent_at, r.nickname recipient
-                FROM chat_messages c
-                JOIN users u ON c.sender_id=u.id
-                LEFT JOIN users r ON c.recipient_id=r.id
-                WHERE c.sent_at > @since AND (c.recipient_id IS NULL OR c.sender_id=@uid OR c.recipient_id=@uid)
-                ORDER BY c.sent_at", conn);
-            cmd.Parameters.AddWithValue("@since", since);
-            cmd.Parameters.AddWithValue("@uid", userId);
+            string sql = File.ReadAllText("fetch_all_chat_messages.sql");
+            using MySqlCommand cmd = new MySqlCommand(sql, conn);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
