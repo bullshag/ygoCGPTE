@@ -16,7 +16,7 @@ namespace WinFormsApp2
         private int _playerGold;
         private readonly System.Windows.Forms.Timer _chatTimer = new System.Windows.Forms.Timer();
         private readonly System.Windows.Forms.Timer _regenTimer = new System.Windows.Forms.Timer();
-        private DateTime _lastMessage = DateTime.MinValue;
+        private DateTime _lastMessage = DateTime.UtcNow.AddMinutes(-5);
         private HashSet<string> _hiredMembers = new();
         private HashSet<string> _mercenaryMembers = new();
         private NavigationWindow? _navigationWindow;
@@ -41,6 +41,7 @@ namespace WinFormsApp2
             _regenTimer.Interval = 3000;
             _regenTimer.Tick += RegenTimer_Tick;
             _regenTimer.Start();
+            ChatTimer_Tick(null, EventArgs.Empty);
         }
 
         private async Task LoadPartyDataAsync()
