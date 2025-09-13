@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-13 15:30 UTC • Document owner: Codex_
+_Last updated: 2025-09-13 15:35 UTC • Document owner: Codex_
 
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
@@ -113,10 +113,11 @@ _Last updated: 2025-09-13 15:30 UTC • Document owner: Codex_
 - **Rules & Data**
   Chat via MySQL tables.
 - **UX notes**
-  Chat window scrollback.
+  Chat window scrollback (auto-scroll implemented).
 - **Technical notes**
   `ChatService` to be rewritten for Unity.
-- **Progress:** Not started, 0%.
+- **Progress:** In progress, 5% ([PR #288](https://github.com/bullshag/ygoCGPTE/pull/288)).
+- **Acceptance criteria:** Send/receive chat messages — <span style="color:red">Blocked: message flow not yet verified</span>.
 - **Open decisions:**
   - TBD: Evaluate real-time networking framework. Owner: TBD, due 2025-10-15.
 
@@ -157,7 +158,7 @@ _Last updated: 2025-09-13 15:30 UTC • Document owner: Codex_
 
 | Legacy Feature | Unity Equivalent | Status | Owner | Notes |
 |---|---|---|---|---|
-| ChatService | Chat UI & service script | Not started | TBD | Verify SQL query `fetch_latest_chat_message.sql` |
+| ChatService | Chat UI & service script | In progress | TBD | Auto-scroll implemented (PR #288). <span style="color:red">Blocked: send/receive not verified</span> |
 | InventoryForm | InventoryUI | Not started | TBD | Requires `unity_inventory_load.sql` |
 | BattleForm | BattleScene | In progress | TBD | Basic scene scaffold |
 | ShopForm | ShopUI | Not started | TBD | Pricing logic TBD |
@@ -166,7 +167,7 @@ _Last updated: 2025-09-13 15:30 UTC • Document owner: Codex_
   1. Set up database access layer (acceptance: Unity reads `create_user.sql`).
   2. Port InventoryForm to InventoryUI (acceptance: load/save items).
   3. Implement BattleScene (acceptance: win/lose conditions match WinForms).
-  4. Integrate ChatService (acceptance: send/receive messages).
+  4. Integrate ChatService (acceptance: send/receive messages) — In progress ([PR #288](https://github.com/bullshag/ygoCGPTE/pull/288)) <span style="color:red">Blocked: message flow unverified</span>.
 
 - **Deprecations:**
   - FriendService features will not be ported due to low usage.
@@ -242,3 +243,4 @@ _Last updated: 2025-09-13 15:30 UTC • Document owner: Codex_
 
 ## 16. Changelog (Auto-Appended)
 - 2025-09-13: Created initial GDD skeleton covering all sections. — Codex
+- 2025-09-13: Updated Networking progress and ChatService migration status after chat auto-scroll work (PR #288). — Codex
