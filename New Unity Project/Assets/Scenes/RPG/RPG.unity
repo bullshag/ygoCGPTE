@@ -173,6 +173,8 @@ MonoBehaviour:
   - {fileID: 927658437}
   goldText: {fileID: 0}
   chatText: {fileID: 807365676}
+  scrollviewObj: {fileID: 760977355}
+  chatScrollView: {fileID: 0}
   worldMapImage: {fileID: 0}
   chatInput: {fileID: 1679264076}
   sendButton: {fileID: 128321793}
@@ -3815,8 +3817,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 640454743}
   m_HandleRect: {fileID: 640454742}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 0.9999923
+  m_Value: 1
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4883,10 +4885,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1920203845}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.9556885, y: -0.00036621094}
-  m_SizeDelta: {x: 735.91, y: 182.46}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0.9556885, y: -181.27832}
+  m_SizeDelta: {x: 735.91, y: 1.9039993}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &807365676
 MonoBehaviour:
@@ -4993,7 +4995,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 4.645607}
+  m_margin: {x: 0, y: -181.45485, z: 0, w: 1.8444155}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -11342,7 +11344,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000018354636}
+  m_AnchoredPosition: {x: 0, y: -0.000030518}
   m_SizeDelta: {x: 0, y: 182.46}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1922977547

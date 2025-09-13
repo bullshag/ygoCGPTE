@@ -8,6 +8,9 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using WinFormsApp2;
+using UnityEngine.UIElements;
+using Image = UnityEngine.UI.Image;
+using Button = UnityEngine.UI.Button;
 
 public class RPGManager : MonoBehaviour
 {
@@ -16,6 +19,8 @@ public class RPGManager : MonoBehaviour
     public List<GameObject> mercBacks = new();
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI chatText;
+    public GameObject scrollviewObj;
+    [SerializeField] private ScrollRect chatScrollView;
     [SerializeField] private Image worldMapImage;
     [SerializeField] private TMP_InputField chatInput;
     [SerializeField] private Button sendButton;
@@ -29,6 +34,7 @@ public class RPGManager : MonoBehaviour
 
     private async void Start()
     {
+        chatScrollView = scrollviewObj.GetComponent<ScrollRect>();
         await LoadPartyMembersAsync();
         PopulatePartyList();
         if (chatInput != null)
@@ -200,6 +206,9 @@ public class RPGManager : MonoBehaviour
             {
                 Debug.LogError($"Failed to fetch chat messages: {task.Exception}");
             }
+
+            Canvas.ForceUpdateCanvases();
+            chatScrollView.verticalNormalizedPosition = 0f;
             yield return new WaitForSeconds(2f);
         }
     }
@@ -221,7 +230,10 @@ public class RPGManager : MonoBehaviour
             {
                 chatText.text += $"\n{msg.Sender}: {msg.Message}";
             }
+            Canvas.ForceUpdateCanvases();
+            chatScrollView.verticalNormalizedPosition = 0f;
         }
+
     }
 
     private IEnumerator RegenLoop()
