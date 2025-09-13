@@ -228,9 +228,10 @@ public class RPGManager : MonoBehaviour
             {
                 chatText.text += $"\n{msg.Sender}: {msg.Message}";
             }
+        }
             Canvas.ForceUpdateCanvases();
             chatScrollRect.verticalNormalizedPosition = 0f;
-        }
+        Canvas.ForceUpdateCanvases();
 
     }
 
