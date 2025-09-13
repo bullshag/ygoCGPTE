@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-13 19:10 UTC • Document owner: Codex_
+_Last updated: 2025-09-14 00:00 UTC • Document owner: Codex_
 
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
@@ -53,9 +53,13 @@ _Last updated: 2025-09-13 19:10 UTC • Document owner: Codex_
   Battle log lists enemy levels and actions.
 - **Technical notes**
   Uses SQL script `unity_character_heal.sql` for healing.
+- **Tasks**
+  - Integrate FrameAnimator with battle actions — Owner: TBD, Estimate: 2d, Dependencies: FEAT-ANI-001, Acceptance: attack animations play via FrameAnimator, Progress: 0% (due 2025-09-30).
+- **Legacy reference**
+  - PictureBox animations → FrameAnimator component (see mapping table).
 - **Progress:** In progress, 15% (FrameAnimator in place).
 - **Open decisions:**
-  - TBD: Integrate FrameAnimator with battle actions. Owner: TBD, due 2025-09-30.
+  - None.
 
 ### Progression
 - **Purpose**
@@ -97,9 +101,12 @@ _Last updated: 2025-09-13 19:10 UTC • Document owner: Codex_
 
   PlayerNavigator checks `CityNode` triggers to toggle `CityInteraction` UI.
 
+- **Tasks**
+  - Add path preview line — Owner: TBD, Estimate: 1d, Dependencies: FEAT-WM-001, Acceptance: preview line renders for queued waypoints, Progress: 0% (due 2025-09-30).
+- **Legacy reference**
+  - WorldMapForm → WorldMap scene + PlayerNavigator (see mapping table).
 - **Progress:** In progress, 35% (commit TBD — Owner: Codex, due 2025-09-14).
 - **Open decisions:**
-  - TBD: Add path preview line. Owner: TBD, due 2025-09-30.
   - TBD: Authenticate WebSocket connections. Owner: TBD, due 2025-09-30.
 
 ### UI/UX
@@ -242,15 +249,17 @@ _Last updated: 2025-09-13 19:10 UTC • Document owner: Codex_
 
 ## 12. Task Backlog (Engineer-Ready)
 
-| ID | Title | Type | Owner | Estimate | Dependencies | Acceptance Criteria | Status | Links | Priority |
-|---|---|---|---|---|---|---|---|---|---|
-| SYS-ARCH-001 | Record Unity version | chore | TBD | 1d | None | `ProjectVersion.txt` committed | To Do | - | Must |
-| FEAT-INV-001 | Port Inventory UI | feature | TBD | 5d | SYS-ARCH-001 | Items/equipment load/save via SQL | To Do | - | Must |
-| FEAT-CBT-001 | Create BattleScene | feature | TBD | 7d | SYS-ARCH-001 | Player can start and resolve battle | To Do | - | Should |
-| FEAT-UI-002 | Implement popup window prefab | feature | Codex | 1d | SYS-ARCH-001 | Popup shows login errors with OK dismissal | Done | PR TBD | Should |
-| FEAT-ANI-001 | Sprite Frame Animator component | feature | Codex | 2d | SYS-ARCH-001 | Lists animate per state at frameRate with tests | Done | PR TBD | Should |
-| FEAT-WM-001 | World map shift-click navigation | feature | Codex | 2d | SYS-ARCH-001 | Shift+Right sets destination; Shift+Left queues waypoint; agent animates per direction | Done | PR TBD | Should |
-| FEAT-WM-002 | City node interaction panel | feature | Codex | 1d | FEAT-WM-001 | CityInteraction panel toggles when entering/exiting CityNode radius | Done | PR TBD | Should |
+| ID | Title | Type | Owner | Estimate | Dependencies | Acceptance Criteria | Status | Progress | Links | Priority |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SYS-ARCH-001 | Record Unity version | chore | TBD | 1d | None | `ProjectVersion.txt` committed | To Do | 0% | - | Must |
+| FEAT-INV-001 | Port Inventory UI | feature | TBD | 5d | SYS-ARCH-001 | Items/equipment load/save via SQL | To Do | 0% | - | Must |
+| FEAT-CBT-001 | Create BattleScene | feature | TBD | 7d | SYS-ARCH-001 | Player can start and resolve battle | To Do | 0% | - | Should |
+| FEAT-UI-002 | Implement popup window prefab | feature | Codex | 1d | SYS-ARCH-001 | Popup shows login errors with OK dismissal | Done | 100% | PR TBD | Should |
+| FEAT-ANI-001 | Sprite Frame Animator component | feature | Codex | 2d | SYS-ARCH-001 | Lists animate per state at frameRate with tests | Done | 100% | PR TBD | Should |
+| FEAT-WM-001 | World map shift-click navigation | feature | Codex | 2d | SYS-ARCH-001 | Shift+Right sets destination; Shift+Left queues waypoint; agent animates per direction | Done | 100% | PR TBD | Should |
+| FEAT-WM-002 | City node interaction panel | feature | Codex | 1d | FEAT-WM-001 | CityInteraction panel toggles when entering/exiting CityNode radius | Done | 100% | PR TBD | Should |
+| FEAT-CBT-002 | Integrate FrameAnimator with battle actions | feature | TBD | 2d | FEAT-ANI-001, FEAT-CBT-001 | Attack and damage sequences play via FrameAnimator | To Do | 0% | - | Should |
+| FEAT-WM-003 | Navigation path preview line | feature | TBD | 1d | FEAT-WM-001 | Queued waypoints display a preview line | To Do | 0% | - | Should |
 
 
 ## 13. Non-Goals & Constraints
@@ -291,4 +300,5 @@ _Last updated: 2025-09-13 19:10 UTC • Document owner: Codex_
 - 2025-09-13: Added PlayerNavigator with shift-click waypoints and NavMesh queue for world map movement. — Codex
 - 2025-09-13: Implemented CityNodeData and city interaction triggers with UI panel toggling. — Codex
 - 2025-09-13: Added remote player state packets, WebSocket broadcasting, interpolation, and sync tests. — Codex
+- 2025-09-14: Documented tasks for FrameAnimator combat integration and navigation path preview line; referenced mapping table. — Codex
 
