@@ -18,7 +18,7 @@ namespace UnityClient
 
         public static async Task<List<ChatMessage>> GetMessagesAsync()
         {
-            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_chat_fetch_all_messages.sql");
+            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_chat_fetch_recent_messages.sql");
             try
             {
                 var rows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(sqlPath));

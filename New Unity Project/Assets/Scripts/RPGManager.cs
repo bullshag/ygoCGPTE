@@ -11,6 +11,7 @@ using WinFormsApp2;
 using UnityEngine.UIElements;
 using Image = UnityEngine.UI.Image;
 using Button = UnityEngine.UI.Button;
+using System.Text;
 
 public class RPGManager : MonoBehaviour
 {
@@ -35,6 +36,14 @@ public class RPGManager : MonoBehaviour
     {
         await LoadPartyMembersAsync();
         PopulatePartyList();
+
+        var initialMessages = await ChatService.GetMessagesAsync();
+        if (chatText != null)
+        {
+            chatText.text = BuildChatText(initialMessages);
+            UpdateChatContentSize();
+        }
+
         if (chatInput != null)
         {
             chatInput.onSubmit.AddListener(_ => SendChatMessage());
@@ -193,11 +202,7 @@ public class RPGManager : MonoBehaviour
             {
                 if (chatText != null)
                 {
-                    chatText.text = string.Empty;
-                    foreach (var msg in task.Result)
-                    {
-                        chatText.text += $"\n{msg.Sender}: {msg.Message}";
-                    }
+                    chatText.text = BuildChatText(task.Result);
                 }
             }
             else
@@ -205,7 +210,6 @@ public class RPGManager : MonoBehaviour
                 Debug.LogError($"Failed to fetch chat messages: {task.Exception}");
             }
 
-            UpdateChatContentSize();
             yield return new WaitForSeconds(2f);
         }
     }
@@ -222,13 +226,22 @@ public class RPGManager : MonoBehaviour
         var messages = await ChatService.GetMessagesAsync();
         if (chatText != null)
         {
-            chatText.text = string.Empty;
-            foreach (var msg in messages)
-            {
-                chatText.text += $"\n{msg.Sender}: {msg.Message}";
-            }
+            chatText.text = BuildChatText(messages);
+            UpdateChatContentSize();
         }
-        UpdateChatContentSize();
+    }
+
+    private string BuildChatText(List<ChatService.ChatMessage> messages)
+    {
+        if (messages == null) return string.Empty;
+        int start = Math.Max(0, messages.Count - 25);
+        StringBuilder sb = new();
+        for (int i = start; i < messages.Count; i++)
+        {
+            var msg = messages[i];
+            sb.Append('\n').Append(msg.Sender).Append(": ").Append(msg.Message);
+        }
+        return sb.ToString();
     }
 
     private void UpdateChatContentSize()
