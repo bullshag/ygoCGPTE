@@ -19,6 +19,7 @@ public class LoginManager : MonoBehaviour
     public Toggle kimServerToggle;
     public Button loginButton;
     public Button createAccountButton;
+    public PopupWindow popupWindowPrefab;
 
     private void Start()
     {
@@ -41,40 +42,58 @@ public class LoginManager : MonoBehaviour
         string username = usernameField != null ? usernameField.text : string.Empty;
         string password = passwordField != null ? passwordField.text : string.Empty;
 
-        if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
+        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
         {
-            Debug.Log($"Login attempt for '{username}'");
-            DatabaseConfigUnity.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
-            DatabaseConfigUnity.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
+            ShowPopup("Please enter username and password.");
+            return;
+        }
 
-            string hashed = HashPassword(password);
-            string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_login_select_user.sql");
-            Debug.Log("Executing login query");
-            try
+        Debug.Log($"Login attempt for '{username}'");
+        DatabaseConfigUnity.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
+        DatabaseConfigUnity.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
+
+        string hashed = HashPassword(password);
+        string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_login_select_user.sql");
+        Debug.Log("Executing login query");
+        try
+        {
+            var rows = await DatabaseClientUnity.QueryAsync(
+                File.ReadAllText(sqlPath),
+                new Dictionary<string, object?> { ["@username"] = username, ["@passwordHash"] = hashed });
+
+            if (rows.Count > 0)
             {
-                var rows = await DatabaseClientUnity.QueryAsync(
-                    File.ReadAllText(sqlPath),
-                    new Dictionary<string, object?> { ["@username"] = username, ["@passwordHash"] = hashed });
-
-                if (rows.Count > 0)
-                {
-                    Debug.Log("Login successful");
-                    int userId = Convert.ToInt32(rows[0]["id"]);
-                    string updatePath = Path.Combine(Application.dataPath, "sql", "unity_login_update_last_seen.sql");
-                    await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(updatePath), new Dictionary<string, object?> { ["@id"] = userId });
-                    await InventoryServiceUnity.LoadAsync(userId);
-                    SceneManager.LoadScene("RPG");
-                }
-                else
-                {
-                    Debug.Log("Login failed");
-                }
+                Debug.Log("Login successful");
+                int userId = Convert.ToInt32(rows[0]["id"]);
+                string updatePath = Path.Combine(Application.dataPath, "sql", "unity_login_update_last_seen.sql");
+                await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(updatePath), new Dictionary<string, object?> { ["@id"] = userId });
+                await InventoryServiceUnity.LoadAsync(userId);
+                SceneManager.LoadScene("RPG");
             }
-            catch (Exception ex)
+            else
             {
-                Debug.LogError($"Login error: {ex.Message}");
+                Debug.Log("Login failed");
+                ShowPopup("Invalid username or password.");
             }
         }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Login error: {ex.Message}");
+            ShowPopup($"Login error: {ex.Message}");
+        }
+    }
+
+    private void ShowPopup(string message)
+    {
+        if (popupWindowPrefab == null)
+        {
+            Debug.LogWarning("PopupWindow prefab not assigned.");
+            return;
+        }
+
+        var canvas = FindObjectOfType<Canvas>();
+        var popup = Instantiate(popupWindowPrefab, canvas != null ? canvas.transform : null);
+        popup.Show(message);
     }
 
     private string HashPassword(string password)

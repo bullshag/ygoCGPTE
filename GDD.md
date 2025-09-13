@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-13 16:56 UTC • Document owner: Codex_
+_Last updated: 2025-09-13 17:32 UTC • Document owner: Codex_
 
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
@@ -9,10 +9,12 @@ _Last updated: 2025-09-13 16:56 UTC • Document owner: Codex_
   - Establish Unity project structure and packages.
   - Define core gameplay loop skeleton.
   - Validate MySQL connectivity from Unity client.
+  - Integrate popup window prefab into login flow.
 - **Top Risks & Blocks (max 5):**
   - Undefined Unity version — Owner: TBD, due 2025-09-20.
   - Missing Windows Desktop SDK in CI — Owner: TBD, due 2025-09-18.
   - Incomplete mapping of legacy features — Owner: TBD, due 2025-09-25.
+  - Popup window usage inconsistent across scenes — Owner: Codex, due 2025-09-27.
 - **Next Milestone:** Unity Prototype Build, 2025-10-01, exit criteria: player can start battle and load inventory from database.
 
 ## 1. Vision & Pillars
@@ -90,7 +92,7 @@ _Last updated: 2025-09-13 16:56 UTC • Document owner: Codex_
   Requires pixel font `Thaleah_PixelFont`.
 - **Technical notes**
   Built with Unity UGUI.
-- **Progress:** In progress, 5% (assets imported).
+- **Progress:** In progress, 8% (popup window prefab integrated).
 - **Open decisions:**
   - TBD: Finalize navigation flow. Owner: TBD, due 2025-09-25.
 
@@ -221,6 +223,7 @@ _Last updated: 2025-09-13 16:56 UTC • Document owner: Codex_
 | SYS-ARCH-001 | Record Unity version | chore | TBD | 1d | None | `ProjectVersion.txt` committed | To Do | - | Must |
 | FEAT-INV-001 | Port Inventory UI | feature | TBD | 5d | SYS-ARCH-001 | Items/equipment load/save via SQL | To Do | - | Must |
 | FEAT-CBT-001 | Create BattleScene | feature | TBD | 7d | SYS-ARCH-001 | Player can start and resolve battle | To Do | - | Should |
+| FEAT-UI-002 | Implement popup window prefab | feature | Codex | 1d | SYS-ARCH-001 | Popup shows login errors with OK dismissal | Done | PR TBD | Should |
 
 ## 13. Non-Goals & Constraints
 - No mobile or console ports in current scope.
@@ -245,6 +248,7 @@ _Last updated: 2025-09-13 16:56 UTC • Document owner: Codex_
 - SQL scripts diverge from WinForms logic (Possible/High) — Owner: TBD — Mitigation: cross-review with legacy code; Trigger: test mismatch.
 - CI lacks Windows components (Likely/High) — Owner: TBD — Mitigation: install WindowsDesktop SDK or adjust tests; Trigger: build pipeline failure.
 - Chat message flow unverified (Possible/Medium) — Owner: TBD — Mitigation: end-to-end test with database; Trigger: messages fail to appear.
+- Popup windows not standardized across scenes (Possible/Low) — Owner: Codex — Mitigation: centralize prefab usage; Trigger: inconsistent UI messaging.
 
 ## 16. Changelog (Auto-Appended)
 - 2025-09-13: Created initial GDD skeleton covering all sections. — Codex
@@ -252,3 +256,4 @@ _Last updated: 2025-09-13 16:56 UTC • Document owner: Codex_
 - 2025-09-13: Verified chatScrollRect wiring and documented auto-scroll on login. — Codex
 - 2025-09-13: Enabled dynamic chat content resizing when new messages arrive. — Codex
 - 2025-09-13: Restricted chat view to 25 messages and resized scroll only on login/send. — Codex
+- 2025-09-13: Added popup window prefab and integrated into login screen for invalid credential messages. — Codex

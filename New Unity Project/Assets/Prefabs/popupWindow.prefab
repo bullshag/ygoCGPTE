@@ -646,6 +646,7 @@ GameObject:
   - component: {fileID: 5052029614342282752}
   - component: {fileID: 8626333159489776715}
   - component: {fileID: 4676926546377347560}
+  - component: {fileID: 693688904551098799}
   m_Layer: 5
   m_Name: popupWindow
   m_TagString: Untagged
@@ -711,6 +712,22 @@ MonoBehaviour:
     y: 0
     width: 1
     height: 1
+--- !u!114 &693688904551098799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2400838222017135901}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c60a310f3e24d488e8e2640715d7344, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  messageText: {fileID: 1681758542472307073}
+  yesButton: {fileID: 2669307503793259267}
+  noButton: {fileID: 4638057256199486411}
+  okButton: {fileID: 7457346626838595531}
 --- !u!1 &6718959994786252956
 GameObject:
   m_ObjectHideFlags: 0
