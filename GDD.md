@@ -9,7 +9,7 @@ _Last updated: 2025-09-13 19:10 UTC • Document owner: Codex_
   - Establish Unity project structure and packages.
   - Define core gameplay loop skeleton.
   - Validate MySQL connectivity from Unity client.
-  - Implement world map waypoint navigation with directional animations.
+  - Implement world map waypoint navigation with directional animations and city interaction triggers.
 - **Top Risks & Blocks (max 5):**
   - Undefined Unity version — Owner: TBD, due 2025-09-20.
   - Missing Windows Desktop SDK in CI — Owner: TBD, due 2025-09-18.
@@ -88,11 +88,15 @@ _Last updated: 2025-09-13 19:10 UTC • Document owner: Codex_
   Move player character across the world map.
 - **Rules & Data**
   Shift+Right Click sets destination; Shift+Left Click queues waypoint.
+  Entering a city radius enables the city interaction panel.
 - **UX notes**
   Directional animations reflect travel direction.
+  City interaction panel appears when entering city radius.
 - **Technical notes**
   Utilizes NavMeshAgent with a queued `Vector3` path and emits `QueueEmptied`.
-  Broadcasts remote player states over WebSockets and interpolates movement for `RemotePlayer` entities.
+
+  PlayerNavigator checks `CityNode` triggers to toggle `CityInteraction` UI.
+
 - **Progress:** In progress, 35% (commit TBD — Owner: Codex, due 2025-09-14).
 - **Open decisions:**
   - TBD: Add path preview line. Owner: TBD, due 2025-09-30.
@@ -107,7 +111,7 @@ _Last updated: 2025-09-13 19:10 UTC • Document owner: Codex_
   Requires pixel font `Thaleah_PixelFont`.
 - **Technical notes**
   Built with Unity UGUI.
-- **Progress:** In progress, 8% (popup window prefab integrated).
+- **Progress:** In progress, 10% (popup window prefab and city interaction panel).
 - **Open decisions:**
   - TBD: Finalize navigation flow. Owner: TBD, due 2025-09-25.
 
@@ -184,8 +188,10 @@ _Last updated: 2025-09-13 19:10 UTC • Document owner: Codex_
 | BattleForm | BattleScene | In progress | TBD | Basic scene scaffold |
 | ShopForm | ShopUI | Not started | TBD | Pricing logic TBD |
 | PictureBox animations | FrameAnimator component | In progress | Codex | Handles sprite-frame playback |
+
 | WorldMapForm | WorldMap scene + PlayerNavigator | In progress | Codex | Shift-click waypoints queue |
 | WorldMap remote party markers | RemotePlayer entities | In progress | Codex | WebSocket state sync with interpolation |
+
 
 - **Migration order:**
   1. Set up database access layer (acceptance: Unity reads `create_user.sql`).
@@ -244,7 +250,8 @@ _Last updated: 2025-09-13 19:10 UTC • Document owner: Codex_
 | FEAT-UI-002 | Implement popup window prefab | feature | Codex | 1d | SYS-ARCH-001 | Popup shows login errors with OK dismissal | Done | PR TBD | Should |
 | FEAT-ANI-001 | Sprite Frame Animator component | feature | Codex | 2d | SYS-ARCH-001 | Lists animate per state at frameRate with tests | Done | PR TBD | Should |
 | FEAT-WM-001 | World map shift-click navigation | feature | Codex | 2d | SYS-ARCH-001 | Shift+Right sets destination; Shift+Left queues waypoint; agent animates per direction | Done | PR TBD | Should |
-| FEAT-NET-001 | Remote player state sync | feature | Codex | 3d | SYS-ARCH-001 | Remote players update smoothly with animation state | Done | PR TBD | Should |
+| FEAT-WM-002 | City node interaction panel | feature | Codex | 1d | FEAT-WM-001 | CityInteraction panel toggles when entering/exiting CityNode radius | Done | PR TBD | Should |
+
 
 ## 13. Non-Goals & Constraints
 - No mobile or console ports in current scope.
@@ -282,4 +289,6 @@ _Last updated: 2025-09-13 19:10 UTC • Document owner: Codex_
 - 2025-09-13: Added popup window prefab and integrated into login screen for invalid credential messages. — Codex
 - 2025-09-13: Introduced FrameAnimator component with context menus and tests to manage sprite animations. — Codex
 - 2025-09-13: Added PlayerNavigator with shift-click waypoints and NavMesh queue for world map movement. — Codex
+- 2025-09-13: Implemented CityNodeData and city interaction triggers with UI panel toggling. — Codex
 - 2025-09-13: Added remote player state packets, WebSocket broadcasting, interpolation, and sync tests. — Codex
+

@@ -11,6 +11,7 @@ public class PlayerNavigator : MonoBehaviour
 {
     [SerializeField] private NavMeshAgent agent;
     [SerializeField] private FrameAnimator frameAnimator;
+    [SerializeField] private GameObject cityInteractionPanel;
 
     private readonly Queue<Vector3> waypoints = new Queue<Vector3>();
     private FrameAnimator.AnimationState currentAnimState = FrameAnimator.AnimationState.Idle;
@@ -132,6 +133,22 @@ public class PlayerNavigator : MonoBehaviour
         {
             frameAnimator?.SetState(state);
             currentAnimState = state;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("CityNode"))
+        {
+            cityInteractionPanel?.SetActive(true);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("CityNode"))
+        {
+            cityInteractionPanel?.SetActive(false);
         }
     }
 }
