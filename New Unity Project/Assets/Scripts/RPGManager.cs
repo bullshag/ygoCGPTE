@@ -19,8 +19,7 @@ public class RPGManager : MonoBehaviour
     public List<GameObject> mercBacks = new();
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI chatText;
-    public GameObject scrollviewObj;
-    [SerializeField] private ScrollRect chatScrollView;
+    [SerializeField] private ScrollRect chatScrollRect;
     [SerializeField] private Image worldMapImage;
     [SerializeField] private TMP_InputField chatInput;
     [SerializeField] private Button sendButton;
@@ -34,7 +33,6 @@ public class RPGManager : MonoBehaviour
 
     private async void Start()
     {
-        chatScrollView = scrollviewObj.GetComponent<ScrollRect>();
         await LoadPartyMembersAsync();
         PopulatePartyList();
         if (chatInput != null)
@@ -208,7 +206,7 @@ public class RPGManager : MonoBehaviour
             }
 
             Canvas.ForceUpdateCanvases();
-            chatScrollView.verticalNormalizedPosition = 0f;
+            chatScrollRect.verticalNormalizedPosition = 0f;
             yield return new WaitForSeconds(2f);
         }
     }
@@ -231,7 +229,7 @@ public class RPGManager : MonoBehaviour
                 chatText.text += $"\n{msg.Sender}: {msg.Message}";
             }
             Canvas.ForceUpdateCanvases();
-            chatScrollView.verticalNormalizedPosition = 0f;
+            chatScrollRect.verticalNormalizedPosition = 0f;
         }
 
     }
