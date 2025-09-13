@@ -1,5 +1,10 @@
 using System;
+using System.Collections.Concurrent;
+using System.Net.WebSockets;
+using System.Text;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +14,37 @@ string connectionString = builder.Configuration.GetConnectionString("Default") ?
     "Server=localhost;Database=accounts;User ID=userclient;Password=123321;";
 string RootPath() => Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..");
 string ReadSql(string file) => File.ReadAllText(Path.Combine(RootPath(), file));
+
+app.UseWebSockets();
+
+var playerStates = new ConcurrentDictionary<int, PlayerStatePacket>();
+var sockets = new ConcurrentBag<WebSocket>();
+
+app.MapPost("/api/state", (PlayerStatePacket packet) =>
+{
+    playerStates[packet.PlayerId] = packet;
+    return Results.Ok();
+});
+
+app.MapGet("/ws", async context =>
+{
+    if (!context.WebSockets.IsWebSocketRequest)
+    {
+        context.Response.StatusCode = 400;
+        return;
+    }
+
+    var socket = await context.WebSockets.AcceptWebSocketAsync();
+    sockets.Add(socket);
+    var cancel = context.RequestAborted;
+    while (!cancel.IsCancellationRequested && socket.State == WebSocketState.Open)
+    {
+        var data = JsonSerializer.Serialize(playerStates.Values);
+        var buffer = Encoding.UTF8.GetBytes(data);
+        await socket.SendAsync(buffer, WebSocketMessageType.Text, true, cancel);
+        await Task.Delay(100, cancel);
+    }
+});
 
 app.MapPost("/api/login", async (LoginRequest req) =>
 {

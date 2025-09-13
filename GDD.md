@@ -94,10 +94,13 @@ _Last updated: 2025-09-13 19:10 UTC • Document owner: Codex_
   City interaction panel appears when entering city radius.
 - **Technical notes**
   Utilizes NavMeshAgent with a queued `Vector3` path and emits `QueueEmptied`.
+
   PlayerNavigator checks `CityNode` triggers to toggle `CityInteraction` UI.
+
 - **Progress:** In progress, 35% (commit TBD — Owner: Codex, due 2025-09-14).
 - **Open decisions:**
   - TBD: Add path preview line. Owner: TBD, due 2025-09-30.
+  - TBD: Authenticate WebSocket connections. Owner: TBD, due 2025-09-30.
 
 ### UI/UX
 - **Purpose**
@@ -185,7 +188,10 @@ _Last updated: 2025-09-13 19:10 UTC • Document owner: Codex_
 | BattleForm | BattleScene | In progress | TBD | Basic scene scaffold |
 | ShopForm | ShopUI | Not started | TBD | Pricing logic TBD |
 | PictureBox animations | FrameAnimator component | In progress | Codex | Handles sprite-frame playback |
-| WorldMapForm | WorldMap scene + PlayerNavigator | In progress | Codex | Shift-click waypoints queue; city nodes trigger interaction panel |
+
+| WorldMapForm | WorldMap scene + PlayerNavigator | In progress | Codex | Shift-click waypoints queue |
+| WorldMap remote party markers | RemotePlayer entities | In progress | Codex | WebSocket state sync with interpolation |
+
 
 - **Migration order:**
   1. Set up database access layer (acceptance: Unity reads `create_user.sql`).
@@ -246,6 +252,7 @@ _Last updated: 2025-09-13 19:10 UTC • Document owner: Codex_
 | FEAT-WM-001 | World map shift-click navigation | feature | Codex | 2d | SYS-ARCH-001 | Shift+Right sets destination; Shift+Left queues waypoint; agent animates per direction | Done | PR TBD | Should |
 | FEAT-WM-002 | City node interaction panel | feature | Codex | 1d | FEAT-WM-001 | CityInteraction panel toggles when entering/exiting CityNode radius | Done | PR TBD | Should |
 
+
 ## 13. Non-Goals & Constraints
 - No mobile or console ports in current scope.
 - Budget limits prevent dedicated backend server development.
@@ -283,3 +290,5 @@ _Last updated: 2025-09-13 19:10 UTC • Document owner: Codex_
 - 2025-09-13: Introduced FrameAnimator component with context menus and tests to manage sprite animations. — Codex
 - 2025-09-13: Added PlayerNavigator with shift-click waypoints and NavMesh queue for world map movement. — Codex
 - 2025-09-13: Implemented CityNodeData and city interaction triggers with UI panel toggling. — Codex
+- 2025-09-13: Added remote player state packets, WebSocket broadcasting, interpolation, and sync tests. — Codex
+
