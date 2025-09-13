@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-13 17:32 UTC • Document owner: Codex_
+_Last updated: 2025-09-13 18:53 UTC • Document owner: Codex_
 
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
@@ -53,9 +53,9 @@ _Last updated: 2025-09-13 17:32 UTC • Document owner: Codex_
   Battle log lists enemy levels and actions.
 - **Technical notes**
   Uses SQL script `unity_character_heal.sql` for healing.
-- **Progress:** In progress, 10% (manual tests).
+- **Progress:** In progress, 15% (FrameAnimator in place).
 - **Open decisions:**
-  - TBD: Define animation system. Owner: TBD, due 2025-09-27.
+  - TBD: Integrate FrameAnimator with battle actions. Owner: TBD, due 2025-09-30.
 
 ### Progression
 - **Purpose**
@@ -168,6 +168,7 @@ _Last updated: 2025-09-13 17:32 UTC • Document owner: Codex_
 | InventoryForm | InventoryUI | Not started | TBD | Requires `unity_inventory_load.sql` |
 | BattleForm | BattleScene | In progress | TBD | Basic scene scaffold |
 | ShopForm | ShopUI | Not started | TBD | Pricing logic TBD |
+| PictureBox animations | FrameAnimator component | In progress | Codex | Handles sprite-frame playback |
 
 - **Migration order:**
   1. Set up database access layer (acceptance: Unity reads `create_user.sql`).
@@ -224,6 +225,7 @@ _Last updated: 2025-09-13 17:32 UTC • Document owner: Codex_
 | FEAT-INV-001 | Port Inventory UI | feature | TBD | 5d | SYS-ARCH-001 | Items/equipment load/save via SQL | To Do | - | Must |
 | FEAT-CBT-001 | Create BattleScene | feature | TBD | 7d | SYS-ARCH-001 | Player can start and resolve battle | To Do | - | Should |
 | FEAT-UI-002 | Implement popup window prefab | feature | Codex | 1d | SYS-ARCH-001 | Popup shows login errors with OK dismissal | Done | PR TBD | Should |
+| FEAT-ANI-001 | Sprite Frame Animator component | feature | Codex | 2d | SYS-ARCH-001 | Lists animate per state at frameRate with tests | Done | PR TBD | Should |
 
 ## 13. Non-Goals & Constraints
 - No mobile or console ports in current scope.
@@ -249,6 +251,7 @@ _Last updated: 2025-09-13 17:32 UTC • Document owner: Codex_
 - CI lacks Windows components (Likely/High) — Owner: TBD — Mitigation: install WindowsDesktop SDK or adjust tests; Trigger: build pipeline failure.
 - Chat message flow unverified (Possible/Medium) — Owner: TBD — Mitigation: end-to-end test with database; Trigger: messages fail to appear.
 - Popup windows not standardized across scenes (Possible/Low) — Owner: Codex — Mitigation: centralize prefab usage; Trigger: inconsistent UI messaging.
+- Sprite animation lists may be incomplete (Possible/Low) — Owner: TBD — Mitigation: context menu to append frames; Trigger: missing frames during play.
 
 ## 16. Changelog (Auto-Appended)
 - 2025-09-13: Created initial GDD skeleton covering all sections. — Codex
@@ -257,3 +260,4 @@ _Last updated: 2025-09-13 17:32 UTC • Document owner: Codex_
 - 2025-09-13: Enabled dynamic chat content resizing when new messages arrive. — Codex
 - 2025-09-13: Restricted chat view to 25 messages and resized scroll only on login/send. — Codex
 - 2025-09-13: Added popup window prefab and integrated into login screen for invalid credential messages. — Codex
+- 2025-09-13: Introduced FrameAnimator component with context menus and tests to manage sprite animations. — Codex
