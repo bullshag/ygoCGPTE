@@ -189,6 +189,7 @@ public class RPGManager : MonoBehaviour
             {
                 if (chatText != null)
                 {
+                    chatText.text = string.Empty;
                     foreach (var msg in task.Result)
                     {
                         chatText.text += $"\n{msg.Sender}: {msg.Message}";
@@ -215,6 +216,7 @@ public class RPGManager : MonoBehaviour
         var messages = await ChatService.GetMessagesAsync();
         if (chatText != null)
         {
+            chatText.text = string.Empty;
             foreach (var msg in messages)
             {
                 chatText.text += $"\n{msg.Sender}: {msg.Message}";
