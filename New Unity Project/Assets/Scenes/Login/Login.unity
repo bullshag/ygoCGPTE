@@ -320,6 +320,7 @@ MonoBehaviour:
   kimServerToggle: {fileID: 578772367}
   loginButton: {fileID: 538855909}
   createAccountButton: {fileID: 632440798}
+  popupWindowPrefab: {fileID: 2400838222017135901, guid: df2c93a0d30ab894a8ebc54d83702a6f, type: 3}
 --- !u!1 &49612713
 GameObject:
   m_ObjectHideFlags: 0
