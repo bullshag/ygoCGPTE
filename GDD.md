@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-13 15:53 UTC • Document owner: Codex_
+_Last updated: 2025-09-13 16:31 UTC • Document owner: Codex_
 
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
@@ -113,12 +113,12 @@ _Last updated: 2025-09-13 15:53 UTC • Document owner: Codex_
 - **Rules & Data**
   Chat via MySQL tables.
 - **UX notes**
-  Chat window scrollback (auto-scroll implemented).
+  Chat window scrollback; content grows with messages (auto-scroll implemented).
 - **Technical notes**
   `ChatService` to be rewritten for Unity.
 - **Owner:** TBD
 - **Dependencies:** ChatService backend, ScrollRect hookup
-- **Progress:** In progress, 8% ([PR #288](https://github.com/bullshag/ygoCGPTE/pull/288))
+- **Progress:** In progress, 9% ([PR #288](https://github.com/bullshag/ygoCGPTE/pull/288))
 - **Acceptance criteria:** Send/receive chat messages; auto-scroll to latest message on login
 - **Risks:** Message flow still unverified may block broader networking features
 - **Open decisions:**
@@ -161,7 +161,7 @@ _Last updated: 2025-09-13 15:53 UTC • Document owner: Codex_
 
 | Legacy Feature | Unity Equivalent | Status | Owner | Notes |
 |---|---|---|---|---|
-| ChatService | Chat UI & service script | In progress | TBD | Auto-scroll on login verified; send/receive pending |
+| ChatService | Chat UI & service script | In progress | TBD | Auto-scroll on login verified; content resizes with messages; send/receive pending |
 | InventoryForm | InventoryUI | Not started | TBD | Requires `unity_inventory_load.sql` |
 | BattleForm | BattleScene | In progress | TBD | Basic scene scaffold |
 | ShopForm | ShopUI | Not started | TBD | Pricing logic TBD |
@@ -249,3 +249,4 @@ _Last updated: 2025-09-13 15:53 UTC • Document owner: Codex_
 - 2025-09-13: Created initial GDD skeleton covering all sections. — Codex
 - 2025-09-13: Updated Networking progress and ChatService migration status after chat auto-scroll work (PR #288). — Codex
 - 2025-09-13: Verified chatScrollRect wiring and documented auto-scroll on login. — Codex
+- 2025-09-13: Enabled dynamic chat content resizing when new messages arrive. — Codex

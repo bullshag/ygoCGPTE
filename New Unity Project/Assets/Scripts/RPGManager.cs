@@ -205,8 +205,7 @@ public class RPGManager : MonoBehaviour
                 Debug.LogError($"Failed to fetch chat messages: {task.Exception}");
             }
 
-            Canvas.ForceUpdateCanvases();
-            chatScrollRect.verticalNormalizedPosition = 0f;
+            UpdateChatContentSize();
             yield return new WaitForSeconds(2f);
         }
     }
@@ -229,10 +228,18 @@ public class RPGManager : MonoBehaviour
                 chatText.text += $"\n{msg.Sender}: {msg.Message}";
             }
         }
-            Canvas.ForceUpdateCanvases();
-            chatScrollRect.verticalNormalizedPosition = 0f;
-        Canvas.ForceUpdateCanvases();
+        UpdateChatContentSize();
+    }
 
+    private void UpdateChatContentSize()
+    {
+        if (chatText == null || chatScrollRect == null) return;
+        Canvas.ForceUpdateCanvases();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(chatText.rectTransform);
+        float preferredHeight = chatText.preferredHeight;
+        chatText.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, preferredHeight);
+        chatScrollRect.content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, preferredHeight);
+        chatScrollRect.verticalNormalizedPosition = 0f;
     }
 
     private IEnumerator RegenLoop()
