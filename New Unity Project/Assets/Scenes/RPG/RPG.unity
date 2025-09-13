@@ -173,8 +173,7 @@ MonoBehaviour:
   - {fileID: 927658437}
   goldText: {fileID: 0}
   chatText: {fileID: 807365676}
-  scrollviewObj: {fileID: 760977355}
-  chatScrollView: {fileID: 0}
+  chatScrollRect: {fileID: 760977357}
   worldMapImage: {fileID: 0}
   chatInput: {fileID: 1679264076}
   sendButton: {fileID: 128321793}
