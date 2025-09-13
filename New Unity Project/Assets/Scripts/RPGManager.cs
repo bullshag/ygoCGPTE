@@ -12,6 +12,7 @@ using UnityEngine.UIElements;
 using Image = UnityEngine.UI.Image;
 using Button = UnityEngine.UI.Button;
 using System.Text;
+using Toggle = UnityEngine.UI.Toggle;
 
 public class RPGManager : MonoBehaviour
 {
@@ -21,6 +22,7 @@ public class RPGManager : MonoBehaviour
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI chatText;
     [SerializeField] private ScrollRect chatScrollRect;
+    [SerializeField] private Toggle ASTog;
     [SerializeField] private Image worldMapImage;
     [SerializeField] private TMP_InputField chatInput;
     [SerializeField] private Button sendButton;
@@ -41,6 +43,7 @@ public class RPGManager : MonoBehaviour
         if (chatText != null)
         {
             chatText.text = BuildChatText(initialMessages);
+
             UpdateChatContentSize();
         }
 
@@ -60,6 +63,7 @@ public class RPGManager : MonoBehaviour
         {
             friendInput.onSubmit.AddListener(OnFriendInputSubmit);
         }
+            UpdateChatContentSize();
     }
 
     private async Task LoadPartyMembersAsync()
@@ -203,13 +207,17 @@ public class RPGManager : MonoBehaviour
                 if (chatText != null)
                 {
                     chatText.text = BuildChatText(task.Result);
+            if (ASTog)
+            {
+
+                        UpdateChatContentSize();
+                    }
                 }
             }
             else
             {
                 Debug.LogError($"Failed to fetch chat messages: {task.Exception}");
             }
-
             yield return new WaitForSeconds(2f);
         }
     }
