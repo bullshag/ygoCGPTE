@@ -114,6 +114,7 @@ _Last updated: 2025-09-13 16:56 UTC • Document owner: Codex_
   Chat via MySQL tables.
 - **UX notes**
   Chat window scrollback; shows last 25 messages; scroll resizes only on login or when sending a message.
+
 - **Technical notes**
   `ChatService` to be rewritten for Unity.
 - **Owner:** TBD
