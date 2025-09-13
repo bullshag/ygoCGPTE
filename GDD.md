@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-13 19:05 UTC • Document owner: Codex_
+_Last updated: 2025-09-13 19:10 UTC • Document owner: Codex_
 
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
@@ -92,9 +92,11 @@ _Last updated: 2025-09-13 19:05 UTC • Document owner: Codex_
   Directional animations reflect travel direction.
 - **Technical notes**
   Utilizes NavMeshAgent with a queued `Vector3` path and emits `QueueEmptied`.
-- **Progress:** In progress, 25% (commit TBD — Owner: Codex, due 2025-09-14).
+  Broadcasts remote player states over WebSockets and interpolates movement for `RemotePlayer` entities.
+- **Progress:** In progress, 35% (commit TBD — Owner: Codex, due 2025-09-14).
 - **Open decisions:**
   - TBD: Add path preview line. Owner: TBD, due 2025-09-30.
+  - TBD: Authenticate WebSocket connections. Owner: TBD, due 2025-09-30.
 
 ### UI/UX
 - **Purpose**
@@ -183,6 +185,7 @@ _Last updated: 2025-09-13 19:05 UTC • Document owner: Codex_
 | ShopForm | ShopUI | Not started | TBD | Pricing logic TBD |
 | PictureBox animations | FrameAnimator component | In progress | Codex | Handles sprite-frame playback |
 | WorldMapForm | WorldMap scene + PlayerNavigator | In progress | Codex | Shift-click waypoints queue |
+| WorldMap remote party markers | RemotePlayer entities | In progress | Codex | WebSocket state sync with interpolation |
 
 - **Migration order:**
   1. Set up database access layer (acceptance: Unity reads `create_user.sql`).
@@ -241,6 +244,7 @@ _Last updated: 2025-09-13 19:05 UTC • Document owner: Codex_
 | FEAT-UI-002 | Implement popup window prefab | feature | Codex | 1d | SYS-ARCH-001 | Popup shows login errors with OK dismissal | Done | PR TBD | Should |
 | FEAT-ANI-001 | Sprite Frame Animator component | feature | Codex | 2d | SYS-ARCH-001 | Lists animate per state at frameRate with tests | Done | PR TBD | Should |
 | FEAT-WM-001 | World map shift-click navigation | feature | Codex | 2d | SYS-ARCH-001 | Shift+Right sets destination; Shift+Left queues waypoint; agent animates per direction | Done | PR TBD | Should |
+| FEAT-NET-001 | Remote player state sync | feature | Codex | 3d | SYS-ARCH-001 | Remote players update smoothly with animation state | Done | PR TBD | Should |
 
 ## 13. Non-Goals & Constraints
 - No mobile or console ports in current scope.
@@ -278,3 +282,4 @@ _Last updated: 2025-09-13 19:05 UTC • Document owner: Codex_
 - 2025-09-13: Added popup window prefab and integrated into login screen for invalid credential messages. — Codex
 - 2025-09-13: Introduced FrameAnimator component with context menus and tests to manage sprite animations. — Codex
 - 2025-09-13: Added PlayerNavigator with shift-click waypoints and NavMesh queue for world map movement. — Codex
+- 2025-09-13: Added remote player state packets, WebSocket broadcasting, interpolation, and sync tests. — Codex
