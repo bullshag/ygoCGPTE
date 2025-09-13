@@ -112,7 +112,7 @@ public class RPGManager : MonoBehaviour
                 var img = go.GetComponent<Image>();
                 if (img != null && go != _selectedBlock)
                 {
-                    img.color = Color.yellow;
+                    img.color = Color.red;
                 }
             }
             else

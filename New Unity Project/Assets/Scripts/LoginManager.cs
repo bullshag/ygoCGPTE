@@ -52,7 +52,7 @@ public class LoginManager : MonoBehaviour
         DatabaseConfigUnity.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
         DatabaseConfigUnity.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
 
-        string hashed = HashPassword(password);
+        string hashed = password; //HashPassword(password);
         string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_login_select_user.sql");
         Debug.Log("Executing login query");
         try
@@ -96,15 +96,15 @@ public class LoginManager : MonoBehaviour
         popup.Show(message);
     }
 
-    private string HashPassword(string password)
-    {
-        using (var sha = SHA256.Create())
-        {
-            byte[] bytes = Encoding.UTF8.GetBytes(password);
-            byte[] hash = sha.ComputeHash(bytes);
-            return Convert.ToBase64String(hash);
-        }
-    }
+   // private string HashPassword(string password)
+   // {
+     //   using (var sha = SHA256.Create())
+     //   {
+     //       byte[] bytes = Encoding.UTF8.GetBytes(password);
+    //        byte[] hash = sha.ComputeHash(bytes);
+    //        return Convert.ToBase64String(hash);
+   //     }
+  //  }
     private void OnCreateAccountClicked()
     {
         SceneManager.LoadScene("Register");

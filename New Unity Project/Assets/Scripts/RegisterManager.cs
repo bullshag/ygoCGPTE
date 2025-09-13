@@ -218,4 +218,9 @@ public class RegisterManager : MonoBehaviour
         }
     }
 
+    public void returntologin()
+    {
+
+        SceneManager.LoadScene("Login");
+    }
 }

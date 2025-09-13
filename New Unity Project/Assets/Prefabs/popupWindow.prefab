@@ -722,8 +722,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1c60a310f3e24d488e8e2640715d7344, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   messageText: {fileID: 1681758542472307073}
   yesButton: {fileID: 2669307503793259267}
   noButton: {fileID: 4638057256199486411}
