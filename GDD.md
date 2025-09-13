@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-13 15:35 UTC • Document owner: Codex_
+_Last updated: 2025-09-13 15:53 UTC • Document owner: Codex_
 
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
@@ -116,8 +116,11 @@ _Last updated: 2025-09-13 15:35 UTC • Document owner: Codex_
   Chat window scrollback (auto-scroll implemented).
 - **Technical notes**
   `ChatService` to be rewritten for Unity.
-- **Progress:** In progress, 5% ([PR #288](https://github.com/bullshag/ygoCGPTE/pull/288)).
-- **Acceptance criteria:** Send/receive chat messages — <span style="color:red">Blocked: message flow not yet verified</span>.
+- **Owner:** TBD
+- **Dependencies:** ChatService backend, ScrollRect hookup
+- **Progress:** In progress, 8% ([PR #288](https://github.com/bullshag/ygoCGPTE/pull/288))
+- **Acceptance criteria:** Send/receive chat messages; auto-scroll to latest message on login
+- **Risks:** Message flow still unverified may block broader networking features
 - **Open decisions:**
   - TBD: Evaluate real-time networking framework. Owner: TBD, due 2025-10-15.
 
@@ -158,7 +161,7 @@ _Last updated: 2025-09-13 15:35 UTC • Document owner: Codex_
 
 | Legacy Feature | Unity Equivalent | Status | Owner | Notes |
 |---|---|---|---|---|
-| ChatService | Chat UI & service script | In progress | TBD | Auto-scroll implemented (PR #288). <span style="color:red">Blocked: send/receive not verified</span> |
+| ChatService | Chat UI & service script | In progress | TBD | Auto-scroll on login verified; send/receive pending |
 | InventoryForm | InventoryUI | Not started | TBD | Requires `unity_inventory_load.sql` |
 | BattleForm | BattleScene | In progress | TBD | Basic scene scaffold |
 | ShopForm | ShopUI | Not started | TBD | Pricing logic TBD |
@@ -167,7 +170,7 @@ _Last updated: 2025-09-13 15:35 UTC • Document owner: Codex_
   1. Set up database access layer (acceptance: Unity reads `create_user.sql`).
   2. Port InventoryForm to InventoryUI (acceptance: load/save items).
   3. Implement BattleScene (acceptance: win/lose conditions match WinForms).
-  4. Integrate ChatService (acceptance: send/receive messages) — In progress ([PR #288](https://github.com/bullshag/ygoCGPTE/pull/288)) <span style="color:red">Blocked: message flow unverified</span>.
+  4. Integrate ChatService (acceptance: send/receive messages) — In progress ([PR #288](https://github.com/bullshag/ygoCGPTE/pull/288)); message flow verification pending.
 
 - **Deprecations:**
   - FriendService features will not be ported due to low usage.
@@ -240,7 +243,9 @@ _Last updated: 2025-09-13 15:35 UTC • Document owner: Codex_
 - Missing Unity version info (Likely/Medium) — Owner: TBD — Mitigation: inspect project settings; Trigger: build fails.
 - SQL scripts diverge from WinForms logic (Possible/High) — Owner: TBD — Mitigation: cross-review with legacy code; Trigger: test mismatch.
 - CI lacks Windows components (Likely/High) — Owner: TBD — Mitigation: install WindowsDesktop SDK or adjust tests; Trigger: build pipeline failure.
+- Chat message flow unverified (Possible/Medium) — Owner: TBD — Mitigation: end-to-end test with database; Trigger: messages fail to appear.
 
 ## 16. Changelog (Auto-Appended)
 - 2025-09-13: Created initial GDD skeleton covering all sections. — Codex
 - 2025-09-13: Updated Networking progress and ChatService migration status after chat auto-scroll work (PR #288). — Codex
+- 2025-09-13: Verified chatScrollRect wiring and documented auto-scroll on login. — Codex
