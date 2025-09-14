@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-14 00:00 UTC • Document owner: Codex_
+_Last updated: 2025-09-14 00:01 UTC • Document owner: Codex_
 
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
@@ -15,6 +15,7 @@ _Last updated: 2025-09-14 00:00 UTC • Document owner: Codex_
   - Missing Windows Desktop SDK in CI — Owner: TBD, due 2025-09-18.
   - Incomplete mapping of legacy features — Owner: TBD, due 2025-09-25.
   - Popup window usage inconsistent across scenes — Owner: Codex, due 2025-09-27.
+    - GUID corruption in `.meta` files may break asset references — Owner: Codex, due 2025-09-14.
 - **Next Milestone:** Unity Prototype Build, 2025-10-01, exit criteria: player can start battle and load inventory from database.
 
 ## 1. Vision & Pillars
@@ -288,6 +289,7 @@ _Last updated: 2025-09-14 00:00 UTC • Document owner: Codex_
 - Popup windows not standardized across scenes (Possible/Low) — Owner: Codex — Mitigation: centralize prefab usage; Trigger: inconsistent UI messaging.
 - Sprite animation lists may be incomplete (Possible/Low) — Owner: TBD — Mitigation: context menu to append frames; Trigger: missing frames during play.
 - Waypoint queue may desync with NavMesh (Possible/Low) — Owner: TBD — Mitigation: monitor agent stalls and clear queue; Trigger: agent stops unexpectedly.
+- GUID corruption in `.meta` files may break asset references (Possible/Low) — Owner: Codex — Mitigation: regenerate or reset GUIDs; Trigger: assets reference missing scripts.
 
 ## 16. Changelog (Auto-Appended)
 - 2025-09-13: Created initial GDD skeleton covering all sections. — Codex
@@ -302,3 +304,4 @@ _Last updated: 2025-09-14 00:00 UTC • Document owner: Codex_
 - 2025-09-13: Added remote player state packets, WebSocket broadcasting, interpolation, and sync tests. — Codex
 - 2025-09-14: Documented tasks for FrameAnimator combat integration and navigation path preview line; referenced mapping table. — Codex
 
+- 2025-09-14: Regenerated Unity .meta GUIDs for FrameAnimator assets (FEAT-ANI-001) to prevent reference corruption. — Codex
