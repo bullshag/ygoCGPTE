@@ -12,8 +12,12 @@ public class PlayerNavigator : MonoBehaviour
     [SerializeField] private NavMeshAgent agent;
     [SerializeField] private FrameAnimator frameAnimator;
     [SerializeField] private GameObject cityInteractionPanel;
+    [SerializeField] private GameObject waypointPrefab;
+    [SerializeField] private LineRenderer pathLinePrefab;
 
     private readonly Queue<Vector3> waypoints = new Queue<Vector3>();
+    private readonly List<GameObject> waypointMarkers = new List<GameObject>();
+    private LineRenderer pathLine;
     private FrameAnimator.AnimationState currentAnimState = FrameAnimator.AnimationState.Idle;
 
     /// <summary>
@@ -33,6 +37,7 @@ public class PlayerNavigator : MonoBehaviour
     {
         HandleInput();
         AdvanceQueue();
+        UpdatePathLine();
         UpdateAnimation();
     }
 
@@ -74,12 +79,16 @@ public class PlayerNavigator : MonoBehaviour
     private void SetDestination(Vector3 destination)
     {
         waypoints.Clear();
+        ClearMarkers();
         agent.SetDestination(destination);
+        SpawnMarker(destination);
+        ClearPathLine();
     }
 
     private void AddWaypoint(Vector3 waypoint)
     {
         waypoints.Enqueue(waypoint);
+        SpawnMarker(waypoint);
         if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
         {
             agent.SetDestination(waypoints.Dequeue());
@@ -95,6 +104,7 @@ public class PlayerNavigator : MonoBehaviour
 
         if (agent.remainingDistance <= agent.stoppingDistance)
         {
+            DestroyFirstMarker();
             if (waypoints.Count > 0)
             {
                 agent.SetDestination(waypoints.Dequeue());
@@ -102,7 +112,75 @@ public class PlayerNavigator : MonoBehaviour
             else
             {
                 QueueEmptied?.Invoke();
+                ClearPathLine();
             }
+        }
+    }
+
+    private void ClearMarkers()
+    {
+        foreach (var marker in waypointMarkers)
+        {
+            if (marker)
+            {
+                Destroy(marker);
+            }
+        }
+        waypointMarkers.Clear();
+    }
+
+    private void SpawnMarker(Vector3 position)
+    {
+        if (!waypointPrefab)
+        {
+            return;
+        }
+        var marker = Instantiate(waypointPrefab, position, Quaternion.identity);
+        waypointMarkers.Add(marker);
+    }
+
+    private void DestroyFirstMarker()
+    {
+        if (waypointMarkers.Count == 0)
+        {
+            return;
+        }
+        var marker = waypointMarkers[0];
+        waypointMarkers.RemoveAt(0);
+        if (marker)
+        {
+            Destroy(marker);
+        }
+    }
+
+    private void UpdatePathLine()
+    {
+        if (!pathLinePrefab)
+        {
+            return;
+        }
+
+        if (!pathLine)
+        {
+            pathLine = Instantiate(pathLinePrefab);
+        }
+
+        var positions = new List<Vector3> { transform.position };
+        if (agent.hasPath)
+        {
+            positions.Add(agent.destination);
+        }
+        positions.AddRange(waypoints);
+        pathLine.positionCount = positions.Count;
+        pathLine.SetPositions(positions.ToArray());
+    }
+
+    private void ClearPathLine()
+    {
+        if (pathLine)
+        {
+            Destroy(pathLine.gameObject);
+            pathLine = null;
         }
     }
 
