@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-14 01:36 UTC • Document owner: Codex_
+_Last updated: 2025-09-14 01:42 UTC • Document owner: Codex_
 
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
@@ -162,21 +162,31 @@ _Last updated: 2025-09-14 01:36 UTC • Document owner: Codex_
 
 ### Networking
 - **Purpose**
-  Support chat and potential multiplayer.
+  Support chat and player state sharing.
 - **Rules & Data**
-  Chat via MySQL tables.
+  Chat and player positions stored in MySQL tables.
 - **UX notes**
   Chat window scrollback; shows last 25 messages; scroll resizes only on login or when sending a message.
 
 - **Technical notes**
-  `ChatService` to be rewritten for Unity.
-- **Owner:** TBD
-- **Dependencies:** ChatService backend, ScrollRect hookup
-  - **Progress:** In progress, 10% ([PR #288](https://github.com/bullshag/ygoCGPTE/pull/288))
-- **Acceptance criteria:** Send/receive chat messages; auto-scroll to latest message on login
-- **Risks:** Message flow still unverified may block broader networking features
+  `ChatService` to be rewritten for Unity. `PlayerStateUploader` and `PlayerStateDownloader` poll MySQL for world map positions.
+- **Owner:** Codex
+- **Dependencies:** ChatService backend, ScrollRect hookup, `player_position` table
+- **Progress:** In progress, 20% ([PR #288](https://github.com/bullshag/ygoCGPTE/pull/288); player state sync prototype)
+- **Acceptance criteria:**
+  - Send/receive chat messages; auto-scroll to latest message on login
+  - Local player position posted every second; remote positions retrieved
+- **Risks:**
+  - Message flow still unverified may block broader networking features
+  - High update frequency may impact database performance
 - **Open decisions:**
   - TBD: Evaluate real-time networking framework. Owner: TBD, due 2025-10-15.
+
+#### Player State Sync
+- **Dependencies:** `player_position` table, `DatabaseClientUnity`
+- **Acceptance Criteria:** Uploader persists current position; downloader retrieves other players' positions.
+- **Risks:** Stale or missing rows may desync remote markers.
+- **Progress:** In progress, 25% — Owner: Codex, due 2025-09-21
 
 ## 5. Content
 - **Units/Characters/Items/Levels**
@@ -224,6 +234,7 @@ _Last updated: 2025-09-14 01:36 UTC • Document owner: Codex_
 | WorldMapForm | WorldMap scene + PlayerNavigator | In progress | Codex | Shift-click waypoints queue |
 | WorldMap remote party markers | RemotePlayer entities | In progress | Codex | WebSocket state sync with interpolation |
 | (New) Free camera navigation | FreeCameraController | In progress | Codex | WASD panning with smoothing |
+| TravelLogService | PlayerStateUploader/Downloader | In progress | Codex | Periodic SQL sync of player positions |
 
 
 - **Migration order:**
@@ -253,6 +264,21 @@ _Last updated: 2025-09-14 01:36 UTC • Document owner: Codex_
   - TBD
 - **Test cases for migration**
   - TBD
+
+### player_position Table
+- **Schema**
+  | Field | Type | Notes |
+  |---|---|---|
+  | player_id | INT PK | references accounts.id |
+  | current_pos | VARCHAR(255) | "x,y,z" position |
+  | is_traveling | TINYINT(1) | 1 when agent has path |
+  | next_waypoint | VARCHAR(255) | nullable "x,y,z" of next waypoint |
+  | timestamp | TIMESTAMP | auto-updated
+- **Dependencies:** `DatabaseClientUnity`
+- **Acceptance Criteria:** table created via `db/migrations/update_player_position.sql`; uploader persists and updates rows.
+- **Risks:** high write frequency may strain database.
+- **Owner:** Codex
+- **Progress:** In progress, 50%
 
 ## 10. Tools & Pipelines
 - **Build pipeline:** CI TBD; must compile Unity client and run `dotnet test` for backend.
@@ -287,6 +313,8 @@ _Last updated: 2025-09-14 01:36 UTC • Document owner: Codex_
 | FEAT-CBT-002 | Integrate FrameAnimator with battle actions | feature | TBD | 2d | FEAT-ANI-001, FEAT-CBT-001 | Attack and damage sequences play via FrameAnimator | To Do | 0% | - | Should |
 | FEAT-WM-003 | Navigation path preview line | feature | TBD | 1d | FEAT-WM-001 | Queued waypoints display a preview line | To Do | 0% | - | Should |
 | FEAT-CAM-001 | Free camera controller | feature | Codex | 1d | FEAT-WM-001 | WASD pans camera with smoothing | In Progress | 10% | - | Should |
+| FEAT-NET-001 | Player state upload service | feature | Codex | 1d | player_position table | Uploader posts position every second | Done | 100% | - | Should |
+| FEAT-NET-002 | Player state download service | feature | Codex | 1d | player_position table, FEAT-NET-001 | Downloader fetches other players' positions | Done | 100% | - | Should |
 
 
 ## 13. Non-Goals & Constraints
@@ -316,6 +344,7 @@ _Last updated: 2025-09-14 01:36 UTC • Document owner: Codex_
 - Sprite animation lists may be incomplete (Possible/Low) — Owner: TBD — Mitigation: context menu to append frames; Trigger: missing frames during play.
 - Waypoint queue may desync with NavMesh (Possible/Low) — Owner: TBD — Mitigation: monitor agent stalls and clear queue; Trigger: agent stops unexpectedly.
 - Shift-click input may conflict with UI elements (Possible/Low) — Owner: TBD — Mitigation: require map focus; Trigger: waypoints fail to enqueue.
+- Player position sync may saturate database (Possible/Low) — Owner: Codex — Mitigation: throttle upload interval; Trigger: DB performance degradation.
 - GUID corruption in `.meta` files may break asset references (Possible/Low) — Owner: Codex — Mitigation: regenerate or reset GUIDs; Trigger: assets reference missing scripts.
 
 ## 16. Changelog (Auto-Appended)
@@ -334,3 +363,4 @@ _Last updated: 2025-09-14 01:36 UTC • Document owner: Codex_
 
 - 2025-09-14: Regenerated Unity .meta GUIDs for FrameAnimator assets (FEAT-ANI-001) to prevent reference corruption. — Codex
 - 2025-09-14: Added WaypointNavAgent with queued NavMesh waypoints and shift-click clearing. — Codex
+- 2025-09-14: Added player_position schema and PlayerState upload/download services for world map sync. — Codex
