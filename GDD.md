@@ -97,8 +97,10 @@ _Last updated: 2025-09-14 02:23 UTC • Document owner: Codex_
 - **UX notes**
   Directional and idle animations reflect agent movement state.
   City interaction panel appears when entering city radius.
+  Waypoint markers show queued clicks and a path line previews the route.
 - **Technical notes**
   Utilizes NavMeshAgent with a queued `Vector3` path and emits `QueueEmptied`.
+  PlayerNavigator instantiates waypoint marker prefabs and updates a LineRenderer for path preview.
   PlayerNavigator checks `CityNode` triggers to toggle `CityInteraction` UI.
 - **Dependencies**
   - Unity NavMesh
@@ -111,10 +113,10 @@ _Last updated: 2025-09-14 02:23 UTC • Document owner: Codex_
 - **Risks**
   - Shift-click input may conflict with UI focus, preventing waypoint capture.
 - **Tasks**
-  - Add path preview line — Owner: TBD, Estimate: 1d, Dependencies: FEAT-WM-001, Acceptance: preview line renders for queued waypoints, Progress: 0% (due 2025-09-30).
+  - Add path preview line — Owner: Codex, Estimate: 1d, Dependencies: FEAT-WM-001, Acceptance: preview line renders for queued waypoints, Progress: 100% (due 2025-09-30).
 - **Legacy reference**
   - WorldMapForm → WorldMap scene + PlayerNavigator (see mapping table).
- - **Progress:** In progress, 50% (commit TBD — Owner: Codex, due 2025-09-14).
+ - **Progress:** In progress, 70% (commit TBD — Owner: Codex, due 2025-09-14).
 - **Open decisions:**
   - TBD: Authenticate WebSocket connections. Owner: TBD, due 2025-09-30.
 
@@ -345,7 +347,7 @@ _Last updated: 2025-09-14 02:23 UTC • Document owner: Codex_
 | FEAT-WM-001 | World map shift-click navigation | feature | Codex | 2d | SYS-ARCH-001 | Shift+Right sets destination; Shift+Left queues waypoint; agent animates per direction | Done | 100% | PR TBD | Should |
 | FEAT-WM-002 | City node interaction panel | feature | Codex | 1d | FEAT-WM-001 | CityInteraction panel toggles when entering/exiting CityNode radius | Done | 100% | PR TBD | Should |
 | FEAT-CBT-002 | Integrate FrameAnimator with battle actions | feature | TBD | 2d | FEAT-ANI-001, FEAT-CBT-001 | Attack and damage sequences play via FrameAnimator | To Do | 0% | - | Should |
-| FEAT-WM-003 | Navigation path preview line | feature | TBD | 1d | FEAT-WM-001 | Queued waypoints display a preview line | To Do | 0% | - | Should |
+| FEAT-WM-003 | Navigation path preview line | feature | Codex | 1d | FEAT-WM-001 | Queued waypoints display a preview line | Done | 100% | PR TBD | Should |
 | FEAT-CAM-001 | Free camera controller | feature | Codex | 1d | FEAT-WM-001 | WASD pans camera with smoothing | In Progress | 10% | - | Should |
 | FEAT-NET-001 | Player state upload service | feature | Codex | 1d | player_position table | Uploader posts position every second | Done | 100% | - | Should |
 | FEAT-NET-002 | Player state download service | feature | Codex | 1d | player_position table, FEAT-NET-001 | Downloader fetches other players' positions | Done | 100% | - | Should |
@@ -402,4 +404,8 @@ _Last updated: 2025-09-14 02:23 UTC • Document owner: Codex_
 - 2025-09-14: Added navigation control mappings from WinForms to Unity camera/agent systems with progress, dependencies, acceptance criteria, and risks. — Codex
 - 2025-09-14: Introduced RemotePlayerMarker prefab and manager for NavMesh waypoint syncing and online/offline tracking. — Codex
 - 2025-09-14: Updated PlayerNavigator to switch to idle animation when NavMeshAgent stops. — Codex
+
 - 2025-09-14: Added CloudSpawner and CloudMover with cloud prefab for random shadow-casting clouds. — Codex
+
+- 2025-09-14: Added waypoint marker prefab and path preview line rendering for queued waypoints. — Codex
+
