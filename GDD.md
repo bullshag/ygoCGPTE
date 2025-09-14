@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-14 00:01 UTC • Document owner: Codex_
+_Last updated: 2025-09-14 01:36 UTC • Document owner: Codex_
 
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
@@ -110,6 +110,23 @@ _Last updated: 2025-09-14 00:01 UTC • Document owner: Codex_
 - **Open decisions:**
   - TBD: Authenticate WebSocket connections. Owner: TBD, due 2025-09-30.
 
+### Camera Controls
+- **Purpose**
+  Provide free-fly camera movement for debugging and exploration.
+- **Control scheme**
+  W/A/S/D keys pan the camera.
+- **Dependencies**
+  FEAT-WM-001
+- **Owner**
+  Codex
+- **Progress:** In progress, 10%.
+- **Acceptance criteria**
+  - WASD translates camera at inspector-defined speed.
+  - Smoothing parameter produces damped motion.
+- **Risks**
+  - Unbounded movement may disorient players or leave scene bounds.
+
+
 ### UI/UX
 - **Purpose**
   Provide screens for login, inventory, battle, and settings.
@@ -199,6 +216,7 @@ _Last updated: 2025-09-14 00:01 UTC • Document owner: Codex_
 
 | WorldMapForm | WorldMap scene + PlayerNavigator | In progress | Codex | Shift-click waypoints queue |
 | WorldMap remote party markers | RemotePlayer entities | In progress | Codex | WebSocket state sync with interpolation |
+| (New) Free camera navigation | FreeCameraController | In progress | Codex | WASD panning with smoothing |
 
 
 - **Migration order:**
@@ -261,6 +279,7 @@ _Last updated: 2025-09-14 00:01 UTC • Document owner: Codex_
 | FEAT-WM-002 | City node interaction panel | feature | Codex | 1d | FEAT-WM-001 | CityInteraction panel toggles when entering/exiting CityNode radius | Done | 100% | PR TBD | Should |
 | FEAT-CBT-002 | Integrate FrameAnimator with battle actions | feature | TBD | 2d | FEAT-ANI-001, FEAT-CBT-001 | Attack and damage sequences play via FrameAnimator | To Do | 0% | - | Should |
 | FEAT-WM-003 | Navigation path preview line | feature | TBD | 1d | FEAT-WM-001 | Queued waypoints display a preview line | To Do | 0% | - | Should |
+| FEAT-CAM-001 | Free camera controller | feature | Codex | 1d | FEAT-WM-001 | WASD pans camera with smoothing | In Progress | 10% | - | Should |
 
 
 ## 13. Non-Goals & Constraints
@@ -303,5 +322,6 @@ _Last updated: 2025-09-14 00:01 UTC • Document owner: Codex_
 - 2025-09-13: Implemented CityNodeData and city interaction triggers with UI panel toggling. — Codex
 - 2025-09-13: Added remote player state packets, WebSocket broadcasting, interpolation, and sync tests. — Codex
 - 2025-09-14: Documented tasks for FrameAnimator combat integration and navigation path preview line; referenced mapping table. — Codex
+- 2025-09-14: Added FreeCameraController with WASD camera panning and smoothing; documented control scheme. — Codex
 
 - 2025-09-14: Regenerated Unity .meta GUIDs for FrameAnimator assets (FEAT-ANI-001) to prevent reference corruption. — Codex
