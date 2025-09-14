@@ -183,10 +183,13 @@ _Last updated: 2025-09-14 01:49 UTC • Document owner: Codex_
   - TBD: Evaluate real-time networking framework. Owner: TBD, due 2025-10-15.
 
 #### Player State Sync
-- **Dependencies:** `player_position` table, `DatabaseClientUnity`
-- **Acceptance Criteria:** Uploader persists current position; downloader retrieves other players' positions.
+- **Dependencies:** `player_position` table, `DatabaseClientUnity`, NavMeshAgent
+- **Acceptance Criteria:**
+  - Uploader persists current position.
+  - Downloader retrieves other players' positions.
+  - RemotePlayerManager spawns markers for online players, sets destinations to next waypoints, and toggles online state each poll.
 - **Risks:** Stale or missing rows may desync remote markers.
-- **Progress:** In progress, 25% — Owner: Codex, due 2025-09-21
+- **Progress:** In progress, 50% — Owner: Codex, due 2025-09-21
 
 ## 5. Content
 - **Units/Characters/Items/Levels**
@@ -232,7 +235,7 @@ _Last updated: 2025-09-14 01:49 UTC • Document owner: Codex_
 | PictureBox animations | FrameAnimator component | In progress | Codex | Handles sprite-frame playback |
 
 | WorldMapForm | WorldMap scene + PlayerNavigator | In progress | Codex | Shift-click waypoints queue |
-| WorldMap remote party markers | RemotePlayer entities | In progress | Codex | WebSocket state sync with interpolation |
+| WorldMap remote party markers | RemotePlayer entities | In progress | Codex | NavMesh markers spawn and follow downloaded waypoints; WebSocket state sync with interpolation |
 | (New) Free camera navigation | FreeCameraController | In progress | Codex | WASD panning with smoothing |
 | TravelLogService | PlayerStateUploader/Downloader | In progress | Codex | Periodic SQL sync of player positions |
 
@@ -372,3 +375,4 @@ _Last updated: 2025-09-14 01:49 UTC • Document owner: Codex_
 - 2025-09-14: Added WaypointNavAgent with queued NavMesh waypoints and shift-click clearing. — Codex
 - 2025-09-14: Added player_position schema and PlayerState upload/download services for world map sync. — Codex
 - 2025-09-14: Added navigation control mappings from WinForms to Unity camera/agent systems with progress, dependencies, acceptance criteria, and risks. — Codex
+- 2025-09-14: Introduced RemotePlayerMarker prefab and manager for NavMesh waypoint syncing and online/offline tracking. — Codex
