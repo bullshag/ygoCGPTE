@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-14 02:14 UTC • Document owner: Codex_
+_Last updated: 2025-09-14 02:23 UTC • Document owner: Codex_
 
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
@@ -136,6 +136,29 @@ _Last updated: 2025-09-14 02:14 UTC • Document owner: Codex_
 - **Risks**
   - Unbounded movement may disorient players or leave scene bounds.
 
+
+### Environmental Effects
+- **Purpose**
+  Provide atmospheric depth with drifting cloud shadows across terrain.
+- **Rules & Data**
+  Clouds spawn at random intervals on the right and drift left at varied speeds.
+- **UX notes**
+  Moving shadows sweep over the land for parallax.
+- **Technical notes**
+  CloudSpawner and CloudMover scripts instantiate shadow-casting cloud prefabs.
+- **Dependencies**
+  - FEAT-WM-001
+- **Acceptance Criteria**
+  - Clouds spawn randomly at set interval range on the right.
+  - Clouds drift right-to-left and destroy themselves off-screen.
+  - SpriteRenderer casts shadows onto terrain.
+- **Risks**
+  - Excessive clouds may reduce performance.
+- **Legacy reference**
+  - None (new feature).
+- **Progress:** Done, 100% (Owner: Codex).
+- **Open decisions:**
+  - TBD: Tweak cloud density and speed. Owner: TBD, due 2025-09-21.
 
 ### UI/UX
 - **Purpose**
@@ -328,6 +351,7 @@ _Last updated: 2025-09-14 02:14 UTC • Document owner: Codex_
 | FEAT-CAM-001 | Free camera controller | feature | Codex | 1d | FEAT-WM-001 | WASD pans camera with smoothing | In Progress | 10% | - | Should |
 | FEAT-NET-001 | Player state upload service | feature | Codex | 1d | player_position table | Uploader posts position every second | Done | 100% | - | Should |
 | FEAT-NET-002 | Player state download service | feature | Codex | 1d | player_position table, FEAT-NET-001 | Downloader fetches other players' positions | Done | 100% | - | Should |
+| FEAT-ENV-001 | Cloud shadow spawner | feature | Codex | 1d | FEAT-WM-001 | Clouds spawn randomly and drift left casting terrain shadows | Done | 100% | - | Could |
 
 
 ## 13. Non-Goals & Constraints
@@ -380,4 +404,8 @@ _Last updated: 2025-09-14 02:14 UTC • Document owner: Codex_
 - 2025-09-14: Added navigation control mappings from WinForms to Unity camera/agent systems with progress, dependencies, acceptance criteria, and risks. — Codex
 - 2025-09-14: Introduced RemotePlayerMarker prefab and manager for NavMesh waypoint syncing and online/offline tracking. — Codex
 - 2025-09-14: Updated PlayerNavigator to switch to idle animation when NavMeshAgent stops. — Codex
+
+- 2025-09-14: Added CloudSpawner and CloudMover with cloud prefab for random shadow-casting clouds. — Codex
+
 - 2025-09-14: Added waypoint marker prefab and path preview line rendering for queued waypoints. — Codex
+
