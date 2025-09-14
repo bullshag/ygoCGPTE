@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS player_position (
+    player_id INT NOT NULL PRIMARY KEY,
+    current_pos VARCHAR(255) NOT NULL,
+    is_traveling TINYINT(1) NOT NULL,
+    next_waypoint VARCHAR(255) NULL,
+    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
