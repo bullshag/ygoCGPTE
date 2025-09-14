@@ -8138,7 +8138,8 @@ GameObject:
   - component: {fileID: 425429354}
   - component: {fileID: 425429355}
   - component: {fileID: 425429356}
-  m_Layer: 5
+  - component: {fileID: 425429357}
+  m_Layer: 0
   m_Name: Square
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8154,7 +8155,7 @@ Transform:
   m_GameObject: {fileID: 425429353}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9, y: -90.5, z: 0}
+  m_LocalPosition: {x: -9, y: 15.5, z: -0.6}
   m_LocalScale: {x: 30.68328, y: 30.68328, z: 30.68328}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8249,6 +8250,18 @@ MonoBehaviour:
   fight: []
   frameRate: 12
   loop: 1
+--- !u!114 &425429357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 425429353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 949cfcaf634119647be3221b63061bcd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &425483359
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29194,6 +29207,7 @@ GameObject:
   - component: {fileID: 1474595783}
   - component: {fileID: 1474595785}
   - component: {fileID: 1474595784}
+  - component: {fileID: 1474595786}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -29275,6 +29289,20 @@ Camera:
   m_OcclusionCulling: 0
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &1474595786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1474595782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d49d2cdcb704889a366d4cda5fb8755, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 250
+  smoothing: 10
 --- !u!4 &1475493176 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3668294998946065527, guid: 6ae20c1be1a82be47ac184de1b001198, type: 3}
@@ -35004,7 +35032,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 2098676586}
   m_Father: {fileID: 2095523546}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1824748822
@@ -39561,7 +39590,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2098676586}
-  m_Layer: 5
+  - component: {fileID: 2098676588}
+  - component: {fileID: 2098676587}
+  m_Layer: 0
   m_Name: player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -39576,14 +39607,48 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2098676585}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.020123793, y: -0, z: -0, w: 0.99979746}
-  m_LocalPosition: {x: 396.9, y: 56.145, z: 514.5}
-  m_LocalScale: {x: 0.46083, y: 0.46083, z: 0.46083}
+  m_LocalRotation: {x: 0.020123795, y: -0, z: -0, w: 0.9997975}
+  m_LocalPosition: {x: 396.9, y: 0, z: 460.2}
+  m_LocalScale: {x: 0.46083, y: 0.46083003, z: 0.46083003}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 425429354}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1824748821}
   m_LocalEulerAnglesHint: {x: 2.306, y: 0, z: 0}
+--- !u!114 &2098676587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2098676585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93cac63753324a74a27897d81e2ef1a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!195 &2098676588
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2098676585}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1001 &2099153561
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -40886,4 +40951,3 @@ SceneRoots:
   - {fileID: 764095211}
   - {fileID: 1474595783}
   - {fileID: 2095523546}
-  - {fileID: 2098676586}
