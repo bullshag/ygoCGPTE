@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-14 01:42 UTC • Document owner: Codex_
+_Last updated: 2025-09-14 01:49 UTC • Document owner: Codex_
 
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
@@ -236,6 +236,13 @@ _Last updated: 2025-09-14 01:42 UTC • Document owner: Codex_
 | (New) Free camera navigation | FreeCameraController | In progress | Codex | WASD panning with smoothing |
 | TravelLogService | PlayerStateUploader/Downloader | In progress | Codex | Periodic SQL sync of player positions |
 
+### Navigation Controls Mapping
+
+| Legacy Control | Unity System | Progress | Owner | Dependencies | Acceptance Criteria | Risks |
+|---|---|---|---|---|---|---|
+| Arrow key map scroll | FreeCameraController (WASD) | 10% | Codex | Unity input system | WASD pans camera with smoothing | Camera bounds undefined may allow scrolling outside map |
+| Mouse click travel path | WaypointNavAgent + PlayerNavigator | 100% | Codex | Unity NavMesh; FEAT-WM-001 | Shift+Left queues waypoint; Shift+Right clears path; agent consumes queue | Shift-click conflicts with UI may block waypoint capture |
+
 
 - **Migration order:**
   1. Set up database access layer (acceptance: Unity reads `create_user.sql`).
@@ -364,3 +371,4 @@ _Last updated: 2025-09-14 01:42 UTC • Document owner: Codex_
 - 2025-09-14: Regenerated Unity .meta GUIDs for FrameAnimator assets (FEAT-ANI-001) to prevent reference corruption. — Codex
 - 2025-09-14: Added WaypointNavAgent with queued NavMesh waypoints and shift-click clearing. — Codex
 - 2025-09-14: Added player_position schema and PlayerState upload/download services for world map sync. — Codex
+- 2025-09-14: Added navigation control mappings from WinForms to Unity camera/agent systems with progress, dependencies, acceptance criteria, and risks. — Codex
