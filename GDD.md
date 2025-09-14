@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-14 01:49 UTC • Document owner: Codex_
+_Last updated: 2025-09-14 02:14 UTC • Document owner: Codex_
 
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
@@ -95,7 +95,7 @@ _Last updated: 2025-09-14 01:49 UTC • Document owner: Codex_
   Shift+Right Click sets destination; Shift+Left Click queues waypoint.
   Entering a city radius enables the city interaction panel.
 - **UX notes**
-  Directional animations reflect travel direction.
+  Directional and idle animations reflect agent movement state.
   City interaction panel appears when entering city radius.
 - **Technical notes**
   Utilizes NavMeshAgent with a queued `Vector3` path and emits `QueueEmptied`.
@@ -106,6 +106,7 @@ _Last updated: 2025-09-14 01:49 UTC • Document owner: Codex_
 - **Acceptance Criteria**
   - Shift+Left Click enqueues NavMesh hit point.
   - Shift+Right Click clears the queue and resets the agent.
+  - Idle animation plays when the agent is stationary.
   - Idle agent consumes queued waypoints sequentially.
 - **Risks**
   - Shift-click input may conflict with UI focus, preventing waypoint capture.
@@ -113,7 +114,7 @@ _Last updated: 2025-09-14 01:49 UTC • Document owner: Codex_
   - Add path preview line — Owner: TBD, Estimate: 1d, Dependencies: FEAT-WM-001, Acceptance: preview line renders for queued waypoints, Progress: 0% (due 2025-09-30).
 - **Legacy reference**
   - WorldMapForm → WorldMap scene + PlayerNavigator (see mapping table).
- - **Progress:** In progress, 45% (commit TBD — Owner: Codex, due 2025-09-14).
+ - **Progress:** In progress, 50% (commit TBD — Owner: Codex, due 2025-09-14).
 - **Open decisions:**
   - TBD: Authenticate WebSocket connections. Owner: TBD, due 2025-09-30.
 
@@ -376,3 +377,4 @@ _Last updated: 2025-09-14 01:49 UTC • Document owner: Codex_
 - 2025-09-14: Added player_position schema and PlayerState upload/download services for world map sync. — Codex
 - 2025-09-14: Added navigation control mappings from WinForms to Unity camera/agent systems with progress, dependencies, acceptance criteria, and risks. — Codex
 - 2025-09-14: Introduced RemotePlayerMarker prefab and manager for NavMesh waypoint syncing and online/offline tracking. — Codex
+- 2025-09-14: Updated PlayerNavigator to switch to idle animation when NavMeshAgent stops. — Codex
