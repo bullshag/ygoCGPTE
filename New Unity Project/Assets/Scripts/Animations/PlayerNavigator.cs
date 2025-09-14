@@ -101,11 +101,6 @@ public class PlayerNavigator : MonoBehaviour
             }
             else
             {
-                if (currentAnimState != FrameAnimator.AnimationState.Idle)
-                {
-                    frameAnimator?.SetState(FrameAnimator.AnimationState.Idle);
-                    currentAnimState = FrameAnimator.AnimationState.Idle;
-                }
                 QueueEmptied?.Invoke();
             }
         }
@@ -116,6 +111,11 @@ public class PlayerNavigator : MonoBehaviour
         var velocity = agent.velocity;
         if (velocity.sqrMagnitude <= 0.0001f)
         {
+            if (currentAnimState != FrameAnimator.AnimationState.Idle)
+            {
+                frameAnimator?.SetState(FrameAnimator.AnimationState.Idle);
+                currentAnimState = FrameAnimator.AnimationState.Idle;
+            }
             return;
         }
 
