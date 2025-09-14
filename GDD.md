@@ -99,14 +99,21 @@ _Last updated: 2025-09-14 00:01 UTC • Document owner: Codex_
   City interaction panel appears when entering city radius.
 - **Technical notes**
   Utilizes NavMeshAgent with a queued `Vector3` path and emits `QueueEmptied`.
-
   PlayerNavigator checks `CityNode` triggers to toggle `CityInteraction` UI.
-
+- **Dependencies**
+  - Unity NavMesh
+  - Unity input system
+- **Acceptance Criteria**
+  - Shift+Left Click enqueues NavMesh hit point.
+  - Shift+Right Click clears the queue and resets the agent.
+  - Idle agent consumes queued waypoints sequentially.
+- **Risks**
+  - Shift-click input may conflict with UI focus, preventing waypoint capture.
 - **Tasks**
   - Add path preview line — Owner: TBD, Estimate: 1d, Dependencies: FEAT-WM-001, Acceptance: preview line renders for queued waypoints, Progress: 0% (due 2025-09-30).
 - **Legacy reference**
   - WorldMapForm → WorldMap scene + PlayerNavigator (see mapping table).
-- **Progress:** In progress, 35% (commit TBD — Owner: Codex, due 2025-09-14).
+ - **Progress:** In progress, 45% (commit TBD — Owner: Codex, due 2025-09-14).
 - **Open decisions:**
   - TBD: Authenticate WebSocket connections. Owner: TBD, due 2025-09-30.
 
@@ -289,6 +296,7 @@ _Last updated: 2025-09-14 00:01 UTC • Document owner: Codex_
 - Popup windows not standardized across scenes (Possible/Low) — Owner: Codex — Mitigation: centralize prefab usage; Trigger: inconsistent UI messaging.
 - Sprite animation lists may be incomplete (Possible/Low) — Owner: TBD — Mitigation: context menu to append frames; Trigger: missing frames during play.
 - Waypoint queue may desync with NavMesh (Possible/Low) — Owner: TBD — Mitigation: monitor agent stalls and clear queue; Trigger: agent stops unexpectedly.
+- Shift-click input may conflict with UI elements (Possible/Low) — Owner: TBD — Mitigation: require map focus; Trigger: waypoints fail to enqueue.
 - GUID corruption in `.meta` files may break asset references (Possible/Low) — Owner: Codex — Mitigation: regenerate or reset GUIDs; Trigger: assets reference missing scripts.
 
 ## 16. Changelog (Auto-Appended)
@@ -305,3 +313,4 @@ _Last updated: 2025-09-14 00:01 UTC • Document owner: Codex_
 - 2025-09-14: Documented tasks for FrameAnimator combat integration and navigation path preview line; referenced mapping table. — Codex
 
 - 2025-09-14: Regenerated Unity .meta GUIDs for FrameAnimator assets (FEAT-ANI-001) to prevent reference corruption. — Codex
+- 2025-09-14: Added WaypointNavAgent with queued NavMesh waypoints and shift-click clearing. — Codex
