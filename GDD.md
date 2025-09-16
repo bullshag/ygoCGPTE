@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-16 21:33 UTC • Document owner: Codex_
+_Last updated: 2025-09-16 22:51 UTC • Document owner: Codex_
 
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
@@ -104,6 +104,7 @@ _Last updated: 2025-09-16 21:33 UTC • Document owner: Codex_
   PlayerNavigator instantiates waypoint marker prefabs and updates a LineRenderer for path preview.
   PlayerNavigator checks `CityNode` triggers to toggle `CityInteraction` UI.
   AreaTooltip enforces trigger colliders, updates TMP labels, and orchestrates show/idle/hide animator states with UnityEvents for buttons.
+  Player GameObject includes a CapsuleCollider and kinematic Rigidbody so tooltip trigger events fire without disrupting NavMesh navigation.
 - **Dependencies**
   - Unity NavMesh
   - Unity input system
@@ -120,7 +121,7 @@ _Last updated: 2025-09-16 21:33 UTC • Document owner: Codex_
   - Implement area tooltip interactions — Owner: Codex, Estimate: 1d, Dependencies: FEAT-WM-001, Acceptance: Tooltip displays area name, plays show/idle/hide states, and invokes Info/Enter events, Progress: 100% (due 2025-09-16).
 - **Legacy reference**
   - WorldMapForm → WorldMap scene + PlayerNavigator (see mapping table).
-- **Progress:** In progress, 80% (commit TBD — Owner: Codex, due 2025-09-16).
+- **Progress:** In progress, 85% (commit TBD — Owner: Codex, due 2025-09-16).
 - **Open decisions:**
   - TBD: Authenticate WebSocket connections. Owner: TBD, due 2025-09-30.
 
@@ -438,4 +439,6 @@ _Last updated: 2025-09-16 21:33 UTC • Document owner: Codex_
 - 2025-09-16: Added AreaTooltip controller for world map location overlays and documented collider-driven show/idle/hide flow. — Codex
 
 - 2025-09-16: Routed RegisterManager to PopupWindow prefab for validation, duplicate checks, and success confirmation that returns to Login. — Codex
+
+- 2025-09-16: Added CapsuleCollider and kinematic Rigidbody to the world map player for tooltip triggers and documented the setup. — Codex
 
