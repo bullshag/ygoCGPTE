@@ -316,6 +316,14 @@ _Last updated: 2025-09-14 02:23 UTC • Document owner: Codex_
 - **Owner:** Codex
 - **Progress:** In progress, 50%
 
+### accounts Schema Rebuild Script
+- **Artifact:** `recreate_accounts_tables.sql`
+- **Owner:** Codex
+- **Dependencies:** MySQL CLI access, Unity client schema contracts
+- **Acceptance Criteria:** Running the script on a fresh `accounts` database creates every required table, stored procedure, and trigger without errors.
+- **Risks:** Future migrations may diverge from this consolidated script if not mirrored (Medium).
+- **Progress:** Complete, 100%
+
 ## 10. Tools & Pipelines
 - **Build pipeline:** CI TBD; must compile Unity client and run `dotnet test` for backend.
 - **Asset pipeline:** Assets imported with default settings; compression TBD.
@@ -408,4 +416,6 @@ _Last updated: 2025-09-14 02:23 UTC • Document owner: Codex_
 - 2025-09-14: Added CloudSpawner and CloudMover with cloud prefab for random shadow-casting clouds. — Codex
 
 - 2025-09-14: Added waypoint marker prefab and path preview line rendering for queued waypoints. — Codex
+
+- 2025-09-16: Authored `recreate_accounts_tables.sql` to rebuild the accounts schema and captured maintenance guidance in the GDD. — Codex
 
