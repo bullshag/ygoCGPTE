@@ -104,6 +104,7 @@ _Last updated: 2025-09-16 22:50 UTC • Document owner: Codex_
   PlayerNavigator checks `CityNode` triggers to toggle `CityInteraction` UI.
 
   AreaTooltip resides on the locationTooltip root, enforces a trigger SphereCollider (radius 143.2, center y -4.06), updates TMP labels, and orchestrates show/idle/hide animator states with UnityEvents for buttons.
+  World map player uses a CapsuleCollider (radius 0.35, height 1.8) and a kinematic Rigidbody to stay inside tooltip triggers without physics drift.
 
 - **Dependencies**
   - Unity NavMesh
@@ -116,12 +117,13 @@ _Last updated: 2025-09-16 22:50 UTC • Document owner: Codex_
   - Area tooltip animator plays show → idle while player remains inside trigger and hide when they exit.
 - **Risks**
   - Shift-click input may conflict with UI focus, preventing waypoint capture.
+  - Scene has not been re-opened in the target Unity editor post-merge; hidden serialization issues could persist until validated. Owner: Codex, due 2025-09-17.
 - **Tasks**
   - Add path preview line — Owner: Codex, Estimate: 1d, Dependencies: FEAT-WM-001, Acceptance: preview line renders for queued waypoints, Progress: 100% (due 2025-09-30).
   - Implement area tooltip interactions — Owner: Codex, Estimate: 1d, Dependencies: FEAT-WM-001, Acceptance: Tooltip displays area name, plays show/idle/hide states, and invokes Info/Enter events, Progress: 100% (due 2025-09-16).
 - **Legacy reference**
   - WorldMapForm → WorldMap scene + PlayerNavigator (see mapping table).
-- **Progress:** In progress, 85% (commit TBD — Owner: Codex, due 2025-09-16).
+- **Progress:** In progress, 90% (scene reopen pending Unity validation — Owner: Codex, due 2025-09-16).
 - **Open decisions:**
   - TBD: Authenticate WebSocket connections. Owner: TBD, due 2025-09-30.
 
@@ -442,4 +444,5 @@ _Last updated: 2025-09-16 22:50 UTC • Document owner: Codex_
 - 2025-09-16: Routed RegisterManager to PopupWindow prefab for validation, duplicate checks, and success confirmation that returns to Login. — Codex
 
 - 2025-09-16: Added CapsuleCollider and kinematic Rigidbody to the world map player for tooltip triggers and documented the setup. — Codex
+- 2025-09-16: Restored RPG scene YAML after merge conflict, reattached AreaTooltip wiring, and reinstated player physics components pending Unity re-save. — Codex
 
