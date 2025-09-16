@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-14 02:23 UTC • Document owner: Codex_
+_Last updated: 2025-09-16 21:33 UTC • Document owner: Codex_
 
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
@@ -14,7 +14,7 @@ _Last updated: 2025-09-14 02:23 UTC • Document owner: Codex_
   - Undefined Unity version — Owner: TBD, due 2025-09-20.
   - Missing Windows Desktop SDK in CI — Owner: TBD, due 2025-09-18.
   - Incomplete mapping of legacy features — Owner: TBD, due 2025-09-25.
-  - Popup window usage inconsistent across scenes — Owner: Codex, due 2025-09-27.
+  - Popup window usage inconsistent across scenes — Owner: Codex, due 2025-09-27 (Login and Register now share PopupWindow prefab; remaining scenes pending audit).
     - GUID corruption in `.meta` files may break asset references — Owner: Codex, due 2025-09-14.
 - **Next Milestone:** Unity Prototype Build, 2025-10-01, exit criteria: player can start battle and load inventory from database.
 
@@ -296,6 +296,16 @@ _Last updated: 2025-09-14 02:23 UTC • Document owner: Codex_
 - **Accessibility:** requirements and status
   - TBD: colorblind mode, text scaling. Owner: TBD, due 2025-10-12.
 
+### Register Screen Feedback
+- **Owner:** Codex
+- **Dependencies:** PopupWindow prefab, DatabaseClientUnity, Register scene Canvas
+- **Progress:** Complete, 100%
+- **Acceptance Criteria:**
+  - Register attempts display PopupWindow messaging for success and failure states.
+  - Success popup transitions to the Login scene after player acknowledgment.
+  - Validation and duplicate username/nickname errors use the popup prefab.
+- **Risks:** PopupWindow reference could be lost during scene merges — Owner: Codex, due 2025-09-27.
+
 ## 9. Data & Persistence
 - **Save format** (JSON/ScriptableObject/etc.)
   - TBD
@@ -356,6 +366,7 @@ _Last updated: 2025-09-14 02:23 UTC • Document owner: Codex_
 | FEAT-INV-001 | Port Inventory UI | feature | TBD | 5d | SYS-ARCH-001 | Items/equipment load/save via SQL | To Do | 0% | - | Must |
 | FEAT-CBT-001 | Create BattleScene | feature | TBD | 7d | SYS-ARCH-001 | Player can start and resolve battle | To Do | 0% | - | Should |
 | FEAT-UI-002 | Implement popup window prefab | feature | Codex | 1d | SYS-ARCH-001 | Popup shows login errors with OK dismissal | Done | 100% | PR TBD | Should |
+| FEAT-UI-003 | Register success popup flow | feature | Codex | 0.5d | PopupWindow prefab, Register scene Canvas | Register screen shows popup on success/failure and returns to Login after confirmation | Done | 100% | PR TBD | Should |
 | FEAT-ANI-001 | Sprite Frame Animator component | feature | Codex | 2d | SYS-ARCH-001 | Lists animate per state at frameRate with tests | Done | 100% | PR TBD | Should |
 | FEAT-WM-001 | World map shift-click navigation | feature | Codex | 2d | SYS-ARCH-001 | Shift+Right sets destination; Shift+Left queues waypoint; agent animates per direction | Done | 100% | PR TBD | Should |
 | FEAT-WM-002 | City node interaction panel | feature | Codex | 1d | FEAT-WM-001 | CityInteraction panel toggles when entering/exiting CityNode radius | Done | 100% | PR TBD | Should |
@@ -425,4 +436,6 @@ _Last updated: 2025-09-14 02:23 UTC • Document owner: Codex_
 
 - 2025-09-16: Authored `recreate_accounts_tables.sql` to rebuild the accounts schema and captured maintenance guidance in the GDD. — Codex
 - 2025-09-16: Added AreaTooltip controller for world map location overlays and documented collider-driven show/idle/hide flow. — Codex
+
+- 2025-09-16: Routed RegisterManager to PopupWindow prefab for validation, duplicate checks, and success confirmation that returns to Login. — Codex
 
