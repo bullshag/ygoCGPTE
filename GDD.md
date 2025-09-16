@@ -98,10 +98,12 @@ _Last updated: 2025-09-14 02:23 UTC • Document owner: Codex_
   Directional and idle animations reflect agent movement state.
   City interaction panel appears when entering city radius.
   Waypoint markers show queued clicks and a path line previews the route.
+  Area tooltips appear over interactable locations, showing the area name with Info/Enter actions while the player remains inside the trigger.
 - **Technical notes**
   Utilizes NavMeshAgent with a queued `Vector3` path and emits `QueueEmptied`.
   PlayerNavigator instantiates waypoint marker prefabs and updates a LineRenderer for path preview.
   PlayerNavigator checks `CityNode` triggers to toggle `CityInteraction` UI.
+  AreaTooltip enforces trigger colliders, updates TMP labels, and orchestrates show/idle/hide animator states with UnityEvents for buttons.
 - **Dependencies**
   - Unity NavMesh
   - Unity input system
@@ -110,13 +112,15 @@ _Last updated: 2025-09-14 02:23 UTC • Document owner: Codex_
   - Shift+Right Click clears the queue and resets the agent.
   - Idle animation plays when the agent is stationary.
   - Idle agent consumes queued waypoints sequentially.
+  - Area tooltip animator plays show → idle while player remains inside trigger and hide when they exit.
 - **Risks**
   - Shift-click input may conflict with UI focus, preventing waypoint capture.
 - **Tasks**
   - Add path preview line — Owner: Codex, Estimate: 1d, Dependencies: FEAT-WM-001, Acceptance: preview line renders for queued waypoints, Progress: 100% (due 2025-09-30).
+  - Implement area tooltip interactions — Owner: Codex, Estimate: 1d, Dependencies: FEAT-WM-001, Acceptance: Tooltip displays area name, plays show/idle/hide states, and invokes Info/Enter events, Progress: 100% (due 2025-09-16).
 - **Legacy reference**
   - WorldMapForm → WorldMap scene + PlayerNavigator (see mapping table).
- - **Progress:** In progress, 70% (commit TBD — Owner: Codex, due 2025-09-14).
+- **Progress:** In progress, 80% (commit TBD — Owner: Codex, due 2025-09-16).
 - **Open decisions:**
   - TBD: Authenticate WebSocket connections. Owner: TBD, due 2025-09-30.
 
@@ -262,6 +266,7 @@ _Last updated: 2025-09-14 02:23 UTC • Document owner: Codex_
 
 | WorldMapForm | WorldMap scene + PlayerNavigator | In progress | Codex | Shift-click waypoints queue |
 | WorldMap remote party markers | RemotePlayer entities | In progress | Codex | NavMesh markers spawn and follow downloaded waypoints; WebSocket state sync with interpolation |
+| WorldMap location tooltip | AreaTooltip prefab controller | Complete | Codex | Collider-driven show/idle/hide animations with area name and button events |
 | (New) Free camera navigation | FreeCameraController | In progress | Codex | WASD panning with smoothing |
 | TravelLogService | PlayerStateUploader/Downloader | In progress | Codex | Periodic SQL sync of player positions |
 
@@ -356,6 +361,7 @@ _Last updated: 2025-09-14 02:23 UTC • Document owner: Codex_
 | FEAT-WM-002 | City node interaction panel | feature | Codex | 1d | FEAT-WM-001 | CityInteraction panel toggles when entering/exiting CityNode radius | Done | 100% | PR TBD | Should |
 | FEAT-CBT-002 | Integrate FrameAnimator with battle actions | feature | TBD | 2d | FEAT-ANI-001, FEAT-CBT-001 | Attack and damage sequences play via FrameAnimator | To Do | 0% | - | Should |
 | FEAT-WM-003 | Navigation path preview line | feature | Codex | 1d | FEAT-WM-001 | Queued waypoints display a preview line | Done | 100% | PR TBD | Should |
+| FEAT-WM-004 | Area tooltip interactions | feature | Codex | 1d | FEAT-WM-001 | Tooltip shows area name, plays show/idle/hide states, and raises Info/Enter events | Done | 100% | PR TBD | Should |
 | FEAT-CAM-001 | Free camera controller | feature | Codex | 1d | FEAT-WM-001 | WASD pans camera with smoothing | In Progress | 10% | - | Should |
 | FEAT-NET-001 | Player state upload service | feature | Codex | 1d | player_position table | Uploader posts position every second | Done | 100% | - | Should |
 | FEAT-NET-002 | Player state download service | feature | Codex | 1d | player_position table, FEAT-NET-001 | Downloader fetches other players' positions | Done | 100% | - | Should |
@@ -418,4 +424,5 @@ _Last updated: 2025-09-14 02:23 UTC • Document owner: Codex_
 - 2025-09-14: Added waypoint marker prefab and path preview line rendering for queued waypoints. — Codex
 
 - 2025-09-16: Authored `recreate_accounts_tables.sql` to rebuild the accounts schema and captured maintenance guidance in the GDD. — Codex
+- 2025-09-16: Added AreaTooltip controller for world map location overlays and documented collider-driven show/idle/hide flow. — Codex
 
