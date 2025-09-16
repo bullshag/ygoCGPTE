@@ -17,6 +17,7 @@ public class RegisterManager : MonoBehaviour
     public Toggle debugServerToggle;
     public Toggle kimServerToggle;
     public Button registerButton;
+    public PopupWindow popupWindowPrefab;
 
     private void Start()
     {
@@ -154,67 +155,83 @@ public class RegisterManager : MonoBehaviour
         if (user.Contains(" ") || pass.Contains(" ") || nick.Contains(" "))
         {
             Debug.Log("No spaces allowed in username, nickname or password");
+            ShowPopup("No spaces allowed in username, nickname or password.");
             return;
         }
         if (user.Length < 3 || user.Length > 12 || pass.Length < 3 || pass.Length > 12 || nick.Length < 3 || nick.Length > 12)
         {
             Debug.Log("Username, nickname and password must be 3-12 characters");
+            ShowPopup("Username, nickname and password must be 3-12 characters.");
             return;
         }
         if (pass != confirm)
         {
             Debug.Log("Passwords do not match");
+            ShowPopup("Passwords do not match.");
             return;
         }
 
         DatabaseConfigUnity.DebugMode = debugServerToggle != null && debugServerToggle.isOn;
         DatabaseConfigUnity.UseKimServer = kimServerToggle != null && kimServerToggle.isOn;
 
-        string checkUserPath = Path.Combine(Application.dataPath, "sql", "unity_register_check_username.sql");
-        var checkUserRows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(checkUserPath), new Dictionary<string, object?> { ["@username"] = user });
-        if (Convert.ToInt32(checkUserRows[0]["cnt"]) > 0)
+        try
         {
-            Debug.Log("Username already exists");
-            return;
-        }
+            string checkUserPath = Path.Combine(Application.dataPath, "sql", "unity_register_check_username.sql");
+            var checkUserRows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(checkUserPath), new Dictionary<string, object?> { ["@username"] = user });
+            if (Convert.ToInt32(checkUserRows[0]["cnt"]) > 0)
+            {
+                Debug.Log("Username already exists");
+                ShowPopup("Username already exists.");
+                return;
+            }
 
-        string checkNickPath = Path.Combine(Application.dataPath, "sql", "unity_register_check_nickname.sql");
-        var checkNickRows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(checkNickPath), new Dictionary<string, object?> { ["@nickname"] = nick });
-        if (Convert.ToInt32(checkNickRows[0]["cnt"]) > 0)
-        {
-            Debug.Log("Nickname already exists");
-            return;
-        }
+            string checkNickPath = Path.Combine(Application.dataPath, "sql", "unity_register_check_nickname.sql");
+            var checkNickRows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(checkNickPath), new Dictionary<string, object?> { ["@nickname"] = nick });
+            if (Convert.ToInt32(checkNickRows[0]["cnt"]) > 0)
+            {
+                Debug.Log("Nickname already exists");
+                ShowPopup("Nickname already exists.");
+                return;
+            }
 
-        var parameters = new Dictionary<string, object?>
-        {
-            ["@username"] = user,
-            ["@nickname"] = nick,
-            ["@password"] = pass
-        };
-        Debug.Log($"Register params - username: {user}, nickname: {nick}");
+            var parameters = new Dictionary<string, object?>
+            {
+                ["@username"] = user,
+                ["@nickname"] = nick,
+                ["@password"] = pass
+            };
+            Debug.Log($"Register params - username: {user}, nickname: {nick}");
 
-        string insertPath = Path.Combine(Application.dataPath, "sql", "unity_register_insert_plain.sql");
-        int rows = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(insertPath), parameters);
-        Debug.Log($"Insert result: {rows}");
-        if (rows > 0)
-        {
-            string idPath = Path.Combine(Application.dataPath, "sql", "unity_register_get_id.sql");
-            var idRows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(idPath), new Dictionary<string, object?> { ["@username"] = user });
-            int newId = Convert.ToInt32(idRows[0]["id"]);
+            string insertPath = Path.Combine(Application.dataPath, "sql", "unity_register_insert_plain.sql");
+            int rows = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(insertPath), parameters);
+            Debug.Log($"Insert result: {rows}");
+            if (rows > 0)
+            {
+                string idPath = Path.Combine(Application.dataPath, "sql", "unity_register_get_id.sql");
+                var idRows = await DatabaseClientUnity.QueryAsync(File.ReadAllText(idPath), new Dictionary<string, object?> { ["@username"] = user });
+                int newId = Convert.ToInt32(idRows[0]["id"]);
 
-            string ensureNodePath = Path.Combine(Application.dataPath, "sql", "unity_register_ensure_node.sql");
-            await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(ensureNodePath), new Dictionary<string, object?> { ["@node"] = "nodeRiverVillage", ["@name"] = "River Village" });
+                string ensureNodePath = Path.Combine(Application.dataPath, "sql", "unity_register_ensure_node.sql");
+                await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(ensureNodePath), new Dictionary<string, object?> { ["@node"] = "nodeRiverVillage", ["@name"] = "River Village" });
 
-            string initTravelPath = Path.Combine(Application.dataPath, "sql", "unity_register_init_travel.sql");
-            await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(initTravelPath), new Dictionary<string, object?> { ["@accountId"] = newId, ["@node"] = "nodeRiverVillage" });
+                string initTravelPath = Path.Combine(Application.dataPath, "sql", "unity_register_init_travel.sql");
+                await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(initTravelPath), new Dictionary<string, object?> { ["@accountId"] = newId, ["@node"] = "nodeRiverVillage" });
 
-            Debug.Log("Account created");
-            SceneManager.LoadScene("Login");
-        }
-        else
-        {
+                Debug.Log("Account created");
+                if (!ShowPopup("Account created successfully.", () => SceneManager.LoadScene("Login")))
+                {
+                    SceneManager.LoadScene("Login");
+                }
+                return;
+            }
+
             Debug.Log("No account created");
+            ShowPopup("Account could not be created. Please try again.");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Register error: {ex.Message}");
+            ShowPopup($"Error creating account: {ex.Message}");
         }
     }
 
@@ -222,5 +239,19 @@ public class RegisterManager : MonoBehaviour
     {
 
         SceneManager.LoadScene("Login");
+    }
+
+    private bool ShowPopup(string message, Action onOk = null)
+    {
+        if (popupWindowPrefab == null)
+        {
+            Debug.LogWarning("PopupWindow prefab not assigned.");
+            return false;
+        }
+
+        var canvas = FindObjectOfType<Canvas>();
+        var popup = Instantiate(popupWindowPrefab, canvas != null ? canvas.transform : null);
+        popup.Show(message, onOk);
+        return true;
     }
 }

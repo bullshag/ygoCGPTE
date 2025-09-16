@@ -170,6 +170,7 @@ MonoBehaviour:
   debugServerToggle: {fileID: 2134382251}
   kimServerToggle: {fileID: 421655209}
   registerButton: {fileID: 2020028608}
+  popupWindowPrefab: {fileID: 693688904551098799, guid: df2c93a0d30ab894a8ebc54d83702a6f, type: 3}
 --- !u!1 &45358550
 GameObject:
   m_ObjectHideFlags: 0
