@@ -1,6 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-16 22:51 UTC • Document owner: Codex_
-
+_Last updated: 2025-09-16 22:50 UTC • Document owner: Codex_
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
 - **Build Status:** Yellow — Windows-specific tests fail in current Linux environment.
@@ -103,8 +102,9 @@ _Last updated: 2025-09-16 22:51 UTC • Document owner: Codex_
   Utilizes NavMeshAgent with a queued `Vector3` path and emits `QueueEmptied`.
   PlayerNavigator instantiates waypoint marker prefabs and updates a LineRenderer for path preview.
   PlayerNavigator checks `CityNode` triggers to toggle `CityInteraction` UI.
-  AreaTooltip enforces trigger colliders, updates TMP labels, and orchestrates show/idle/hide animator states with UnityEvents for buttons.
-  Player GameObject includes a CapsuleCollider and kinematic Rigidbody so tooltip trigger events fire without disrupting NavMesh navigation.
+
+  AreaTooltip resides on the locationTooltip root, enforces a trigger SphereCollider (radius 143.2, center y -4.06), updates TMP labels, and orchestrates show/idle/hide animator states with UnityEvents for buttons.
+
 - **Dependencies**
   - Unity NavMesh
   - Unity input system
@@ -437,6 +437,7 @@ _Last updated: 2025-09-16 22:51 UTC • Document owner: Codex_
 
 - 2025-09-16: Authored `recreate_accounts_tables.sql` to rebuild the accounts schema and captured maintenance guidance in the GDD. — Codex
 - 2025-09-16: Added AreaTooltip controller for world map location overlays and documented collider-driven show/idle/hide flow. — Codex
+- 2025-09-16: Rewired the locationTooltip root with AreaTooltip, a trigger SphereCollider sized to the location radius, and assigned TMP label, buttons, and animator triggers. — Codex
 
 - 2025-09-16: Routed RegisterManager to PopupWindow prefab for validation, duplicate checks, and success confirmation that returns to Login. — Codex
 

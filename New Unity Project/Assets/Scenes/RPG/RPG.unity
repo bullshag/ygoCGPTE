@@ -1,11 +1,31 @@
-  - component: {fileID: 2098676590}
-  - component: {fileID: 2098676591}
---- !u!136 &2098676590
-CapsuleCollider:
+
+  - component: {fileID: 1670716960}
+  - component: {fileID: 1670716961}
+--- !u!135 &1670716960
+SphereCollider:
+
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1670716957}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 143.2
+  m_Center: {x: 0, y: -4.0585327, z: 0}
+--- !u!114 &1670716961
+MonoBehaviour:
+=======
   m_GameObject: {fileID: 2098676585}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
@@ -16,17 +36,31 @@ CapsuleCollider:
   m_Center: {x: 0, y: 0.9, z: 0}
 --- !u!54 &2098676591
 Rigidbody:
+
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2098676585}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_GameObject: {fileID: 1670716957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eafcd6f7336d454aa9c29ae642af1b6b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  areaName: TBD
+  playerTag: Player
+  areaNameLabel: {fileID: 1777021107}
+  infoButton: {fileID: 773833809}
+  enterButton: {fileID: 346116943}
+  tooltipAnimator: {fileID: 1670716959}
+  showStateName: Show
+  showTriggerName: Show
+  idleStateName: Idle
+  idleCrossFadeDuration: 0.1
+  hideTriggerName: Hide
+  InfoClicked:
+    m_PersistentCalls:
+      m_Calls: []
+  EnterClicked:
+    m_PersistentCalls:
+      m_Calls: []
