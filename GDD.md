@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-16 22:50 UTC • Document owner: Codex_
+_Last updated: 2025-09-22 21:56 UTC • Document owner: Codex_
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
 - **Build Status:** Yellow — Windows-specific tests fail in current Linux environment.
@@ -102,6 +102,7 @@ _Last updated: 2025-09-16 22:50 UTC • Document owner: Codex_
   Utilizes NavMeshAgent with a queued `Vector3` path and emits `QueueEmptied`.
   PlayerNavigator instantiates waypoint marker prefabs and updates a LineRenderer for path preview.
   PlayerNavigator checks `CityNode` triggers to toggle `CityInteraction` UI.
+  PlayerNavigator raycasts ignore tooltip trigger colliders so shift-clicking works within area volumes.
 
   AreaTooltip resides on the locationTooltip root, enforces a trigger SphereCollider (radius 143.2, center y -4.06), updates TMP labels, and orchestrates show/idle/hide animator states with UnityEvents for buttons.
   World map player uses a CapsuleCollider (radius 0.35, height 1.8) and a kinematic Rigidbody to stay inside tooltip triggers without physics drift.
@@ -445,4 +446,6 @@ _Last updated: 2025-09-16 22:50 UTC • Document owner: Codex_
 
 - 2025-09-16: Added CapsuleCollider and kinematic Rigidbody to the world map player for tooltip triggers and documented the setup. — Codex
 - 2025-09-16: Restored RPG scene YAML after merge conflict, reattached AreaTooltip wiring, and reinstated player physics components pending Unity re-save. — Codex
+
+- 2025-09-22: Updated PlayerNavigator raycast to ignore tooltip triggers, restoring waypoint placement inside area volumes. — Codex
 

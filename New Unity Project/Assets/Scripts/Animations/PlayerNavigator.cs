@@ -67,7 +67,7 @@ public class PlayerNavigator : MonoBehaviour
     private bool TryGetMousePoint(out Vector3 point)
     {
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out var hit))
+        if (Physics.Raycast(ray, out var hit, Mathf.Infinity, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
         {
             point = hit.point;
             return true;
