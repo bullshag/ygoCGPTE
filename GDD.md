@@ -106,6 +106,7 @@ _Last updated: 2025-09-22 21:56 UTC • Document owner: Codex_
 
   AreaTooltip resides on the locationTooltip root, enforces a trigger SphereCollider (radius 143.2, center y -4.06), updates TMP labels, and orchestrates show/idle/hide animator states with UnityEvents for buttons.
   World map player uses a CapsuleCollider (radius 0.35, height 1.8) and a kinematic Rigidbody to stay inside tooltip triggers without physics drift.
+  Player GameObject now carries the `Player` tag, and TagManager explicitly includes it so AreaTooltip trigger checks succeed.
 
 - **Dependencies**
   - Unity NavMesh
@@ -119,6 +120,7 @@ _Last updated: 2025-09-22 21:56 UTC • Document owner: Codex_
 - **Risks**
   - Shift-click input may conflict with UI focus, preventing waypoint capture.
   - Scene has not been re-opened in the target Unity editor post-merge; hidden serialization issues could persist until validated. Owner: Codex, due 2025-09-17.
+  - Future TagManager edits might drop the `Player` tag, breaking tooltip detection — Owner: Codex, due 2025-09-24.
 - **Tasks**
   - Add path preview line — Owner: Codex, Estimate: 1d, Dependencies: FEAT-WM-001, Acceptance: preview line renders for queued waypoints, Progress: 100% (due 2025-09-30).
   - Implement area tooltip interactions — Owner: Codex, Estimate: 1d, Dependencies: FEAT-WM-001, Acceptance: Tooltip displays area name, plays show/idle/hide states, and invokes Info/Enter events, Progress: 100% (due 2025-09-16).
@@ -270,7 +272,7 @@ _Last updated: 2025-09-22 21:56 UTC • Document owner: Codex_
 
 | WorldMapForm | WorldMap scene + PlayerNavigator | In progress | Codex | Shift-click waypoints queue |
 | WorldMap remote party markers | RemotePlayer entities | In progress | Codex | NavMesh markers spawn and follow downloaded waypoints; WebSocket state sync with interpolation |
-| WorldMap location tooltip | AreaTooltip prefab controller | Complete | Codex | Collider-driven show/idle/hide animations with area name and button events |
+| WorldMap location tooltip | AreaTooltip prefab controller | Complete | Codex | Collider-driven show/idle/hide animations with area name and button events; requires `Player` tag retention |
 | (New) Free camera navigation | FreeCameraController | In progress | Codex | WASD panning with smoothing |
 | TravelLogService | PlayerStateUploader/Downloader | In progress | Codex | Periodic SQL sync of player positions |
 
@@ -448,4 +450,5 @@ _Last updated: 2025-09-22 21:56 UTC • Document owner: Codex_
 - 2025-09-16: Restored RPG scene YAML after merge conflict, reattached AreaTooltip wiring, and reinstated player physics components pending Unity re-save. — Codex
 
 - 2025-09-22: Updated PlayerNavigator raycast to ignore tooltip triggers, restoring waypoint placement inside area volumes. — Codex
+- 2025-09-22: Tagged world map player and restored `Player` tag in TagManager so AreaTooltip triggers fire on entry/exit. — Codex
 
