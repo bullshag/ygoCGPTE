@@ -1,108 +1,250 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using WinFormsApp2;
-using TMPro;
 
 /// <summary>
-/// Unity UI wrapper for TavernManager interactions.
-/// Displays recruit candidates and allows hiring or joining parties.
+/// Structured controller for Tavern activities. Manages recruit discovery, detail overlays,
+/// and wiring to tavern services.
 /// </summary>
 public class TavernPanel : MonoBehaviour
 {
-    [SerializeField] private RectTransform candidateListParent = null!;
+    [Header("Top-Level Actions")]
+    [SerializeField] private Button searchPartyMembersButton = null!;
+    [SerializeField] private Button hireMercenariesButton = null!;
+    [SerializeField] private Button lookForWorkButton = null!;
+
+    [Header("Candidate List")]
+    [SerializeField] private ScrollRect candidateScrollRect = null!;
+    [SerializeField] private GameObject candidateButtonPrefab = null!;
+
+    [Header("Detail Overlay")]
+    [SerializeField] private TavernRecruitDetailPanel recruitDetailPanel = null!;
+
+    [Header("Services")]
     [SerializeField] private TavernManager tavernManager = null!;
+    [SerializeField] private RPGManager rpgManager = null!;
 
-    private readonly List<TavernManager.Recruit> _candidates = new();
+    private readonly PartyMemberGenerator _generator = new();
+    private readonly List<PartyMemberGenerator.GeneratedRecruit> _availableRecruits = new();
+    private readonly List<Button> _spawnedButtons = new();
+    private PartyMemberGenerator.GeneratedRecruit? _selectedRecruit;
 
-    private async void Start()
+    private Transform? CandidateContent => candidateScrollRect != null ? candidateScrollRect.content : null;
+
+    private void Awake()
+    {
+        if (recruitDetailPanel != null)
+        {
+            recruitDetailPanel.HideInstant();
+        }
+
+        if (candidateScrollRect != null)
+        {
+            candidateScrollRect.gameObject.SetActive(true);
+        }
+    }
+
+    private void Start()
     {
         if (tavernManager == null)
+        {
             tavernManager = FindObjectOfType<TavernManager>();
-        await RefreshAsync();
-    }
-
-    /// <summary>
-    /// Reload candidate list from the server and rebuild the UI.
-    /// </summary>
-    private async Task RefreshAsync()
-    {
-        int accountId = InventoryServiceUnity.AccountId;
-        _candidates.Clear();
-        _candidates.AddRange(await tavernManager.GetCandidatesAsync(accountId));
-
-        if (candidateListParent == null)
-        {
-            var canvas = FindObjectOfType<Canvas>() ?? new GameObject("Canvas", typeof(Canvas)).GetComponent<Canvas>();
-            candidateListParent = canvas.transform as RectTransform;
         }
 
-        foreach (Transform child in candidateListParent)
-            Destroy(child.gameObject);
-
-        foreach (var c in _candidates)
+        if (rpgManager == null)
         {
-            var entry = new GameObject($"Candidate_{c.id}", typeof(RectTransform));
-            entry.transform.SetParent(candidateListParent, false);
+            rpgManager = FindObjectOfType<RPGManager>();
+        }
 
-            var nameGO = new GameObject("Name", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
-            var nameRT = nameGO.GetComponent<RectTransform>();
-            nameRT.SetParent(entry.transform);
-            nameRT.sizeDelta = new Vector2(200, 30);
-            var label = nameGO.GetComponent<TextMeshProUGUI>();
-            label.text = $"{c.name} (Lv {c.level})";
-            label.color = Color.black;
+        WireTopLevelButtons();
+        ConfigureTodoButton(hireMercenariesButton);
+        ConfigureTodoButton(lookForWorkButton);
+    }
 
-            var hireBtn = CreateButton(entry.transform, "Hire", new Vector2(110, 0));
-            int recruitId = c.id;
-            hireBtn.onClick.AddListener(async () =>
+    private void WireTopLevelButtons()
+    {
+        if (searchPartyMembersButton != null)
+        {
+            searchPartyMembersButton.onClick.RemoveAllListeners();
+            searchPartyMembersButton.onClick.AddListener(() => _ = OnSearchForPartyMembersAsync());
+        }
+    }
+
+    private void ConfigureTodoButton(Button? button)
+    {
+        if (button == null)
+        {
+            return;
+        }
+
+        button.onClick.RemoveAllListeners();
+        button.interactable = false;
+
+        var label = button.GetComponentInChildren<TMP_Text>();
+        if (label != null)
+        {
+            label.text = $"{label.text} (Coming Soon)";
+            label.alpha = 0.5f;
+        }
+    }
+
+    private async Task OnSearchForPartyMembersAsync()
+    {
+        if (searchPartyMembersButton != null)
+        {
+            searchPartyMembersButton.interactable = false;
+        }
+
+        try
+        {
+            await PopulateRecruitListAsync();
+        }
+        finally
+        {
+            if (searchPartyMembersButton != null)
             {
-                if (await tavernManager.HireAsync(accountId, recruitId))
-                    await RefreshAsync();
-            });
-
-            var joinBtn = CreateButton(entry.transform, "Join Party", new Vector2(220, 0));
-            joinBtn.onClick.AddListener(OnJoinParty);
+                searchPartyMembersButton.interactable = true;
+            }
         }
     }
 
-    /// <summary>
-    /// Helper for dynamically creating UI buttons.
-    /// </summary>
-    private Button CreateButton(Transform parent, string label, Vector2 position)
+    private async Task PopulateRecruitListAsync()
     {
-        var go = new GameObject(label + "Button", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
-        var rt = go.GetComponent<RectTransform>();
-        rt.SetParent(parent);
-        rt.sizeDelta = new Vector2(90, 30);
-        rt.anchoredPosition = position;
+        if (tavernManager == null || candidateScrollRect == null || candidateButtonPrefab == null)
+        {
+            Debug.LogWarning("TavernPanel missing required references for candidate generation.");
+            return;
+        }
 
-        var textGO = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
-        var textRT = textGO.GetComponent<RectTransform>();
-        textRT.SetParent(go.transform);
-        textRT.anchorMin = Vector2.zero;
-        textRT.anchorMax = Vector2.one;
-        textRT.offsetMin = Vector2.zero;
-        textRT.offsetMax = Vector2.zero;
-        var text = textGO.GetComponent<TextMeshProUGUI>();
-        text.text = label;
-        text.alignment = TextAlignmentOptions.Center;
-        text.color = Color.black;
+        int accountId = InventoryServiceUnity.AccountId;
+        List<TavernManager.Recruit> baseRecruits = await tavernManager.GetCandidatesAsync(accountId);
+        _availableRecruits.Clear();
+        _availableRecruits.AddRange(_generator.BuildCandidates(baseRecruits, 3));
 
-        return go.GetComponent<Button>();
+        RebuildCandidateButtons();
     }
 
-    /// <summary>
-    /// Placeholder for opening the multiplayer party join flow.
-    /// Refreshes candidate list afterward.
-    /// </summary>
-    private async void OnJoinParty()
+    private void RebuildCandidateButtons()
     {
-        // Placeholder: actual implementation would open a join-party window.
-        await RefreshAsync();
+        foreach (var button in _spawnedButtons)
+        {
+            if (button != null)
+            {
+                Destroy(button.gameObject);
+            }
+        }
+        _spawnedButtons.Clear();
+
+        var content = CandidateContent;
+        if (content == null)
+        {
+            Debug.LogWarning("TavernPanel candidate content is not assigned.");
+            return;
+        }
+
+        foreach (Transform child in content)
+        {
+            Destroy(child.gameObject);
+        }
+
+        foreach (var recruit in _availableRecruits)
+        {
+            var candidateGO = Instantiate(candidateButtonPrefab, content);
+            var button = candidateGO.GetComponent<Button>();
+            if (button == null)
+            {
+                button = candidateGO.AddComponent<Button>();
+            }
+
+            var label = candidateGO.GetComponentInChildren<TMP_Text>();
+            if (label != null)
+            {
+                label.text = recruit.DisplayLabel;
+            }
+
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(() => OnRecruitSelected(recruit));
+            _spawnedButtons.Add(button);
+        }
+
+        candidateScrollRect.gameObject.SetActive(_availableRecruits.Count > 0);
+    }
+
+    private void OnRecruitSelected(PartyMemberGenerator.GeneratedRecruit recruit)
+    {
+        _selectedRecruit = recruit;
+        if (candidateScrollRect != null)
+        {
+            candidateScrollRect.gameObject.SetActive(false);
+        }
+
+        if (recruitDetailPanel == null)
+        {
+            Debug.LogWarning("Recruit detail panel not assigned.");
+            if (candidateScrollRect != null)
+            {
+                candidateScrollRect.gameObject.SetActive(true);
+            }
+            return;
+        }
+
+        recruitDetailPanel.Show(
+            recruit,
+            () => _ = HireSelectedRecruitAsync(),
+            CloseDetailPanel);
+    }
+
+    private async Task HireSelectedRecruitAsync()
+    {
+        if (_selectedRecruit == null || tavernManager == null)
+        {
+            return;
+        }
+
+        int accountId = InventoryServiceUnity.AccountId;
+        bool success = await tavernManager.HireAsync(accountId, _selectedRecruit.Source.id);
+        if (!success)
+        {
+            Debug.LogWarning($"Failed to hire recruit {_selectedRecruit.Source.name}.");
+            CloseDetailPanel();
+            return;
+        }
+
+        await CharacterService.AddPartyMemberAsync(_selectedRecruit.ToCharacterData());
+
+        _availableRecruits.Remove(_selectedRecruit);
+        _selectedRecruit = null;
+
+        CloseDetailPanel();
+        RebuildCandidateButtons();
+        await RefreshPartyDisplayAsync();
+    }
+
+    private void CloseDetailPanel()
+    {
+        recruitDetailPanel?.Hide();
+        _selectedRecruit = null;
+        if (candidateScrollRect != null)
+        {
+            candidateScrollRect.gameObject.SetActive(true);
+        }
+    }
+
+    private async Task RefreshPartyDisplayAsync()
+    {
+        if (rpgManager == null)
+        {
+            rpgManager = FindObjectOfType<RPGManager>();
+        }
+
+        if (rpgManager != null)
+        {
+            await rpgManager.RefreshPartyUIAsync();
+        }
     }
 
     public void BackToMain() => MainRPGNavigation.OpenMain();
 }
-

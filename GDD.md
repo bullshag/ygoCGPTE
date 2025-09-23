@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-23 05:46 UTC • Document owner: Codex_
+_Last updated: 2025-09-23 06:40 UTC • Document owner: Codex_
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
 - **Build Status:** Yellow — Windows-specific tests fail in current Linux environment.
@@ -188,7 +188,7 @@ _Last updated: 2025-09-23 05:46 UTC • Document owner: Codex_
   LocationActivitiesPanel provides keyboard/gamepad friendly navigation for city activities.
 - **Technical notes**
   Built with Unity UGUI.
-- **Progress:** In progress, 15% (popup window prefab, city interaction panel wiring, and location activities panel highlighting).
+- **Progress:** In progress, 25% (popup window prefab, city interaction panel wiring, location activities panel highlighting, and tavern recruitment flow scaffolding).
 - **Open decisions:**
   - TBD: Finalize navigation flow. Owner: TBD, due 2025-09-25.
 
@@ -277,6 +277,7 @@ _Last updated: 2025-09-23 05:46 UTC • Document owner: Codex_
 | InventoryForm | InventoryUI | Not started | TBD | Requires `unity_inventory_load.sql` |
 | BattleForm | BattleScene | In progress | TBD | Basic scene scaffold |
 | ShopForm | ShopUI | Not started | TBD | Pricing logic TBD |
+| TavernForm | TavernPanel + TavernRecruitDetailPanel | In progress | Codex | Search for Party Members flow live; Mercenaries/Work buttons disabled pending specs |
 | PictureBox animations | FrameAnimator component | In progress | Codex | Handles sprite-frame playback |
 
 | WorldMapForm | WorldMap scene + PlayerNavigator | In progress | Codex | Shift-click waypoints queue |
@@ -321,6 +322,16 @@ _Last updated: 2025-09-23 05:46 UTC • Document owner: Codex_
   - Success popup transitions to the Login scene after player acknowledgment.
   - Validation and duplicate username/nickname errors use the popup prefab.
 - **Risks:** PopupWindow reference could be lost during scene merges — Owner: Codex, due 2025-09-27.
+
+### Tavern Panel
+- **Owner:** Codex
+- **Dependencies:** TavernManager, CharacterService cache, RPGManager.RefreshPartyUIAsync, ScrollRect candidate list prefab, TavernRecruitDetailPanel overlay
+- **Progress:** In progress, 45%
+- **Acceptance Criteria:**
+  - "Search for Party Members" generates three recruits through PartyMemberGenerator and populates ScrollRect buttons labeled "NAME – COST gold".
+  - Selecting a recruit opens a modal detail overlay with stats plus Hire and Cancel actions while hiding the list.
+  - Hire triggers TavernManager.HireAsync, updates CharacterService party cache, removes the recruit from available results, and refreshes RPGManager's party display.
+- **Risks:** Detail panel prefab requires Unity editor wiring before QA — Owner: Codex, due 2025-09-25.
 
 ## 9. Data & Persistence
 - **Save format** (JSON/ScriptableObject/etc.)
@@ -383,6 +394,8 @@ _Last updated: 2025-09-23 05:46 UTC • Document owner: Codex_
 | FEAT-CBT-001 | Create BattleScene | feature | TBD | 7d | SYS-ARCH-001 | Player can start and resolve battle | To Do | 0% | - | Should |
 | FEAT-UI-002 | Implement popup window prefab | feature | Codex | 1d | SYS-ARCH-001 | Popup shows login errors with OK dismissal | Done | 100% | PR TBD | Should |
 | FEAT-UI-003 | Register success popup flow | feature | Codex | 0.5d | PopupWindow prefab, Register scene Canvas | Register screen shows popup on success/failure and returns to Login after confirmation | Done | 100% | PR TBD | Should |
+| FEAT-UI-004 | Tavern recruit search & detail overlay | feature | Codex | 2d | TavernManager, CharacterService cache, RPGManager refresh hook | Search button spawns 3 recruits, modal displays stats, Hire updates party UI | In Progress | 45% | - | Should |
+| FEAT-UI-005 | Activate Tavern mercenary/work actions | feature | TBD | 3d | FEAT-UI-004 | Mercenary and Work buttons enabled with dedicated flows | To Do | 0% | - | Could |
 | FEAT-ANI-001 | Sprite Frame Animator component | feature | Codex | 2d | SYS-ARCH-001 | Lists animate per state at frameRate with tests | Done | 100% | PR TBD | Should |
 | FEAT-WM-001 | World map shift-click navigation | feature | Codex | 2d | SYS-ARCH-001 | Shift+Right sets destination; Shift+Left queues waypoint; agent animates per direction | Done | 100% | PR TBD | Should |
 | FEAT-WM-002 | City node interaction panel | feature | Codex | 1d | FEAT-WM-001 | CityInteraction panel toggles when entering/exiting CityNode radius | Done | 100% | PR TBD | Should |
@@ -458,6 +471,7 @@ _Last updated: 2025-09-23 05:46 UTC • Document owner: Codex_
 
 - 2025-09-16: Added CapsuleCollider and kinematic Rigidbody to the world map player for tooltip triggers and documented the setup. — Codex
 - 2025-09-16: Restored RPG scene YAML after merge conflict, reattached AreaTooltip wiring, and reinstated player physics components pending Unity re-save. — Codex
+- 2025-09-23: Documented structured TavernPanel flow, recruit detail overlay, CharacterService party cache updates, and RPGManager refresh hook. — Codex
 
 - 2025-09-22: Updated PlayerNavigator raycast to ignore tooltip triggers, restoring waypoint placement inside area volumes. — Codex
 - 2025-09-22: Tagged world map player and restored `Player` tag in TagManager so AreaTooltip triggers fire on entry/exit. — Codex
