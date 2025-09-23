@@ -151,7 +151,7 @@ _Last updated: 2025-09-24 14:10 UTC • Document owner: Codex_
   - Pressing Enter (keyboard or keypad) while within a tooltip opens the location activities panel; Escape/Cancel closes it and allows re-opening without exiting the trigger.
 - **Risks**
   - Shift-click input may conflict with UI focus, preventing waypoint capture.
-  - Scene has not been re-opened in the target Unity editor post-merge; hidden serialization issues could persist until validated. Owner: Codex, due 2025-09-17.
+  - Scene has not been re-opened in the target Unity editor post-merge; hidden serialization issues could persist until validated. Owner: Codex, due 2025-09-26 (RPG scene restored via manual YAML merge; Unity re-save still pending).
   - Future TagManager edits might drop the `Player` tag, breaking tooltip detection — Owner: Codex, due 2025-09-24.
   - Input axis "Cancel" may be missing on some control schemes, blocking Escape-equivalent close behavior — Owner: Codex, due 2025-09-28.
 - **Tasks**
@@ -309,7 +309,7 @@ _Last updated: 2025-09-24 14:10 UTC • Document owner: Codex_
 | WorldMapForm | WorldMap scene + PlayerNavigator | In progress | Codex | Shift-click waypoints queue |
 | WorldMap remote party markers | RemotePlayer entities | In progress | Codex | NavMesh markers spawn and follow downloaded waypoints; WebSocket state sync with interpolation |
 | WorldMap location tooltip | AreaTooltip prefab controller | Complete | Codex | Collider-driven show/idle/hide animations with area name and button events; requires `Player` tag retention |
-| WorldMap city activities panel | LocationActivitiesPanel | In progress | Codex | Keyboard-accessible Enter/Escape flow with yellow/red highlights; activity content placeholders awaiting Tavern/Shop hooks |
+| WorldMap city activities panel | LocationActivitiesPanel | In progress | Codex | Scene restored from stable YAML; Enter triggers LocationActivitiesPanel.ShowX + Open; content placeholders awaiting Tavern/Shop hooks |
 | LocationDialog | LocationActivitiesPanel Refresh | In progress | Codex | Migration delta: WinForms modal buttons were static; Unity refresh must bind dynamic location metadata and drive contextual sub-panels |
 | (New) Free camera navigation | FreeCameraController | In progress | Codex | WASD panning with smoothing |
 | TravelLogService | PlayerStateUploader/Downloader | In progress | Codex | Periodic SQL sync of player positions |
@@ -460,7 +460,7 @@ _Last updated: 2025-09-24 14:10 UTC • Document owner: Codex_
 
 | Feature | Progress | Owner | Dependencies | Acceptance Criteria | Risks |
 |---|---|---|---|---|---|
-| Location Activities Panel Refresh | 15% (due 2025-09-29) | Codex | FEAT-WM-001; FEAT-UI-006; location metadata service (Owner: TBD, due 2025-09-27) | Populates activities from `CityNode` metadata;<br>Focus returns to list after closing a sub-panel;<br>Supports 1080p/1440p layouts without blocking map input | InputAction focus clashes during sub-panel open (Owner: Codex, due 2025-09-30);<br>Metadata contract TBD may delay integration (Owner: TBD, due 2025-09-27);<br>Unbudgeted transition animations risk scope creep (Owner: Codex, due 2025-10-02) |
+| Location Activities Panel Refresh | 60% (due 2025-09-29) | Codex | FEAT-WM-001; FEAT-UI-006; location metadata service (Owner: TBD, due 2025-09-27) | Populates activities from `CityNode` metadata;<br>Focus returns to list after closing a sub-panel;<br>Supports 1080p/1440p layouts without blocking map input | InputAction focus clashes during sub-panel open (Owner: Codex, due 2025-09-30);<br>Metadata contract TBD may delay integration (Owner: TBD, due 2025-09-27);<br>Unbudgeted transition animations risk scope creep (Owner: Codex, due 2025-10-02) |
 | Tavern Sub-Panel Integration | 5% (due 2025-10-01) | Codex | FEAT-UI-004; FEAT-UI-007; TavernManager API audit (Owner: TBD, due 2025-09-28) | Hire, Mercenary, Work actions expose stateful buttons;<br>Hire reuses recruit overlay and closes cleanly;<br>`tavern_subpanel_open` telemetry fires with location ID | Legacy edge cases from TavernForm undocumented (Owner: TBD, due 2025-09-29);<br>Responsive layout for small resolutions unverified (Owner: Codex, due 2025-10-03);<br>CharacterService refresh timing may double-trigger updates (Owner: Codex, due 2025-10-04) |
 
 ## 15. Risks & Mitigations
@@ -514,6 +514,8 @@ _Last updated: 2025-09-24 14:10 UTC • Document owner: Codex_
 - 2025-09-22: Tagged world map player and restored `Player` tag in TagManager so AreaTooltip triggers fire on entry/exit. — Codex
 
 - 2025-09-23: Recovered RPG scene from backup commit, reinstated the `player` GameObject tag, and logged scene YAML edit risk mitigation. — Codex
+
+- 2025-09-23: Restored RPG scene from clean snapshot, reattached LocationActivitiesPanel hierarchy, and wired AreaTooltip Enter events to open the panel. — Codex
 
 - 2025-09-24: Added LocationActivitiesPanel with yellow/red highlighting, Enter/Escape input flow, and updated AreaTooltip to re-arm interactions per keyboard accessibility pillar. — Codex
 
