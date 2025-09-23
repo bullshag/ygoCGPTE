@@ -68,7 +68,7 @@ public class RPGManager : MonoBehaviour
 
     private async Task LoadPartyMembersAsync()
     {
-        partyMembers = await CharacterService.GetPartyMembersAsync();
+        partyMembers = new List<CharacterData>(await CharacterService.GetPartyMembersAsync());
         hiredCompanions = await CharacterService.GetHiredCompanionsAsync();
         if (goldText != null)
         {
@@ -304,6 +304,12 @@ public class RPGManager : MonoBehaviour
         await FriendServiceUnity.SendFriendRequestAsync(InventoryServiceUnity.AccountId, nick);
         if (friendInput != null)
             friendInput.text = string.Empty;
+    }
+
+    public async Task RefreshPartyUIAsync()
+    {
+        await LoadPartyMembersAsync();
+        PopulatePartyList();
     }
 }
 

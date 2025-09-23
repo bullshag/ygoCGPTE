@@ -8,6 +8,10 @@ using WinFormsApp2;
 
 public static class CharacterService
 {
+    private static readonly List<CharacterData> PartyMembersCache = new();
+
+    public static IReadOnlyList<CharacterData> CachedPartyMembers => PartyMembersCache;
+
     public static async Task<List<CharacterData>> GetPartyMembersAsync()
     {
         try
@@ -32,7 +36,11 @@ public static class CharacterService
                     MaxMana = Convert.ToInt32(row["max_mana"])
                 });
             }
-            return members;
+
+            PartyMembersCache.Clear();
+            PartyMembersCache.AddRange(members);
+
+            return new List<CharacterData>(PartyMembersCache);
         }
         catch (Exception ex)
         {
@@ -95,5 +103,15 @@ public static class CharacterService
             Debug.LogError($"Failed to fetch hired companions: {ex.Message}");
             return new List<CharacterData>();
         }
+    }
+
+    public static Task AddPartyMemberAsync(CharacterData data)
+    {
+        if (data != null)
+        {
+            PartyMembersCache.Add(data);
+        }
+
+        return Task.CompletedTask;
     }
 }
