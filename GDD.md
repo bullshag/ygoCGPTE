@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-22 21:56 UTC • Document owner: Codex_
+_Last updated: 2025-09-23 05:46 UTC • Document owner: Codex_
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
 - **Build Status:** Yellow — Windows-specific tests fail in current Linux environment.
@@ -15,6 +15,7 @@ _Last updated: 2025-09-22 21:56 UTC • Document owner: Codex_
   - Incomplete mapping of legacy features — Owner: TBD, due 2025-09-25.
   - Popup window usage inconsistent across scenes — Owner: Codex, due 2025-09-27 (Login and Register now share PopupWindow prefab; remaining scenes pending audit).
     - GUID corruption in `.meta` files may break asset references — Owner: Codex, due 2025-09-14.
+  - Scene asset regression risk due to manual YAML edits — Owner: Codex, due 2025-09-30. Mitigation: Use Unity editor or verified templates when adjusting scene tags; Trigger: scene fails to open or loses GameObject data.
 - **Next Milestone:** Unity Prototype Build, 2025-10-01, exit criteria: player can start battle and load inventory from database.
 
 ## 1. Vision & Pillars
@@ -106,7 +107,7 @@ _Last updated: 2025-09-22 21:56 UTC • Document owner: Codex_
 
   AreaTooltip resides on the locationTooltip root, enforces a trigger SphereCollider (radius 143.2, center y -4.06), updates TMP labels, and orchestrates show/idle/hide animator states with UnityEvents for buttons.
   World map player uses a CapsuleCollider (radius 0.35, height 1.8) and a kinematic Rigidbody to stay inside tooltip triggers without physics drift.
-  Player GameObject now carries the `Player` tag, and TagManager explicitly includes it so AreaTooltip trigger checks succeed.
+  Player GameObject now carries the `Player` tag (restored after YAML corruption), and TagManager explicitly includes it so AreaTooltip trigger checks succeed.
 
 - **Dependencies**
   - Unity NavMesh
@@ -451,4 +452,6 @@ _Last updated: 2025-09-22 21:56 UTC • Document owner: Codex_
 
 - 2025-09-22: Updated PlayerNavigator raycast to ignore tooltip triggers, restoring waypoint placement inside area volumes. — Codex
 - 2025-09-22: Tagged world map player and restored `Player` tag in TagManager so AreaTooltip triggers fire on entry/exit. — Codex
+
+- 2025-09-23: Recovered RPG scene from backup commit, reinstated the `player` GameObject tag, and logged scene YAML edit risk mitigation. — Codex
 
