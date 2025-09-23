@@ -94,11 +94,13 @@ _Last updated: 2025-09-23 05:46 UTC • Document owner: Codex_
 - **Rules & Data**
   Shift+Right Click sets destination; Shift+Left Click queues waypoint.
   Entering a city radius enables the city interaction panel.
+  Pressing Enter while inside an area tooltip opens the LocationActivitiesPanel with the corresponding activity selected.
 - **UX notes**
   Directional and idle animations reflect agent movement state.
   City interaction panel appears when entering city radius.
   Waypoint markers show queued clicks and a path line previews the route.
   Area tooltips appear over interactable locations, showing the area name with Info/Enter actions while the player remains inside the trigger.
+  Location activities buttons highlight in yellow for the active selection and red for inactive options to reinforce focus state.
 - **Technical notes**
   Utilizes NavMeshAgent with a queued `Vector3` path and emits `QueueEmptied`.
   PlayerNavigator instantiates waypoint marker prefabs and updates a LineRenderer for path preview.
@@ -106,6 +108,10 @@ _Last updated: 2025-09-23 05:46 UTC • Document owner: Codex_
   PlayerNavigator raycasts ignore tooltip trigger colliders so shift-clicking works within area volumes.
 
   AreaTooltip resides on the locationTooltip root, enforces a trigger SphereCollider (radius 143.2, center y -4.06), updates TMP labels, and orchestrates show/idle/hide animator states with UnityEvents for buttons.
+  AreaTooltip now listens for `KeyCode.Return` / keypad enter while the player remains inside and latches input until LocationActivitiesPanel closes.
+  LocationActivitiesPanel drives button highlighting, exposes per-activity show methods, and resets tooltip interaction when closed via Escape or the Cancel input action.
+  LocationActivitiesPanel now attaches to the prebuilt `locationInfoWindow` canvas, reusing existing Tavern/Shop/Temple/Academy/Arena/Graveyard buttons and backgrounds instead of introducing duplicate UI prefabs.
+  PlayerNavigator now toggles that shared canvas via `cityInteractionPanel` so the legacy layout opens with Enter and hides on Escape/Cancel without bespoke prefabs.
   World map player uses a CapsuleCollider (radius 0.35, height 1.8) and a kinematic Rigidbody to stay inside tooltip triggers without physics drift.
   Player GameObject now carries the `Player` tag (restored after YAML corruption), and TagManager explicitly includes it so AreaTooltip trigger checks succeed.
 
@@ -118,16 +124,19 @@ _Last updated: 2025-09-23 05:46 UTC • Document owner: Codex_
   - Idle animation plays when the agent is stationary.
   - Idle agent consumes queued waypoints sequentially.
   - Area tooltip animator plays show → idle while player remains inside trigger and hide when they exit.
+  - Pressing Enter (keyboard or keypad) while within a tooltip opens the location activities panel; Escape/Cancel closes it and allows re-opening without exiting the trigger.
 - **Risks**
   - Shift-click input may conflict with UI focus, preventing waypoint capture.
   - Scene has not been re-opened in the target Unity editor post-merge; hidden serialization issues could persist until validated. Owner: Codex, due 2025-09-17.
   - Future TagManager edits might drop the `Player` tag, breaking tooltip detection — Owner: Codex, due 2025-09-24.
+  - Input axis "Cancel" may be missing on some control schemes, blocking Escape-equivalent close behavior — Owner: Codex, due 2025-09-28.
 - **Tasks**
   - Add path preview line — Owner: Codex, Estimate: 1d, Dependencies: FEAT-WM-001, Acceptance: preview line renders for queued waypoints, Progress: 100% (due 2025-09-30).
   - Implement area tooltip interactions — Owner: Codex, Estimate: 1d, Dependencies: FEAT-WM-001, Acceptance: Tooltip displays area name, plays show/idle/hide states, and invokes Info/Enter events, Progress: 100% (due 2025-09-16).
+  - Implement location activities panel with keyboard/gamepad highlighting — Owner: Codex, Estimate: 1d, Dependencies: FEAT-WM-001, Acceptance: Enter opens panel, Escape/Cancel closes, active button shows yellow highlight, Progress: 100% (due 2025-09-24).
 - **Legacy reference**
   - WorldMapForm → WorldMap scene + PlayerNavigator (see mapping table).
-- **Progress:** In progress, 90% (scene reopen pending Unity validation — Owner: Codex, due 2025-09-16).
+- **Progress:** In progress, 93% (scene reopen pending Unity validation; location activities panel keyboard flow live — Owner: Codex, due 2025-09-16).
 - **Open decisions:**
   - TBD: Authenticate WebSocket connections. Owner: TBD, due 2025-09-30.
 
@@ -178,9 +187,10 @@ _Last updated: 2025-09-23 05:46 UTC • Document owner: Codex_
   Interface must support keyboard and mouse.
 - **UX notes**
   Requires pixel font `Thaleah_PixelFont`.
+  LocationActivitiesPanel provides keyboard/gamepad friendly navigation for city activities.
 - **Technical notes**
   Built with Unity UGUI.
-- **Progress:** In progress, 10% (popup window prefab and city interaction panel).
+- **Progress:** In progress, 15% (popup window prefab, city interaction panel wiring, and location activities panel highlighting).
 - **Open decisions:**
   - TBD: Finalize navigation flow. Owner: TBD, due 2025-09-25.
 
@@ -274,6 +284,7 @@ _Last updated: 2025-09-23 05:46 UTC • Document owner: Codex_
 | WorldMapForm | WorldMap scene + PlayerNavigator | In progress | Codex | Shift-click waypoints queue |
 | WorldMap remote party markers | RemotePlayer entities | In progress | Codex | NavMesh markers spawn and follow downloaded waypoints; WebSocket state sync with interpolation |
 | WorldMap location tooltip | AreaTooltip prefab controller | Complete | Codex | Collider-driven show/idle/hide animations with area name and button events; requires `Player` tag retention |
+| WorldMap city activities panel | LocationActivitiesPanel | In progress | Codex | Keyboard-accessible Enter/Escape flow with yellow/red highlights; activity content placeholders awaiting Tavern/Shop hooks |
 | (New) Free camera navigation | FreeCameraController | In progress | Codex | WASD panning with smoothing |
 | TravelLogService | PlayerStateUploader/Downloader | In progress | Codex | Periodic SQL sync of player positions |
 
@@ -454,4 +465,7 @@ _Last updated: 2025-09-23 05:46 UTC • Document owner: Codex_
 - 2025-09-22: Tagged world map player and restored `Player` tag in TagManager so AreaTooltip triggers fire on entry/exit. — Codex
 
 - 2025-09-23: Recovered RPG scene from backup commit, reinstated the `player` GameObject tag, and logged scene YAML edit risk mitigation. — Codex
+
+- 2025-09-24: Added LocationActivitiesPanel with yellow/red highlighting, Enter/Escape input flow, and updated AreaTooltip to re-arm interactions per keyboard accessibility pillar. — Codex
+- 2025-09-24: Retrofitted LocationActivitiesPanel onto the existing `locationInfoWindow`, removed redundant prefab wiring, and re-hooked AreaTooltip Enter events to the shared panel for plug-and-play city activity UI. — Codex
 
