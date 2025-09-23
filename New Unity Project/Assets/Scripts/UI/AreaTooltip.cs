@@ -62,6 +62,13 @@ public class AreaTooltip : MonoBehaviour
     private int hideTriggerHash;
     private Coroutine idleCoroutine;
     private bool isPlayerInside;
+    private bool interactionLocked;
+
+    /// <summary>
+    /// Reference to the most recent tooltip that triggered its enter interaction.
+    /// Used by UI panels to re-enable input without requiring the player to exit the trigger.
+    /// </summary>
+    public static AreaTooltip LastActivatedTooltip { get; private set; }
 
     private void Awake()
     {
@@ -89,6 +96,7 @@ public class AreaTooltip : MonoBehaviour
     {
         StopIdleCoroutine();
         isPlayerInside = false;
+        UnlockInteraction();
     }
 
     private void OnDestroy()
@@ -104,6 +112,7 @@ public class AreaTooltip : MonoBehaviour
         }
 
         isPlayerInside = true;
+        interactionLocked = false;
         PlayShowAnimation();
     }
 
@@ -116,10 +125,24 @@ public class AreaTooltip : MonoBehaviour
 
         isPlayerInside = false;
         StopIdleCoroutine();
+        UnlockInteraction();
         if (tooltipAnimator != null && hideTriggerHash != 0)
         {
             tooltipAnimator.ResetTrigger(showTriggerHash);
             tooltipAnimator.SetTrigger(hideTriggerHash);
+        }
+    }
+
+    private void Update()
+    {
+        if (!isPlayerInside || interactionLocked)
+        {
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            TryInvokeEnter();
         }
     }
 
@@ -271,7 +294,31 @@ public class AreaTooltip : MonoBehaviour
 
     private void HandleEnterClicked()
     {
+        TryInvokeEnter();
+    }
+
+    private void TryInvokeEnter()
+    {
+        if (interactionLocked)
+        {
+            return;
+        }
+
+        interactionLocked = true;
+        LastActivatedTooltip = this;
         EnterClicked.Invoke();
+    }
+
+    /// <summary>
+    /// Re-enables enter interactions after an external panel closes.
+    /// </summary>
+    public void UnlockInteraction()
+    {
+        interactionLocked = false;
+        if (LastActivatedTooltip == this)
+        {
+            LastActivatedTooltip = null;
+        }
     }
 
     private void ValidateSerializedFields()
