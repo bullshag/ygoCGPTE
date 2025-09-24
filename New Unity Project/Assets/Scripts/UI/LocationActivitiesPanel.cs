@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
 /// Controls the city location activities panel and its associated content views.
@@ -32,6 +34,15 @@ public class LocationActivitiesPanel : MonoBehaviour
     [SerializeField]
     private List<LocationView> locations = new();
 
+    [Header("Visuals")]
+    [SerializeField]
+    private bool useButtonColorHighlights = true;
+
+    [Header("Placeholders")]
+    [SerializeField]
+    [Tooltip("Format string used when auto-generating placeholder content for locations without bespoke panels.")]
+    private string placeholderMessageFormat = "{0} content coming soon.";
+
     private LocationView activeView;
     private bool isOpen;
 
@@ -42,6 +53,7 @@ public class LocationActivitiesPanel : MonoBehaviour
             panelRoot = gameObject;
         }
 
+        var templateView = locations.FirstOrDefault(l => l.contentRoot != null);
         foreach (var location in locations)
         {
             if (location.button != null)
@@ -50,10 +62,8 @@ public class LocationActivitiesPanel : MonoBehaviour
                 location.button.onClick.AddListener(location.cachedAction);
             }
 
-            if (location.contentRoot != null)
-            {
-                location.contentRoot.SetActive(false);
-            }
+            EnsureContentRoot(location, templateView?.contentRoot);
+            location.contentRoot?.SetActive(false);
         }
 
         panelRoot.SetActive(false);
@@ -230,6 +240,11 @@ public class LocationActivitiesPanel : MonoBehaviour
 
     private void ApplyVisualStates()
     {
+        if (!useButtonColorHighlights)
+        {
+            return;
+        }
+
         foreach (var location in locations)
         {
             if (location.button == null)
@@ -245,5 +260,82 @@ public class LocationActivitiesPanel : MonoBehaviour
 
             targetGraphic.color = location == activeView ? ActiveColor : InactiveColor;
         }
+    }
+
+    private void EnsureContentRoot(LocationView location, GameObject templateRoot)
+    {
+        if (location.contentRoot != null)
+        {
+            return;
+        }
+
+        var placeholder = CreatePlaceholderContent(location.displayName, templateRoot);
+        location.contentRoot = placeholder;
+    }
+
+    private GameObject CreatePlaceholderContent(string displayName, GameObject templateRoot)
+    {
+        var parent = templateRoot != null ? templateRoot.transform.parent : panelRoot.transform;
+        var placeholder = new GameObject($"{displayName}Placeholder", typeof(RectTransform));
+        var placeholderRect = placeholder.GetComponent<RectTransform>();
+        placeholderRect.SetParent(parent, false);
+
+        ApplyTemplateLayout(templateRoot, placeholderRect);
+
+        var label = BuildPlaceholderLabel(placeholderRect, templateRoot, displayName);
+        label.text = string.Format(placeholderMessageFormat, displayName);
+
+        placeholder.SetActive(false);
+        return placeholder;
+    }
+
+    private static void ApplyTemplateLayout(GameObject templateRoot, RectTransform target)
+    {
+        if (templateRoot != null && templateRoot.TryGetComponent(out RectTransform templateRect))
+        {
+            target.anchorMin = templateRect.anchorMin;
+            target.anchorMax = templateRect.anchorMax;
+            target.anchoredPosition = templateRect.anchoredPosition;
+            target.sizeDelta = templateRect.sizeDelta;
+            target.pivot = templateRect.pivot;
+        }
+        else
+        {
+            target.anchorMin = new Vector2(0.5f, 0.5f);
+            target.anchorMax = new Vector2(0.5f, 0.5f);
+            target.anchoredPosition = Vector2.zero;
+            target.sizeDelta = new Vector2(600f, 400f);
+            target.pivot = new Vector2(0.5f, 0.5f);
+        }
+    }
+
+    private static TextMeshProUGUI BuildPlaceholderLabel(RectTransform parent, GameObject templateRoot, string displayName)
+    {
+        var labelGO = new GameObject($"{displayName}Label", typeof(RectTransform), typeof(CanvasRenderer));
+        var labelRect = labelGO.GetComponent<RectTransform>();
+        labelRect.SetParent(parent, false);
+        labelRect.anchorMin = new Vector2(0.1f, 0.1f);
+        labelRect.anchorMax = new Vector2(0.9f, 0.9f);
+        labelRect.offsetMin = Vector2.zero;
+        labelRect.offsetMax = Vector2.zero;
+
+        var label = labelGO.AddComponent<TextMeshProUGUI>();
+        label.alignment = TextAlignmentOptions.Center;
+        label.enableWordWrapping = true;
+        label.fontSize = 28f;
+
+        if (templateRoot != null)
+        {
+            var templateLabel = templateRoot.GetComponentInChildren<TextMeshProUGUI>(true);
+            if (templateLabel != null)
+            {
+                label.font = templateLabel.font;
+                label.fontSize = templateLabel.fontSize;
+                label.fontStyle = templateLabel.fontStyle;
+                label.color = templateLabel.color;
+            }
+        }
+
+        return label;
     }
 }
