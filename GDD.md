@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-24 04:06 UTC • Document owner: Codex_
+_Last updated: 2025-09-24 05:25 UTC • Document owner: Codex_
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
 - **Build Status:** Yellow — Windows-specific tests fail in current Linux environment.
@@ -129,6 +129,7 @@ _Last updated: 2025-09-24 04:06 UTC • Document owner: Codex_
   - Buttons highlight via configurable yellow/red color swaps; missing content roots automatically spawn placeholder RectTransforms that mirror a template's layout and inject formatted "coming soon" messaging until bespoke sub-panels arrive.
   - Auto-discovery maps `infoFrame` buttons to matching background panels, preserving handcrafted layouts while fabricating placeholders for Shop, Temple, Academy, Graveyard, and Arena until bespoke content arrives.
   - `Search for Enemies` now bypasses panel selection and closes the window before calling `MainRPGNavigation.OpenBattle()`, ensuring the combat scene loads straight from the city list without stale focus.
+  - Removed legacy prefab-based `LocationActivitiesPanel` clone from the RPG scene to resolve merge conflicts and keep auto-discovered bindings authoritative.
 - **Risks:**
   - InputAction conflicts may reoccur when sub-panels capture focus — Owner: Codex, due 2025-09-30.
   - Location metadata contract is still TBD and may slip — Owner: TBD, due 2025-09-27.
@@ -536,4 +537,4 @@ _Last updated: 2025-09-24 04:06 UTC • Document owner: Codex_
 
 - 2025-09-24: Rewired PlayerNavigator and AreaTooltip to the existing `locationInfoWindow`, migrated LocationActivitiesPanel onto it, and generated placeholder content for yet-to-be-specified locations. — Codex
 - 2025-09-24: Restored RPG scene from commit 0ea6a56 after corruption and re-populated LocationActivitiesPanel defaults in YAML. — Codex
-
+- 2025-09-24: Removed duplicate prefab-based LocationActivitiesPanel from RPG scene and retargeted city tooltip events to the auto-discovered panel on `locationInfoWindow`. — Codex

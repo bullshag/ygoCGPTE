@@ -39,3 +39,5 @@ MonoBehaviour:
   useButtonColorHighlights: 1
   placeholderMessageFormat: "{0} content coming soon."
   cityInteractionPanel: {fileID: 980410313}
+        - m_Target: {fileID: 980410317}
+        - m_Target: {fileID: 980410317}
