@@ -385,11 +385,11 @@ public class LocationActivitiesPanel : MonoBehaviour
             yield break;
         }
 
+        var textInfo = CultureInfo.InvariantCulture.TextInfo;
         var camel = string.Concat(parts.Select((part, index) => index == 0
             ? part.ToLowerInvariant()
-            : CultureInfo.InvariantCulture.TextInfo.ToTitleCase(part.ToLowerInvariant())));
-
-        var pascal = string.Concat(parts.Select(part => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(part.ToLowerInvariant())));
+            : textInfo.ToTitleCase(part.ToLowerInvariant())));
+        var pascal = string.Concat(parts.Select(part => textInfo.ToTitleCase(part.ToLowerInvariant())));
         var lower = string.Concat(parts).ToLowerInvariant();
 
         yield return camel;
