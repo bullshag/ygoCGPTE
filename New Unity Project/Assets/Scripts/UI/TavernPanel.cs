@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -32,10 +34,12 @@ public class TavernPanel : MonoBehaviour
     private readonly List<Button> _spawnedButtons = new();
     private PartyMemberGenerator.GeneratedRecruit? _selectedRecruit;
 
-    private Transform? CandidateContent => candidateScrollRect != null ? candidateScrollRect.content : null;
+    private Transform CandidateContent => candidateScrollRect != null ? candidateScrollRect.content : null;
 
     private void Awake()
     {
+        AutoWireSerializedReferences();
+
         if (recruitDetailPanel != null)
         {
             recruitDetailPanel.HideInstant();
@@ -62,6 +66,68 @@ public class TavernPanel : MonoBehaviour
         WireTopLevelButtons();
         ConfigureTodoButton(hireMercenariesButton);
         ConfigureTodoButton(lookForWorkButton);
+    }
+
+    private void AutoWireSerializedReferences()
+    {
+        searchPartyMembersButton = searchPartyMembersButton ?? FindButtonByName("searchPartyMembersBtn");
+        hireMercenariesButton = hireMercenariesButton ?? FindButtonByName("hireMercBtn");
+        lookForWorkButton = lookForWorkButton ?? FindButtonByName("questsBtn");
+
+        if (candidateScrollRect == null)
+        {
+            candidateScrollRect = GetComponentInChildren<ScrollRect>(true);
+        }
+
+        if (candidateButtonPrefab == null)
+        {
+            var content = CandidateContent ?? candidateScrollRect?.content;
+            if (content != null)
+            {
+                var templateButton = content.GetComponentsInChildren<Button>(true)
+                    .FirstOrDefault();
+                if (templateButton != null)
+                {
+                    candidateButtonPrefab = templateButton.gameObject;
+                    candidateButtonPrefab.SetActive(false);
+                }
+            }
+        }
+
+        if (recruitDetailPanel == null)
+        {
+            recruitDetailPanel = GetComponentInChildren<TavernRecruitDetailPanel>(true);
+        }
+    }
+
+    private Button FindButtonByName(string objectName)
+    {
+        var target = FindChildRecursive(transform, objectName);
+        return target != null ? target.GetComponent<Button>() : null;
+    }
+
+    private static Transform FindChildRecursive(Transform parent, string name)
+    {
+        if (parent == null)
+        {
+            return null;
+        }
+
+        foreach (Transform child in parent)
+        {
+            if (string.Equals(child.name, name, StringComparison.OrdinalIgnoreCase))
+            {
+                return child;
+            }
+
+            var descendant = FindChildRecursive(child, name);
+            if (descendant != null)
+            {
+                return descendant;
+            }
+        }
+
+        return null;
     }
 
     private void WireTopLevelButtons()
@@ -145,14 +211,26 @@ public class TavernPanel : MonoBehaviour
             return;
         }
 
+        if (candidateButtonPrefab == null)
+        {
+            Debug.LogWarning("TavernPanel candidate button prefab is not assigned.");
+            return;
+        }
+
         foreach (Transform child in content)
         {
+            if (candidateButtonPrefab != null && child.gameObject == candidateButtonPrefab)
+            {
+                continue;
+            }
+
             Destroy(child.gameObject);
         }
 
         foreach (var recruit in _availableRecruits)
         {
             var candidateGO = Instantiate(candidateButtonPrefab, content);
+            candidateGO.SetActive(true);
             var button = candidateGO.GetComponent<Button>();
             if (button == null)
             {

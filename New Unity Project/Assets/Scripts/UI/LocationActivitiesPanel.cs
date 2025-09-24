@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -26,6 +27,9 @@ public class LocationActivitiesPanel : MonoBehaviour
         [NonSerialized] public UnityAction cachedAction = null!;
     }
 
+    private const string ButtonSuffix = "Btn";
+    private const string BackgroundSuffix = "Background";
+
     [Header("Panel Root")]
     [SerializeField]
     private GameObject panelRoot = null!;
@@ -33,6 +37,15 @@ public class LocationActivitiesPanel : MonoBehaviour
     [Header("Location Views")]
     [SerializeField]
     private List<LocationView> locations = new();
+
+    [Header("Auto Discovery")]
+    [SerializeField]
+    [Tooltip("Automatically discover buttons/content under the configured container when explicit locations are not provided.")]
+    private bool autoDiscoverLocations = true;
+
+    [SerializeField]
+    [Tooltip("Optional override for the container that holds the activity buttons (defaults to searching for 'infoFrame').")]
+    private Transform buttonContainerOverride = null!;
 
     [Header("Visuals")]
     [SerializeField]
@@ -51,6 +64,11 @@ public class LocationActivitiesPanel : MonoBehaviour
         if (panelRoot == null)
         {
             panelRoot = gameObject;
+        }
+
+        if (autoDiscoverLocations)
+        {
+            DiscoverLocationsFromHierarchy();
         }
 
         var templateView = locations.FirstOrDefault(l => l.contentRoot != null);
@@ -197,6 +215,240 @@ public class LocationActivitiesPanel : MonoBehaviour
         {
             SetActiveView(view);
         }
+    }
+
+    private void DiscoverLocationsFromHierarchy()
+    {
+        if (locations.Any(l => l.button != null))
+        {
+            return;
+        }
+
+        var container = ResolveButtonContainer();
+        if (container == null)
+        {
+            Debug.LogWarning($"[{nameof(LocationActivitiesPanel)}] Unable to find button container for auto discovery.", this);
+            return;
+        }
+
+        locations.Clear();
+
+        foreach (var button in container.GetComponentsInChildren<Button>(true))
+        {
+            if (button == null)
+            {
+                continue;
+            }
+
+            var baseName = ExtractBaseName(button.gameObject.name);
+            var displayName = ExtractDisplayName(button, baseName);
+
+            if (IsSearchForEnemiesButton(baseName, displayName))
+            {
+                WireSearchForEnemiesButton(button);
+                continue;
+            }
+
+            if (string.IsNullOrEmpty(displayName))
+            {
+                continue;
+            }
+
+            var content = FindContentRoot(displayName, baseName);
+            locations.Add(new LocationView
+            {
+                displayName = displayName,
+                button = button,
+                contentRoot = content
+            });
+        }
+    }
+
+    private Transform ResolveButtonContainer()
+    {
+        if (buttonContainerOverride != null)
+        {
+            return buttonContainerOverride;
+        }
+
+        if (panelRoot != null)
+        {
+            var found = FindChildRecursive(panelRoot.transform, "infoFrame");
+            if (found != null)
+            {
+                buttonContainerOverride = found;
+                return found;
+            }
+        }
+
+        var infoFrame = GameObject.Find("infoFrame");
+        if (infoFrame != null)
+        {
+            buttonContainerOverride = infoFrame.transform;
+            return buttonContainerOverride;
+        }
+
+        return null;
+    }
+
+    private static string ExtractBaseName(string objectName)
+    {
+        if (string.IsNullOrEmpty(objectName))
+        {
+            return string.Empty;
+        }
+
+        return objectName.EndsWith(ButtonSuffix, StringComparison.OrdinalIgnoreCase)
+            ? objectName[..^ButtonSuffix.Length]
+            : objectName;
+    }
+
+    private static string ExtractDisplayName(Button button, string fallback)
+    {
+        var label = button.GetComponentInChildren<TMP_Text>();
+        if (label != null && !string.IsNullOrWhiteSpace(label.text))
+        {
+            return label.text.Trim();
+        }
+
+        if (string.IsNullOrEmpty(fallback))
+        {
+            return string.Empty;
+        }
+
+        return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(fallback.Replace('_', ' '));
+    }
+
+    private static bool IsSearchForEnemiesButton(string baseName, string displayName)
+    {
+        if (baseName.Equals("enemies", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return displayName.IndexOf("Enemies", StringComparison.OrdinalIgnoreCase) >= 0;
+    }
+
+    private void WireSearchForEnemiesButton(Button button)
+    {
+        button.onClick.RemoveAllListeners();
+        button.onClick.AddListener(() =>
+        {
+            Close();
+            MainRPGNavigation.OpenBattle();
+        });
+    }
+
+    private GameObject FindContentRoot(string displayName, string baseName)
+    {
+        foreach (var candidate in BuildContentNameCandidates(displayName, baseName))
+        {
+            var found = TryFindContentObject(candidate);
+            if (found != null)
+            {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
+    private IEnumerable<string> BuildContentNameCandidates(string displayName, string baseName)
+    {
+        if (!string.IsNullOrEmpty(baseName))
+        {
+            yield return baseName + BackgroundSuffix;
+            yield return baseName + "Panel";
+        }
+
+        if (!string.IsNullOrEmpty(displayName))
+        {
+            foreach (var variant in BuildNameVariants(displayName))
+            {
+                yield return variant + BackgroundSuffix;
+                yield return variant + "Panel";
+            }
+        }
+    }
+
+    private static IEnumerable<string> BuildNameVariants(string source)
+    {
+        var trimmed = source.Trim();
+        if (string.IsNullOrEmpty(trimmed))
+        {
+            yield break;
+        }
+
+        var parts = trimmed.Split(new[] { ' ', '-', '_' }, StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 0)
+        {
+            yield break;
+        }
+
+        var camel = string.Concat(parts.Select((part, index) => index == 0
+            ? part.ToLowerInvariant()
+            : CultureInfo.InvariantCulture.TextInfo.ToTitleCase(part.ToLowerInvariant())));
+
+        var pascal = string.Concat(parts.Select(part => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(part.ToLowerInvariant())));
+        var lower = string.Concat(parts).ToLowerInvariant();
+
+        yield return camel;
+        if (!string.Equals(camel, pascal, StringComparison.Ordinal))
+        {
+            yield return pascal;
+        }
+        if (!string.Equals(lower, camel, StringComparison.Ordinal) && !string.Equals(lower, pascal, StringComparison.Ordinal))
+        {
+            yield return lower;
+        }
+    }
+
+    private GameObject TryFindContentObject(string name)
+    {
+        if (panelRoot != null)
+        {
+            var found = FindChildRecursive(panelRoot.transform, name);
+            if (found != null)
+            {
+                return found.gameObject;
+            }
+        }
+
+        if (panelRoot != null && panelRoot.transform.parent != null)
+        {
+            var found = FindChildRecursive(panelRoot.transform.parent, name);
+            if (found != null)
+            {
+                return found.gameObject;
+            }
+        }
+
+        var sceneObject = GameObject.Find(name);
+        return sceneObject != null ? sceneObject : null;
+    }
+
+    private static Transform FindChildRecursive(Transform root, string name)
+    {
+        if (root == null)
+        {
+            return null;
+        }
+
+        foreach (Transform child in root)
+        {
+            if (string.Equals(child.name, name, StringComparison.OrdinalIgnoreCase))
+            {
+                return child;
+            }
+
+            var descendant = FindChildRecursive(child, name);
+            if (descendant != null)
+            {
+                return descendant;
+            }
+        }
+
+        return null;
     }
 
     private void SetActiveView(LocationView view)
