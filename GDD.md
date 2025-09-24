@@ -15,7 +15,7 @@ _Last updated: 2025-09-24 18:45 UTC • Document owner: Codex_
   - Incomplete mapping of legacy features — Owner: TBD, due 2025-09-25.
   - Popup window usage inconsistent across scenes — Owner: Codex, due 2025-09-27 (Login and Register now share PopupWindow prefab; remaining scenes pending audit).
     - GUID corruption in `.meta` files may break asset references — Owner: Codex, due 2025-09-14.
-  - Scene asset regression risk due to manual YAML edits — Owner: Codex, due 2025-09-30. Mitigation: Use Unity editor or verified templates when adjusting scene tags; Trigger: scene fails to open or loses GameObject data.
+  - Scene asset regression risk due to manual YAML edits — Owner: Codex, due 2025-09-30. Mitigation: Use Unity editor or verified templates when adjusting scene tags; Trigger: scene fails to open or loses GameObject data. Status 2025-09-24: Restored RPG scene from commit 0ea6a56 to resolve YAML truncation.
 - **Next Milestone:** Unity Prototype Build, 2025-10-01, exit criteria: player can start battle and load inventory from database.
 
 ## 1. Vision & Pillars
@@ -524,4 +524,5 @@ _Last updated: 2025-09-24 18:45 UTC • Document owner: Codex_
 - 2025-09-24: Scoped LocationActivitiesPanel refresh and Tavern sub-panel integration, recorded new dependencies, acceptance criteria, and risks, and noted TBD follow-ups for location metadata service contract (Owner: TBD, due 2025-09-27) and TavernManager API audit (Owner: TBD, due 2025-09-28) to unblock implementation steps. — Codex
 
 - 2025-09-24: Rewired PlayerNavigator and AreaTooltip to the existing `locationInfoWindow`, migrated LocationActivitiesPanel onto it, and generated placeholder content for yet-to-be-specified locations. — Codex
+- 2025-09-24: Restored RPG scene from commit 0ea6a56 after corruption and re-populated LocationActivitiesPanel defaults in YAML. — Codex
 
