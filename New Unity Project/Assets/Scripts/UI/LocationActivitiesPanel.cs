@@ -1,341 +1,298 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using TMPro;
 
 /// <summary>
-/// Controls the city location activities panel and its associated content views.
-/// Handles button highlighting, panel visibility, and keyboard/gamepad shortcuts.
+/// Drives the location activity buttons, loading availability from the database
+/// and managing highlight states.
 /// </summary>
 public class LocationActivitiesPanel : MonoBehaviour
 {
-    private static readonly Color ActiveColor = new(1f, 0.92f, 0.016f, 1f); // Bright yellow
-    private static readonly Color InactiveColor = new(0.6f, 0.0f, 0.0f, 1f); // Deep red
-
     [Serializable]
-    private class LocationView
+    private class ActivityButton
     {
-        [Tooltip("Display name for debugging purposes only.")]
-        public string displayName = string.Empty;
+        public LocationActivityType activityType;
         public Button button = null!;
-        public GameObject contentRoot = null!;
-        [NonSerialized] public UnityAction cachedAction = null!;
+        [NonSerialized] public UnityAction? cachedHandler;
     }
 
-    [Header("Panel Root")]
-    [SerializeField]
-    private GameObject panelRoot = null!;
+    private static readonly Color BaseColor = ParseColor("#FF4949", new Color(1f, 0.286f, 0.286f, 1f));
+    private static readonly Color ActiveColor = new(1f, 0.92f, 0.016f, 1f);
 
-    [Header("Location Views")]
+    [Header("Location Context")]
     [SerializeField]
-    private List<LocationView> locations = new();
+    private string locationId = string.Empty;
 
-    [Header("Visuals")]
+    [Tooltip("Hide buttons that are unavailable instead of leaving them disabled.")]
     [SerializeField]
-    private bool useButtonColorHighlights = true;
+    private bool hideUnavailableButtons = true;
 
-    [Header("Placeholders")]
+    [Tooltip("Seconds that the Search button remains highlighted before returning to red.")]
     [SerializeField]
-    [Tooltip("Format string used when auto-generating placeholder content for locations without bespoke panels.")]
-    private string placeholderMessageFormat = "{0} content coming soon.";
+    private float searchHighlightDuration = 0.35f;
 
-    private LocationView activeView;
-    private bool isOpen;
+    [Header("Buttons")]
+    [SerializeField]
+    private List<ActivityButton> activityButtons = new();
+
+    private readonly LocationActivityService _service = new();
+    private readonly Dictionary<LocationActivityType, ActivityButton> _lookup = new();
+
+    private ActivityButton? _activeSelection;
+    private CancellationTokenSource? _refreshCts;
+    private Coroutine? _searchRoutine;
+
+    /// <summary>
+    /// Currently selected activity (excluding Search).
+    /// </summary>
+    public LocationActivityType? ActiveActivity => _activeSelection?.activityType;
 
     private void Awake()
     {
-        if (panelRoot == null)
+        _lookup.Clear();
+        foreach (var entry in activityButtons)
         {
-            panelRoot = gameObject;
-        }
-
-        var templateView = locations.FirstOrDefault(l => l.contentRoot != null);
-        foreach (var location in locations)
-        {
-            if (location.button != null)
+            if (entry?.button == null)
             {
-                location.cachedAction = () => HandleLocationClicked(location);
-                location.button.onClick.AddListener(location.cachedAction);
+                continue;
             }
 
-            EnsureContentRoot(location, templateView?.contentRoot);
-            location.contentRoot?.SetActive(false);
-        }
+            if (_lookup.ContainsKey(entry.activityType))
+            {
+                Debug.LogWarning($"Duplicate activity mapping for {entry.activityType} detected on {name}. Only the first mapping will be used.");
+                continue;
+            }
 
-        panelRoot.SetActive(false);
-        isOpen = false;
+            _lookup.Add(entry.activityType, entry);
+            ConfigureButtonColors(entry.button, BaseColor);
+
+            entry.cachedHandler = () => HandleButtonClicked(entry.activityType);
+            entry.button.onClick.AddListener(entry.cachedHandler);
+        }
+    }
+
+    private void OnEnable()
+    {
+        _ = RefreshAvailabilityAsync();
+    }
+
+    private void OnDisable()
+    {
+        CancelPendingRefresh();
     }
 
     private void OnDestroy()
     {
-        foreach (var location in locations)
+        foreach (var entry in activityButtons)
         {
-            if (location.button != null)
+            if (entry?.button != null && entry.cachedHandler != null)
             {
-                if (location.cachedAction != null)
-                {
-                    location.button.onClick.RemoveListener(location.cachedAction);
-                }
+                entry.button.onClick.RemoveListener(entry.cachedHandler);
             }
         }
     }
 
-    private void Update()
+    /// <summary>
+    /// Assign a new location identifier and refresh the availability data.
+    /// </summary>
+    public void SetLocation(string newLocationId)
     {
-        if (!isOpen)
+        if (string.Equals(locationId, newLocationId, StringComparison.OrdinalIgnoreCase))
         {
             return;
         }
 
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Close();
-            return;
-        }
-
-        if (Input.GetButtonDown("Cancel"))
-        {
-            Close();
-        }
+        locationId = newLocationId;
+        _ = RefreshAvailabilityAsync();
     }
 
     /// <summary>
-    /// Displays the panel and highlights the previously selected location or the first available entry.
+    /// Force a refresh of the availability data using the configured location identifier.
     /// </summary>
-    public void Open()
+    public async Task RefreshAvailabilityAsync()
     {
-        if (panelRoot == null)
+        CancelPendingRefresh();
+
+        if (string.IsNullOrWhiteSpace(locationId))
         {
+            Debug.LogWarning($"{nameof(LocationActivitiesPanel)} on {name} cannot refresh without a location identifier.");
+            ApplyAvailability(new LocationActivityAvailability());
             return;
         }
 
-        panelRoot.SetActive(true);
-        isOpen = true;
+        _refreshCts = new CancellationTokenSource();
+        var token = _refreshCts.Token;
 
-        if (activeView == null && locations.Count > 0)
+        try
         {
-            SetActiveView(locations[0]);
+            var availability = await _service.GetAvailabilityAsync(locationId, token).ConfigureAwait(true);
+            ApplyAvailability(availability);
         }
-        else
+        catch (OperationCanceledException)
         {
-            ApplyVisualStates();
-            ShowOnlyActiveContent();
+            // Intentionally ignored when the panel is disabled or destroyed.
         }
-
-        if (EventSystem.current != null && activeView != null && activeView.button != null)
+        catch (Exception ex)
         {
-            EventSystem.current.SetSelectedGameObject(activeView.button.gameObject);
+            Debug.LogError($"Failed to load location activities for '{locationId}': {ex.Message}");
+            ApplyAvailability(new LocationActivityAvailability());
         }
     }
 
-    /// <summary>
-    /// Hides the panel and resets AreaTooltip so the player can reopen it without leaving the trigger volume.
-    /// </summary>
-    public void Close()
+    private void CancelPendingRefresh()
     {
-        if (panelRoot == null)
+        if (_refreshCts == null)
         {
             return;
         }
 
-        panelRoot.SetActive(false);
-        isOpen = false;
-        HideAllContent();
-
-        if (EventSystem.current != null)
+        if (!_refreshCts.IsCancellationRequested)
         {
-            EventSystem.current.SetSelectedGameObject(null);
+            _refreshCts.Cancel();
         }
 
-        var lastTooltip = AreaTooltip.LastActivatedTooltip;
-        lastTooltip?.UnlockInteraction();
+        _refreshCts.Dispose();
+        _refreshCts = null;
     }
 
-    /// <summary>
-    /// Makes the Tavern content visible.
-    /// </summary>
-    public void ShowTavern() => SelectLocationByName("Tavern");
-
-    /// <summary>
-    /// Makes the Shop content visible.
-    /// </summary>
-    public void ShowShop() => SelectLocationByName("Shop");
-
-    /// <summary>
-    /// Makes the Temple content visible.
-    /// </summary>
-    public void ShowTemple() => SelectLocationByName("Temple");
-
-    /// <summary>
-    /// Makes the Academy content visible.
-    /// </summary>
-    public void ShowAcademy() => SelectLocationByName("Academy");
-
-    /// <summary>
-    /// Makes the Arena content visible.
-    /// </summary>
-    public void ShowArena() => SelectLocationByName("Arena");
-
-    /// <summary>
-    /// Makes the Graveyard content visible.
-    /// </summary>
-    public void ShowGraveyard() => SelectLocationByName("Graveyard");
-
-    private void HandleLocationClicked(LocationView view)
+    private void ApplyAvailability(LocationActivityAvailability availability)
     {
-        SetActiveView(view);
-    }
-
-    private void SelectLocationByName(string name)
-    {
-        var view = locations.Find(l => string.Equals(l.displayName, name, StringComparison.OrdinalIgnoreCase));
-        if (view != null)
+        foreach (var entry in activityButtons)
         {
-            SetActiveView(view);
-        }
-    }
-
-    private void SetActiveView(LocationView view)
-    {
-        if (view == null)
-        {
-            return;
-        }
-
-        activeView = view;
-        ShowOnlyActiveContent();
-        ApplyVisualStates();
-
-        if (EventSystem.current != null && view.button != null)
-        {
-            EventSystem.current.SetSelectedGameObject(view.button.gameObject);
-        }
-    }
-
-    private void ShowOnlyActiveContent()
-    {
-        foreach (var location in locations)
-        {
-            if (location.contentRoot != null)
-            {
-                location.contentRoot.SetActive(location == activeView);
-            }
-        }
-    }
-
-    private void HideAllContent()
-    {
-        foreach (var location in locations)
-        {
-            if (location.contentRoot != null)
-            {
-                location.contentRoot.SetActive(false);
-            }
-        }
-    }
-
-    private void ApplyVisualStates()
-    {
-        if (!useButtonColorHighlights)
-        {
-            return;
-        }
-
-        foreach (var location in locations)
-        {
-            if (location.button == null)
+            if (entry?.button == null)
             {
                 continue;
             }
 
-            var targetGraphic = location.button.targetGraphic;
-            if (targetGraphic == null)
+            bool isEnabled = availability.IsEnabled(entry.activityType);
+
+            if (hideUnavailableButtons)
             {
-                continue;
+                entry.button.gameObject.SetActive(isEnabled);
+            }
+            else
+            {
+                entry.button.interactable = isEnabled;
             }
 
-            targetGraphic.color = location == activeView ? ActiveColor : InactiveColor;
+            if (!isEnabled && _activeSelection == entry)
+            {
+                _activeSelection = null;
+            }
+
+            if (!isEnabled)
+            {
+                ConfigureButtonColors(entry.button, BaseColor);
+            }
+        }
+
+        if (_activeSelection != null && _activeSelection.button != null)
+        {
+            ConfigureButtonColors(_activeSelection.button, ActiveColor);
+        }
+        else
+        {
+            ResetNonSearchButtonsToBase();
         }
     }
 
-    private void EnsureContentRoot(LocationView location, GameObject templateRoot)
+    private void HandleButtonClicked(LocationActivityType activityType)
     {
-        if (location.contentRoot != null)
+        if (!_lookup.TryGetValue(activityType, out var entry) || entry.button == null)
         {
             return;
         }
 
-        var placeholder = CreatePlaceholderContent(location.displayName, templateRoot);
-        location.contentRoot = placeholder;
-    }
-
-    private GameObject CreatePlaceholderContent(string displayName, GameObject templateRoot)
-    {
-        var parent = templateRoot != null ? templateRoot.transform.parent : panelRoot.transform;
-        var placeholder = new GameObject($"{displayName}Placeholder", typeof(RectTransform));
-        var placeholderRect = placeholder.GetComponent<RectTransform>();
-        placeholderRect.SetParent(parent, false);
-
-        ApplyTemplateLayout(templateRoot, placeholderRect);
-
-        var label = BuildPlaceholderLabel(placeholderRect, templateRoot, displayName);
-        label.text = string.Format(placeholderMessageFormat, displayName);
-
-        placeholder.SetActive(false);
-        return placeholder;
-    }
-
-    private static void ApplyTemplateLayout(GameObject templateRoot, RectTransform target)
-    {
-        if (templateRoot != null && templateRoot.TryGetComponent(out RectTransform templateRect))
+        if (activityType == LocationActivityType.SearchForEnemies)
         {
-            target.anchorMin = templateRect.anchorMin;
-            target.anchorMax = templateRect.anchorMax;
-            target.anchoredPosition = templateRect.anchoredPosition;
-            target.sizeDelta = templateRect.sizeDelta;
-            target.pivot = templateRect.pivot;
+            HandleSearchButton(entry);
+            return;
         }
-        else
-        {
-            target.anchorMin = new Vector2(0.5f, 0.5f);
-            target.anchorMax = new Vector2(0.5f, 0.5f);
-            target.anchoredPosition = Vector2.zero;
-            target.sizeDelta = new Vector2(600f, 400f);
-            target.pivot = new Vector2(0.5f, 0.5f);
-        }
+
+        _activeSelection = entry;
+        ResetNonSearchButtonsToBase();
+        ConfigureButtonColors(entry.button, ActiveColor);
     }
 
-    private static TextMeshProUGUI BuildPlaceholderLabel(RectTransform parent, GameObject templateRoot, string displayName)
+    private void HandleSearchButton(ActivityButton entry)
     {
-        var labelGO = new GameObject($"{displayName}Label", typeof(RectTransform), typeof(CanvasRenderer));
-        var labelRect = labelGO.GetComponent<RectTransform>();
-        labelRect.SetParent(parent, false);
-        labelRect.anchorMin = new Vector2(0.1f, 0.1f);
-        labelRect.anchorMax = new Vector2(0.9f, 0.9f);
-        labelRect.offsetMin = Vector2.zero;
-        labelRect.offsetMax = Vector2.zero;
+        ResetNonSearchButtonsToBase();
 
-        var label = labelGO.AddComponent<TextMeshProUGUI>();
-        label.alignment = TextAlignmentOptions.Center;
-        label.enableWordWrapping = true;
-        label.fontSize = 28f;
-
-        if (templateRoot != null)
+        if (_searchRoutine != null)
         {
-            var templateLabel = templateRoot.GetComponentInChildren<TextMeshProUGUI>(true);
-            if (templateLabel != null)
+            StopCoroutine(_searchRoutine);
+            _searchRoutine = null;
+        }
+
+        ConfigureButtonColors(entry.button, ActiveColor);
+        _searchRoutine = StartCoroutine(ResetSearchAfterDelay(entry));
+    }
+
+    private IEnumerator ResetSearchAfterDelay(ActivityButton entry)
+    {
+        yield return new WaitForSeconds(Mathf.Max(0.05f, searchHighlightDuration));
+
+        if (entry.button != null)
+        {
+            ConfigureButtonColors(entry.button, BaseColor);
+        }
+
+        if (_activeSelection != null && _activeSelection.button != null)
+        {
+            ConfigureButtonColors(_activeSelection.button, ActiveColor);
+        }
+
+        _searchRoutine = null;
+    }
+
+    private void ResetNonSearchButtonsToBase()
+    {
+        foreach (var entry in activityButtons)
+        {
+            if (entry?.button == null)
             {
-                label.font = templateLabel.font;
-                label.fontSize = templateLabel.fontSize;
-                label.fontStyle = templateLabel.fontStyle;
-                label.color = templateLabel.color;
+                continue;
             }
+
+            if (entry.activityType == LocationActivityType.SearchForEnemies)
+            {
+                continue;
+            }
+
+            ConfigureButtonColors(entry.button, BaseColor);
+        }
+    }
+
+    private static void ConfigureButtonColors(Button button, Color color)
+    {
+        if (button == null)
+        {
+            return;
         }
 
-        return label;
+        if (button.targetGraphic != null)
+        {
+            button.targetGraphic.color = color;
+        }
+
+        var colors = button.colors;
+        colors.normalColor = color;
+        colors.highlightedColor = color;
+        colors.pressedColor = color;
+        colors.selectedColor = color;
+        colors.disabledColor = new Color(color.r * 0.6f, color.g * 0.6f, color.b * 0.6f, color.a);
+        colors.colorMultiplier = 1f;
+        button.colors = colors;
+    }
+
+    private static Color ParseColor(string hex, Color fallback)
+    {
+        return ColorUtility.TryParseHtmlString(hex, out var parsed) ? parsed : fallback;
     }
 }

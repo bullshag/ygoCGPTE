@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-24 18:45 UTC • Document owner: Codex_
+_Last updated: 2025-09-25 21:25 UTC • Document owner: Codex
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
 - **Build Status:** Yellow — Windows-specific tests fail in current Linux environment.
@@ -8,6 +8,7 @@ _Last updated: 2025-09-24 18:45 UTC • Document owner: Codex_
   - Establish Unity project structure and packages.
   - Define core gameplay loop skeleton.
   - Validate MySQL connectivity from Unity client.
+  - Stand up data-driven location activity availability service.
   - Implement world map waypoint navigation with directional animations and city interaction triggers.
 - **Top Risks & Blocks (max 5):**
   - Undefined Unity version — Owner: TBD, due 2025-09-20.
@@ -110,13 +111,14 @@ _Last updated: 2025-09-24 18:45 UTC • Document owner: Codex_
   AreaTooltip resides on the locationTooltip root, enforces a trigger SphereCollider (radius 143.2, center y -4.06), updates TMP labels, and orchestrates show/idle/hide animator states with UnityEvents for buttons.
   AreaTooltip now listens for `KeyCode.Return` / keypad enter while the player remains inside and latches input until LocationActivitiesPanel closes.
   LocationActivitiesPanel now mounts directly onto the handcrafted `locationInfoWindow`, reusing existing buttons/backgrounds, auto-generating placeholder content for unimplemented locations, and resetting tooltip interaction when closed via Escape or the Cancel input action.
+  LocationActivitiesPanel now reads availability via LocationActivityService, toggling buttons using the `location_activity_settings` table and enforcing #FF4949 idle / yellow active color states.
   World map player uses a CapsuleCollider (radius 0.35, height 1.8) and a kinematic Rigidbody to stay inside tooltip triggers without physics drift.
   Player GameObject now carries the `Player` tag (restored after YAML corruption), and TagManager explicitly includes it so AreaTooltip trigger checks succeed.
 
 #### Location Activities Panel Refresh
 - **Owner:** Codex — coordinating with UI/UX.
-- **Progress:** In progress, 75% (legacy locationInfoWindow wiring complete; metadata-driven population pending) — due 2025-09-29.
-- **Dependencies:** FEAT-WM-001, FEAT-UI-006, location metadata service (Owner: TBD, due 2025-09-27).
+- **Progress:** In progress, 85% (database-driven availability online; contextual sub-panels pending) — due 2025-09-29.
+- **Dependencies:** FEAT-WM-001, FEAT-UI-006, location metadata service (Owner: TBD, due 2025-09-27), `location_activity_settings` table (Owner: Codex, delivered 2025-09-25).
 - **Acceptance Criteria:**
   - Activity list populates dynamically from `CityNode` metadata with keyboard/gamepad focus cycling preserved.
   - Selecting an activity opens the matching contextual sub-panel and returns focus to the root list on close.
@@ -127,6 +129,7 @@ _Last updated: 2025-09-24 18:45 UTC • Document owner: Codex_
   - Location metadata contract is still TBD and may slip — Owner: TBD, due 2025-09-27.
   - Animation transitions for new sub-panels are unbudgeted and could cause scope creep — Owner: Codex, due 2025-10-02.
   - Placeholder content must be replaced once metadata contract lands to avoid stale copy — Owner: Codex, due 2025-09-29.
+  - SQL availability mismatches could hide required actions until data review — Owner: Codex, due 2025-09-28.
 
 #### Tavern Sub-Panel Integration
 - **Owner:** Codex (UI) with systems handoff to TavernManager.
@@ -216,7 +219,7 @@ _Last updated: 2025-09-24 18:45 UTC • Document owner: Codex_
   LocationActivitiesPanel provides keyboard/gamepad friendly navigation for city activities.
 - **Technical notes**
   Built with Unity UGUI.
-- **Progress:** In progress, 25% (popup window prefab, city interaction panel wiring, location activities panel highlighting, and tavern recruitment flow scaffolding).
+- **Progress:** In progress, 30% (popup window prefab, database-driven location activities panel, city interaction wiring, and tavern recruitment scaffolding).
 - **Open decisions:**
   - TBD: Finalize navigation flow. Owner: TBD, due 2025-09-25.
 
@@ -311,7 +314,7 @@ _Last updated: 2025-09-24 18:45 UTC • Document owner: Codex_
 | WorldMapForm | WorldMap scene + PlayerNavigator | In progress | Codex | Shift-click waypoints queue |
 | WorldMap remote party markers | RemotePlayer entities | In progress | Codex | NavMesh markers spawn and follow downloaded waypoints; WebSocket state sync with interpolation |
 | WorldMap location tooltip | AreaTooltip prefab controller | Complete | Codex | Collider-driven show/idle/hide animations with area name and button events; requires `Player` tag retention |
-| WorldMap city activities panel | LocationActivitiesPanel | In progress | Codex | Scene restored from stable YAML; Enter triggers LocationActivitiesPanel.ShowX + Open; content placeholders awaiting Tavern/Shop hooks |
+| WorldMap city activities panel | LocationActivitiesPanel | In progress | Codex | Scene restored from stable YAML; Enter triggers LocationActivitiesPanel.SetLocation + Open; database-driven availability toggles with #FF4949 idle / yellow active palette while Tavern/Shop hooks remain TODO |
 | LocationDialog | LocationActivitiesPanel Refresh | In progress | Codex | Migration delta: WinForms modal buttons were static; Unity refresh must bind dynamic location metadata and drive contextual sub-panels |
 | (New) Free camera navigation | FreeCameraController | In progress | Codex | WASD panning with smoothing |
 | TravelLogService | PlayerStateUploader/Downloader | In progress | Codex | Periodic SQL sync of player positions |
@@ -388,6 +391,22 @@ _Last updated: 2025-09-24 18:45 UTC • Document owner: Codex_
 - **Owner:** Codex
 - **Progress:** In progress, 50%
 
+### location_activity_settings Table
+- **Schema**
+  | Field | Type | Notes |
+  |---|---|---|
+  | id | INT AUTO_INCREMENT PK | Surrogate key |
+  | location_id | VARCHAR(50) | FK to nodes.id |
+  | activity_key | VARCHAR(32) | Enum: tavern/shop/temple/academy/graveyard/arena/search_for_enemies |
+  | is_enabled | TINYINT(1) | 1 when activity is available |
+  | created_at | TIMESTAMP | Default CURRENT_TIMESTAMP |
+  | updated_at | TIMESTAMP | Auto-updated on change |
+- **Dependencies:** `create_location_activity_settings.sql`, LocationActivityService (Owner: Codex, delivered 2025-09-25)
+- **Acceptance Criteria:** Schema script executes without error; Unity LocationActivitiesPanel reflects enabled activities per row data.
+- **Risks:** Data entry errors could disable mandatory actions until reviewed — Owner: Codex, due 2025-09-28.
+- **Owner:** Codex
+- **Progress:** Complete, 100% (initial schema delivered 2025-09-25)
+
 ### accounts Schema Rebuild Script
 - **Artifact:** `recreate_accounts_tables.sql`
 - **Owner:** Codex
@@ -426,7 +445,7 @@ _Last updated: 2025-09-24 18:45 UTC • Document owner: Codex_
 | FEAT-UI-003 | Register success popup flow | feature | Codex | 0.5d | PopupWindow prefab, Register scene Canvas | Register screen shows popup on success/failure and returns to Login after confirmation | Done | 100% | PR TBD | Should |
 | FEAT-UI-004 | Tavern recruit search & detail overlay | feature | Codex | 2d | TavernManager, CharacterService cache, RPGManager refresh hook | Search button spawns 3 recruits, modal displays stats, Hire updates party UI | In Progress | 45% | - | Should |
 | FEAT-UI-005 | Activate Tavern mercenary/work actions | feature | TBD | 3d | FEAT-UI-004 | Mercenary and Work buttons enabled with dedicated flows | To Do | 0% | - | Could |
-| FEAT-UI-006 | Location activities panel refresh | feature | Codex | 2d | FEAT-WM-001; location metadata service (Owner: TBD, due 2025-09-27) | Populate activities from `CityNode` metadata, support Enter/Escape focus return, maintain 1080p/1440p layout safety | In Progress | 15% | - | Should |
+| FEAT-UI-006 | Location activities panel refresh | feature | Codex | 2d | FEAT-WM-001; location metadata service (Owner: TBD, due 2025-09-27); `location_activity_settings` table (Owner: Codex, delivered 2025-09-25) | Populate activities from `CityNode` metadata, surface database-driven availability, support Enter/Escape focus return, maintain 1080p/1440p layout safety | In Progress | 60% | - | Should |
 | FEAT-UI-007 | Tavern sub-panel integration | feature | Codex | 3d | FEAT-UI-004; FEAT-UI-006; TavernManager API audit (Owner: TBD, due 2025-09-28) | Hire/Mercenary/Work actions available with telemetry `tavern_subpanel_open` firing on open and CharacterService refresh on hire | In Progress | 5% | - | Should |
 | FEAT-ANI-001 | Sprite Frame Animator component | feature | Codex | 2d | SYS-ARCH-001 | Lists animate per state at frameRate with tests | Done | 100% | PR TBD | Should |
 | FEAT-WM-001 | World map shift-click navigation | feature | Codex | 2d | SYS-ARCH-001 | Shift+Right sets destination; Shift+Left queues waypoint; agent animates per direction | Done | 100% | PR TBD | Should |
@@ -462,7 +481,7 @@ _Last updated: 2025-09-24 18:45 UTC • Document owner: Codex_
 
 | Feature | Progress | Owner | Dependencies | Acceptance Criteria | Risks |
 |---|---|---|---|---|---|
-| Location Activities Panel Refresh | 75% (due 2025-09-29) | Codex | FEAT-WM-001; FEAT-UI-006; location metadata service (Owner: TBD, due 2025-09-27) | Reuses handcrafted `locationInfoWindow` layout with dynamic activity selection;<br>Populates activities from `CityNode` metadata when service lands;<br>Supports 1080p/1440p layouts without blocking map input | InputAction focus clashes during sub-panel open (Owner: Codex, due 2025-09-30);<br>Metadata contract TBD may delay integration (Owner: TBD, due 2025-09-27);<br>Placeholder copy must transition to live data once metadata lands (Owner: Codex, due 2025-09-29) |
+| Location Activities Panel Refresh | 85% (due 2025-09-29) | Codex | FEAT-WM-001; FEAT-UI-006; location metadata service (Owner: TBD, due 2025-09-27); `location_activity_settings` table (Owner: Codex, delivered 2025-09-25) | Reuses handcrafted `locationInfoWindow` layout with dynamic activity selection;<br>Loads availability via LocationActivityService and database toggles;<br>Supports 1080p/1440p layouts without blocking map input | InputAction focus clashes during sub-panel open (Owner: Codex, due 2025-09-30);<br>Metadata contract TBD may delay integration (Owner: TBD, due 2025-09-27);<br>Placeholder copy must transition to live data once metadata lands (Owner: Codex, due 2025-09-29);<br>SQL data drift could hide critical actions (Owner: Codex, due 2025-09-28) |
 | Tavern Sub-Panel Integration | 5% (due 2025-10-01) | Codex | FEAT-UI-004; FEAT-UI-007; TavernManager API audit (Owner: TBD, due 2025-09-28) | Hire, Mercenary, Work actions expose stateful buttons;<br>Hire reuses recruit overlay and closes cleanly;<br>`tavern_subpanel_open` telemetry fires with location ID | Legacy edge cases from TavernForm undocumented (Owner: TBD, due 2025-09-29);<br>Responsive layout for small resolutions unverified (Owner: Codex, due 2025-10-03);<br>CharacterService refresh timing may double-trigger updates (Owner: Codex, due 2025-10-04) |
 
 ## 15. Risks & Mitigations
@@ -526,3 +545,4 @@ _Last updated: 2025-09-24 18:45 UTC • Document owner: Codex_
 - 2025-09-24: Rewired PlayerNavigator and AreaTooltip to the existing `locationInfoWindow`, migrated LocationActivitiesPanel onto it, and generated placeholder content for yet-to-be-specified locations. — Codex
 - 2025-09-24: Restored RPG scene from commit 0ea6a56 after corruption and re-populated LocationActivitiesPanel defaults in YAML. — Codex
 
+- 2025-09-25: Rebuilt LocationActivitiesPanel with database-driven availability, delivered LocationActivityService, and authored `create_location_activity_settings.sql` for per-location toggles. — Codex
