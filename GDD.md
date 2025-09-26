@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-26 00:37 UTC • Document owner: Codex
+_Last updated: 2025-09-26 02:13 UTC • Document owner: Codex
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
 - **Build Status:** Yellow — Windows-specific tests fail in current Linux environment.
@@ -16,7 +16,7 @@ _Last updated: 2025-09-26 00:37 UTC • Document owner: Codex
   - Incomplete mapping of legacy features — Owner: TBD, due 2025-09-25.
   - Popup window usage inconsistent across scenes — Owner: Codex, due 2025-09-27 (Login and Register now share PopupWindow prefab; remaining scenes pending audit).
     - GUID corruption in `.meta` files may break asset references — Owner: Codex, due 2025-09-14.
-  - Scene asset regression risk due to manual YAML edits — Owner: Codex, due 2025-09-30. Mitigation: Use Unity editor or verified templates when adjusting scene tags; Trigger: scene fails to open or loses GameObject data. Status 2025-09-24: Restored RPG scene from commit 0ea6a56 to resolve YAML truncation.
+  - Scene asset regression risk due to manual YAML edits — Owner: Codex, due 2025-09-30. Mitigation: Use Unity editor or verified templates when adjusting scene tags; Trigger: scene fails to open or loses GameObject data. Status 2025-09-26: Restored RPG scene from commit 5a21cfe after YAML truncation recurred; Unity re-save validation still pending.
 - **Next Milestone:** Unity Prototype Build, 2025-10-01, exit criteria: player can start battle and load inventory from database.
 
 ## 1. Vision & Pillars
@@ -157,7 +157,7 @@ _Last updated: 2025-09-26 00:37 UTC • Document owner: Codex
   - Pressing Enter (keyboard or keypad) while within a tooltip opens the location activities panel; Escape/Cancel closes it and allows re-opening without exiting the trigger.
 - **Risks**
   - Shift-click input may conflict with UI focus, preventing waypoint capture.
-  - Scene has not been re-opened in the target Unity editor post-merge; hidden serialization issues could persist until validated. Owner: Codex, due 2025-09-26 (RPG scene restored via manual YAML merge; Unity re-save still pending).
+  - Scene has not been re-opened in the target Unity editor post-merge; hidden serialization issues could persist until validated. Owner: Codex, due 2025-09-27 (RPG scene restored via commit 5a21cfe snapshot on 2025-09-26; Unity re-save still pending).
   - Future TagManager edits might drop the `Player` tag, breaking tooltip detection — Owner: Codex, due 2025-09-24.
   - Input axis "Cancel" may be missing on some control schemes, blocking Escape-equivalent close behavior — Owner: Codex, due 2025-09-28.
 - **Tasks**
@@ -548,3 +548,4 @@ _Last updated: 2025-09-26 00:37 UTC • Document owner: Codex
 - 2025-09-24: Restored RPG scene from commit 0ea6a56 after corruption and re-populated LocationActivitiesPanel defaults in YAML. — Codex
 
 - 2025-09-25: Rebuilt LocationActivitiesPanel with database-driven availability, delivered LocationActivityService, and authored `create_location_activity_settings.sql` for per-location toggles. — Codex
+- 2025-09-26: Restored RPG scene from commit 5a21cfe after corruption resurfaced and re-verified LocationActivitiesPanel bindings; scheduled Unity re-save validation follow-up. — Codex
