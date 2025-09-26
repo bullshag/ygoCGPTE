@@ -41,6 +41,15 @@ public class LocationActivitiesPanel : MonoBehaviour
     [SerializeField]
     private List<ActivityButton> activityButtons = new();
 
+    [Header("Debug")]
+    [Tooltip("When enabled, periodically refreshes availability while the panel is active.")]
+    [SerializeField]
+    private bool debugAutoRefresh = false;
+
+    [SerializeField]
+    [Min(0.5f)]
+    private float debugRefreshIntervalSeconds = 3f;
+
     private readonly LocationActivityService _service = new();
     private readonly Dictionary<LocationActivityType, ActivityButton> _lookup = new();
 
@@ -79,12 +88,24 @@ public class LocationActivitiesPanel : MonoBehaviour
 
     private void OnEnable()
     {
-        _ = RefreshAvailabilityAsync();
+        RequestRefresh();
+        StartDebugAutoRefresh();
     }
 
     private void OnDisable()
     {
         CancelPendingRefresh();
+        StopDebugAutoRefresh();
+    }
+
+    private void OnValidate()
+    {
+        debugRefreshIntervalSeconds = Mathf.Max(0.5f, debugRefreshIntervalSeconds);
+
+        if (Application.isPlaying && isActiveAndEnabled)
+        {
+            StartDebugAutoRefresh();
+        }
     }
 
     private void OnDestroy()
@@ -143,6 +164,39 @@ public class LocationActivitiesPanel : MonoBehaviour
             Debug.LogError($"Failed to load location activities for '{locationId}': {ex.Message}");
             ApplyAvailability(new LocationActivityAvailability());
         }
+    }
+
+    private void RequestRefresh()
+    {
+        _ = RefreshAvailabilityAsync();
+    }
+
+    private void StartDebugAutoRefresh()
+    {
+        if (!Application.isPlaying)
+        {
+            return;
+        }
+
+        if (!debugAutoRefresh)
+        {
+            CancelInvoke(nameof(RequestRefresh));
+            return;
+        }
+
+        float interval = Mathf.Max(0.5f, debugRefreshIntervalSeconds);
+        CancelInvoke(nameof(RequestRefresh));
+        InvokeRepeating(nameof(RequestRefresh), interval, interval);
+    }
+
+    private void StopDebugAutoRefresh()
+    {
+        if (!Application.isPlaying)
+        {
+            return;
+        }
+
+        CancelInvoke(nameof(RequestRefresh));
     }
 
     private void CancelPendingRefresh()
