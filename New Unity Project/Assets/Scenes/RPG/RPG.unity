@@ -6919,10 +6919,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee6df38ff892402882c31f955794e349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  panelRoot: {fileID: 980410313}
-  locations: []
-  useButtonColorHighlights: 1
-  placeholderMessageFormat: '{0} content coming soon.'
+  locationId: 1
+  hideUnavailableButtons: 1
+  searchHighlightDuration: 0.35
+  activityButtons:
+  - activityType: 0
+    button: {fileID: 1101359382}
+  - activityType: 1
+    button: {fileID: 1573720323}
+  - activityType: 2
+    button: {fileID: 1378287568}
+  - activityType: 3
+    button: {fileID: 1035969847}
+  - activityType: 4
+    button: {fileID: 1393541458}
+  - activityType: 5
+    button: {fileID: 224202933}
 --- !u!4 &330100179 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3589134749510340305, guid: b480acaf9535f2942ba5abb7038fe980, type: 3}
@@ -20234,7 +20246,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.0006460721}
+  m_AnchoredPosition: {x: 0, y: 0.000051988318}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!1001 &896226838
@@ -21205,7 +21217,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1888948189}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999972
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
