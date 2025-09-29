@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-26 03:05 UTC • Document owner: Codex
+_Last updated: 2025-09-26 04:10 UTC • Document owner: Codex
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
 - **Build Status:** Yellow — Windows-specific tests fail in current Linux environment.
@@ -113,6 +113,7 @@ _Last updated: 2025-09-26 03:05 UTC • Document owner: Codex
   LocationActivitiesPanel now mounts directly onto the handcrafted `locationInfoWindow`, reusing existing buttons/backgrounds, auto-generating placeholder content for unimplemented locations, and resetting tooltip interaction when closed via Escape or the Cancel input action.
   LocationActivitiesPanel now reads availability via LocationActivityService, toggling buttons using the `location_activity_settings` table and enforcing #FF4949 idle / yellow active color states.
   LocationActivitiesPanel exposes a debug auto-refresh toggle that re-queries the database every 3 seconds for QA verification while the panel remains active.
+  LocationActivityService logs each database availability query to the Unity console, listing activities and their enabled states for diagnostics.
   LocationActivitiesPanel scene wiring now seeds `nodeFortAurus` as the default locationId and binds Tavern, Shop, Temple, Academy, Graveyard, Arena, and Search buttons to their respective UI `Button` components so database availability toggles map correctly.
   World map player uses a CapsuleCollider (radius 0.35, height 1.8) and a kinematic Rigidbody to stay inside tooltip triggers without physics drift.
   Player GameObject now carries the `Player` tag (restored after YAML corruption), and TagManager explicitly includes it so AreaTooltip trigger checks succeed.
@@ -551,3 +552,4 @@ _Last updated: 2025-09-26 03:05 UTC • Document owner: Codex
 - 2025-09-25: Rebuilt LocationActivitiesPanel with database-driven availability, delivered LocationActivityService, and authored `create_location_activity_settings.sql` for per-location toggles. — Codex
 - 2025-09-26: Restored RPG scene from commit 5a21cfe after corruption resurfaced and re-verified LocationActivitiesPanel bindings; scheduled Unity re-save validation follow-up. — Codex
 - 2025-09-26: Added LocationActivitiesPanel debug auto-refresh toggle to poll database availability every 3 seconds for QA verification. — Codex
+- 2025-09-26: Updated LocationActivityService to emit console logs enumerating activities and enabled states whenever availability is queried. — Codex

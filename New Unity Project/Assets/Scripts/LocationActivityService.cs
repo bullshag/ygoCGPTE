@@ -72,6 +72,11 @@ public sealed class LocationActivityService
             availability.Set(activityType, isEnabled);
         }
 
+        var formattedStates = string.Join(
+            ", ",
+            availability.States.Select(state => $"{state.Key}:{(state.Value ? "enabled" : "disabled")}"));
+        Debug.Log($"LocationActivityService: Retrieved availability for '{locationId}' -> {formattedStates}");
+
         return availability;
     }
 
