@@ -2,21 +2,45 @@ using UnityEngine;
 
 public class locationWindowHandler : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private void OnDisable()
+    {
+        UnlockTooltipInteraction();
+    }
 
-    
     public void hideLocationActivityWindow()
     {
-        gameObject.SetActive(false);
-    }
-    void Start()
-    {
-        
+        HidePanel();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        
+        if (!gameObject.activeInHierarchy)
+        {
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape) ||
+            Input.GetKeyDown(KeyCode.Backspace) ||
+            Input.GetKeyDown(KeyCode.JoystickButton1) ||
+            Input.GetButtonDown("Cancel"))
+        {
+            HidePanel();
+        }
+    }
+
+    private void HidePanel()
+    {
+        if (!gameObject.activeSelf)
+        {
+            return;
+        }
+
+        UnlockTooltipInteraction();
+        gameObject.SetActive(false);
+    }
+
+    private static void UnlockTooltipInteraction()
+    {
+        AreaTooltip.LastActivatedTooltip?.UnlockInteraction();
     }
 }
