@@ -39,6 +39,8 @@ public class AreaTooltip : MonoBehaviour
     [SerializeField]
     private string showTriggerName = "Show";
 
+    public GameObject locationPanelObject;
+
     [Tooltip("State name for the idle animation.")]
     [SerializeField]
     private string idleStateName = "Idle";
@@ -81,6 +83,11 @@ public class AreaTooltip : MonoBehaviour
         collider.isTrigger = true;
     }
 
+    public void locationPanelShow()
+    {
+        locationPanelObject.SetActive(true);
+        Debug.Log("CLICKED");
+    }
     private void OnValidate()
     {
         CacheAnimatorHashes();
