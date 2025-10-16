@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-09-26 04:10 UTC • Document owner: Codex
+_Last updated: 2025-10-16 20:00 UTC • Document owner: Codex
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
 - **Build Status:** Yellow — Windows-specific tests fail in current Linux environment.
@@ -171,6 +171,19 @@ _Last updated: 2025-09-26 04:10 UTC • Document owner: Codex
 - **Progress:** In progress, 88% (scene reopen pending Unity validation; location activities panel refresh and Tavern sub-panel wiring outstanding — Owner: Codex, due 2025-09-30).
 - **Open decisions:**
   - TBD: Authenticate WebSocket connections. Owner: TBD, due 2025-09-30.
+
+#### World-Space UI Interaction
+- **Owner:** Codex
+- **Progress:** In progress, 90% (Canvas GraphicRaycaster configuration updated; Play Mode verification pending headless environment follow-up) — due 2025-10-18.
+- **Dependencies:** FEAT-WM-001; locationTooltip Canvas hierarchy; Unity world-space Canvas event system configuration.
+- **Acceptance Criteria:**
+  - locationTooltip world-space Canvas receives pointer events while facing away from the camera.
+  - Enter button click triggers AreaTooltip `EnterClicked` UnityEvent and logs interaction in Play Mode.
+  - Visual orientation of tooltip children remains correct after Canvas configuration change.
+- **Risks:**
+  - Play Mode confirmation blocked by headless CI; requires on-device validation. Owner: Codex, due 2025-10-18.
+  - Future prefab overrides may revert GraphicRaycaster settings, reintroducing missed clicks — Owner: Codex, due 2025-10-25.
+  - If tooltip orientation flips again, Info button alignment could break; needs regression test pass — Owner: Codex, due 2025-10-22.
 
 ### Camera Controls
 - **Purpose**
@@ -553,3 +566,4 @@ _Last updated: 2025-09-26 04:10 UTC • Document owner: Codex
 - 2025-09-26: Restored RPG scene from commit 5a21cfe after corruption resurfaced and re-verified LocationActivitiesPanel bindings; scheduled Unity re-save validation follow-up. — Codex
 - 2025-09-26: Added LocationActivitiesPanel debug auto-refresh toggle to poll database availability every 3 seconds for QA verification. — Codex
 - 2025-09-26: Updated LocationActivityService to emit console logs enumerating activities and enabled states whenever availability is queried. — Codex
+- 2025-10-16: Disabled locationTooltip Canvas GraphicRaycaster Ignore Reversed Graphics to restore Enter button clicks and documented world-space UI verification follow-up. — Codex
