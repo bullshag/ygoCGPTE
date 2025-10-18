@@ -375,6 +375,12 @@ public class AreaTooltip : MonoBehaviour
             return;
         }
 
+        CacheLocationPanelDependencies();
+        if (locationActivitiesPanel != null && !string.IsNullOrWhiteSpace(locationNodeId))
+        {
+            locationActivitiesPanel.SetLocation(locationNodeId);
+        }
+
         interactionLocked = true;
         LastActivatedTooltip = this;
         EnterClicked.Invoke();
