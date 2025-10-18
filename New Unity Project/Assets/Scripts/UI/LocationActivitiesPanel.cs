@@ -62,6 +62,13 @@ public class LocationActivitiesPanel : MonoBehaviour
     /// </summary>
     public LocationActivityType? ActiveActivity => _activeSelection?.activityType;
 
+    /// <summary>
+    /// Raised whenever the active activity selection changes. A <c>null</c> value indicates that
+    /// no contextual activity is currently selected (for example, after clearing the selection or
+    /// clicking the Search option).
+    /// </summary>
+    public event Action<LocationActivityType?> ActivitySelectionChanged;
+
     private void Awake()
     {
         _lookup.Clear();
@@ -153,6 +160,8 @@ public class LocationActivitiesPanel : MonoBehaviour
 
             ConfigureButtonColors(entry.button, BaseColor);
         }
+
+        NotifyActivitySelectionChanged(null);
     }
 
     /// <summary>
@@ -239,6 +248,8 @@ public class LocationActivitiesPanel : MonoBehaviour
 
     private void ApplyAvailability(LocationActivityAvailability availability)
     {
+        bool selectionCleared = false;
+
         foreach (var entry in activityButtons)
         {
             if (entry?.button == null)
@@ -258,6 +269,7 @@ public class LocationActivitiesPanel : MonoBehaviour
             if (!isEnabled && _activeSelection == entry)
             {
                 _activeSelection = null;
+                selectionCleared = true;
             }
 
             if (!isEnabled)
@@ -273,6 +285,11 @@ public class LocationActivitiesPanel : MonoBehaviour
         else
         {
             ResetNonSearchButtonsToBase();
+        }
+
+        if (selectionCleared)
+        {
+            NotifyActivitySelectionChanged(null);
         }
     }
 
@@ -292,6 +309,7 @@ public class LocationActivitiesPanel : MonoBehaviour
         _activeSelection = entry;
         ResetNonSearchButtonsToBase();
         ConfigureButtonColors(entry.button, ActiveColor);
+        NotifyActivitySelectionChanged(activityType);
     }
 
     private void HandleSearchButton(ActivityButton entry)
@@ -302,6 +320,7 @@ public class LocationActivitiesPanel : MonoBehaviour
 
         ConfigureButtonColors(entry.button, ActiveColor);
         _searchRoutine = StartCoroutine(ResetSearchAfterDelay(entry));
+        NotifyActivitySelectionChanged(null);
     }
 
     private IEnumerator ResetSearchAfterDelay(ActivityButton entry)
@@ -337,6 +356,11 @@ public class LocationActivitiesPanel : MonoBehaviour
 
             ConfigureButtonColors(entry.button, BaseColor);
         }
+    }
+
+    private void NotifyActivitySelectionChanged(LocationActivityType? activityType)
+    {
+        ActivitySelectionChanged?.Invoke(activityType);
     }
 
     private static void ConfigureButtonColors(Button button, Color color)
