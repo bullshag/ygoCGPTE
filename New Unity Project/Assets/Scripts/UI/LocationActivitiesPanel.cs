@@ -96,6 +96,7 @@ public class LocationActivitiesPanel : MonoBehaviour
     {
         CancelPendingRefresh();
         StopDebugAutoRefresh();
+        ClearSelection();
     }
 
     private void OnValidate()
@@ -124,21 +125,33 @@ public class LocationActivitiesPanel : MonoBehaviour
     /// </summary>
     public void SetLocation(string newLocationId)
     {
-        if (string.Equals(locationId, newLocationId, StringComparison.OrdinalIgnoreCase))
-        {
-            if (isActiveAndEnabled)
-            {
-                _ = RefreshAvailabilityAsync();
-            }
+        newLocationId ??= string.Empty;
+        bool locationChanged = !string.Equals(locationId, newLocationId, StringComparison.OrdinalIgnoreCase);
 
-            return;
+        if (locationChanged)
+        {
+            locationId = newLocationId;
         }
 
-        locationId = newLocationId;
+        _ = RefreshAvailabilityAsync();
+    }
 
-        if (isActiveAndEnabled)
+    /// <summary>
+    /// Clears any active selection and resets button colors to their base state.
+    /// </summary>
+    public void ClearSelection()
+    {
+        _activeSelection = null;
+        StopSearchRoutine();
+
+        foreach (var entry in activityButtons)
         {
-            _ = RefreshAvailabilityAsync();
+            if (entry?.button == null)
+            {
+                continue;
+            }
+
+            ConfigureButtonColors(entry.button, BaseColor);
         }
     }
 
@@ -235,13 +248,11 @@ public class LocationActivitiesPanel : MonoBehaviour
 
             bool isEnabled = availability.IsEnabled(entry.activityType);
 
+            entry.button.interactable = isEnabled;
+
             if (hideUnavailableButtons)
             {
                 entry.button.gameObject.SetActive(isEnabled);
-            }
-            else
-            {
-                entry.button.interactable = isEnabled;
             }
 
             if (!isEnabled && _activeSelection == entry)
@@ -287,11 +298,7 @@ public class LocationActivitiesPanel : MonoBehaviour
     {
         ResetNonSearchButtonsToBase();
 
-        if (_searchRoutine != null)
-        {
-            StopCoroutine(_searchRoutine);
-            _searchRoutine = null;
-        }
+        StopSearchRoutine();
 
         ConfigureButtonColors(entry.button, ActiveColor);
         _searchRoutine = StartCoroutine(ResetSearchAfterDelay(entry));
@@ -352,6 +359,17 @@ public class LocationActivitiesPanel : MonoBehaviour
         colors.disabledColor = new Color(color.r * 0.6f, color.g * 0.6f, color.b * 0.6f, color.a);
         colors.colorMultiplier = 1f;
         button.colors = colors;
+    }
+
+    private void StopSearchRoutine()
+    {
+        if (_searchRoutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(_searchRoutine);
+        _searchRoutine = null;
     }
 
     private static Color ParseColor(string hex, Color fallback)

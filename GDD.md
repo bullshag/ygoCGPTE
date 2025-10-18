@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-10-18 04:55 UTC • Document owner: Codex
+_Last updated: 2025-10-18 21:22 UTC • Document owner: Codex
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
 - **Build Status:** Yellow — Windows-specific tests fail in current Linux environment.
@@ -112,17 +112,18 @@ _Last updated: 2025-10-18 04:55 UTC • Document owner: Codex
   AreaTooltip now listens for `KeyCode.Return` / keypad enter while the player remains inside and latches input until LocationActivitiesPanel closes.
   LocationActivitiesPanel now mounts directly onto the handcrafted `locationInfoWindow`, reusing existing buttons/backgrounds, auto-generating placeholder content for unimplemented locations, and explicitly unlocks `AreaTooltip.LastActivatedTooltip` across all close paths (Escape, Back button, Cancel input) before/after hiding so the panel can reopen without leaving the trigger.
   LocationActivitiesPanel now reads availability via LocationActivityService, toggling buttons using the `location_activity_settings` table and enforcing #FF4949 idle / yellow active color states.
-  locationWindowHandler now resolves the close/back button via GraphicRaycaster UI raycasts so world-space clicks dismiss the panel even when the EventSystem misses OnClick events.
+  locationWindowHandler now resolves the close/back button via GraphicRaycaster UI raycasts so world-space clicks dismiss the panel even when the EventSystem misses OnClick events, and it clears the LocationActivitiesPanel highlight state on every close path.
   AreaTooltip now caches a GraphicRaycaster and performs pointer raycasts on mouse release so world-space clicks on Enter/Info reliably trigger their UnityEvents alongside keyboard input.
   LocationActivitiesPanel exposes a debug auto-refresh toggle that re-queries the database every 3 seconds for QA verification while the panel remains active.
   LocationActivityService logs each database availability query to the Unity console, listing activities and their enabled states for diagnostics.
-  AreaTooltip now exposes a configurable `locationNodeId`, assigns the LocationActivitiesPanel component before activation, and binds Tavern, Shop, Temple, Academy, Graveyard, Arena, and Search buttons so database availability toggles map correctly per node when Enter is pressed.
+  AreaTooltip now exposes a configurable `locationNodeId`, assigns the LocationActivitiesPanel component before activation, binds Tavern, Shop, Temple, Academy, Graveyard, Arena, and Search buttons so database availability toggles map correctly per node when Enter is pressed, and forces the panel to refresh availability when Enter fires so disabled buttons always reflect the target node.
+  LocationActivitiesPanel now provides a `ClearSelection` utility used on window close, and `SetLocation` always refreshes availability so unavailable activities immediately disable even if the panel was previously hidden.
   World map player uses a CapsuleCollider (radius 0.35, height 1.8) and a kinematic Rigidbody to stay inside tooltip triggers without physics drift.
   Player GameObject now carries the `Player` tag (restored after YAML corruption), and TagManager explicitly includes it so AreaTooltip trigger checks succeed.
 
 #### Location Activities Panel Refresh
 - **Owner:** Codex — coordinating with UI/UX.
-- **Progress:** In progress, 96% (per-node Enter refresh implemented; contextual sub-panels pending) — due 2025-09-29.
+- **Progress:** In progress, 98% (Enter wiring and selection reset complete; contextual sub-panels pending) — due 2025-09-29.
 - **Dependencies:** FEAT-WM-001, FEAT-UI-006, location metadata service (Owner: TBD, due 2025-09-27), `location_activity_settings` table (Owner: Codex, delivered 2025-09-25).
 - **Acceptance Criteria:**
   - Activity list populates dynamically from `CityNode` metadata with keyboard/gamepad focus cycling preserved.
@@ -499,7 +500,7 @@ _Last updated: 2025-10-18 04:55 UTC • Document owner: Codex
 
 | Feature | Progress | Owner | Dependencies | Acceptance Criteria | Risks |
 |---|---|---|---|---|---|
-| Location Activities Panel Refresh | 96% (due 2025-09-29) | Codex | FEAT-WM-001; FEAT-UI-006; location metadata service (Owner: TBD, due 2025-09-27); `location_activity_settings` table (Owner: Codex, delivered 2025-09-25) | Reuses handcrafted `locationInfoWindow` layout with dynamic activity selection;<br>Loads availability via LocationActivityService and database toggles;<br>Supports 1080p/1440p layouts without blocking map input;<br>Debug toggle enables 3-second polling for QA | InputAction focus clashes during sub-panel open (Owner: Codex, due 2025-09-30);<br>Metadata contract TBD may delay integration (Owner: TBD, due 2025-09-27);<br>Placeholder copy must transition to live data once metadata lands (Owner: Codex, due 2025-09-29);<br>SQL data drift could hide critical actions (Owner: Codex, due 2025-09-28) |
+| Location Activities Panel Refresh | 98% (due 2025-09-29) | Codex | FEAT-WM-001; FEAT-UI-006; location metadata service (Owner: TBD, due 2025-09-27); `location_activity_settings` table (Owner: Codex, delivered 2025-09-25) | Reuses handcrafted `locationInfoWindow` layout with dynamic activity selection;<br>Loads availability via LocationActivityService and database toggles;<br>Supports 1080p/1440p layouts without blocking map input;<br>Debug toggle enables 3-second polling for QA | InputAction focus clashes during sub-panel open (Owner: Codex, due 2025-09-30);<br>Metadata contract TBD may delay integration (Owner: TBD, due 2025-09-27);<br>Placeholder copy must transition to live data once metadata lands (Owner: Codex, due 2025-09-29);<br>SQL data drift could hide critical actions (Owner: Codex, due 2025-09-28) |
 | Tavern Sub-Panel Integration | 5% (due 2025-10-01) | Codex | FEAT-UI-004; FEAT-UI-007; TavernManager API audit (Owner: TBD, due 2025-09-28) | Hire, Mercenary, Work actions expose stateful buttons;<br>Hire reuses recruit overlay and closes cleanly;<br>`tavern_subpanel_open` telemetry fires with location ID | Legacy edge cases from TavernForm undocumented (Owner: TBD, due 2025-09-29);<br>Responsive layout for small resolutions unverified (Owner: Codex, due 2025-10-03);<br>CharacterService refresh timing may double-trigger updates (Owner: Codex, due 2025-10-04) |
 
 ## 15. Risks & Mitigations
@@ -515,6 +516,7 @@ _Last updated: 2025-10-18 04:55 UTC • Document owner: Codex
 - GUID corruption in `.meta` files may break asset references (Possible/Low) — Owner: Codex — Mitigation: regenerate or reset GUIDs; Trigger: assets reference missing scripts.
 
 ## 16. Changelog (Auto-Appended)
+- 2025-10-18: Synced tooltip Enter flow with LocationActivitiesPanel, forcing availability refresh and clearing selection highlights when the window closes. — Codex
 - 2025-10-18: Reinstated Fort Aurus scene bindings by restoring the RPG scene from a clean snapshot and updated risk log for re-save validation. — Codex
 - 2025-09-13: Created initial GDD skeleton covering all sections. — Codex
 - 2025-09-13: Updated Networking progress and ChatService migration status after chat auto-scroll work (PR #288). — Codex

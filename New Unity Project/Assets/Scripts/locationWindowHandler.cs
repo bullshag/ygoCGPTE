@@ -9,6 +9,10 @@ public class locationWindowHandler : MonoBehaviour
     [SerializeField]
     private GraphicRaycaster graphicRaycaster;
 
+    [Tooltip("Optional explicit reference to the location activities panel shown within this window.")]
+    [SerializeField]
+    private LocationActivitiesPanel locationActivitiesPanel;
+
     private readonly List<RaycastResult> raycastResults = new();
     private Button closeButton;
 
@@ -16,11 +20,14 @@ public class locationWindowHandler : MonoBehaviour
     {
         CacheCloseButton();
         CacheGraphicRaycaster();
+        CacheLocationActivitiesPanel();
     }
 
     private void OnDisable()
     {
         UnlockTooltipInteraction();
+        CacheLocationActivitiesPanel();
+        locationActivitiesPanel?.ClearSelection();
     }
 
     public void hideLocationActivityWindow()
@@ -56,6 +63,8 @@ public class locationWindowHandler : MonoBehaviour
             return;
         }
 
+        CacheLocationActivitiesPanel();
+        locationActivitiesPanel?.ClearSelection();
         UnlockTooltipInteraction();
         gameObject.SetActive(false);
     }
@@ -144,6 +153,16 @@ public class locationWindowHandler : MonoBehaviour
         }
 
         graphicRaycaster = GetComponentInParent<GraphicRaycaster>(true);
+    }
+
+    private void CacheLocationActivitiesPanel()
+    {
+        if (locationActivitiesPanel != null)
+        {
+            return;
+        }
+
+        locationActivitiesPanel = GetComponentInChildren<LocationActivitiesPanel>(true);
     }
 
 }
