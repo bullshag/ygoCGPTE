@@ -1,7 +1,9 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
@@ -29,6 +31,10 @@ public class AreaTooltip : MonoBehaviour
 
     [SerializeField]
     private Animator tooltipAnimator = null!;
+
+    [Header("UI Infrastructure")]
+    [SerializeField]
+    private GraphicRaycaster graphicRaycaster = null!;
 
     [Header("Animator States")]
     [Tooltip("State name for the show animation.")]
@@ -65,6 +71,7 @@ public class AreaTooltip : MonoBehaviour
     private Coroutine idleCoroutine;
     private bool isPlayerInside;
     private bool interactionLocked;
+    private readonly List<RaycastResult> raycastResults = new();
 
     /// <summary>
     /// Reference to the most recent tooltip that triggered its enter interaction.
@@ -74,6 +81,7 @@ public class AreaTooltip : MonoBehaviour
 
     private void Awake()
     {
+        CacheGraphicRaycaster();
         ValidateSerializedFields();
         CacheAnimatorHashes();
         BindButtons();
@@ -90,6 +98,7 @@ public class AreaTooltip : MonoBehaviour
     }
     private void OnValidate()
     {
+        CacheGraphicRaycaster();
         CacheAnimatorHashes();
         UpdateAreaNameLabel();
     }
@@ -145,6 +154,11 @@ public class AreaTooltip : MonoBehaviour
         if (!isPlayerInside || interactionLocked)
         {
             return;
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            TryHandlePointerClick();
         }
 
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
@@ -369,5 +383,80 @@ public class AreaTooltip : MonoBehaviour
         {
             Debug.LogWarning($"[{nameof(AreaTooltip)}] Hide trigger name is empty; tooltip cannot animate out.", this);
         }
+
+        if (graphicRaycaster == null)
+        {
+            Debug.LogWarning($"[{nameof(AreaTooltip)}] GraphicRaycaster is not assigned; pointer raycasts may fail.", this);
+        }
+    }
+
+    private void CacheGraphicRaycaster()
+    {
+        if (graphicRaycaster != null)
+        {
+            return;
+        }
+
+        graphicRaycaster = GetComponentInChildren<GraphicRaycaster>(true);
+    }
+
+    private void TryHandlePointerClick()
+    {
+        if (EventSystem.current == null)
+        {
+            return;
+        }
+
+        CacheGraphicRaycaster();
+        if (graphicRaycaster == null)
+        {
+            return;
+        }
+
+        var pointerData = new PointerEventData(EventSystem.current)
+        {
+            position = Input.mousePosition
+        };
+
+        raycastResults.Clear();
+        graphicRaycaster.Raycast(pointerData, raycastResults);
+
+        for (var i = 0; i < raycastResults.Count; i++)
+        {
+            var result = raycastResults[i];
+            if (IsButtonHit(enterButton, result.gameObject))
+            {
+                ExecuteButtonClick(enterButton);
+                return;
+            }
+
+            if (IsButtonHit(infoButton, result.gameObject))
+            {
+                ExecuteButtonClick(infoButton);
+                return;
+            }
+        }
+    }
+
+    private static bool IsButtonHit(Button button, GameObject hit)
+    {
+        if (button == null || hit == null)
+        {
+            return false;
+        }
+
+        var buttonTransform = button.transform;
+        var hitTransform = hit.transform;
+        return hitTransform == buttonTransform || hitTransform.IsChildOf(buttonTransform);
+    }
+
+    private void ExecuteButtonClick(Button button)
+    {
+        if (button == null || !button.isActiveAndEnabled || !button.interactable)
+        {
+            return;
+        }
+
+        button.onClick.Invoke();
     }
 }
