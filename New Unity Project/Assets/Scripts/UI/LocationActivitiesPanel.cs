@@ -126,11 +126,20 @@ public class LocationActivitiesPanel : MonoBehaviour
     {
         if (string.Equals(locationId, newLocationId, StringComparison.OrdinalIgnoreCase))
         {
+            if (isActiveAndEnabled)
+            {
+                _ = RefreshAvailabilityAsync();
+            }
+
             return;
         }
 
         locationId = newLocationId;
-        _ = RefreshAvailabilityAsync();
+
+        if (isActiveAndEnabled)
+        {
+            _ = RefreshAvailabilityAsync();
+        }
     }
 
     /// <summary>
