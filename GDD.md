@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-10-19 14:32 UTC • Document owner: Codex
+_Last updated: 2025-10-18 03:58 UTC • Document owner: Codex
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
 - **Build Status:** Yellow — Windows-specific tests fail in current Linux environment.
@@ -16,7 +16,7 @@ _Last updated: 2025-10-19 14:32 UTC • Document owner: Codex
   - Incomplete mapping of legacy features — Owner: TBD, due 2025-09-25.
   - Popup window usage inconsistent across scenes — Owner: Codex, due 2025-09-27 (Login and Register now share PopupWindow prefab; remaining scenes pending audit).
     - GUID corruption in `.meta` files may break asset references — Owner: Codex, due 2025-09-14.
-  - Scene asset regression risk due to manual YAML edits — Owner: Codex, due 2025-09-30. Mitigation: Use Unity editor or verified templates when adjusting scene tags; Trigger: scene fails to open or loses GameObject data. Status 2025-09-26: Restored RPG scene from commit 5a21cfe after YAML truncation recurred; Unity re-save validation still pending.
+  - Scene asset regression risk due to manual YAML edits — Owner: Codex, due 2025-09-30. Mitigation: Use Unity editor or verified templates when adjusting scene tags; Trigger: scene fails to open or loses GameObject data. Status 2025-10-18: Cleared leftover merge conflict markers from RPG scene; Unity re-save validation still pending.
 - **Next Milestone:** Unity Prototype Build, 2025-10-01, exit criteria: player can start battle and load inventory from database.
 
 ## 1. Vision & Pillars
@@ -573,3 +573,4 @@ _Last updated: 2025-10-19 14:32 UTC • Document owner: Codex
 - 2025-10-16: Disabled locationTooltip Canvas GraphicRaycaster Ignore Reversed Graphics to restore Enter button clicks and documented world-space UI verification follow-up. — Codex
 - 2025-10-18: Captured locationWindowHandler close-button raycast detection, refreshed World-Space UI Interaction progress to 94%, and reiterated pending Play Mode verification gap. — Codex
 - 2025-10-19: Enabled AreaTooltip node configuration with per-node Enter refresh into LocationActivitiesPanel and cleared the panel's default locationId to rely on tooltip-provided identifiers. — Codex
+- 2025-10-18: Removed leftover merge conflict markers from RPG scene and confirmed LocationActivitiesPanel references for Fort Aurus remain intact pending Unity re-save validation. — Codex
