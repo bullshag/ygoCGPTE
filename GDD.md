@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-10-16 20:00 UTC • Document owner: Codex
+_Last updated: 2025-10-18 02:18 UTC • Document owner: Codex
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
 - **Build Status:** Yellow — Windows-specific tests fail in current Linux environment.
@@ -110,8 +110,10 @@ _Last updated: 2025-10-16 20:00 UTC • Document owner: Codex
 
   AreaTooltip resides on the locationTooltip root, enforces a trigger SphereCollider (radius 143.2, center y -4.06), updates TMP labels, and orchestrates show/idle/hide animator states with UnityEvents for buttons.
   AreaTooltip now listens for `KeyCode.Return` / keypad enter while the player remains inside and latches input until LocationActivitiesPanel closes.
-  LocationActivitiesPanel now mounts directly onto the handcrafted `locationInfoWindow`, reusing existing buttons/backgrounds, auto-generating placeholder content for unimplemented locations, and resetting tooltip interaction when closed via Escape or the Cancel input action.
+  LocationActivitiesPanel now mounts directly onto the handcrafted `locationInfoWindow`, reusing existing buttons/backgrounds, auto-generating placeholder content for unimplemented locations, and explicitly unlocks `AreaTooltip.LastActivatedTooltip` across all close paths (Escape, Back button, Cancel input) before/after hiding so the panel can reopen without leaving the trigger.
   LocationActivitiesPanel now reads availability via LocationActivityService, toggling buttons using the `location_activity_settings` table and enforcing #FF4949 idle / yellow active color states.
+  locationWindowHandler now resolves the close/back button via GraphicRaycaster UI raycasts so world-space clicks dismiss the panel even when the EventSystem misses OnClick events.
+  AreaTooltip now caches a GraphicRaycaster and performs pointer raycasts on mouse release so world-space clicks on Enter/Info reliably trigger their UnityEvents alongside keyboard input.
   LocationActivitiesPanel exposes a debug auto-refresh toggle that re-queries the database every 3 seconds for QA verification while the panel remains active.
   LocationActivityService logs each database availability query to the Unity console, listing activities and their enabled states for diagnostics.
   LocationActivitiesPanel scene wiring now seeds `nodeFortAurus` as the default locationId and binds Tavern, Shop, Temple, Academy, Graveyard, Arena, and Search buttons to their respective UI `Button` components so database availability toggles map correctly.
@@ -174,7 +176,7 @@ _Last updated: 2025-10-16 20:00 UTC • Document owner: Codex
 
 #### World-Space UI Interaction
 - **Owner:** Codex
-- **Progress:** In progress, 90% (Canvas GraphicRaycaster configuration updated; Play Mode verification pending headless environment follow-up) — due 2025-10-18.
+- **Progress:** In progress, 97% (2025-10-18: AreaTooltip now raycasts pointer clicks through its GraphicRaycaster to fire Enter/Info events in-world; locationWindowHandler close raycast verified previously; Play Mode verification still pending due to headless environment limits) — due 2025-10-18.
 - **Dependencies:** FEAT-WM-001; locationTooltip Canvas hierarchy; Unity world-space Canvas event system configuration.
 - **Acceptance Criteria:**
   - locationTooltip world-space Canvas receives pointer events while facing away from the camera.
@@ -556,8 +558,10 @@ _Last updated: 2025-10-16 20:00 UTC • Document owner: Codex
 - 2025-09-23: Restored RPG scene from clean snapshot, reattached LocationActivitiesPanel hierarchy, and wired AreaTooltip Enter events to open the panel. — Codex
 
 - 2025-09-24: Added LocationActivitiesPanel with yellow/red highlighting, Enter/Escape input flow, and updated AreaTooltip to re-arm interactions per keyboard accessibility pillar. — Codex
+- 2025-10-18: Enabled AreaTooltip GraphicRaycaster pointer raycasts so world-space Enter/Info clicks invoke their UnityEvents and documented the follow-up Play Mode verification need. — Codex
 
 - 2025-09-24: Scoped LocationActivitiesPanel refresh and Tavern sub-panel integration, recorded new dependencies, acceptance criteria, and risks, and noted TBD follow-ups for location metadata service contract (Owner: TBD, due 2025-09-27) and TavernManager API audit (Owner: TBD, due 2025-09-28) to unblock implementation steps. — Codex
+- 2025-10-16: Documented tooltip unlock fix on LocationActivitiesPanel close (Escape/Back/Cancel), updated World-Space UI Interaction progress, and noted headless Play Mode verification gap. — Codex
 
 - 2025-09-24: Rewired PlayerNavigator and AreaTooltip to the existing `locationInfoWindow`, migrated LocationActivitiesPanel onto it, and generated placeholder content for yet-to-be-specified locations. — Codex
 - 2025-09-24: Restored RPG scene from commit 0ea6a56 after corruption and re-populated LocationActivitiesPanel defaults in YAML. — Codex
@@ -567,3 +571,4 @@ _Last updated: 2025-10-16 20:00 UTC • Document owner: Codex
 - 2025-09-26: Added LocationActivitiesPanel debug auto-refresh toggle to poll database availability every 3 seconds for QA verification. — Codex
 - 2025-09-26: Updated LocationActivityService to emit console logs enumerating activities and enabled states whenever availability is queried. — Codex
 - 2025-10-16: Disabled locationTooltip Canvas GraphicRaycaster Ignore Reversed Graphics to restore Enter button clicks and documented world-space UI verification follow-up. — Codex
+- 2025-10-18: Captured locationWindowHandler close-button raycast detection, refreshed World-Space UI Interaction progress to 94%, and reiterated pending Play Mode verification gap. — Codex
