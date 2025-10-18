@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -5,6 +6,13 @@ using UnityEngine.UI;
 
 public class locationWindowHandler : MonoBehaviour
 {
+    [Serializable]
+    private sealed class ActivityWindow
+    {
+        public LocationActivityType activityType;
+        public GameObject window = null!;
+    }
+
     [Tooltip("Optional explicit reference to the GraphicRaycaster responsible for this window.")]
     [SerializeField]
     private GraphicRaycaster graphicRaycaster;
@@ -13,14 +21,30 @@ public class locationWindowHandler : MonoBehaviour
     [SerializeField]
     private LocationActivitiesPanel locationActivitiesPanel;
 
+    [Header("Activity Windows")]
+    [Tooltip("List of contextual windows that should toggle when corresponding activities are selected.")]
+    [SerializeField]
+    private List<ActivityWindow> activityWindows = new();
+
     private readonly List<RaycastResult> raycastResults = new();
+    private readonly Dictionary<LocationActivityType, GameObject> windowLookup = new();
     private Button closeButton;
+    private bool isSubscribedToSelection;
 
     private void Awake()
     {
         CacheCloseButton();
         CacheGraphicRaycaster();
         CacheLocationActivitiesPanel();
+        BuildWindowLookup();
+        HideAllActivityWindows();
+    }
+
+    private void OnEnable()
+    {
+        CacheLocationActivitiesPanel();
+        BuildWindowLookup();
+        HideAllActivityWindows();
     }
 
     private void OnDisable()
@@ -28,6 +52,12 @@ public class locationWindowHandler : MonoBehaviour
         UnlockTooltipInteraction();
         CacheLocationActivitiesPanel();
         locationActivitiesPanel?.ClearSelection();
+        HideAllActivityWindows();
+    }
+
+    private void OnDestroy()
+    {
+        UnsubscribeFromSelectionEvents();
     }
 
     public void hideLocationActivityWindow()
@@ -157,12 +187,87 @@ public class locationWindowHandler : MonoBehaviour
 
     private void CacheLocationActivitiesPanel()
     {
-        if (locationActivitiesPanel != null)
+        if (locationActivitiesPanel == null)
+        {
+            locationActivitiesPanel = GetComponentInChildren<LocationActivitiesPanel>(true);
+        }
+
+        if (locationActivitiesPanel != null && !isSubscribedToSelection)
+        {
+            locationActivitiesPanel.ActivitySelectionChanged += HandleActivitySelectionChanged;
+            isSubscribedToSelection = true;
+        }
+    }
+
+    private void BuildWindowLookup()
+    {
+        windowLookup.Clear();
+
+        if (activityWindows == null)
         {
             return;
         }
 
-        locationActivitiesPanel = GetComponentInChildren<LocationActivitiesPanel>(true);
+        foreach (var entry in activityWindows)
+        {
+            if (entry == null || entry.window == null)
+            {
+                continue;
+            }
+
+            if (windowLookup.ContainsKey(entry.activityType))
+            {
+                Debug.LogWarning($"Duplicate activity window mapping for {entry.activityType} on {name}. Only the first mapping will be used.");
+                continue;
+            }
+
+            windowLookup.Add(entry.activityType, entry.window);
+        }
+    }
+
+    private void HideAllActivityWindows()
+    {
+        if (activityWindows == null)
+        {
+            return;
+        }
+
+        foreach (var entry in activityWindows)
+        {
+            if (entry?.window == null)
+            {
+                continue;
+            }
+
+            if (entry.window.activeSelf)
+            {
+                entry.window.SetActive(false);
+            }
+        }
+    }
+
+    private void HandleActivitySelectionChanged(LocationActivityType? activityType)
+    {
+        HideAllActivityWindows();
+
+        if (!activityType.HasValue)
+        {
+            return;
+        }
+
+        if (windowLookup.TryGetValue(activityType.Value, out var window) && window != null)
+        {
+            window.SetActive(true);
+        }
+    }
+
+    private void UnsubscribeFromSelectionEvents()
+    {
+        if (locationActivitiesPanel != null && isSubscribedToSelection)
+        {
+            locationActivitiesPanel.ActivitySelectionChanged -= HandleActivitySelectionChanged;
+            isSubscribedToSelection = false;
+        }
     }
 
 }
