@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-10-19 14:32 UTC • Document owner: Codex
+_Last updated: 2025-10-18 04:40 UTC • Document owner: Codex
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
 - **Build Status:** Yellow — Windows-specific tests fail in current Linux environment.
@@ -16,7 +16,7 @@ _Last updated: 2025-10-19 14:32 UTC • Document owner: Codex
   - Incomplete mapping of legacy features — Owner: TBD, due 2025-09-25.
   - Popup window usage inconsistent across scenes — Owner: Codex, due 2025-09-27 (Login and Register now share PopupWindow prefab; remaining scenes pending audit).
     - GUID corruption in `.meta` files may break asset references — Owner: Codex, due 2025-09-14.
-  - Scene asset regression risk due to manual YAML edits — Owner: Codex, due 2025-09-30. Mitigation: Use Unity editor or verified templates when adjusting scene tags; Trigger: scene fails to open or loses GameObject data. Status 2025-09-26: Restored RPG scene from commit 5a21cfe after YAML truncation recurred; Unity re-save validation still pending.
+  - Scene asset regression risk due to manual YAML edits — Owner: Codex, due 2025-09-30. Mitigation: Use Unity editor or verified templates when adjusting scene tags; Trigger: scene fails to open or loses GameObject data. Status 2025-10-18: Removed lingering stash merge marker from RPG scene YAML; Unity re-save validation still pending.
 - **Next Milestone:** Unity Prototype Build, 2025-10-01, exit criteria: player can start battle and load inventory from database.
 
 ## 1. Vision & Pillars
@@ -558,6 +558,7 @@ _Last updated: 2025-10-19 14:32 UTC • Document owner: Codex
 - 2025-09-23: Restored RPG scene from clean snapshot, reattached LocationActivitiesPanel hierarchy, and wired AreaTooltip Enter events to open the panel. — Codex
 
 - 2025-09-24: Added LocationActivitiesPanel with yellow/red highlighting, Enter/Escape input flow, and updated AreaTooltip to re-arm interactions per keyboard accessibility pillar. — Codex
+- 2025-10-18: Removed lingering stash merge marker from RPG scene YAML and noted Unity re-save validation follow-up. — Codex
 - 2025-10-18: Enabled AreaTooltip GraphicRaycaster pointer raycasts so world-space Enter/Info clicks invoke their UnityEvents and documented the follow-up Play Mode verification need. — Codex
 
 - 2025-09-24: Scoped LocationActivitiesPanel refresh and Tavern sub-panel integration, recorded new dependencies, acceptance criteria, and risks, and noted TBD follow-ups for location metadata service contract (Owner: TBD, due 2025-09-27) and TavernManager API audit (Owner: TBD, due 2025-09-28) to unblock implementation steps. — Codex
@@ -573,3 +574,4 @@ _Last updated: 2025-10-19 14:32 UTC • Document owner: Codex
 - 2025-10-16: Disabled locationTooltip Canvas GraphicRaycaster Ignore Reversed Graphics to restore Enter button clicks and documented world-space UI verification follow-up. — Codex
 - 2025-10-18: Captured locationWindowHandler close-button raycast detection, refreshed World-Space UI Interaction progress to 94%, and reiterated pending Play Mode verification gap. — Codex
 - 2025-10-19: Enabled AreaTooltip node configuration with per-node Enter refresh into LocationActivitiesPanel and cleared the panel's default locationId to rely on tooltip-provided identifiers. — Codex
+- 2025-10-18: Removed leftover merge conflict markers from RPG scene and confirmed LocationActivitiesPanel references for Fort Aurus remain intact pending Unity re-save validation. — Codex
