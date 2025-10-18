@@ -36,6 +36,17 @@ public class AreaTooltip : MonoBehaviour
     [SerializeField]
     private GraphicRaycaster graphicRaycaster = null!;
 
+    [Header("Location Panel")]
+    [SerializeField]
+    private GameObject locationPanelObject = null!;
+
+    [SerializeField]
+    private LocationActivitiesPanel locationActivitiesPanel = null!;
+
+    [Tooltip("Identifier used when loading activities for this tooltip.")]
+    [SerializeField]
+    private string locationNodeId = string.Empty;
+
     [Header("Animator States")]
     [Tooltip("State name for the show animation.")]
     [SerializeField]
@@ -44,8 +55,6 @@ public class AreaTooltip : MonoBehaviour
     [Tooltip("Trigger name that plays the show animation.")]
     [SerializeField]
     private string showTriggerName = "Show";
-
-    public GameObject locationPanelObject;
 
     [Tooltip("State name for the idle animation.")]
     [SerializeField]
@@ -82,6 +91,7 @@ public class AreaTooltip : MonoBehaviour
     private void Awake()
     {
         CacheGraphicRaycaster();
+        CacheLocationPanelDependencies();
         ValidateSerializedFields();
         CacheAnimatorHashes();
         BindButtons();
@@ -93,12 +103,36 @@ public class AreaTooltip : MonoBehaviour
 
     public void locationPanelShow()
     {
+        CacheLocationPanelDependencies();
+
+        if (locationPanelObject == null)
+        {
+            Debug.LogWarning($"[{nameof(AreaTooltip)}] Location panel object is not assigned.", this);
+            return;
+        }
+
+        if (locationActivitiesPanel != null)
+        {
+            if (!string.IsNullOrWhiteSpace(locationNodeId))
+            {
+                locationActivitiesPanel.SetLocation(locationNodeId);
+            }
+            else
+            {
+                Debug.LogWarning($"[{nameof(AreaTooltip)}] Location node identifier is empty; reusing existing panel location.", this);
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"[{nameof(AreaTooltip)}] Location activities panel is not assigned.", this);
+        }
+
         locationPanelObject.SetActive(true);
-        Debug.Log("CLICKED");
     }
     private void OnValidate()
     {
         CacheGraphicRaycaster();
+        CacheLocationPanelDependencies();
         CacheAnimatorHashes();
         UpdateAreaNameLabel();
     }
@@ -165,6 +199,22 @@ public class AreaTooltip : MonoBehaviour
         {
             TryInvokeEnter();
         }
+    }
+
+    /// <summary>
+    /// Configure the node identifier used when loading activities.
+    /// </summary>
+    public void SetLocationNodeId(string nodeId)
+    {
+        locationNodeId = nodeId;
+    }
+
+    /// <summary>
+    /// Retrieve the node identifier associated with this tooltip.
+    /// </summary>
+    public string GetLocationNodeId()
+    {
+        return locationNodeId;
     }
 
     /// <summary>
@@ -359,6 +409,16 @@ public class AreaTooltip : MonoBehaviour
             Debug.LogWarning($"[{nameof(AreaTooltip)}] Enter button is not assigned.", this);
         }
 
+        if (locationPanelObject == null)
+        {
+            Debug.LogWarning($"[{nameof(AreaTooltip)}] Location panel object is not assigned.", this);
+        }
+
+        if (locationActivitiesPanel == null && locationPanelObject != null)
+        {
+            Debug.LogWarning($"[{nameof(AreaTooltip)}] Location activities panel component is not assigned.", this);
+        }
+
         if (tooltipAnimator == null)
         {
             Debug.LogWarning($"[{nameof(AreaTooltip)}] Animator is not assigned.", this);
@@ -398,6 +458,21 @@ public class AreaTooltip : MonoBehaviour
         }
 
         graphicRaycaster = GetComponentInChildren<GraphicRaycaster>(true);
+    }
+
+    private void CacheLocationPanelDependencies()
+    {
+        if (locationActivitiesPanel != null)
+        {
+            return;
+        }
+
+        if (locationPanelObject == null)
+        {
+            return;
+        }
+
+        locationActivitiesPanel = locationPanelObject.GetComponent<LocationActivitiesPanel>();
     }
 
     private void TryHandlePointerClick()
