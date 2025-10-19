@@ -12,37 +12,57 @@ using WinFormsApp2;
 public class TavernPanel : MonoBehaviour
 {
     [Header("Top-Level Actions")]
+    [Tooltip("Button players press to roll for new tavern recruits.")]
     [SerializeField] private Button searchPartyMembersButton = null!;
+    [Tooltip("Placeholder button reserved for future mercenary contracts.")]
     [SerializeField] private Button hireMercenariesButton = null!;
+    [Tooltip("Placeholder button reserved for future tavern work quests.")]
     [SerializeField] private Button lookForWorkButton = null!;
 
     [Header("Candidate List")]
+    [Tooltip("Scroll view containing generated recruit buttons.")]
     [SerializeField] private ScrollRect candidateScrollRect = null!;
+    [Tooltip("Prefab instantiated for each recruit option in the list.")]
     [SerializeField] private GameObject candidateButtonPrefab = null!;
 
     [Header("Detail Overlay")]
+    [Tooltip("Detail overlay panel that surfaces recruit biography, stats, and hire action.")]
     [SerializeField] private TavernRecruitDetailPanel recruitDetailPanel = null!;
 
+    [Header("Selected Recruit Stat Labels")]
+    [Tooltip("Text element displaying the selected recruit's strength value.")]
+    [SerializeField] private TMP_Text strengthValueLabel = null!;
+    [Tooltip("Text element displaying the selected recruit's dexterity value.")]
+    [SerializeField] private TMP_Text dexterityValueLabel = null!;
+    [Tooltip("Text element displaying the selected recruit's intelligence value.")]
+    [SerializeField] private TMP_Text intelligenceValueLabel = null!;
+    [Tooltip("Text element displaying the selected recruit's maximum health.")]
+    [SerializeField] private TMP_Text maxHpValueLabel = null!;
+    [Tooltip("Text element displaying the selected recruit's maximum mana.")]
+    [SerializeField] private TMP_Text maxMpValueLabel = null!;
+    [Tooltip("Text element displaying the selected recruit's action speed.")]
+    [SerializeField] private TMP_Text actionSpeedValueLabel = null!;
+    [Tooltip("Text element displaying the selected recruit's physical defense.")]
+    [SerializeField] private TMP_Text physicalDefenseValueLabel = null!;
+    [Tooltip("Text element displaying the selected recruit's magical defense.")]
+    [SerializeField] private TMP_Text magicDefenseValueLabel = null!;
+    [Tooltip("Text element displaying the gold cost to hire the selected recruit.")]
+    [SerializeField] private TMP_Text hireCostValueLabel = null!;
+
     [Header("Services")]
+    [Tooltip("Runtime TavernManager service used to query and hire recruits.")]
     [SerializeField] private TavernManager tavernManager = null!;
+    [Tooltip("RPGManager reference responsible for refreshing party displays after hires.")]
     [SerializeField] private RPGManager rpgManager = null!;
 
-    private readonly PartyMemberGenerator _generator = new();
     private readonly List<PartyMemberGenerator.GeneratedRecruit> _availableRecruits = new();
     private readonly List<Button> _spawnedButtons = new();
     private PartyMemberGenerator.GeneratedRecruit? _selectedRecruit;
+    private string activeNodeId = string.Empty;
+
+    private const string DefaultStatPlaceholder = "--";
 
     private Transform? CandidateContent => candidateScrollRect != null ? candidateScrollRect.content : null;
-
-    private static readonly (int count, float weight)[] RecruitCountWeights =
-    {
-        (1, 0.28f),
-        (2, 0.24f),
-        (3, 0.2f),
-        (4, 0.14f),
-        (5, 0.09f),
-        (6, 0.05f)
-    };
 
     private void Awake()
     {
@@ -55,6 +75,8 @@ public class TavernPanel : MonoBehaviour
         {
             candidateScrollRect.gameObject.SetActive(true);
         }
+
+        UpdateStatLabels(null);
     }
 
     private void Start()
@@ -72,6 +94,11 @@ public class TavernPanel : MonoBehaviour
         WireTopLevelButtons();
         ConfigureTodoButton(hireMercenariesButton);
         ConfigureTodoButton(lookForWorkButton);
+    }
+
+    public void SetActiveNode(string nodeId)
+    {
+        activeNodeId = nodeId ?? string.Empty;
     }
 
     private void WireTopLevelButtons()
@@ -131,6 +158,8 @@ public class TavernPanel : MonoBehaviour
 
         CloseDetailPanel();
 
+        UpdateStatLabels(null);
+
         int accountId = InventoryServiceUnity.AccountId;
         List<TavernManager.Recruit> baseRecruits = await tavernManager.GetCandidatesAsync(accountId);
         int recruitCount = RollRecruitCount();
@@ -144,27 +173,18 @@ public class TavernPanel : MonoBehaviour
     {
         float totalWeight = 0f;
         foreach (var option in RecruitCountWeights)
+        if (string.IsNullOrWhiteSpace(activeNodeId))
         {
-            totalWeight += option.weight;
+            Debug.LogWarning("TavernPanel cannot populate recruits without an active node identifier.");
+            return;
         }
 
-        if (totalWeight <= 0f)
-        {
-            return 1;
-        }
+        int accountId = InventoryServiceUnity.AccountId;
+        List<PartyMemberGenerator.GeneratedRecruit> recruits = await tavernManager.GetCandidatesAsync(accountId, activeNodeId);
+        _availableRecruits.Clear();
+        _availableRecruits.AddRange(recruits);
 
-        float roll = Random.value * totalWeight;
-        foreach (var option in RecruitCountWeights)
-        {
-            if (roll <= option.weight)
-            {
-                return option.count;
-            }
-
-            roll -= option.weight;
-        }
-
-        return RecruitCountWeights[^1].count;
+        RebuildCandidateButtons();
     }
 
     private void RebuildCandidateButtons()
@@ -263,6 +283,8 @@ public class TavernPanel : MonoBehaviour
             return;
         }
 
+        UpdateStatLabels(recruit);
+
         recruitDetailPanel.Show(
             recruit,
             () => _ = HireSelectedRecruitAsync(),
@@ -277,7 +299,7 @@ public class TavernPanel : MonoBehaviour
         }
 
         int accountId = InventoryServiceUnity.AccountId;
-        bool success = await tavernManager.HireAsync(accountId, _selectedRecruit.Source.id);
+        bool success = await tavernManager.HireAsync(accountId, _selectedRecruit.Source.id, activeNodeId);
         if (!success)
         {
             Debug.LogWarning($"Failed to hire recruit {_selectedRecruit.Source.name}.");
@@ -287,11 +309,10 @@ public class TavernPanel : MonoBehaviour
 
         await CharacterService.AddPartyMemberAsync(_selectedRecruit.ToCharacterData());
 
-        _availableRecruits.Remove(_selectedRecruit);
         _selectedRecruit = null;
 
         CloseDetailPanel();
-        RebuildCandidateButtons();
+        await PopulateRecruitListAsync();
         await RefreshPartyDisplayAsync();
     }
 
@@ -303,6 +324,8 @@ public class TavernPanel : MonoBehaviour
         {
             candidateScrollRect.gameObject.SetActive(true);
         }
+
+        UpdateStatLabels(null);
     }
 
     private async Task RefreshPartyDisplayAsync()
@@ -319,4 +342,40 @@ public class TavernPanel : MonoBehaviour
     }
 
     public void BackToMain() => MainRPGNavigation.OpenMain();
+
+    private void UpdateStatLabels(PartyMemberGenerator.GeneratedRecruit? recruit)
+    {
+        if (recruit == null)
+        {
+            SetStatText(strengthValueLabel, DefaultStatPlaceholder);
+            SetStatText(dexterityValueLabel, DefaultStatPlaceholder);
+            SetStatText(intelligenceValueLabel, DefaultStatPlaceholder);
+            SetStatText(maxHpValueLabel, DefaultStatPlaceholder);
+            SetStatText(maxMpValueLabel, DefaultStatPlaceholder);
+            SetStatText(actionSpeedValueLabel, DefaultStatPlaceholder);
+            SetStatText(physicalDefenseValueLabel, DefaultStatPlaceholder);
+            SetStatText(magicDefenseValueLabel, DefaultStatPlaceholder);
+            SetStatText(hireCostValueLabel, DefaultStatPlaceholder);
+            return;
+        }
+
+        var stats = recruit.Stats;
+        SetStatText(strengthValueLabel, stats.Strength.ToString());
+        SetStatText(dexterityValueLabel, stats.Dexterity.ToString());
+        SetStatText(intelligenceValueLabel, stats.Intelligence.ToString());
+        SetStatText(maxHpValueLabel, stats.MaxHP.ToString());
+        SetStatText(maxMpValueLabel, stats.MaxMP.ToString());
+        SetStatText(actionSpeedValueLabel, stats.ActionSpeed.ToString("0.0"));
+        SetStatText(physicalDefenseValueLabel, stats.PhysicalDefense.ToString());
+        SetStatText(magicDefenseValueLabel, stats.MagicDefense.ToString());
+        SetStatText(hireCostValueLabel, recruit.Cost.ToString());
+    }
+
+    private static void SetStatText(TMP_Text? label, string value)
+    {
+        if (label != null)
+        {
+            label.text = value;
+        }
+    }
 }

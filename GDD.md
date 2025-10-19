@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-10-19 22:05 UTC • Document owner: Codex
+_Last updated: 2025-10-19 22:45 UTC • Document owner: Codex
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
 - **Build Status:** Yellow — Windows-specific tests fail in current Linux environment.
@@ -379,18 +379,19 @@ _Last updated: 2025-10-19 22:05 UTC • Document owner: Codex
 
 ### Tavern Panel
 - **Owner:** Codex
-- **Dependencies:** TavernManager, CharacterService cache, RPGManager.RefreshPartyUIAsync, ScrollRect candidate list prefab, TavernRecruitDetailPanel overlay, Manual-layout candidate button prefab anchors (anchorMin/Max (0.5,1), pivot (0.5,1))
-- **Progress:** In progress, 70%
+- **Dependencies:** TavernManager, CharacterService cache, RPGManager.RefreshPartyUIAsync, ScrollRect candidate list prefab, TavernRecruitDetailPanel overlay, Manual-layout candidate button prefab anchors (anchorMin/Max (0.5,1), pivot (0.5,1)), LocationActivitiesPanel.CurrentLocationId wiring, SQL scripts (`unity_tavern_select_recruits_by_node.sql`, `unity_tavern_upsert_recruits.sql`, `unity_tavern_prune_recruits.sql`, `unity_tavern_purchase_flow.sql`, `unity_tavern_refund_gold.sql`)
+- **Progress:** In progress, 80%
 - **Acceptance Criteria:**
-  - "Search for Party Members" produces 1–6 recruits per weighted roll (1 most common) through PartyMemberGenerator and populates ScrollRect buttons labeled "NAME – COST gold".
-  - Generated recruits roll 10–30 weighted stat points distributed across STR/DEX/INT/HP/MP/ASPD/P.DEF/M.DEF using 0.1/×5/×3 scaling, surface the expanded block in the detail overlay, and price at 10 gold per effective point.
-  - Selecting a recruit opens a modal detail overlay with the expanded stat block plus Hire and Cancel actions while hiding the list.
-  - Hire triggers TavernManager.HireAsync, updates CharacterService party cache, removes the recruit from available results, and refreshes RPGManager's party display at the new hire cost.
+  - "Search for Party Members" resolves the active node via `TavernPanel.SetActiveNode` (fed by LocationActivitiesPanel) and loads a 1–6 recruit roster persisted by TavernManager for 24 hours per node.
+  - Persisted recruits include rolled STR/DEX/INT/HP/MP/ASPD/P.DEF/M.DEF stats, total cost, and creation timestamp stored/retrieved through the new Unity SQL scripts; the detail overlay surfaces these stored values without re-rolling client-side.
+  - Hiring a recruit uses the stored cost to deduct gold, mark the roster entry purchased, refresh the available list, and update CharacterService/RPGManager, refunding gold if the DB assignment fails.
   - Candidate buttons use absolute RectTransform positioning with anchoredPosition (0, 113 − 74 × index, 0) and remain stable with layout groups disabled.
 - **Risks:** Detail panel prefab requires Unity editor wiring before QA — Owner: Codex, due 2025-09-25.
 - **Implementation Notes (2025-10-19):**
   - Candidate list content disables VerticalLayoutGroup and ContentSizeFitter at runtime to preserve manual spacing.
   - Candidate button prefabs must retain non-stretch anchors (anchorMin/Max (0.5,1), pivot (0.5,1)) so TavernPanel positioning logic remains valid.
+- **Implementation Notes (2025-10-20):**
+  - TavernManager now handles node-aware roster generation, pruning, and persistence via the new SQL scripts with 24-hour rotation.
 
 ## 9. Data & Persistence
 - **Save format** (JSON/ScriptableObject/etc.)
@@ -433,6 +434,31 @@ _Last updated: 2025-10-19 22:05 UTC • Document owner: Codex
 - **Owner:** Codex
 - **Progress:** Complete, 100% (initial schema delivered 2025-09-25)
 
+### unity_tavern_recruits Node Rosters
+- **Owner:** TBD (due 2025-10-25)
+- **Dependencies:** `unity_tavern_select_recruits_by_node.sql`, `unity_tavern_upsert_recruits.sql`, `unity_tavern_prune_recruits.sql`, `unity_tavern_purchase_flow.sql`, `unity_tavern_refund_gold.sql`, TavernManager node ID wiring, DB migration adding `unity_tavern_recruits`.
+- **Progress:** In progress, 40% (Unity persistence scripts authored; schema migration pending)
+- **Schema Snapshot:**
+  | Field | Type | Notes |
+  |---|---|---|
+  | node_id | VARCHAR(64) | Part of PK; matches LocationActivitiesPanel node identifiers |
+  | recruit_id | INT | Part of PK; references `characters.id` |
+  | cost | INT | Stored hire cost |
+  | created_utc | DATETIME | UTC timestamp enabling 24-hour rotation |
+  | strength/dexterity/intelligence | INT | Rolled primary stats |
+  | max_hp/max_mp | INT | Rolled resource stats |
+  | action_speed | DECIMAL(5,2) | Rolled attack speed |
+  | physical_defense/magic_defense | INT | Rolled defenses |
+  | rolled_points | INT | Total rolled stat points |
+  | purchased_utc | DATETIME NULL | Null while available; set on hire |
+  | purchased_account_id | INT NULL | Tracks hiring account |
+- **Acceptance Criteria:**
+  - `unity_tavern_upsert_recruits.sql` seeds or refreshes node rosters, resetting purchased metadata.
+  - `unity_tavern_select_recruits_by_node.sql` returns only non-purchased recruits with full stat blocks for Unity UI consumption.
+  - `unity_tavern_prune_recruits.sql` removes purchased entries immediately and expires rosters older than 24 hours, with `@forceReset` allowing manual regeneration.
+  - `unity_tavern_purchase_flow.sql` deducts stored cost, assigns the recruit, and stamps purchase metadata; `unity_tavern_refund_gold.sql` restores gold if character assignment fails.
+- **Risks:** `unity_tavern_recruits` schema migration not yet authored — Owner: TBD, due 2025-10-23.
+
 ### accounts Schema Rebuild Script
 - **Artifact:** `recreate_accounts_tables.sql`
 - **Owner:** Codex
@@ -469,7 +495,7 @@ _Last updated: 2025-10-19 22:05 UTC • Document owner: Codex
 | FEAT-CBT-001 | Create BattleScene | feature | TBD | 7d | SYS-ARCH-001 | Player can start and resolve battle | To Do | 0% | - | Should |
 | FEAT-UI-002 | Implement popup window prefab | feature | Codex | 1d | SYS-ARCH-001 | Popup shows login errors with OK dismissal | Done | 100% | PR TBD | Should |
 | FEAT-UI-003 | Register success popup flow | feature | Codex | 0.5d | PopupWindow prefab, Register scene Canvas | Register screen shows popup on success/failure and returns to Login after confirmation | Done | 100% | PR TBD | Should |
-| FEAT-UI-004 | Tavern recruit search & detail overlay | feature | Codex | 2d | TavernManager, CharacterService cache, RPGManager refresh hook | Search button spawns 1–6 weighted recruits with expanded stat/cost block; modal displays stats; Hire updates party UI | In Progress | 65% | - | Should |
+| FEAT-UI-004 | Tavern recruit search & detail overlay | feature | Codex | 2d | TavernManager, CharacterService cache, RPGManager refresh hook | Search button loads persisted node rosters (1–6 recruits) with stored stat/cost blocks; modal displays stats; Hire updates party UI and deducts stored cost | In Progress | 80% | - | Should |
 | FEAT-UI-005 | Activate Tavern mercenary/work actions | feature | TBD | 3d | FEAT-UI-004 | Mercenary and Work buttons enabled with dedicated flows | To Do | 0% | - | Could |
 | FEAT-UI-006 | Location activities panel refresh | feature | Codex | 2d | FEAT-WM-001; location metadata service (Owner: TBD, due 2025-09-27); `location_activity_settings` table (Owner: Codex, delivered 2025-09-25) | Populate activities from `CityNode` metadata, surface database-driven availability, support Enter/Escape focus return, maintain 1080p/1440p layout safety | In Progress | 60% | - | Should |
 | FEAT-UI-007 | Tavern sub-panel integration | feature | Codex | 3d | FEAT-UI-004; FEAT-UI-006; TavernManager API audit (Owner: TBD, due 2025-09-28) | Hire/Mercenary/Work actions available with telemetry `tavern_subpanel_open` firing on open and CharacterService refresh on hire | In Progress | 5% | - | Should |
@@ -508,7 +534,7 @@ _Last updated: 2025-10-19 22:05 UTC • Document owner: Codex
 | Feature | Progress | Owner | Dependencies | Acceptance Criteria | Risks |
 |---|---|---|---|---|---|
 | Location Activities Panel Refresh | 100% (completed 2025-10-18) | Codex | FEAT-WM-001; FEAT-UI-006; location metadata service (Owner: TBD, due 2025-09-27); `location_activity_settings` table (Owner: Codex, delivered 2025-09-25) | Reuses handcrafted `locationInfoWindow` layout with dynamic activity selection;<br>Loads availability via LocationActivityService and database toggles;<br>Emits `ActivitySelectionChanged` events that drive `locationWindowHandler` to toggle contextual Tavern/Shop/etc. windows;<br>Supports 1080p/1440p layouts without blocking map input;<br>Debug toggle enables 3-second polling for QA | InputAction focus clashes during sub-panel open (Owner: Codex, due 2025-09-30);<br>Metadata contract TBD may delay integration (Owner: TBD, due 2025-09-27);<br>Placeholder copy must transition to live data once metadata lands (Owner: Codex, due 2025-09-29);<br>SQL data drift could hide critical actions (Owner: Codex, due 2025-09-28) |
-| Tavern Sub-Panel Integration | 5% (due 2025-10-01) | Codex | FEAT-UI-004; FEAT-UI-007; TavernManager API audit (Owner: TBD, due 2025-09-28) | Hire, Mercenary, Work actions expose stateful buttons;<br>Hire reuses recruit overlay and closes cleanly;<br>`tavern_subpanel_open` telemetry fires with location ID | Legacy edge cases from TavernForm undocumented (Owner: TBD, due 2025-09-29);<br>Responsive layout for small resolutions unverified (Owner: Codex, due 2025-10-03);<br>CharacterService refresh timing may double-trigger updates (Owner: Codex, due 2025-10-04) |
+| Tavern Sub-Panel Integration | 12% (due 2025-10-01) | Codex | FEAT-UI-004; FEAT-UI-007; TavernManager API audit (Owner: TBD, due 2025-09-28) | Hire, Mercenary, Work actions expose stateful buttons;<br>Hire reuses recruit overlay and closes cleanly;<br>`tavern_subpanel_open` telemetry fires with location ID;<br>Inspector surfaces recruit stat labels with tooltip guidance for designer hookup | Legacy edge cases from TavernForm undocumented (Owner: TBD, due 2025-09-29);<br>Responsive layout for small resolutions unverified (Owner: Codex, due 2025-10-03);<br>CharacterService refresh timing may double-trigger updates (Owner: Codex, due 2025-10-04) |
 
 ## 15. Risks & Mitigations
 - Missing Unity version info (Likely/Medium) — Owner: TBD — Mitigation: inspect project settings; Trigger: build fails.
@@ -523,6 +549,7 @@ _Last updated: 2025-10-19 22:05 UTC • Document owner: Codex
 - GUID corruption in `.meta` files may break asset references (Possible/Low) — Owner: Codex — Mitigation: regenerate or reset GUIDs; Trigger: assets reference missing scripts.
 
 ## 16. Changelog (Auto-Appended)
+- 2025-10-19: Surfaced recruit stat TMP labels with tooltip descriptions in TavernPanel so designers can wire tavern UI without code changes and documented progress bump. — Codex
 - 2025-10-19: Documented TavernPanel manual candidate button layout (anchoredPosition offsets, layout group disablement) and updated progress to 70%. — Codex
 - 2025-10-18: Wired `locationWindowHandler` to the new `ActivitySelectionChanged` event so designers can assign Tavern/Shop/Temple/etc. GameObjects that automatically show when their buttons are selected and hide otherwise. — Codex
 - 2025-10-18: Linked the Search for Enemies button to the LocationActivitiesPanel availability list so disabled states hide the control in Fort Aurus. — Codex
