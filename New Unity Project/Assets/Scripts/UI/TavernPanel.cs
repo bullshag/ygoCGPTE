@@ -27,22 +27,12 @@ public class TavernPanel : MonoBehaviour
     [SerializeField] private TavernManager tavernManager = null!;
     [SerializeField] private RPGManager rpgManager = null!;
 
-    private readonly PartyMemberGenerator _generator = new();
     private readonly List<PartyMemberGenerator.GeneratedRecruit> _availableRecruits = new();
     private readonly List<Button> _spawnedButtons = new();
     private PartyMemberGenerator.GeneratedRecruit? _selectedRecruit;
+    private string activeNodeId = string.Empty;
 
     private Transform? CandidateContent => candidateScrollRect != null ? candidateScrollRect.content : null;
-
-    private static readonly (int count, float weight)[] RecruitCountWeights =
-    {
-        (1, 0.28f),
-        (2, 0.24f),
-        (3, 0.2f),
-        (4, 0.14f),
-        (5, 0.09f),
-        (6, 0.05f)
-    };
 
     private void Awake()
     {
@@ -72,6 +62,11 @@ public class TavernPanel : MonoBehaviour
         WireTopLevelButtons();
         ConfigureTodoButton(hireMercenariesButton);
         ConfigureTodoButton(lookForWorkButton);
+    }
+
+    public void SetActiveNode(string nodeId)
+    {
+        activeNodeId = nodeId ?? string.Empty;
     }
 
     private void WireTopLevelButtons()
@@ -131,40 +126,18 @@ public class TavernPanel : MonoBehaviour
 
         CloseDetailPanel();
 
+        if (string.IsNullOrWhiteSpace(activeNodeId))
+        {
+            Debug.LogWarning("TavernPanel cannot populate recruits without an active node identifier.");
+            return;
+        }
+
         int accountId = InventoryServiceUnity.AccountId;
-        List<TavernManager.Recruit> baseRecruits = await tavernManager.GetCandidatesAsync(accountId);
-        int recruitCount = RollRecruitCount();
+        List<PartyMemberGenerator.GeneratedRecruit> recruits = await tavernManager.GetCandidatesAsync(accountId, activeNodeId);
         _availableRecruits.Clear();
-        _availableRecruits.AddRange(_generator.BuildCandidates(baseRecruits, recruitCount));
+        _availableRecruits.AddRange(recruits);
 
         RebuildCandidateButtons();
-    }
-
-    private static int RollRecruitCount()
-    {
-        float totalWeight = 0f;
-        foreach (var option in RecruitCountWeights)
-        {
-            totalWeight += option.weight;
-        }
-
-        if (totalWeight <= 0f)
-        {
-            return 1;
-        }
-
-        float roll = Random.value * totalWeight;
-        foreach (var option in RecruitCountWeights)
-        {
-            if (roll <= option.weight)
-            {
-                return option.count;
-            }
-
-            roll -= option.weight;
-        }
-
-        return RecruitCountWeights[^1].count;
     }
 
     private void RebuildCandidateButtons()
@@ -277,7 +250,7 @@ public class TavernPanel : MonoBehaviour
         }
 
         int accountId = InventoryServiceUnity.AccountId;
-        bool success = await tavernManager.HireAsync(accountId, _selectedRecruit.Source.id);
+        bool success = await tavernManager.HireAsync(accountId, _selectedRecruit.Source.id, activeNodeId);
         if (!success)
         {
             Debug.LogWarning($"Failed to hire recruit {_selectedRecruit.Source.name}.");
@@ -287,11 +260,10 @@ public class TavernPanel : MonoBehaviour
 
         await CharacterService.AddPartyMemberAsync(_selectedRecruit.ToCharacterData());
 
-        _availableRecruits.Remove(_selectedRecruit);
         _selectedRecruit = null;
 
         CloseDetailPanel();
-        RebuildCandidateButtons();
+        await PopulateRecruitListAsync();
         await RefreshPartyDisplayAsync();
     }
 
