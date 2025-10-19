@@ -258,6 +258,15 @@ public class locationWindowHandler : MonoBehaviour
         if (windowLookup.TryGetValue(activityType.Value, out var window) && window != null)
         {
             window.SetActive(true);
+
+            if (activityType.Value == LocationActivityType.Tavern)
+            {
+                var tavernPanel = window.GetComponentInChildren<TavernPanel>(true);
+                if (tavernPanel != null && locationActivitiesPanel != null)
+                {
+                    tavernPanel.SetActiveNode(locationActivitiesPanel.CurrentLocationId);
+                }
+            }
         }
     }
 

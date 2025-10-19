@@ -157,23 +157,23 @@ public class PartyMemberGenerator
     /// <summary>
     /// Simple stat block representation.
     /// </summary>
-    public class RecruitStats
-    {
-        public int Strength { get; set; }
-        public int Dexterity { get; set; }
-        public int Intelligence { get; set; }
-        public int MaxHP { get; set; }
+        public class RecruitStats
+        {
+            public int Strength { get; set; }
+            public int Dexterity { get; set; }
+            public int Intelligence { get; set; }
+            public int MaxHP { get; set; }
         public int MaxMP { get; set; }
         public float ActionSpeed { get; set; }
         public int PhysicalDefense { get; set; }
         public int MagicDefense { get; set; }
         public int RolledPointCount { get; set; }
 
-        public static RecruitStats CreateBaseline()
-        {
-            return new RecruitStats
+            public static RecruitStats CreateBaseline()
             {
-                Strength = BaselinePrimaryStat,
+                return new RecruitStats
+                {
+                    Strength = BaselinePrimaryStat,
                 Dexterity = BaselinePrimaryStat,
                 Intelligence = BaselinePrimaryStat,
                 MaxHP = BaselineMaxHp,
@@ -183,7 +183,23 @@ public class PartyMemberGenerator
                 MagicDefense = BaselineDefense,
                 RolledPointCount = 0
             };
-        }
+            }
+
+            public RecruitStats Clone()
+            {
+                return new RecruitStats
+                {
+                    Strength = Strength,
+                    Dexterity = Dexterity,
+                    Intelligence = Intelligence,
+                    MaxHP = MaxHP,
+                    MaxMP = MaxMP,
+                    ActionSpeed = ActionSpeed,
+                    PhysicalDefense = PhysicalDefense,
+                    MagicDefense = MagicDefense,
+                    RolledPointCount = RolledPointCount
+                };
+            }
 
         public int GetEffectivePointTotal()
         {
