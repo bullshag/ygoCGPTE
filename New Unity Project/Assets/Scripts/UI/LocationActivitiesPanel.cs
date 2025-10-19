@@ -63,6 +63,11 @@ public class LocationActivitiesPanel : MonoBehaviour
     public LocationActivityType? ActiveActivity => _activeSelection?.activityType;
 
     /// <summary>
+    /// Current location identifier assigned to the activities panel.
+    /// </summary>
+    public string CurrentLocationId => locationId;
+
+    /// <summary>
     /// Raised whenever the active activity selection changes. A <c>null</c> value indicates that
     /// no contextual activity is currently selected (for example, after clearing the selection or
     /// clicking the Search option).
