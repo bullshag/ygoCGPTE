@@ -34,6 +34,16 @@ public class TavernPanel : MonoBehaviour
 
     private Transform? CandidateContent => candidateScrollRect != null ? candidateScrollRect.content : null;
 
+    private static readonly (int count, float weight)[] RecruitCountWeights =
+    {
+        (1, 0.28f),
+        (2, 0.24f),
+        (3, 0.2f),
+        (4, 0.14f),
+        (5, 0.09f),
+        (6, 0.05f)
+    };
+
     private void Awake()
     {
         if (recruitDetailPanel != null)
@@ -119,12 +129,42 @@ public class TavernPanel : MonoBehaviour
             return;
         }
 
+        CloseDetailPanel();
+
         int accountId = InventoryServiceUnity.AccountId;
         List<TavernManager.Recruit> baseRecruits = await tavernManager.GetCandidatesAsync(accountId);
+        int recruitCount = RollRecruitCount();
         _availableRecruits.Clear();
-        _availableRecruits.AddRange(_generator.BuildCandidates(baseRecruits, 3));
+        _availableRecruits.AddRange(_generator.BuildCandidates(baseRecruits, recruitCount));
 
         RebuildCandidateButtons();
+    }
+
+    private static int RollRecruitCount()
+    {
+        float totalWeight = 0f;
+        foreach (var option in RecruitCountWeights)
+        {
+            totalWeight += option.weight;
+        }
+
+        if (totalWeight <= 0f)
+        {
+            return 1;
+        }
+
+        float roll = Random.value * totalWeight;
+        foreach (var option in RecruitCountWeights)
+        {
+            if (roll <= option.weight)
+            {
+                return option.count;
+            }
+
+            roll -= option.weight;
+        }
+
+        return RecruitCountWeights[^1].count;
     }
 
     private void RebuildCandidateButtons()
