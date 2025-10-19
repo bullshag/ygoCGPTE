@@ -190,13 +190,45 @@ public class TavernPanel : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        foreach (var recruit in _availableRecruits)
+        var layoutGroup = content.GetComponent<VerticalLayoutGroup>();
+        if (layoutGroup != null && layoutGroup.enabled)
         {
+            layoutGroup.enabled = false;
+        }
+
+        var sizeFitter = content.GetComponent<ContentSizeFitter>();
+        if (sizeFitter != null && sizeFitter.enabled)
+        {
+            sizeFitter.enabled = false;
+        }
+
+        var contentRect = content as RectTransform;
+        if (contentRect != null)
+        {
+            contentRect.anchorMin = new Vector2(0.5f, 1f);
+            contentRect.anchorMax = new Vector2(0.5f, 1f);
+            contentRect.pivot = new Vector2(0.5f, 1f);
+        }
+
+        for (int index = 0; index < _availableRecruits.Count; index++)
+        {
+            var recruit = _availableRecruits[index];
             var candidateGO = Instantiate(candidateButtonPrefab, content);
             var button = candidateGO.GetComponent<Button>();
             if (button == null)
             {
                 button = candidateGO.AddComponent<Button>();
+            }
+
+            var rectTransform = candidateGO.GetComponent<RectTransform>();
+            if (rectTransform != null)
+            {
+                rectTransform.anchorMin = new Vector2(0.5f, 1f);
+                rectTransform.anchorMax = new Vector2(0.5f, 1f);
+                rectTransform.pivot = new Vector2(0.5f, 1f);
+                float yOffset = 113f - (74f * index);
+                rectTransform.anchoredPosition = new Vector2(0f, yOffset);
+                rectTransform.anchoredPosition3D = new Vector3(0f, yOffset, 0f);
             }
 
             var label = candidateGO.GetComponentInChildren<TMP_Text>();

@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-10-18 22:05 UTC • Document owner: Codex
+_Last updated: 2025-10-19 22:05 UTC • Document owner: Codex
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
 - **Build Status:** Yellow — Windows-specific tests fail in current Linux environment.
@@ -379,14 +379,18 @@ _Last updated: 2025-10-18 22:05 UTC • Document owner: Codex
 
 ### Tavern Panel
 - **Owner:** Codex
-- **Dependencies:** TavernManager, CharacterService cache, RPGManager.RefreshPartyUIAsync, ScrollRect candidate list prefab, TavernRecruitDetailPanel overlay
-- **Progress:** In progress, 65%
+- **Dependencies:** TavernManager, CharacterService cache, RPGManager.RefreshPartyUIAsync, ScrollRect candidate list prefab, TavernRecruitDetailPanel overlay, Manual-layout candidate button prefab anchors (anchorMin/Max (0.5,1), pivot (0.5,1))
+- **Progress:** In progress, 70%
 - **Acceptance Criteria:**
   - "Search for Party Members" produces 1–6 recruits per weighted roll (1 most common) through PartyMemberGenerator and populates ScrollRect buttons labeled "NAME – COST gold".
   - Generated recruits roll 10–30 weighted stat points distributed across STR/DEX/INT/HP/MP/ASPD/P.DEF/M.DEF using 0.1/×5/×3 scaling, surface the expanded block in the detail overlay, and price at 10 gold per effective point.
   - Selecting a recruit opens a modal detail overlay with the expanded stat block plus Hire and Cancel actions while hiding the list.
   - Hire triggers TavernManager.HireAsync, updates CharacterService party cache, removes the recruit from available results, and refreshes RPGManager's party display at the new hire cost.
+  - Candidate buttons use absolute RectTransform positioning with anchoredPosition (0, 113 − 74 × index, 0) and remain stable with layout groups disabled.
 - **Risks:** Detail panel prefab requires Unity editor wiring before QA — Owner: Codex, due 2025-09-25.
+- **Implementation Notes (2025-10-19):**
+  - Candidate list content disables VerticalLayoutGroup and ContentSizeFitter at runtime to preserve manual spacing.
+  - Candidate button prefabs must retain non-stretch anchors (anchorMin/Max (0.5,1), pivot (0.5,1)) so TavernPanel positioning logic remains valid.
 
 ## 9. Data & Persistence
 - **Save format** (JSON/ScriptableObject/etc.)
@@ -519,6 +523,7 @@ _Last updated: 2025-10-18 22:05 UTC • Document owner: Codex
 - GUID corruption in `.meta` files may break asset references (Possible/Low) — Owner: Codex — Mitigation: regenerate or reset GUIDs; Trigger: assets reference missing scripts.
 
 ## 16. Changelog (Auto-Appended)
+- 2025-10-19: Documented TavernPanel manual candidate button layout (anchoredPosition offsets, layout group disablement) and updated progress to 70%. — Codex
 - 2025-10-18: Wired `locationWindowHandler` to the new `ActivitySelectionChanged` event so designers can assign Tavern/Shop/Temple/etc. GameObjects that automatically show when their buttons are selected and hide otherwise. — Codex
 - 2025-10-18: Linked the Search for Enemies button to the LocationActivitiesPanel availability list so disabled states hide the control in Fort Aurus. — Codex
 - 2025-10-18: Synced tooltip Enter flow with LocationActivitiesPanel, forcing availability refresh and clearing selection highlights when the window closes. — Codex
