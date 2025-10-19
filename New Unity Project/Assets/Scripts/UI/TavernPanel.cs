@@ -20,6 +20,8 @@ public class TavernPanel : MonoBehaviour
     [SerializeField] private Button lookForWorkButton = null!;
 
     [Header("Candidate List")]
+    [Tooltip("Root object that houses the recruit listing UI.")]
+    [SerializeField] private GameObject recruitWindowRoot = null!;
     [Tooltip("Scroll view containing generated recruit buttons.")]
     [SerializeField] private ScrollRect candidateScrollRect = null!;
     [Tooltip("Prefab instantiated for each recruit option in the list.")]
@@ -150,6 +152,8 @@ public class TavernPanel : MonoBehaviour
 
     private async Task PopulateRecruitListAsync()
     {
+        SetRecruitWindowVisible(false);
+
         if (tavernManager == null || candidateScrollRect == null || candidateButtonPrefab == null)
         {
             Debug.LogWarning("TavernPanel missing required references for candidate generation.");
@@ -170,6 +174,8 @@ public class TavernPanel : MonoBehaviour
         List<PartyMemberGenerator.GeneratedRecruit> recruits = await tavernManager.GetCandidatesAsync(accountId, activeNodeId);
         _availableRecruits.Clear();
         _availableRecruits.AddRange(recruits);
+
+        SetRecruitWindowVisible(_availableRecruits.Count > 0);
 
         RebuildCandidateButtons();
     }
@@ -363,6 +369,19 @@ public class TavernPanel : MonoBehaviour
         if (label != null)
         {
             label.text = value;
+        }
+    }
+
+    private void SetRecruitWindowVisible(bool isVisible)
+    {
+        if (recruitWindowRoot == null)
+        {
+            return;
+        }
+
+        if (recruitWindowRoot.activeSelf != isVisible)
+        {
+            recruitWindowRoot.SetActive(isVisible);
         }
     }
 }
