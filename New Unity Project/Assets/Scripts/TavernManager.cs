@@ -72,7 +72,10 @@ public class TavernManager : MonoBehaviour
         int cost = candidate.Cost;
         string purchaseFlowPath = Path.Combine(Application.dataPath, "sql", "unity_tavern_purchase_flow.sql");
         string[] statements = File.ReadAllText(purchaseFlowPath)
-            .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            .Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(statement => statement.Trim())
+            .Where(statement => statement.Length > 0)
+            .ToArray();
 
         var parameters = new Dictionary<string, object?>
         {

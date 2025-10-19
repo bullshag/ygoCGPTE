@@ -156,28 +156,15 @@ public class TavernPanel : MonoBehaviour
             return;
         }
 
-        CloseDetailPanel();
-
-        UpdateStatLabels(null);
-
-        int accountId = InventoryServiceUnity.AccountId;
-        List<TavernManager.Recruit> baseRecruits = await tavernManager.GetCandidatesAsync(accountId);
-        int recruitCount = RollRecruitCount();
-        _availableRecruits.Clear();
-        _availableRecruits.AddRange(_generator.BuildCandidates(baseRecruits, recruitCount));
-
-        RebuildCandidateButtons();
-    }
-
-    private static int RollRecruitCount()
-    {
-        float totalWeight = 0f;
-        foreach (var option in RecruitCountWeights)
         if (string.IsNullOrWhiteSpace(activeNodeId))
         {
             Debug.LogWarning("TavernPanel cannot populate recruits without an active node identifier.");
             return;
         }
+
+        CloseDetailPanel();
+
+        UpdateStatLabels(null);
 
         int accountId = InventoryServiceUnity.AccountId;
         List<PartyMemberGenerator.GeneratedRecruit> recruits = await tavernManager.GetCandidatesAsync(accountId, activeNodeId);
