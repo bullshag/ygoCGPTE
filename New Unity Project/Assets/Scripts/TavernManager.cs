@@ -12,6 +12,7 @@ using UnityEngine;
 public class TavernManager : MonoBehaviour
 {
     private static readonly TimeSpan RecruitLifetime = TimeSpan.FromHours(24);
+    private const int SeedRecruitBatchSize = 6;
 
     private static readonly (int count, float weight)[] RecruitCountWeights =
     {
@@ -205,10 +206,10 @@ public class TavernManager : MonoBehaviour
 
     private async Task<List<PersistedRecruit>> GenerateAndPersistRecruitsAsync(string nodeId)
     {
-        var baseRecruits = await LoadBaseRecruitsAsync();
+        var baseRecruits = await LoadOrSeedBaseRecruitsAsync();
         if (baseRecruits.Count == 0)
         {
-            Debug.LogWarning("No base recruits were available for tavern generation.");
+            Debug.LogWarning("No base recruits were available for tavern generation even after seeding.");
             return new List<PersistedRecruit>();
         }
 
@@ -252,6 +253,47 @@ public class TavernManager : MonoBehaviour
         }
 
         return list;
+    }
+
+    private async Task<List<Recruit>> LoadOrSeedBaseRecruitsAsync()
+    {
+        var recruits = await LoadBaseRecruitsAsync();
+        if (recruits.Count > 0)
+        {
+            return recruits;
+        }
+
+        Debug.LogWarning("No tavern candidates flagged in the characters table; attempting to seed fallback recruits.");
+
+        try
+        {
+            await SeedDefaultRecruitsAsync();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Failed to seed fallback tavern recruits: {ex.Message}");
+            return recruits;
+        }
+
+        recruits = await LoadBaseRecruitsAsync();
+        if (recruits.Count == 0)
+        {
+            Debug.LogError("Fallback tavern recruit seeding did not produce any candidates. Ensure characters exist with in_tavern = 1.");
+        }
+
+        return recruits;
+    }
+
+    private async Task SeedDefaultRecruitsAsync()
+    {
+        string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_tavern_seed_recruits.sql");
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@limit"] = SeedRecruitBatchSize
+        };
+
+        int affected = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(sqlPath), parameters);
+        Debug.Log($"Seeded {affected} fallback tavern recruits.");
     }
 
     private static int RollRecruitCount()
