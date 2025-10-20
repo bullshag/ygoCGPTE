@@ -292,8 +292,28 @@ public class TavernManager : MonoBehaviour
             ["@limit"] = SeedRecruitBatchSize
         };
 
-        int affected = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(sqlPath), parameters);
-        Debug.Log($"Seeded {affected} fallback tavern recruits.");
+        string sql = File.ReadAllText(sqlPath);
+        int affected = await DatabaseClientUnity.ExecuteAsync(sql, parameters);
+        if (affected > 0)
+        {
+            Debug.Log($"Seeded {affected} fallback tavern recruits from existing neutral characters.");
+            return;
+        }
+
+        Debug.LogWarning("Primary tavern seed script affected 0 rows. Inserting template recruits before retrying.");
+
+        string fallbackPath = Path.Combine(Application.dataPath, "sql", "unity_tavern_insert_fallback_recruits.sql");
+        int inserted = await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(fallbackPath));
+        if (inserted <= 0)
+        {
+            Debug.LogError("Fallback tavern recruit insert did not add any rows. Manual data intervention required.");
+            return;
+        }
+
+        Debug.Log($"Inserted {inserted} template tavern recruits.");
+
+        affected = await DatabaseClientUnity.ExecuteAsync(sql, parameters);
+        Debug.Log($"Re-ran primary tavern seed script after fallback insert; marked {affected} recruits as available.");
     }
 
     private static int RollRecruitCount()
