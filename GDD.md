@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-10-19 04:35 UTC • Document owner: Codex
+_Last updated: 2025-10-20 01:44 UTC • Document owner: Codex
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
 - **Build Status:** Yellow — Windows-specific tests fail in current Linux environment.
@@ -55,6 +55,7 @@ _Last updated: 2025-10-19 04:35 UTC • Document owner: Codex
   Battle log lists enemy levels and actions.
 - **Technical notes**
   Uses SQL script `unity_character_heal.sql` for healing.
+  Characters table now stores `max_mana` to match Unity CharacterService queries and avoid runtime fetch errors.
 - **Tasks**
   - Integrate FrameAnimator with battle actions — Owner: TBD, Estimate: 2d, Dependencies: FEAT-ANI-001, Acceptance: attack animations play via FrameAnimator, Progress: 0% (due 2025-09-30).
 - **Legacy reference**
@@ -551,6 +552,7 @@ _Last updated: 2025-10-19 04:35 UTC • Document owner: Codex
 - GUID corruption in `.meta` files may break asset references (Possible/Low) — Owner: Codex — Mitigation: regenerate or reset GUIDs; Trigger: assets reference missing scripts.
 
 ## 16. Changelog (Auto-Appended)
+- 2025-10-20: Added `max_mana` to the characters schema, published a dedicated migration script, and documented the Unity CharacterService dependency so party queries no longer fail at runtime. — Codex
 - 2025-10-19: Hardened TavernPanel recruit search to require active node IDs, reuse TavernManager's persisted roster fetch, and backported SQL split trimming for pre-.NET Standard runtimes. Progress for Tavern sub-panel integration updated to 18%. — Codex
 - 2025-10-19: Enabled TavernPanel to toggle the recruit window root when search results arrive so "Search for Party Members" reveals the candidate list without manual inspector changes; updated Tavern sub-panel progress to 22%. — Codex
 - 2025-10-19: Surfaced recruit stat TMP labels with tooltip descriptions in TavernPanel so designers can wire tavern UI without code changes and documented progress bump. — Codex

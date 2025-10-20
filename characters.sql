@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS characters (
     current_hp INT NOT NULL,
     max_hp INT NOT NULL,
     mana INT NOT NULL,
+    max_mana INT NOT NULL,
     experience_points INT NOT NULL DEFAULT 0,
     action_speed INT NOT NULL,
     strength INT NOT NULL,

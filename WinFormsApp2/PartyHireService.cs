@@ -117,14 +117,16 @@ namespace WinFormsApp2.Multiplayer
             foreach (var m in party.Members)
             {
                 using var cmd = new MySqlCommand(
-                    "INSERT INTO characters (account_id, name, current_hp, max_hp, mana, experience_points, action_speed, strength, dex, intelligence, melee_defense, magic_defense, level, skill_points, in_tavern, in_arena, is_dead, role, targeting_style, is_mercenary) " +
-                    "VALUES (@a,@n,@hp,@max,@mana,@exp,@spd,@str,@dex,@int,0,0,1,0,0,0,0,'DPS','no priorities',1)", conn);
+                    "INSERT INTO characters (account_id, name, current_hp, max_hp, mana, max_mana, experience_points, action_speed, strength, dex, intelligence, melee_defense, magic_defense, level, skill_points, in_tavern, in_arena, is_dead, role, targeting_style, is_mercenary) " +
+                    "VALUES (@a,@n,@hp,@max,@mana,@maxMana,@exp,@spd,@str,@dex,@int,0,0,1,0,0,0,0,'DPS','no priorities',1)", conn);
                 cmd.Parameters.AddWithValue("@a", hirerId);
                 cmd.Parameters.AddWithValue("@n", m.Name);
                 int hp = m.MaxHp;
                 cmd.Parameters.AddWithValue("@hp", hp);
                 cmd.Parameters.AddWithValue("@max", hp);
-                cmd.Parameters.AddWithValue("@mana", 10 + 5 * m.Intelligence);
+                int mana = 10 + 5 * m.Intelligence;
+                cmd.Parameters.AddWithValue("@mana", mana);
+                cmd.Parameters.AddWithValue("@maxMana", mana);
                 cmd.Parameters.AddWithValue("@exp", m.Experience);
                 cmd.Parameters.AddWithValue("@spd", m.ActionSpeed);
                 cmd.Parameters.AddWithValue("@str", m.Strength);

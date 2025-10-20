@@ -84,7 +84,7 @@ namespace WinFormsApp2
             updateGold.Parameters.AddWithValue("@id", _userId);
             updateGold.ExecuteNonQuery();
 
-            using MySqlCommand insert = new MySqlCommand("INSERT INTO characters(account_id, name, current_hp, max_hp, mana, experience_points, action_speed, strength, dex, intelligence, melee_defense, magic_defense, level, skill_points) VALUES(@acc,@name,@hp,@maxHp,@mana,0,@speed,@str,@dex,@int,0,0,1,0)", conn);
+            using MySqlCommand insert = new MySqlCommand("INSERT INTO characters(account_id, name, current_hp, max_hp, mana, max_mana, experience_points, action_speed, strength, dex, intelligence, melee_defense, magic_defense, level, skill_points) VALUES(@acc,@name,@hp,@maxHp,@mana,@maxMana,0,@speed,@str,@dex,@int,0,0,1,0)", conn);
             insert.Parameters.AddWithValue("@acc", _userId);
             string name = txtName.Text.Trim();
             if (name.Contains(' ') || name.Length < 3 || name.Length > 12)
@@ -107,6 +107,7 @@ namespace WinFormsApp2
             insert.Parameters.AddWithValue("@hp", hp);
             insert.Parameters.AddWithValue("@maxHp", hp);
             insert.Parameters.AddWithValue("@mana", mana);
+            insert.Parameters.AddWithValue("@maxMana", mana);
             insert.Parameters.AddWithValue("@speed", _candidate.ActionSpeed);
             insert.Parameters.AddWithValue("@str", finalStr);
             insert.Parameters.AddWithValue("@dex", finalDex);
