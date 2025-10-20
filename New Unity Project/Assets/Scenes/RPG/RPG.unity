@@ -18623,7 +18623,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &817415267
 RectTransform:
   m_ObjectHideFlags: 0
@@ -38002,6 +38002,7 @@ MonoBehaviour:
   searchPartyMembersButton: {fileID: 1257406708}
   hireMercenariesButton: {fileID: 1344664173}
   lookForWorkButton: {fileID: 1561140099}
+  recruitWindowRoot: {fileID: 817415266}
   candidateScrollRect: {fileID: 1096117104}
   candidateButtonPrefab: {fileID: 9006145768570850555, guid: 552af44b82aa8614d8eff7cbb144f681, type: 3}
   recruitDetailPanel: {fileID: 0}
