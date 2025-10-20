@@ -24,6 +24,7 @@ public class TavernManager : MonoBehaviour
     };
 
     private readonly PartyMemberGenerator _generator = new();
+    private bool _hasEnsuredSchema;
 
     /// <summary>
     /// Fetch recruit candidates for the supplied location node, generating a new roster when the
@@ -37,6 +38,7 @@ public class TavernManager : MonoBehaviour
             return new List<PartyMemberGenerator.GeneratedRecruit>();
         }
 
+        await EnsureSchemaAsync();
         await PruneNodeRecruitsAsync(nodeId, forceReset: false);
         var persisted = await LoadPersistedRecruitsAsync(nodeId);
 
@@ -61,6 +63,7 @@ public class TavernManager : MonoBehaviour
             return false;
         }
 
+        await EnsureSchemaAsync();
         var roster = await LoadPersistedRecruitsAsync(nodeId);
         var candidate = roster.FirstOrDefault(r => r.Recruit.id == recruitId);
         if (candidate == null)
@@ -111,6 +114,11 @@ public class TavernManager : MonoBehaviour
         if (markRows <= 0)
         {
             Debug.LogWarning($"Recruit {recruitId} could not be marked as purchased for node '{nodeId}'.");
+        }
+        else
+        {
+            string removeSqlPath = Path.Combine(Application.dataPath, "sql", "unity_tavern_remove_recruit.sql");
+            await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(removeSqlPath), parameters);
         }
 
         await PruneNodeRecruitsAsync(nodeId, forceReset: false);
@@ -309,5 +317,26 @@ public class TavernManager : MonoBehaviour
         };
 
         await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(sqlPath), parameters);
+    }
+
+    private async Task EnsureSchemaAsync()
+    {
+        if (_hasEnsuredSchema)
+        {
+            return;
+        }
+
+        string sqlPath = Path.Combine(Application.dataPath, "sql", "unity_tavern_create_recruits_table.sql");
+
+        try
+        {
+            await DatabaseClientUnity.ExecuteAsync(File.ReadAllText(sqlPath));
+            _hasEnsuredSchema = true;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Failed to ensure tavern recruit schema: {ex.Message}");
+            throw;
+        }
     }
 }
