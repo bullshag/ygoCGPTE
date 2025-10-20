@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-10-20 02:45 UTC • Document owner: Codex
+_Last updated: 2025-10-20 03:30 UTC • Document owner: Codex
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
 - **Build Status:** Yellow — Windows-specific tests fail in current Linux environment.
@@ -538,7 +538,7 @@ _Last updated: 2025-10-20 02:45 UTC • Document owner: Codex
 | Feature | Progress | Owner | Dependencies | Acceptance Criteria | Risks |
 |---|---|---|---|---|---|
 | Location Activities Panel Refresh | 100% (completed 2025-10-18) | Codex | FEAT-WM-001; FEAT-UI-006; location metadata service (Owner: TBD, due 2025-09-27); `location_activity_settings` table (Owner: Codex, delivered 2025-09-25) | Reuses handcrafted `locationInfoWindow` layout with dynamic activity selection;<br>Loads availability via LocationActivityService and database toggles;<br>Emits `ActivitySelectionChanged` events that drive `locationWindowHandler` to toggle contextual Tavern/Shop/etc. windows;<br>Supports 1080p/1440p layouts without blocking map input;<br>Debug toggle enables 3-second polling for QA | InputAction focus clashes during sub-panel open (Owner: Codex, due 2025-09-30);<br>Metadata contract TBD may delay integration (Owner: TBD, due 2025-09-27);<br>Placeholder copy must transition to live data once metadata lands (Owner: Codex, due 2025-09-29);<br>SQL data drift could hide critical actions (Owner: Codex, due 2025-09-28) |
-| Tavern Sub-Panel Integration | 26% (due 2025-10-01) | Codex | FEAT-UI-004; FEAT-UI-007; TavernManager API audit (Owner: TBD, due 2025-09-28) | Hire, Mercenary, Work actions expose stateful buttons;<br>Hire reuses recruit overlay and closes cleanly;<br>`tavern_subpanel_open` telemetry fires with location ID;<br>Inspector surfaces recruit stat labels with tooltip guidance for designer hookup;<br>Search action consumes TavernManager node-scoped roster with async gating, stale roster pruning, and schema self-healing | Legacy edge cases from TavernForm undocumented (Owner: TBD, due 2025-09-29);<br>Responsive layout for small resolutions unverified (Owner: Codex, due 2025-10-03);<br>CharacterService refresh timing may double-trigger updates (Owner: Codex, due 2025-10-04) |
+| Tavern Sub-Panel Integration | 34% (due 2025-10-01) | Codex | FEAT-UI-004; FEAT-UI-007; TavernManager API audit (Owner: TBD, due 2025-09-28) | Hire, Mercenary, Work actions expose stateful buttons;<br>Hire reuses recruit overlay and closes cleanly;<br>`tavern_subpanel_open` telemetry fires with location ID;<br>Inspector surfaces recruit stat labels with tooltip guidance for designer hookup;<br>Search action consumes TavernManager node-scoped roster with async gating, stale roster pruning, schema self-healing, and fallback recruit seeding when the database is empty | Legacy edge cases from TavernForm undocumented (Owner: TBD, due 2025-09-29);<br>Responsive layout for small resolutions unverified (Owner: Codex, due 2025-10-03);<br>CharacterService refresh timing may double-trigger updates (Owner: Codex, due 2025-10-04) |
 
 ## 15. Risks & Mitigations
 - Missing Unity version info (Likely/Medium) — Owner: TBD — Mitigation: inspect project settings; Trigger: build fails.
@@ -553,6 +553,7 @@ _Last updated: 2025-10-20 02:45 UTC • Document owner: Codex
 - GUID corruption in `.meta` files may break asset references (Possible/Low) — Owner: Codex — Mitigation: regenerate or reset GUIDs; Trigger: assets reference missing scripts.
 
 ## 16. Changelog (Auto-Appended)
+- 2025-10-20: Added fallback tavern recruit seeding SQL and updated TavernManager to auto-populate candidates when none are flagged, increasing Tavern Sub-Panel Integration progress to 34%. — Codex
 - 2025-10-20: Added auto-migration SQL to create node-scoped tavern recruit tables, wired TavernManager to self-heal schema before candidate queries, and hard-deleted hired recruits from the per-node pool; updated Tavern Sub-Panel Integration progress to 26%. — Codex
 - 2025-10-20: Added `max_mana` to the characters schema, published a dedicated migration script, and documented the Unity CharacterService dependency so party queries no longer fail at runtime. — Codex
 - 2025-10-19: Hardened TavernPanel recruit search to require active node IDs, reuse TavernManager's persisted roster fetch, and backported SQL split trimming for pre-.NET Standard runtimes. Progress for Tavern sub-panel integration updated to 18%. — Codex
