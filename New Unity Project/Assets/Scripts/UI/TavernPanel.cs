@@ -59,6 +59,7 @@ public class TavernPanel : MonoBehaviour
 
     private readonly List<PartyMemberGenerator.GeneratedRecruit> _availableRecruits = new();
     private readonly List<Button> _spawnedButtons = new();
+    private readonly Dictionary<Button, Color> _buttonDefaultColors = new();
     private PartyMemberGenerator.GeneratedRecruit? _selectedRecruit;
     private string activeNodeId = string.Empty;
 
@@ -190,6 +191,7 @@ public class TavernPanel : MonoBehaviour
             }
         }
         _spawnedButtons.Clear();
+        _buttonDefaultColors.Clear();
 
         var content = CandidateContent;
         if (content == null)
@@ -239,9 +241,10 @@ public class TavernPanel : MonoBehaviour
                 rectTransform.anchorMin = new Vector2(0.5f, 1f);
                 rectTransform.anchorMax = new Vector2(0.5f, 1f);
                 rectTransform.pivot = new Vector2(0.5f, 1f);
-                float yOffset = 113f - (74f * index);
-                rectTransform.anchoredPosition = new Vector2(0f, yOffset);
-                rectTransform.anchoredPosition3D = new Vector3(0f, yOffset, 0f);
+                float originalYOffset = 113f - (74f * index);
+                float loweredYOffset = originalYOffset - (Mathf.Abs(originalYOffset) * 0.2f);
+                rectTransform.anchoredPosition = new Vector2(0f, loweredYOffset);
+                rectTransform.anchoredPosition3D = new Vector3(0f, loweredYOffset, 0f);
             }
 
             var label = candidateGO.GetComponentInChildren<TMP_Text>();
@@ -251,37 +254,78 @@ public class TavernPanel : MonoBehaviour
             }
 
             button.onClick.RemoveAllListeners();
-            button.onClick.AddListener(() => OnRecruitSelected(recruit));
+            var cachedRecruit = recruit;
+            var cachedButton = button;
+            button.onClick.AddListener(() => OnRecruitButtonClicked(cachedRecruit, cachedButton));
             _spawnedButtons.Add(button);
+
+            if (button.targetGraphic != null)
+            {
+                _buttonDefaultColors[button] = button.targetGraphic.color;
+            }
         }
 
         candidateScrollRect.gameObject.SetActive(_availableRecruits.Count > 0);
     }
 
-    private void OnRecruitSelected(PartyMemberGenerator.GeneratedRecruit recruit)
+    private void OnRecruitButtonClicked(PartyMemberGenerator.GeneratedRecruit recruit, Button sourceButton)
     {
         _selectedRecruit = recruit;
-        if (candidateScrollRect != null)
-        {
-            candidateScrollRect.gameObject.SetActive(false);
-        }
 
         if (recruitDetailPanel == null)
         {
             Debug.LogWarning("Recruit detail panel not assigned.");
-            if (candidateScrollRect != null)
-            {
-                candidateScrollRect.gameObject.SetActive(true);
-            }
             return;
         }
 
+        UpdateButtonHighlights(sourceButton);
         UpdateStatLabels(recruit);
 
         recruitDetailPanel.Show(
             recruit,
             () => _ = HireSelectedRecruitAsync(),
             CloseDetailPanel);
+    }
+
+    private void UpdateButtonHighlights(Button selectedButton)
+    {
+        foreach (var button in _spawnedButtons)
+        {
+            if (button == null)
+            {
+                continue;
+            }
+
+            if (button.targetGraphic == null)
+            {
+                continue;
+            }
+
+            if (button == selectedButton)
+            {
+                button.targetGraphic.color = Color.yellow;
+            }
+            else if (_buttonDefaultColors.TryGetValue(button, out var defaultColor))
+            {
+                button.targetGraphic.color = defaultColor;
+            }
+        }
+    }
+
+    private void ResetButtonHighlights()
+    {
+        foreach (var button in _spawnedButtons)
+        {
+            if (button == null || button.targetGraphic == null)
+            {
+                continue;
+            }
+
+            if (_buttonDefaultColors.TryGetValue(button, out var defaultColor))
+            {
+                button.targetGraphic.color = defaultColor;
+            }
+        }
     }
 
     private async Task HireSelectedRecruitAsync()
@@ -318,6 +362,7 @@ public class TavernPanel : MonoBehaviour
             candidateScrollRect.gameObject.SetActive(true);
         }
 
+        ResetButtonHighlights();
         UpdateStatLabels(null);
     }
 
