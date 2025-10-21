@@ -38005,7 +38005,7 @@ MonoBehaviour:
   recruitWindowRoot: {fileID: 817415266}
   candidateScrollRect: {fileID: 1096117104}
   candidateButtonPrefab: {fileID: 9006145768570850555, guid: 552af44b82aa8614d8eff7cbb144f681, type: 3}
-  recruitDetailPanel: {fileID: 0}
+  recruitDetailPanel: {fileID: 1686987379}
   strengthValueLabel: {fileID: 1007133056}
   dexterityValueLabel: {fileID: 1321313900}
   intelligenceValueLabel: {fileID: 368930416}
@@ -39180,6 +39180,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1686987378}
+  - component: {fileID: 1686987379}
   m_Layer: 5
   m_Name: partyMemberStatblock
   m_TagString: Untagged
@@ -39216,6 +39217,24 @@ RectTransform:
   m_AnchoredPosition: {x: -159, y: 234.40509}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1686987379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1686987377}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85bccfcba0574df4b8d95bbc4a7ba032, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  root: {fileID: 1686987377}
+  nameText: {fileID: 0}
+  statsText: {fileID: 0}
+  costText: {fileID: 0}
+  hireButton: {fileID: 0}
+  cancelButton: {fileID: 0}
 --- !u!4 &1688141914 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3668294998946065527, guid: 6ae20c1be1a82be47ac184de1b001198, type: 3}
