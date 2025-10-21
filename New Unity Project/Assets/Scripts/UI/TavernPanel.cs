@@ -63,6 +63,8 @@ public class TavernPanel : MonoBehaviour
     private PartyMemberGenerator.GeneratedRecruit? _selectedRecruit;
     private string activeNodeId = string.Empty;
 
+    private const float CandidateVerticalOffsetReduction = 0.6f;
+
     private const string DefaultStatPlaceholder = "--";
 
     private Transform? CandidateContent => candidateScrollRect != null ? candidateScrollRect.content : null;
@@ -242,7 +244,7 @@ public class TavernPanel : MonoBehaviour
                 rectTransform.anchorMax = new Vector2(0.5f, 1f);
                 rectTransform.pivot = new Vector2(0.5f, 1f);
                 float originalYOffset = 113f - (74f * index);
-                float loweredYOffset = originalYOffset - (Mathf.Abs(originalYOffset) * 0.2f);
+                float loweredYOffset = originalYOffset - (Mathf.Abs(originalYOffset) * CandidateVerticalOffsetReduction);
                 rectTransform.anchoredPosition = new Vector2(0f, loweredYOffset);
                 rectTransform.anchoredPosition3D = new Vector3(0f, loweredYOffset, 0f);
             }
@@ -413,7 +415,7 @@ public class TavernPanel : MonoBehaviour
     {
         if (label != null)
         {
-            label.text = value;
+            label.SetText(value);
         }
     }
 
