@@ -1,5 +1,5 @@
 # Game Design Document (Living) — ygoCGPTE
-_Last updated: 2025-10-20 21:05 UTC • Document owner: Codex
+_Last updated: 2025-10-21 05:07 UTC • Document owner: Codex
 ## 0. Executive Snapshot
 - **Current Phase:** Porting Core Systems to Unity
 - **Build Status:** Yellow — Windows-specific tests fail in current Linux environment.
@@ -142,7 +142,7 @@ _Last updated: 2025-10-20 21:05 UTC • Document owner: Codex
 
 #### Tavern Sub-Panel Integration
 - **Owner:** Codex (UI) with systems handoff to TavernManager.
-- **Progress:** In progress, 38% (fallback recruit self-healing implemented; UI prefab wiring pending) — due 2025-10-01.
+- **Progress:** In progress, 58% (recruit list anchors lowered 60%, selection highlighting live, stat labels updating reliably; hire confirmation polish pending) — due 2025-10-01.
 - **Dependencies:** FEAT-UI-004, FEAT-UI-007, TavernManager service API audit (Owner: TBD, due 2025-09-28).
 - **Acceptance Criteria:**
   - Tavern sub-panel surfaces Hire, Mercenary Contract, and Work actions with stateful availability messaging.
@@ -153,10 +153,10 @@ _Last updated: 2025-10-20 21:05 UTC • Document owner: Codex
   - UI layout may exceed safe area for smaller resolutions; responsive behavior unverified — Owner: Codex, due 2025-10-03.
   - Data refresh timing between TavernManager and CharacterService may double-trigger updates — Owner: Codex, due 2025-10-04.
 
-- **Latest Update (2025-10-20):**
-  - Added a fallback insert path that triggers when `unity_tavern_seed_recruits.sql` affects 0 rows, ensuring template recruits exist before `LoadBaseRecruitsAsync` retries.
-  - Data assumptions: fallback templates remain unowned (`account_id = NULL`), start flagged for tavern duty (`in_tavern = 1`), and expose baseline stats (HP 28–42, MP 24–40, action speed 9–11) for Unity's randomization layer.
-  - TavernManager re-runs the primary seeding script after the insert to respect per-node roster limits and reuse existing batching.
+- **Latest Update (2025-10-21):**
+  - Dropped candidate button anchors an additional 40% (total 60%) for better alignment with the parchment frame and ensured `RectTransform` 3D positions match so world-space offsets remain consistent.
+  - Switched stat label updates to TextMeshPro `SetText` calls so recruit selections immediately refresh Strength/DEX/etc. readouts without relying on inspector refresh timing.
+  - Maintained yellow highlight resets and detail panel wiring; no database/API changes required.
 
 - **Risk Updates (2025-10-20):**
   - New Risk — Template roster drift (Possible/Low) — Owner: Codex, due 2025-10-05. Mitigation: review fallback stat block quarterly to keep generated costs aligned with balance expectations.
@@ -546,7 +546,7 @@ _Last updated: 2025-10-20 21:05 UTC • Document owner: Codex
 | Feature | Progress | Owner | Dependencies | Acceptance Criteria | Risks |
 |---|---|---|---|---|---|
 | Location Activities Panel Refresh | 100% (completed 2025-10-18) | Codex | FEAT-WM-001; FEAT-UI-006; location metadata service (Owner: TBD, due 2025-09-27); `location_activity_settings` table (Owner: Codex, delivered 2025-09-25) | Reuses handcrafted `locationInfoWindow` layout with dynamic activity selection;<br>Loads availability via LocationActivityService and database toggles;<br>Emits `ActivitySelectionChanged` events that drive `locationWindowHandler` to toggle contextual Tavern/Shop/etc. windows;<br>Supports 1080p/1440p layouts without blocking map input;<br>Debug toggle enables 3-second polling for QA | InputAction focus clashes during sub-panel open (Owner: Codex, due 2025-09-30);<br>Metadata contract TBD may delay integration (Owner: TBD, due 2025-09-27);<br>Placeholder copy must transition to live data once metadata lands (Owner: Codex, due 2025-09-29);<br>SQL data drift could hide critical actions (Owner: Codex, due 2025-09-28) |
-| Tavern Sub-Panel Integration | 38% (due 2025-10-01) | Codex | FEAT-UI-004; FEAT-UI-007; TavernManager API audit (Owner: TBD, due 2025-09-28) | Hire, Mercenary, Work actions expose stateful buttons;<br>Hire reuses recruit overlay and closes cleanly;<br>`tavern_subpanel_open` telemetry fires with location ID;<br>Inspector surfaces recruit stat labels with tooltip guidance for designer hookup;<br>Search action consumes TavernManager node-scoped roster with async gating, stale roster pruning, schema self-healing, and fallback recruit seeding when the database is empty | Legacy edge cases from TavernForm undocumented (Owner: TBD, due 2025-09-29) — fallback roster insert mitigates empty state but documentation gap remains;<br>Responsive layout for small resolutions unverified (Owner: Codex, due 2025-10-03);<br>CharacterService refresh timing may double-trigger updates (Owner: Codex, due 2025-10-04);<br>Template roster drift could skew recruit balance (Owner: Codex, due 2025-10-05) |
+| Tavern Sub-Panel Integration | 58% (due 2025-10-01) | Codex | FEAT-UI-004; FEAT-UI-007; TavernManager API audit (Owner: TBD, due 2025-09-28) | Hire, Mercenary, Work actions expose stateful buttons;<br>Hire reuses recruit overlay and closes cleanly;<br>`tavern_subpanel_open` telemetry fires with location ID;<br>Inspector surfaces recruit stat labels with tooltip guidance for designer hookup;<br>Search action consumes TavernManager node-scoped roster with async gating, stale roster pruning, schema self-healing, and fallback recruit seeding when the database is empty;<br>Candidate buttons repositioned 60% lower with yellow highlight persistence and SetText-driven stat readouts | Legacy edge cases from TavernForm undocumented (Owner: TBD, due 2025-09-29) — fallback roster insert mitigates empty state but documentation gap remains;<br>Responsive layout for small resolutions unverified (Owner: Codex, due 2025-10-03);<br>CharacterService refresh timing may double-trigger updates (Owner: Codex, due 2025-10-04);<br>Template roster drift could skew recruit balance (Owner: Codex, due 2025-10-05) |
 
 ## 15. Risks & Mitigations
 - Missing Unity version info (Likely/Medium) — Owner: TBD — Mitigation: inspect project settings; Trigger: build fails.
@@ -561,6 +561,8 @@ _Last updated: 2025-10-20 21:05 UTC • Document owner: Codex
 - GUID corruption in `.meta` files may break asset references (Possible/Low) — Owner: Codex — Mitigation: regenerate or reset GUIDs; Trigger: assets reference missing scripts.
 
 ## 16. Changelog (Auto-Appended)
+- 2025-10-21: Lowered TavernPanel recruit buttons by an additional 40%, switched stat label updates to TextMeshPro SetText for reliable refreshes, and raised Tavern Sub-Panel Integration progress to 58%. — Codex
+- 2025-10-20: Tuned TavernPanel recruit button layout, added yellow selection highlighting, and wired stat labels to button clicks, raising Tavern Sub-Panel Integration progress to 44%. — Codex
 - 2025-10-20: Added fallback recruit insert SQL and detection in TavernManager to recover from empty seed runs, updated Tavern Sub-Panel Integration progress to 38%, and recorded new template roster risk. — Codex
 - 2025-10-20: Added fallback tavern recruit seeding SQL and updated TavernManager to auto-populate candidates when none are flagged, increasing Tavern Sub-Panel Integration progress to 34%. — Codex
 - 2025-10-20: Added auto-migration SQL to create node-scoped tavern recruit tables, wired TavernManager to self-heal schema before candidate queries, and hard-deleted hired recruits from the per-node pool; updated Tavern Sub-Panel Integration progress to 26%. — Codex
